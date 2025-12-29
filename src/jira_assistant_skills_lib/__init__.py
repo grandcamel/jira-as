@@ -22,7 +22,7 @@ Example usage:
         print(issue['fields']['summary'])
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 # Error handling
 from .error_handler import (
@@ -130,6 +130,17 @@ from .cache import (
 # Automation client
 from .automation_client import AutomationClient
 
+# Batch processing
+from .batch_processor import (
+    BatchProcessor,
+    BatchConfig,
+    BatchProgress,
+    CheckpointManager,
+    get_recommended_batch_size,
+    generate_operation_id,
+    list_pending_checkpoints,
+)
+
 __all__ = [
     # Version
     "__version__",
@@ -215,4 +226,12 @@ __all__ = [
     # Cache
     "JiraCache",
     "get_cache",
+    # Batch Processing
+    "BatchProcessor",
+    "BatchConfig",
+    "BatchProgress",
+    "CheckpointManager",
+    "get_recommended_batch_size",
+    "generate_operation_id",
+    "list_pending_checkpoints",
 ]
