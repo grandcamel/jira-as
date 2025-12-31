@@ -22,7 +22,7 @@ Example usage:
         print(issue['fields']['summary'])
 """
 
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 
 # Error handling
 from .error_handler import (
@@ -52,6 +52,9 @@ from .config_manager import (
     ConfigManager,
     get_jira_client,
     get_automation_client,
+    get_agile_fields,
+    get_agile_field,
+    get_project_defaults,
 )
 
 # Validators
@@ -237,6 +240,9 @@ __all__ = [
     "ConfigManager",
     "get_jira_client",
     "get_automation_client",
+    "get_agile_fields",
+    "get_agile_field",
+    "get_project_defaults",
     # Errors
     "JiraError",
     "AuthenticationError",
