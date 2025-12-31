@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jira-assistant-skills-lib"
-version = "0.2.0"
+version = "0.2.1"
 description = "Shared library for JIRA Assistant Skills - HTTP client, configuration management, error handling, and utilities for JIRA REST API automation"
 readme = "README.md"
 license = "MIT"
@@ -41,7 +41,7 @@ dependencies = [
     "colorama>=0.4.6",
     "python-dotenv>=1.0.0",
     "tqdm>=4.66.0",
-    "assistant-skills-lib>=1.0.0",
+    "assistant-skills-lib>=0.2.1",
 ]
 
 [project.optional-dependencies]

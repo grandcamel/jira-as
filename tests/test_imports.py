@@ -11,7 +11,7 @@ class TestPackageImports:
     def test_version(self):
         """Test version is accessible."""
         from jira_assistant_skills_lib import __version__
-        assert __version__ == "0.1.5"
+        assert __version__ == "0.2.1"
 
     def test_client_imports(self):
         """Test client classes are importable."""
