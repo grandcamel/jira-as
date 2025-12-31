@@ -17,40 +17,25 @@ import time
 from datetime import timedelta
 from pathlib import Path
 from typing import Dict, Any, Optional, List
+from .error_handler import JiraError
+from assistant_skills_lib.cache import SkillCache, get_skill_cache
 
-from .cache import JiraCache, get_cache
-
+# Default TTL for autocomplete suggestions
+DEFAULT_SUGGESTION_TTL = timedelta(hours=24)
 
 class AutocompleteCache:
     """
-    Cache for JQL autocomplete data.
-
-    Caches:
-    - Field definitions (names, operators, types)
-    - JQL functions
-    - Reserved words
-    - Field value suggestions
+    Caches JQL autocomplete suggestions to reduce API calls.
     """
 
-    # Cache keys
-    KEY_AUTOCOMPLETE_DATA = "jql:autocomplete:data"
-    KEY_FIELDS_LIST = "jql:fields:all"
-    KEY_FUNCTIONS_LIST = "jql:functions:all"
-    KEY_RESERVED_WORDS = "jql:reserved:words"
-    KEY_SUGGESTION_PREFIX = "jql:suggest:"
-
-    # TTL settings
-    TTL_AUTOCOMPLETE = timedelta(days=1)
-    TTL_SUGGESTIONS = timedelta(hours=1)
-
-    def __init__(self, cache: Optional[JiraCache] = None):
+    def __init__(self, cache: Optional[SkillCache] = None):
         """
         Initialize autocomplete cache.
 
         Args:
-            cache: Optional JiraCache instance (creates one if not provided)
+            cache: Optional SkillCache instance (creates one if not provided)
         """
-        self._cache = cache or get_cache()
+        self._cache = cache or get_skill_cache("jira_autocomplete")
         self._memory_cache: Dict[str, Any] = {}
         self._memory_cache_time: Dict[str, float] = {}
 

@@ -16,8 +16,11 @@ import json
 from pathlib import Path
 from typing import Dict, Any, Optional
 
-from .error_handler import ValidationError
-from .validators import validate_url, validate_email
+from assistant_skills_lib.config_manager import BaseConfigManager
+from assistant_skills_lib.error_handler import ValidationError # Assuming error_handler is consolidated next
+from assistant_skills_lib.validators import validate_url # Assuming validate_url is consolidated next
+
+from .validators import validate_email # Keep local validate_email for now, will consolidate generic ones
 from .jira_client import JiraClient
 from .automation_client import AutomationClient
 
@@ -39,7 +42,7 @@ DEFAULT_AGILE_FIELDS = {
 }
 
 
-class ConfigManager:
+class ConfigManager(BaseConfigManager):
     """
     Manages JIRA configuration from multiple sources with profile support.
     """
@@ -51,96 +54,28 @@ class ConfigManager:
         Args:
             profile: Profile name to use (default: from config or 'production')
         """
-        self.config = self._load_config()
-        self.profile = profile or self._get_default_profile()
+        super().__init__(profile=profile) # Call BaseConfigManager's init
 
-    def _find_claude_dir(self) -> Optional[Path]:
+    def get_service_name(self) -> str:
         """
-        Find .claude directory by walking up from current directory.
-
-        Returns:
-            Path to .claude directory or None if not found
+        Returns the name of the service, which is 'jira'.
         """
-        current = Path.cwd()
+        return "jira"
 
-        while current != current.parent:
-            claude_dir = current / '.claude'
-            if claude_dir.is_dir():
-                return claude_dir
-            current = current.parent
-
-        return None
-
-    def _load_config(self) -> Dict[str, Any]:
+    def get_default_config(self) -> Dict[str, Any]:
         """
-        Load and merge configuration from all sources.
-
-        Returns:
-            Merged configuration dictionary
+        Returns the default configuration dictionary for JIRA.
         """
-        config = {
-            'jira': {
-                'default_profile': 'production',
-                'profiles': {},
-                'api': {
-                    'version': '3',
-                    'timeout': 30,
-                    'max_retries': 3,
-                    'retry_backoff': 2.0
-                }
+        return {
+            'default_profile': 'production',
+            'profiles': {},
+            'api': {
+                'version': '3',
+                'timeout': 30,
+                'max_retries': 3,
+                'retry_backoff': 2.0
             }
         }
-
-        claude_dir = self._find_claude_dir()
-
-        if claude_dir:
-            team_settings = claude_dir / 'settings.json'
-            if team_settings.exists():
-                with open(team_settings, 'r') as f:
-                    team_config = json.load(f)
-                    config = self._merge_config(config, team_config)
-
-            local_settings = claude_dir / 'settings.local.json'
-            if local_settings.exists():
-                with open(local_settings, 'r') as f:
-                    local_config = json.load(f)
-                    config = self._merge_config(config, local_config)
-
-        return config
-
-    def _merge_config(self, base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Recursively merge override config into base config.
-
-        Args:
-            base: Base configuration
-            override: Override configuration
-
-        Returns:
-            Merged configuration
-        """
-        result = base.copy()
-
-        for key, value in override.items():
-            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
-                result[key] = self._merge_config(result[key], value)
-            else:
-                result[key] = value
-
-        return result
-
-    def _get_default_profile(self) -> str:
-        """
-        Get default profile from config or environment.
-
-        Returns:
-            Profile name
-        """
-        env_profile = os.getenv('JIRA_PROFILE')
-        if env_profile:
-            return env_profile
-
-        return self.config.get('jira', {}).get('default_profile', 'production')
 
     def get_profile_config(self, profile: Optional[str] = None) -> Dict[str, Any]:
         """
@@ -155,15 +90,15 @@ class ConfigManager:
         Raises:
             ValidationError: If profile doesn't exist
         """
-        profile = profile or self.profile
-        profiles = self.config.get('jira', {}).get('profiles', {})
+        profile_name = profile or self.profile
+        profiles = self.config.get(self.service_name, {}).get('profiles', {})
 
-        if profile not in profiles:
+        if profile_name not in profiles:
             raise ValidationError(
-                f"Profile '{profile}' not found. Available profiles: {list(profiles.keys())}"
+                f"Profile '{profile_name}' not found. Available profiles: {list(profiles.keys())}"
             )
-
-        return profiles[profile]
+        
+        return profiles[profile_name]
 
     def get_credentials(self, profile: Optional[str] = None) -> tuple:
         """
@@ -196,9 +131,9 @@ class ConfigManager:
         url, email, api_token = None, None, None
 
         # Priority 1: Environment variables (highest priority)
-        url = os.getenv('JIRA_SITE_URL')
-        email = os.getenv('JIRA_EMAIL')
-        api_token = os.getenv(f'JIRA_API_TOKEN_{profile.upper()}') or os.getenv('JIRA_API_TOKEN')
+        url = self.get_credential_from_env('SITE_URL')
+        email = self.get_credential_from_env('EMAIL')
+        api_token = self.get_credential_from_env(f'API_TOKEN_{profile_name.upper()}') or self.get_credential_from_env('API_TOKEN')
 
         # Priority 2: System keychain (if available and we're missing any credential)
         if CREDENTIAL_MANAGER_AVAILABLE and is_keychain_available():
@@ -243,9 +178,9 @@ class ConfigManager:
                 "Set JIRA_EMAIL environment variable, run setup.py, or configure in .claude/settings.local.json"
             )
 
-        # Validate format
+        # Validate format (using base class's validate_url from assistant_skills_lib)
         url = validate_url(url)
-        email = validate_email(email)
+        email = validate_email(email) # Keep local validate_email for now
 
         return url, email, api_token
 
@@ -256,12 +191,11 @@ class ConfigManager:
         Returns:
             API configuration dictionary
         """
-        return self.config.get('jira', {}).get('api', {
-            'version': '3',
-            'timeout': 30,
-            'max_retries': 3,
-            'retry_backoff': 2.0
-        })
+        # Get base API config and merge with Jira-specific defaults/overrides
+        base_api_config = super().get_api_config()
+        jira_api_config = self.config.get(self.service_name, {}).get('api', {})
+        base_api_config.update(jira_api_config)
+        return base_api_config
 
     def get_client(self, profile: Optional[str] = None) -> JiraClient:
         """
@@ -306,14 +240,7 @@ class ConfigManager:
         except ValidationError:
             return None
 
-    def list_profiles(self) -> list:
-        """
-        List all available profiles.
 
-        Returns:
-            List of profile names
-        """
-        return list(self.config.get('jira', {}).get('profiles', {}).keys())
 
     def get_agile_fields(self, profile: Optional[str] = None) -> Dict[str, str]:
         """
@@ -405,7 +332,7 @@ class ConfigManager:
         api_config = self.get_api_config()
 
         # Check for optional automation-specific config
-        automation_config = self.config.get('automation', {})
+        automation_config = self.config.get(self.service_name, {}).get('automation', {})
         cloud_id = automation_config.get('cloudId')
         product = automation_config.get('product', 'jira')
         use_gateway = automation_config.get('useGateway', False)
@@ -436,7 +363,7 @@ def get_jira_client(profile: Optional[str] = None) -> JiraClient:
     Raises:
         ValidationError: If configuration is invalid or incomplete
     """
-    config_manager = ConfigManager(profile=profile)
+    config_manager = ConfigManager.get_instance(profile=profile)
     return config_manager.get_client()
 
 
@@ -453,7 +380,7 @@ def get_automation_client(profile: Optional[str] = None) -> AutomationClient:
     Raises:
         ValidationError: If configuration is invalid or incomplete
     """
-    config_manager = ConfigManager(profile=profile)
+    config_manager = ConfigManager.get_instance(profile=profile)
     return config_manager.get_automation_client()
 
 
@@ -467,7 +394,7 @@ def get_agile_fields(profile: Optional[str] = None) -> Dict[str, str]:
     Returns:
         Dictionary of field names to field IDs
     """
-    config_manager = ConfigManager(profile=profile)
+    config_manager = ConfigManager.get_instance(profile=profile)
     return config_manager.get_agile_fields()
 
 
@@ -485,7 +412,7 @@ def get_agile_field(field_name: str, profile: Optional[str] = None) -> str:
     Raises:
         ValidationError: If field_name is not a valid Agile field
     """
-    config_manager = ConfigManager(profile=profile)
+    config_manager = ConfigManager.get_instance(profile=profile)
     return config_manager.get_agile_field(field_name)
 
 

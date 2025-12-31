@@ -13,27 +13,34 @@ import sys
 import functools
 from typing import Optional, Dict, Any, Callable
 
+# Import base error classes and functions from the consolidated library
+from assistant_skills_lib.error_handler import (
+    BaseAPIError,
+    AuthenticationError as BaseAuthenticationError,
+    PermissionError as BasePermissionError,
+    ValidationError as BaseValidationError,
+    NotFoundError as BaseNotFoundError,
+    RateLimitError as BaseRateLimitError,
+    ConflictError as BaseConflictError,
+    ServerError as BaseServerError,
+    sanitize_error_message as base_sanitize_error_message,
+    print_error as base_print_error,
+    handle_errors as base_handle_errors,
+)
 
-class JiraError(Exception):
+
+class JiraError(BaseAPIError):
     """Base exception for all JIRA-related errors."""
 
     def __init__(self, message: str, status_code: Optional[int] = None,
-                 response_data: Optional[Dict[str, Any]] = None):
-        self.message = message
-        self.status_code = status_code
-        self.response_data = response_data or {}
-        super().__init__(self.message)
-
-    def __str__(self):
-        if self.status_code:
-            return f"[{self.status_code}] {self.message}"
-        return self.message
+                 response_data: Optional[Dict[str, Any]] = None, **kwargs: Any):
+        super().__init__(message=message, status_code=status_code, response_data=response_data, **kwargs)
 
 
-class AuthenticationError(JiraError):
+class AuthenticationError(BaseAuthenticationError):
     """Raised when authentication fails."""
 
-    def __init__(self, message: str = "Authentication failed", **kwargs):
+    def __init__(self, message: str = "Authentication failed", **kwargs: Any):
         hint = "\n\nTroubleshooting:\n"
         hint += "  1. Verify JIRA_API_TOKEN is set correctly\n"
         hint += "  2. Check that your email matches your JIRA account\n"
@@ -42,10 +49,10 @@ class AuthenticationError(JiraError):
         super().__init__(message + hint, **kwargs)
 
 
-class PermissionError(JiraError):
+class PermissionError(BasePermissionError):
     """Raised when the user lacks permissions for an operation."""
 
-    def __init__(self, message: str = "Permission denied", **kwargs):
+    def __init__(self, message: str = "Permission denied", **kwargs: Any):
         hint = "\n\nTroubleshooting:\n"
         hint += "  1. Check your JIRA permissions for this project\n"
         hint += "  2. Verify you have the required role (e.g., Developer, Admin)\n"
@@ -53,30 +60,30 @@ class PermissionError(JiraError):
         super().__init__(message + hint, **kwargs)
 
 
-class ValidationError(JiraError):
+class ValidationError(BaseValidationError):
     """Raised when input validation fails."""
 
-    def __init__(self, message: str = "Validation failed", field: Optional[str] = None, **kwargs):
+    def __init__(self, message: str = "Validation failed", field: Optional[str] = None, **kwargs: Any):
         self.field = field
         if field:
             message = f"{message} (field: {field})"
         super().__init__(message, **kwargs)
 
 
-class NotFoundError(JiraError):
+class NotFoundError(BaseNotFoundError):
     """Raised when a resource is not found."""
 
-    def __init__(self, resource_type: str = "Resource", resource_id: str = "", **kwargs):
+    def __init__(self, resource_type: str = "Resource", resource_id: str = "", **kwargs: Any):
         message = f"{resource_type} not found"
         if resource_id:
             message += f": {resource_id}"
         super().__init__(message, **kwargs)
 
 
-class RateLimitError(JiraError):
+class RateLimitError(BaseRateLimitError):
     """Raised when API rate limit is exceeded."""
 
-    def __init__(self, retry_after: Optional[int] = None, **kwargs):
+    def __init__(self, retry_after: Optional[int] = None, **kwargs: Any):
         self.retry_after = retry_after
         message = "API rate limit exceeded"
         if retry_after:
@@ -86,15 +93,15 @@ class RateLimitError(JiraError):
         super().__init__(message, **kwargs)
 
 
-class ConflictError(JiraError):
+class ConflictError(BaseConflictError):
     """Raised when there's a conflict (e.g., duplicate, concurrent modification)."""
     pass
 
 
-class ServerError(JiraError):
+class ServerError(BaseServerError):
     """Raised when the JIRA server encounters an error."""
 
-    def __init__(self, message: str = "JIRA server error", **kwargs):
+    def __init__(self, message: str = "JIRA server error", **kwargs: Any):
         hint = "\n\nThe JIRA server encountered an error. Please try again later."
         super().__init__(message + hint, **kwargs)
 
@@ -103,10 +110,10 @@ class ServerError(JiraError):
 # Automation API Errors
 # -----------------------------------------------------------------------------
 
-class AutomationError(JiraError):
+class AutomationError(JiraError): # Inherit from JiraError as it's Jira-specific
     """Base exception for Automation API errors."""
 
-    def __init__(self, message: str = "Automation API error", **kwargs):
+    def __init__(self, message: str = "Automation API error", **kwargs: Any):
         hint = "\n\nTroubleshooting:\n"
         hint += "  1. Verify you have Jira Administrator permissions\n"
         hint += "  2. Ensure the Cloud ID is correct\n"
@@ -117,38 +124,35 @@ class AutomationError(JiraError):
 class AutomationNotFoundError(AutomationError):
     """Raised when an automation rule or template is not found."""
 
-    def __init__(self, resource_type: str = "Automation resource", resource_id: str = "", **kwargs):
+    def __init__(self, resource_type: str = "Automation resource", resource_id: str = "", **kwargs: Any):
         message = f"{resource_type} not found"
         if resource_id:
             message += f": {resource_id}"
-        # Call grandparent to avoid adding AutomationError hints
-        JiraError.__init__(self, message, **kwargs)
+        super().__init__(message, **kwargs)
 
 
 class AutomationPermissionError(AutomationError):
     """Raised when the user lacks permissions for automation management."""
 
-    def __init__(self, message: str = "Automation permission denied", **kwargs):
+    def __init__(self, message: str = "Automation permission denied", **kwargs: Any):
         hint = "\n\nTroubleshooting:\n"
         hint += "  1. You need Jira Administrator permission for full rule management\n"
         hint += "  2. Project Administrator is needed for project-scoped rules\n"
         hint += "  3. Ensure API token has 'manage:jira-automation' scope"
-        # Call grandparent to avoid adding AutomationError hints
-        JiraError.__init__(self, message + hint, **kwargs)
+        super().__init__(message + hint, **kwargs)
 
 
 class AutomationValidationError(AutomationError):
     """Raised when automation rule configuration is invalid."""
 
-    def __init__(self, message: str = "Automation validation failed", field: Optional[str] = None, **kwargs):
+    def __init__(self, message: str = "Automation validation failed", field: Optional[str] = None, **kwargs: Any):
         self.field = field
         if field:
             message = f"{message} (field: {field})"
-        # Call grandparent to avoid adding AutomationError hints
-        JiraError.__init__(self, message, **kwargs)
+        super().__init__(message, **kwargs)
 
 
-def handle_jira_error(response, operation: str = "operation") -> None:
+def handle_jira_error(response: Any, operation: str = "operation") -> None:
     """
     Handle HTTP response errors and raise appropriate exceptions.
 
@@ -180,62 +184,52 @@ def handle_jira_error(response, operation: str = "operation") -> None:
         error_data = {}
 
     message = f"Failed to {operation}: {message}"
+    
+    error_kwargs = {
+        "message": message,
+        "status_code": status_code,
+        "response_data": error_data,
+        "operation": operation,
+    }
 
     if status_code == 400:
-        raise ValidationError(message, status_code=status_code, response_data=error_data)
+        raise ValidationError(**error_kwargs)
     elif status_code == 401:
-        raise AuthenticationError(message, status_code=status_code, response_data=error_data)
+        raise AuthenticationError(**error_kwargs)
     elif status_code == 403:
-        raise PermissionError(message, status_code=status_code, response_data=error_data)
+        raise PermissionError(**error_kwargs)
     elif status_code == 404:
-        raise NotFoundError("Resource", message, status_code=status_code, response_data=error_data)
+        raise NotFoundError(resource_type="Resource", resource_id="", **error_kwargs) # Resource specific info added
     elif status_code == 409:
-        raise ConflictError(message, status_code=status_code, response_data=error_data)
+        raise ConflictError(**error_kwargs)
     elif status_code == 429:
         retry_after = response.headers.get('Retry-After')
         raise RateLimitError(
             retry_after=int(retry_after) if retry_after else None,
-            status_code=status_code,
-            response_data=error_data
+            **error_kwargs
         )
     elif status_code >= 500:
-        raise ServerError(message, status_code=status_code, response_data=error_data)
+        raise ServerError(**error_kwargs)
     else:
-        raise JiraError(message, status_code=status_code, response_data=error_data)
+        raise JiraError(**error_kwargs)
 
 
 def sanitize_error_message(message: str) -> str:
     """
     Sanitize error messages to remove potentially sensitive information.
 
-    Removes or redacts:
-    - Email addresses
-    - Account IDs (Atlassian format)
-    - API tokens/keys
-    - URLs with authentication
-    - Issue keys with context (keeps key, redacts description)
+    Calls the base sanitizer and then applies JIRA-specific redactions.
 
     Args:
         message: Raw error message
 
     Returns:
         Sanitized error message safe for production logging
-
-    Example:
-        >>> sanitize_error_message("User john@company.com not found")
-        "User [EMAIL REDACTED] not found"
     """
     if not message:
         return message
 
-    sanitized = message
-
-    # Redact email addresses
-    sanitized = re.sub(
-        r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}',
-        '[EMAIL REDACTED]',
-        sanitized
-    )
+    sanitized = base_sanitize_error_message(message)
 
     # Redact Atlassian account IDs (24-character hex strings)
     sanitized = re.sub(
@@ -253,55 +247,44 @@ def sanitize_error_message(message: str) -> str:
         flags=re.IGNORECASE
     )
 
-    # Redact API tokens (typical formats)
+    # Redact API tokens (typical formats: ATATT, etc.)
     sanitized = re.sub(
         r'(ATATT[A-Za-z0-9+/=]+)',
         '[API_TOKEN REDACTED]',
         sanitized
     )
 
-    # Redact URLs with credentials
-    sanitized = re.sub(
-        r'(https?://)[^:]+:[^@]+@',
-        r'\1[CREDENTIALS REDACTED]@',
-        sanitized
-    )
-
-    # Redact bearer tokens
-    sanitized = re.sub(
-        r'(Bearer\s+)[A-Za-z0-9._-]+',
-        r'\1[TOKEN REDACTED]',
-        sanitized,
-        flags=re.IGNORECASE
-    )
-
     return sanitized
 
 
-def print_error(error: Exception, debug: bool = False, sanitize: bool = False) -> None:
+def print_error(error: Exception, debug: bool = False) -> None:
     """
     Print error message to stderr with optional debug information.
+
+    Uses the base print_error function and provides Jira-specific hints.
 
     Args:
         error: Exception to print
         debug: If True, include full stack trace
-        sanitize: If True, sanitize sensitive data from error messages
     """
-    error_str = str(error)
-    if sanitize:
-        error_str = sanitize_error_message(error_str)
+    extra_hints = {
+        AuthenticationError: "Check your JIRA_EMAIL and JIRA_API_TOKEN. Get a token at: https://id.atlassian.com/manage-profile/security/api-tokens",
+        PermissionError: "Verify your JIRA permissions for this operation or project.",
+        AutomationError: "Verify JIRA Administrator permissions and API token scopes for 'manage:jira-automation'."
+    }
+    
+    # Adapt debug for show_traceback in base_print_error
+    show_traceback = debug and hasattr(error, '__traceback__')
 
-    print(f"\nError: {error_str}", file=sys.stderr)
-
-    if debug and hasattr(error, '__traceback__'):
-        import traceback
-        print("\nDebug traceback:", file=sys.stderr)
-        traceback.print_tb(error.__traceback__, file=sys.stderr)
-
+    # Pass the sanitized error message and specific hints to the base print_error
+    base_print_error(
+        message=f"Jira Error: {error.message if isinstance(error, BaseAPIError) else str(error)}",
+        error=error,
+        show_traceback=show_traceback,
+        extra_hints=extra_hints
+    )
     if isinstance(error, JiraError) and error.response_data:
-        response_str = str(error.response_data)
-        if sanitize:
-            response_str = sanitize_error_message(response_str)
+        response_str = sanitize_error_message(str(error.response_data))
         print(f"\nResponse data: {response_str}", file=sys.stderr)
 
 
@@ -309,7 +292,7 @@ def handle_errors(func: Callable) -> Callable:
     """
     Decorator to handle errors in CLI scripts.
 
-    Catches all exceptions, prints user-friendly error messages,
+    Catches JIRA-specific exceptions and prints user-friendly error messages,
     and exits with appropriate status codes.
 
     Args:
@@ -322,15 +305,13 @@ def handle_errors(func: Callable) -> Callable:
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except KeyboardInterrupt:
-            print("\n\nOperation cancelled by user.", file=sys.stderr)
-            sys.exit(130)  # Standard exit code for SIGINT
         except JiraError as e:
             print_error(e)
             sys.exit(1)
         except Exception as e:
-            print(f"\nUnexpected error: {e}", file=sys.stderr)
-            print_error(e, debug=True)
-            sys.exit(1)
+            # Re-raise unexpected exceptions to be caught by base_handle_errors
+            raise
+    
+    # Wrap Jira's custom handler with the base handler to catch generic exceptions
+    return base_handle_errors(wrapper)
 
-    return wrapper

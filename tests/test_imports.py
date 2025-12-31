@@ -11,7 +11,7 @@ class TestPackageImports:
     def test_version(self):
         """Test version is accessible."""
         from jira_assistant_skills_lib import __version__
-        assert __version__ == "0.1.0"
+        assert __version__ == "0.1.5"
 
     def test_client_imports(self):
         """Test client classes are importable."""
@@ -114,7 +114,8 @@ class TestValidators:
 
     def test_validate_issue_key_invalid(self):
         """Test invalid issue key."""
-        from jira_assistant_skills_lib import validate_issue_key, ValidationError
+        from jira_assistant_skills_lib import validate_issue_key
+        from assistant_skills_lib.error_handler import ValidationError
         with pytest.raises(ValidationError):
             validate_issue_key('')
         with pytest.raises(ValidationError):
@@ -130,7 +131,8 @@ class TestValidators:
 
     def test_validate_project_key_invalid(self):
         """Test invalid project key."""
-        from jira_assistant_skills_lib import validate_project_key, ValidationError
+        from jira_assistant_skills_lib import validate_project_key
+        from assistant_skills_lib.error_handler import ValidationError
         with pytest.raises(ValidationError):
             validate_project_key('')
         with pytest.raises(ValidationError):
@@ -144,7 +146,8 @@ class TestValidators:
 
     def test_validate_jql_invalid(self):
         """Test invalid JQL."""
-        from jira_assistant_skills_lib import validate_jql, ValidationError
+        from jira_assistant_skills_lib import validate_jql
+        from assistant_skills_lib.error_handler import ValidationError
         with pytest.raises(ValidationError):
             validate_jql('')
 

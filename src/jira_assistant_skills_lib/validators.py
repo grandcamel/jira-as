@@ -7,8 +7,17 @@ and other inputs before making API calls.
 
 import re
 import os
-from typing import Optional
-from .error_handler import ValidationError
+from typing import Optional, List
+from pathlib import Path
+
+from assistant_skills_lib.error_handler import ValidationError
+from assistant_skills_lib.validators import (
+    validate_required,
+    validate_url as base_validate_url,
+    validate_email as base_validate_email,
+    validate_path as base_validate_path,
+    validate_int
+)
 
 
 def validate_issue_key(issue_key: str) -> str:
@@ -24,16 +33,15 @@ def validate_issue_key(issue_key: str) -> str:
     Raises:
         ValidationError: If format is invalid
     """
-    if not issue_key:
-        raise ValidationError("Issue key cannot be empty")
-
-    issue_key = issue_key.strip().upper()
+    issue_key = validate_required(issue_key, "issue_key")
+    issue_key = issue_key.upper()
 
     pattern = r'^[A-Z][A-Z0-9]*-[0-9]+$'
     if not re.match(pattern, issue_key):
         raise ValidationError(
             f"Invalid issue key format: '{issue_key}'. "
-            "Expected format: PROJECT-123 (e.g., PROJ-42, DEV-1234)"
+            "Expected format: PROJECT-123 (e.g., PROJ-42, DEV-1234)",
+            operation="validation", details={"field": "issue_key", "value": issue_key}
         )
 
     return issue_key
@@ -52,22 +60,22 @@ def validate_project_key(project_key: str) -> str:
     Raises:
         ValidationError: If format is invalid
     """
-    if not project_key:
-        raise ValidationError("Project key cannot be empty")
-
-    project_key = project_key.strip().upper()
+    project_key = validate_required(project_key, "project_key")
+    project_key = project_key.upper()
 
     pattern = r'^[A-Z][A-Z0-9]*$'
     if not re.match(pattern, project_key):
         raise ValidationError(
             f"Invalid project key format: '{project_key}'. "
             "Expected format: 2-10 uppercase letters/numbers, starting with a letter "
-            "(e.g., PROJ, DEV, SUPPORT)"
+            "(e.g., PROJ, DEV, SUPPORT)",
+            operation="validation", details={"field": "project_key", "value": project_key}
         )
 
     if len(project_key) < 2 or len(project_key) > 10:
         raise ValidationError(
-            f"Project key must be 2-10 characters long (got {len(project_key)})"
+            f"Project key must be 2-10 characters long (got {len(project_key)})",
+            operation="validation", details={"field": "project_key", "value": project_key}
         )
 
     return project_key
@@ -86,10 +94,7 @@ def validate_jql(jql: str) -> str:
     Raises:
         ValidationError: If JQL appears invalid
     """
-    if not jql:
-        raise ValidationError("JQL query cannot be empty")
-
-    jql = jql.strip()
+    jql = validate_required(jql, "jql")
 
     dangerous_patterns = [
         r';\s*DROP',
@@ -103,12 +108,14 @@ def validate_jql(jql: str) -> str:
     for pattern in dangerous_patterns:
         if re.search(pattern, jql, re.IGNORECASE):
             raise ValidationError(
-                f"JQL query contains potentially dangerous pattern: {pattern}"
+                f"JQL query contains potentially dangerous pattern: {pattern}",
+                operation="validation", details={"field": "jql", "value": jql}
             )
 
     if len(jql) > 10000:
         raise ValidationError(
-            f"JQL query is too long ({len(jql)} characters). Maximum is 10000."
+            f"JQL query is too long ({len(jql)} characters). Maximum is 10000.",
+            operation="validation", details={"field": "jql", "value": jql}
         )
 
     return jql
@@ -117,6 +124,7 @@ def validate_jql(jql: str) -> str:
 def validate_file_path(file_path: str, must_exist: bool = True) -> str:
     """
     Validate file path for attachments.
+    Leverages base_validate_path and adds JIRA-specific size limits.
 
     Args:
         file_path: Path to file
@@ -128,18 +136,13 @@ def validate_file_path(file_path: str, must_exist: bool = True) -> str:
     Raises:
         ValidationError: If file doesn't exist or path is invalid
     """
-    if not file_path:
-        raise ValidationError("File path cannot be empty")
-
-    file_path = os.path.expanduser(file_path.strip())
-
-    if must_exist and not os.path.exists(file_path):
-        raise ValidationError(f"File not found: {file_path}")
-
-    if must_exist and not os.path.isfile(file_path):
-        raise ValidationError(f"Path is not a file: {file_path}")
-
-    abs_path = os.path.abspath(file_path)
+    path_obj = base_validate_path(
+        file_path,
+        field_name="file_path",
+        must_exist=must_exist,
+        must_be_file=True # Always a file for attachments
+    )
+    abs_path = str(path_obj.absolute())
 
     if must_exist:
         file_size = os.path.getsize(abs_path)
@@ -147,18 +150,20 @@ def validate_file_path(file_path: str, must_exist: bool = True) -> str:
         if file_size > max_size:
             raise ValidationError(
                 f"File is too large ({file_size / 1024 / 1024:.1f}MB). "
-                f"Maximum size is {max_size / 1024 / 1024}MB."
+                f"Maximum size is {max_size / 1024 / 1024}MB.",
+                operation="validation", details={"field": "file_path", "value": abs_path}
             )
 
     return abs_path
 
 
-def validate_url(url: str) -> str:
+def validate_url(url: str, require_https: bool = True) -> str:
     """
-    Validate JIRA instance URL.
+    Validate JIRA instance URL using base_validate_url.
 
     Args:
         url: URL to validate
+        require_https: If True, ensure HTTPS protocol (default for Jira)
 
     Returns:
         Normalized URL (no trailing slash)
@@ -166,31 +171,17 @@ def validate_url(url: str) -> str:
     Raises:
         ValidationError: If URL format is invalid
     """
-    if not url:
-        raise ValidationError("URL cannot be empty")
-
-    url = url.strip().rstrip('/')
-
-    if not url.startswith(('http://', 'https://')):
-        raise ValidationError(
-            f"Invalid URL format: '{url}'. Must start with http:// or https://"
-        )
-
-    if not url.startswith('https://'):
-        raise ValidationError(
-            f"Insecure URL: '{url}'. HTTPS is required for JIRA API access"
-        )
-
-    pattern = r'^https://[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*'
-    if not re.match(pattern, url):
-        raise ValidationError(f"Invalid URL format: '{url}'")
-
-    return url
+    return base_validate_url(
+        url,
+        field_name="URL",
+        require_https=require_https,
+        allowed_schemes=['https'] # JIRA typically requires HTTPS
+    )
 
 
 def validate_email(email: str) -> str:
     """
-    Validate email address format.
+    Validate email address format using base_validate_email.
 
     Args:
         email: Email address to validate
@@ -201,16 +192,7 @@ def validate_email(email: str) -> str:
     Raises:
         ValidationError: If email format is invalid
     """
-    if not email:
-        raise ValidationError("Email cannot be empty")
-
-    email = email.strip().lower()
-
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    if not re.match(pattern, email):
-        raise ValidationError(f"Invalid email format: '{email}'")
-
-    return email
+    return base_validate_email(email, field_name="email")
 
 
 def validate_transition_id(transition_id: str) -> str:
@@ -226,17 +208,8 @@ def validate_transition_id(transition_id: str) -> str:
     Raises:
         ValidationError: If not a valid numeric ID
     """
-    if not transition_id:
-        raise ValidationError("Transition ID cannot be empty")
-
-    transition_id = transition_id.strip()
-
-    if not transition_id.isdigit():
-        raise ValidationError(
-            f"Invalid transition ID: '{transition_id}'. Must be a numeric value"
-        )
-
-    return transition_id
+    transition_id_int = validate_int(transition_id, "transition_id", min_value=0)
+    return str(transition_id_int)
 
 
 # ========== Project Administration Validators ==========
@@ -273,15 +246,14 @@ def validate_project_type(project_type: str) -> str:
     Raises:
         ValidationError: If project type is invalid
     """
-    if not project_type:
-        raise ValidationError("Project type cannot be empty")
-
-    project_type = project_type.strip().lower()
+    project_type = validate_required(project_type, "project_type")
+    project_type = project_type.lower()
 
     if project_type not in VALID_PROJECT_TYPES:
         raise ValidationError(
             f"Invalid project type: '{project_type}'. "
-            f"Valid types: {', '.join(VALID_PROJECT_TYPES)}"
+            f"Valid types: {', '.join(VALID_PROJECT_TYPES)}",
+            operation="validation", details={"field": "project_type", "value": project_type}
         )
 
     return project_type
@@ -300,15 +272,14 @@ def validate_assignee_type(assignee_type: str) -> str:
     Raises:
         ValidationError: If assignee type is invalid
     """
-    if not assignee_type:
-        raise ValidationError("Assignee type cannot be empty")
-
-    assignee_type = assignee_type.strip().upper()
+    assignee_type = validate_required(assignee_type, "assignee_type")
+    assignee_type = assignee_type.upper()
 
     if assignee_type not in VALID_ASSIGNEE_TYPES:
         raise ValidationError(
             f"Invalid assignee type: '{assignee_type}'. "
-            f"Valid types: {', '.join(VALID_ASSIGNEE_TYPES)}"
+            f"Valid types: {', '.join(VALID_ASSIGNEE_TYPES)}",
+            operation="validation", details={"field": "assignee_type", "value": assignee_type}
         )
 
     return assignee_type
@@ -327,10 +298,8 @@ def validate_project_template(template: str) -> str:
     Raises:
         ValidationError: If template is unknown shortcut
     """
-    if not template:
-        raise ValidationError("Project template cannot be empty")
-
-    template = template.strip().lower()
+    template = validate_required(template, "project_template")
+    template = template.lower()
 
     # If it's a shortcut, expand it
     if template in PROJECT_TEMPLATES:
@@ -345,7 +314,8 @@ def validate_project_template(template: str) -> str:
     raise ValidationError(
         f"Unknown template shortcut: '{template}'. "
         f"Valid shortcuts: {shortcuts}\n"
-        "Or provide a full template key (e.g., com.pyxis.greenhopper.jira:gh-scrum-template)"
+        "Or provide a full template key (e.g., com.pyxis.greenhopper.jira:gh-scrum-template)",
+        operation="validation", details={"field": "project_template", "value": template}
     )
 
 
@@ -362,17 +332,18 @@ def validate_project_name(name: str) -> str:
     Raises:
         ValidationError: If name is invalid
     """
-    if not name:
-        raise ValidationError("Project name cannot be empty")
-
-    name = name.strip()
+    name = validate_required(name, "project_name")
 
     if len(name) < 2:
-        raise ValidationError("Project name must be at least 2 characters long")
+        raise ValidationError(
+            "Project name must be at least 2 characters long",
+            operation="validation", details={"field": "project_name", "value": name}
+        )
 
     if len(name) > 80:
         raise ValidationError(
-            f"Project name is too long ({len(name)} characters). Maximum is 80."
+            f"Project name is too long ({len(name)} characters). Maximum is 80.",
+            operation="validation", details={"field": "project_name", "value": name}
         )
 
     return name
@@ -391,17 +362,18 @@ def validate_category_name(name: str) -> str:
     Raises:
         ValidationError: If name is invalid
     """
-    if not name:
-        raise ValidationError("Category name cannot be empty")
-
-    name = name.strip()
+    name = validate_required(name, "category_name")
 
     if len(name) < 1:
-        raise ValidationError("Category name must not be empty")
+        raise ValidationError(
+            "Category name must not be empty",
+            operation="validation", details={"field": "category_name", "value": name}
+        )
 
     if len(name) > 255:
         raise ValidationError(
-            f"Category name is too long ({len(name)} characters). Maximum is 255."
+            f"Category name is too long ({len(name)} characters). Maximum is 255.",
+            operation="validation", details={"field": "category_name", "value": name}
         )
 
     return name
@@ -430,7 +402,8 @@ def validate_avatar_file(file_path: str) -> str:
     if ext not in valid_extensions:
         raise ValidationError(
             f"Invalid avatar file format: '{ext}'. "
-            f"Valid formats: {', '.join(valid_extensions)}"
+            f"Valid formats: {', '.join(valid_extensions)}",
+            operation="validation", details={"field": "file_path", "value": abs_path}
         )
 
     # Check file size (1MB max for avatars)
@@ -439,7 +412,8 @@ def validate_avatar_file(file_path: str) -> str:
     if file_size > max_size:
         raise ValidationError(
             f"Avatar file is too large ({file_size / 1024:.1f}KB). "
-            f"Maximum size is {max_size / 1024}KB."
+            f"Maximum size is {max_size / 1024}KB.",
+            operation="validation", details={"field": "file_path", "value": abs_path}
         )
 
     return abs_path
