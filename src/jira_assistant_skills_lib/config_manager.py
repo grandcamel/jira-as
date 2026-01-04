@@ -133,7 +133,7 @@ class ConfigManager(BaseConfigManager):
         # Priority 1: Environment variables (highest priority)
         url = self.get_credential_from_env('SITE_URL')
         email = self.get_credential_from_env('EMAIL')
-        api_token = self.get_credential_from_env(f'API_TOKEN_{profile_name.upper()}') or self.get_credential_from_env('API_TOKEN')
+        api_token = self.get_credential_from_env(f'API_TOKEN_{profile.upper()}') or self.get_credential_from_env('API_TOKEN')
 
         # Priority 2: System keychain (if available and we're missing any credential)
         if CREDENTIAL_MANAGER_AVAILABLE and is_keychain_available():
