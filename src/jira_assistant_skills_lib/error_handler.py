@@ -32,9 +32,19 @@ from assistant_skills_lib.error_handler import (
 class JiraError(BaseAPIError):
     """Base exception for all JIRA-related errors."""
 
-    def __init__(self, message: str, status_code: Optional[int] = None,
-                 response_data: Optional[Dict[str, Any]] = None, **kwargs: Any):
-        super().__init__(message=message, status_code=status_code, response_data=response_data, **kwargs)
+    def __init__(
+        self,
+        message: str,
+        status_code: Optional[int] = None,
+        response_data: Optional[Dict[str, Any]] = None,
+        **kwargs: Any,
+    ):
+        super().__init__(
+            message=message,
+            status_code=status_code,
+            response_data=response_data,
+            **kwargs,
+        )
 
 
 class AuthenticationError(BaseAuthenticationError):
@@ -42,7 +52,7 @@ class AuthenticationError(BaseAuthenticationError):
 
     def __init__(self, message: str = "Authentication failed", **kwargs: Any):
         # Remove 'message' from kwargs if present to avoid duplicate argument
-        kwargs.pop('message', None)
+        kwargs.pop("message", None)
         hint = "\n\nTroubleshooting:\n"
         hint += "  1. Verify JIRA_API_TOKEN is set correctly\n"
         hint += "  2. Check that your email matches your JIRA account\n"
@@ -56,7 +66,7 @@ class PermissionError(BasePermissionError):
 
     def __init__(self, message: str = "Permission denied", **kwargs: Any):
         # Remove 'message' from kwargs if present to avoid duplicate argument
-        kwargs.pop('message', None)
+        kwargs.pop("message", None)
         hint = "\n\nTroubleshooting:\n"
         hint += "  1. Check your JIRA permissions for this project\n"
         hint += "  2. Verify you have the required role (e.g., Developer, Admin)\n"
@@ -67,9 +77,14 @@ class PermissionError(BasePermissionError):
 class ValidationError(BaseValidationError):
     """Raised when input validation fails."""
 
-    def __init__(self, message: str = "Validation failed", field: Optional[str] = None, **kwargs: Any):
+    def __init__(
+        self,
+        message: str = "Validation failed",
+        field: Optional[str] = None,
+        **kwargs: Any,
+    ):
         # Remove 'message' from kwargs if present to avoid duplicate argument
-        kwargs.pop('message', None)
+        kwargs.pop("message", None)
         self.field = field
         if field:
             message = f"{message} (field: {field})"
@@ -79,9 +94,11 @@ class ValidationError(BaseValidationError):
 class NotFoundError(BaseNotFoundError):
     """Raised when a resource is not found."""
 
-    def __init__(self, resource_type: str = "Resource", resource_id: str = "", **kwargs: Any):
+    def __init__(
+        self, resource_type: str = "Resource", resource_id: str = "", **kwargs: Any
+    ):
         # Remove 'message' from kwargs if present to avoid duplicate argument
-        kwargs.pop('message', None)
+        kwargs.pop("message", None)
         message = f"{resource_type} not found"
         if resource_id:
             message += f": {resource_id}"
@@ -93,7 +110,7 @@ class RateLimitError(BaseRateLimitError):
 
     def __init__(self, retry_after: Optional[int] = None, **kwargs: Any):
         # Remove 'message' from kwargs if present to avoid duplicate argument
-        kwargs.pop('message', None)
+        kwargs.pop("message", None)
         message = "API rate limit exceeded"
         if retry_after:
             message += f". Retry after {retry_after} seconds"
@@ -105,6 +122,7 @@ class RateLimitError(BaseRateLimitError):
 
 class ConflictError(BaseConflictError):
     """Raised when there's a conflict (e.g., duplicate, concurrent modification)."""
+
     pass
 
 
@@ -113,7 +131,7 @@ class ServerError(BaseServerError):
 
     def __init__(self, message: str = "JIRA server error", **kwargs: Any):
         # Remove 'message' from kwargs if present to avoid duplicate argument
-        kwargs.pop('message', None)
+        kwargs.pop("message", None)
         hint = "\n\nThe JIRA server encountered an error. Please try again later."
         super().__init__(message + hint, **kwargs)
 
@@ -122,12 +140,13 @@ class ServerError(BaseServerError):
 # Automation API Errors
 # -----------------------------------------------------------------------------
 
-class AutomationError(JiraError): # Inherit from JiraError as it's Jira-specific
+
+class AutomationError(JiraError):  # Inherit from JiraError as it's Jira-specific
     """Base exception for Automation API errors."""
 
     def __init__(self, message: str = "Automation API error", **kwargs: Any):
         # Remove 'message' from kwargs if present to avoid duplicate argument
-        kwargs.pop('message', None)
+        kwargs.pop("message", None)
         hint = "\n\nTroubleshooting:\n"
         hint += "  1. Verify you have Jira Administrator permissions\n"
         hint += "  2. Ensure the Cloud ID is correct\n"
@@ -138,9 +157,14 @@ class AutomationError(JiraError): # Inherit from JiraError as it's Jira-specific
 class AutomationNotFoundError(AutomationError):
     """Raised when an automation rule or template is not found."""
 
-    def __init__(self, resource_type: str = "Automation resource", resource_id: str = "", **kwargs: Any):
+    def __init__(
+        self,
+        resource_type: str = "Automation resource",
+        resource_id: str = "",
+        **kwargs: Any,
+    ):
         # Remove 'message' from kwargs if present to avoid duplicate argument
-        kwargs.pop('message', None)
+        kwargs.pop("message", None)
         message = f"{resource_type} not found"
         if resource_id:
             message += f": {resource_id}"
@@ -152,7 +176,7 @@ class AutomationPermissionError(AutomationError):
 
     def __init__(self, message: str = "Automation permission denied", **kwargs: Any):
         # Remove 'message' from kwargs if present to avoid duplicate argument
-        kwargs.pop('message', None)
+        kwargs.pop("message", None)
         hint = "\n\nTroubleshooting:\n"
         hint += "  1. You need Jira Administrator permission for full rule management\n"
         hint += "  2. Project Administrator is needed for project-scoped rules\n"
@@ -163,9 +187,14 @@ class AutomationPermissionError(AutomationError):
 class AutomationValidationError(AutomationError):
     """Raised when automation rule configuration is invalid."""
 
-    def __init__(self, message: str = "Automation validation failed", field: Optional[str] = None, **kwargs: Any):
+    def __init__(
+        self,
+        message: str = "Automation validation failed",
+        field: Optional[str] = None,
+        **kwargs: Any,
+    ):
         # Remove 'message' from kwargs if present to avoid duplicate argument
-        kwargs.pop('message', None)
+        kwargs.pop("message", None)
         self.field = field
         if field:
             message = f"{message} (field: {field})"
@@ -190,21 +219,21 @@ def handle_jira_error(response: Any, operation: str = "operation") -> None:
 
     try:
         error_data = response.json()
-        error_messages = error_data.get('errorMessages', [])
-        errors = error_data.get('errors', {})
+        error_messages = error_data.get("errorMessages", [])
+        errors = error_data.get("errors", {})
 
         if error_messages:
-            message = '; '.join(error_messages)
+            message = "; ".join(error_messages)
         elif errors:
-            message = '; '.join([f"{k}: {v}" for k, v in errors.items()])
+            message = "; ".join([f"{k}: {v}" for k, v in errors.items()])
         else:
-            message = error_data.get('message', response.text or 'Unknown error')
+            message = error_data.get("message", response.text or "Unknown error")
     except ValueError:
         message = response.text or f"HTTP {status_code} error"
         error_data = {}
 
     message = f"Failed to {operation}: {message}"
-    
+
     error_kwargs = {
         "message": message,
         "status_code": status_code,
@@ -219,14 +248,15 @@ def handle_jira_error(response: Any, operation: str = "operation") -> None:
     elif status_code == 403:
         raise PermissionError(**error_kwargs)
     elif status_code == 404:
-        raise NotFoundError(resource_type="Resource", resource_id="", **error_kwargs) # Resource specific info added
+        raise NotFoundError(
+            resource_type="Resource", resource_id="", **error_kwargs
+        )  # Resource specific info added
     elif status_code == 409:
         raise ConflictError(**error_kwargs)
     elif status_code == 429:
-        retry_after = response.headers.get('Retry-After')
+        retry_after = response.headers.get("Retry-After")
         raise RateLimitError(
-            retry_after=int(retry_after) if retry_after else None,
-            **error_kwargs
+            retry_after=int(retry_after) if retry_after else None, **error_kwargs
         )
     elif status_code >= 500:
         raise ServerError(**error_kwargs)
@@ -253,26 +283,16 @@ def sanitize_error_message(message: str) -> str:
 
     # Redact Atlassian account IDs (24-character hex strings)
     sanitized = re.sub(
-        r'[0-9a-f]{24}',
-        '[ACCOUNT_ID REDACTED]',
-        sanitized,
-        flags=re.IGNORECASE
+        r"[0-9a-f]{24}", "[ACCOUNT_ID REDACTED]", sanitized, flags=re.IGNORECASE
     )
 
     # Redact longer UUIDs/tokens (32+ chars of hex)
     sanitized = re.sub(
-        r'[0-9a-f]{32,}',
-        '[TOKEN REDACTED]',
-        sanitized,
-        flags=re.IGNORECASE
+        r"[0-9a-f]{32,}", "[TOKEN REDACTED]", sanitized, flags=re.IGNORECASE
     )
 
     # Redact API tokens (typical formats: ATATT, etc.)
-    sanitized = re.sub(
-        r'(ATATT[A-Za-z0-9+/=]+)',
-        '[API_TOKEN REDACTED]',
-        sanitized
-    )
+    sanitized = re.sub(r"(ATATT[A-Za-z0-9+/=]+)", "[API_TOKEN REDACTED]", sanitized)
 
     return sanitized
 
@@ -290,18 +310,18 @@ def print_error(error: Exception, debug: bool = False) -> None:
     extra_hints = {
         AuthenticationError: "Check your JIRA_EMAIL and JIRA_API_TOKEN. Get a token at: https://id.atlassian.com/manage-profile/security/api-tokens",
         PermissionError: "Verify your JIRA permissions for this operation or project.",
-        AutomationError: "Verify JIRA Administrator permissions and API token scopes for 'manage:jira-automation'."
+        AutomationError: "Verify JIRA Administrator permissions and API token scopes for 'manage:jira-automation'.",
     }
-    
+
     # Adapt debug for show_traceback in base_print_error
-    show_traceback = debug and hasattr(error, '__traceback__')
+    show_traceback = debug and hasattr(error, "__traceback__")
 
     # Pass the sanitized error message and specific hints to the base print_error
     base_print_error(
         message=f"Jira Error: {error.message if isinstance(error, BaseAPIError) else str(error)}",
         error=error,
         show_traceback=show_traceback,
-        extra_hints=extra_hints
+        extra_hints=extra_hints,
     )
     if isinstance(error, JiraError) and error.response_data:
         response_str = sanitize_error_message(str(error.response_data))
@@ -321,6 +341,7 @@ def handle_errors(func: Callable) -> Callable:
     Returns:
         Wrapped function with error handling
     """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
@@ -331,7 +352,6 @@ def handle_errors(func: Callable) -> Callable:
         except Exception as e:
             # Re-raise unexpected exceptions to be caught by base_handle_errors
             raise
-    
+
     # Wrap Jira's custom handler with the base handler to catch generic exceptions
     return base_handle_errors(wrapper)
-

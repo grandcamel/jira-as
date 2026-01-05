@@ -17,16 +17,23 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 
 from assistant_skills_lib.config_manager import BaseConfigManager
-from assistant_skills_lib.error_handler import ValidationError # Assuming error_handler is consolidated next
-from assistant_skills_lib.validators import validate_url # Assuming validate_url is consolidated next
+from assistant_skills_lib.error_handler import (
+    ValidationError,
+)  # Assuming error_handler is consolidated next
+from assistant_skills_lib.validators import (
+    validate_url,
+)  # Assuming validate_url is consolidated next
 
-from .validators import validate_email # Keep local validate_email for now, will consolidate generic ones
+from .validators import (
+    validate_email,
+)  # Keep local validate_email for now, will consolidate generic ones
 from .jira_client import JiraClient
 from .automation_client import AutomationClient
 
 # Try to import credential_manager for keychain support
 try:
     from .credential_manager import CredentialManager, is_keychain_available
+
     CREDENTIAL_MANAGER_AVAILABLE = True
 except ImportError:
     CREDENTIAL_MANAGER_AVAILABLE = False
@@ -34,11 +41,11 @@ except ImportError:
 
 # Default Agile field IDs (common defaults, may vary per JIRA instance)
 DEFAULT_AGILE_FIELDS = {
-    'epic_link': 'customfield_10014',
-    'story_points': 'customfield_10016',
-    'epic_name': 'customfield_10011',
-    'epic_color': 'customfield_10012',
-    'sprint': 'customfield_10020'
+    "epic_link": "customfield_10014",
+    "story_points": "customfield_10016",
+    "epic_name": "customfield_10011",
+    "epic_color": "customfield_10012",
+    "sprint": "customfield_10020",
 }
 
 
@@ -54,7 +61,7 @@ class ConfigManager(BaseConfigManager):
         Args:
             profile: Profile name to use (default: from config or 'production')
         """
-        super().__init__(profile=profile) # Call BaseConfigManager's init
+        super().__init__(profile=profile)  # Call BaseConfigManager's init
 
     def get_service_name(self) -> str:
         """
@@ -67,14 +74,14 @@ class ConfigManager(BaseConfigManager):
         Returns the default configuration dictionary for JIRA.
         """
         return {
-            'default_profile': 'production',
-            'profiles': {},
-            'api': {
-                'version': '3',
-                'timeout': 30,
-                'max_retries': 3,
-                'retry_backoff': 2.0
-            }
+            "default_profile": "production",
+            "profiles": {},
+            "api": {
+                "version": "3",
+                "timeout": 30,
+                "max_retries": 3,
+                "retry_backoff": 2.0,
+            },
         }
 
     def get_profile_config(self, profile: Optional[str] = None) -> Dict[str, Any]:
@@ -91,13 +98,13 @@ class ConfigManager(BaseConfigManager):
             ValidationError: If profile doesn't exist
         """
         profile_name = profile or self.profile
-        profiles = self.config.get(self.service_name, {}).get('profiles', {})
+        profiles = self.config.get(self.service_name, {}).get("profiles", {})
 
         if profile_name not in profiles:
             raise ValidationError(
                 f"Profile '{profile_name}' not found. Available profiles: {list(profiles.keys())}"
             )
-        
+
         return profiles[profile_name]
 
     def get_credentials(self, profile: Optional[str] = None) -> tuple:
@@ -131,16 +138,20 @@ class ConfigManager(BaseConfigManager):
         url, email, api_token = None, None, None
 
         # Priority 1: Environment variables (highest priority)
-        url = self.get_credential_from_env('SITE_URL')
-        email = self.get_credential_from_env('EMAIL')
-        api_token = self.get_credential_from_env(f'API_TOKEN_{profile.upper()}') or self.get_credential_from_env('API_TOKEN')
+        url = self.get_credential_from_env("SITE_URL")
+        email = self.get_credential_from_env("EMAIL")
+        api_token = self.get_credential_from_env(
+            f"API_TOKEN_{profile.upper()}"
+        ) or self.get_credential_from_env("API_TOKEN")
 
         # Priority 2: System keychain (if available and we're missing any credential)
         if CREDENTIAL_MANAGER_AVAILABLE and is_keychain_available():
             if not (url and email and api_token):
                 try:
                     cred_mgr = CredentialManager(profile)
-                    kc_url, kc_email, kc_token = cred_mgr.get_credentials_from_keychain(profile)
+                    kc_url, kc_email, kc_token = cred_mgr.get_credentials_from_keychain(
+                        profile
+                    )
                     url = url or kc_url
                     email = email or kc_email
                     api_token = api_token or kc_token
@@ -149,14 +160,14 @@ class ConfigManager(BaseConfigManager):
 
         # Priority 3: settings.local.json credentials
         if not (url and email and api_token):
-            credentials = self.config.get('jira', {}).get('credentials', {})
+            credentials = self.config.get("jira", {}).get("credentials", {})
             profile_creds = credentials.get(profile, {})
-            email = email or profile_creds.get('email')
-            api_token = api_token or profile_creds.get('api_token')
+            email = email or profile_creds.get("email")
+            api_token = api_token or profile_creds.get("api_token")
 
         # Priority 4: settings.json for URL (from profile config)
         if not url:
-            url = profile_config.get('url')
+            url = profile_config.get("url")
 
         # Validate we have all required credentials
         if not url:
@@ -180,7 +191,7 @@ class ConfigManager(BaseConfigManager):
 
         # Validate format (using base class's validate_url from assistant_skills_lib)
         url = validate_url(url)
-        email = validate_email(email) # Keep local validate_email for now
+        email = validate_email(email)  # Keep local validate_email for now
 
         return url, email, api_token
 
@@ -193,7 +204,7 @@ class ConfigManager(BaseConfigManager):
         """
         # Get base API config and merge with Jira-specific defaults/overrides
         base_api_config = super().get_api_config()
-        jira_api_config = self.config.get(self.service_name, {}).get('api', {})
+        jira_api_config = self.config.get(self.service_name, {}).get("api", {})
         base_api_config.update(jira_api_config)
         return base_api_config
 
@@ -218,9 +229,9 @@ class ConfigManager(BaseConfigManager):
             base_url=url,
             email=email,
             api_token=api_token,
-            timeout=api_config.get('timeout', 30),
-            max_retries=api_config.get('max_retries', 3),
-            retry_backoff=api_config.get('retry_backoff', 2.0)
+            timeout=api_config.get("timeout", 30),
+            max_retries=api_config.get("max_retries", 3),
+            retry_backoff=api_config.get("retry_backoff", 2.0),
         )
 
     def get_default_project(self, profile: Optional[str] = None) -> Optional[str]:
@@ -236,11 +247,9 @@ class ConfigManager(BaseConfigManager):
         profile = profile or self.profile
         try:
             profile_config = self.get_profile_config(profile)
-            return profile_config.get('default_project')
+            return profile_config.get("default_project")
         except ValidationError:
             return None
-
-
 
     def get_agile_fields(self, profile: Optional[str] = None) -> Dict[str, str]:
         """
@@ -266,11 +275,11 @@ class ConfigManager(BaseConfigManager):
 
         # Check environment variables (highest priority)
         env_mappings = {
-            'epic_link': 'JIRA_EPIC_LINK_FIELD',
-            'story_points': 'JIRA_STORY_POINTS_FIELD',
-            'epic_name': 'JIRA_EPIC_NAME_FIELD',
-            'epic_color': 'JIRA_EPIC_COLOR_FIELD',
-            'sprint': 'JIRA_SPRINT_FIELD'
+            "epic_link": "JIRA_EPIC_LINK_FIELD",
+            "story_points": "JIRA_STORY_POINTS_FIELD",
+            "epic_name": "JIRA_EPIC_NAME_FIELD",
+            "epic_color": "JIRA_EPIC_COLOR_FIELD",
+            "sprint": "JIRA_SPRINT_FIELD",
         }
 
         for field_name, env_var in env_mappings.items():
@@ -281,7 +290,7 @@ class ConfigManager(BaseConfigManager):
         # Override with profile-specific config
         try:
             profile_config = self.get_profile_config(profile)
-            agile_config = profile_config.get('agile_fields', {})
+            agile_config = profile_config.get("agile_fields", {})
             for field_name, field_id in agile_config.items():
                 if field_id:
                     fields[field_name] = field_id
@@ -304,7 +313,13 @@ class ConfigManager(BaseConfigManager):
         Raises:
             ValidationError: If field_name is not a valid Agile field
         """
-        valid_fields = ['epic_link', 'story_points', 'epic_name', 'epic_color', 'sprint']
+        valid_fields = [
+            "epic_link",
+            "story_points",
+            "epic_name",
+            "epic_color",
+            "sprint",
+        ]
         if field_name not in valid_fields:
             raise ValidationError(
                 f"Invalid Agile field name: {field_name}. "
@@ -332,10 +347,10 @@ class ConfigManager(BaseConfigManager):
         api_config = self.get_api_config()
 
         # Check for optional automation-specific config
-        automation_config = self.config.get(self.service_name, {}).get('automation', {})
-        cloud_id = automation_config.get('cloudId')
-        product = automation_config.get('product', 'jira')
-        use_gateway = automation_config.get('useGateway', False)
+        automation_config = self.config.get(self.service_name, {}).get("automation", {})
+        cloud_id = automation_config.get("cloudId")
+        product = automation_config.get("product", "jira")
+        use_gateway = automation_config.get("useGateway", False)
 
         return AutomationClient(
             site_url=url,
@@ -344,9 +359,9 @@ class ConfigManager(BaseConfigManager):
             cloud_id=cloud_id,  # Will be auto-fetched if None
             product=product,
             use_gateway=use_gateway,
-            timeout=api_config.get('timeout', 30),
-            max_retries=api_config.get('max_retries', 3),
-            retry_backoff=api_config.get('retry_backoff', 2.0)
+            timeout=api_config.get("timeout", 30),
+            max_retries=api_config.get("max_retries", 3),
+            retry_backoff=api_config.get("retry_backoff", 2.0),
         )
 
 
@@ -431,11 +446,13 @@ def get_project_context(project_key: str, profile: Optional[str] = None):
         ProjectContext object with metadata, workflows, patterns, and defaults
     """
     from project_context import get_project_context as _get_project_context
+
     return _get_project_context(project_key, profile)
 
 
-def get_project_defaults(project_key: str, issue_type: Optional[str] = None,
-                         profile: Optional[str] = None) -> Dict[str, Any]:
+def get_project_defaults(
+    project_key: str, issue_type: Optional[str] = None, profile: Optional[str] = None
+) -> Dict[str, Any]:
     """
     Convenience function to get default values for issue creation.
 
@@ -460,7 +477,7 @@ def get_project_defaults(project_key: str, issue_type: Optional[str] = None,
     if issue_type:
         return get_defaults_for_issue_type(context, issue_type)
     else:
-        return context.defaults.get('global', {})
+        return context.defaults.get("global", {})
 
 
 def has_project_context(project_key: str, profile: Optional[str] = None) -> bool:
@@ -475,4 +492,5 @@ def has_project_context(project_key: str, profile: Optional[str] = None) -> bool
         True if skill directory or settings config exists for this project
     """
     from project_context import has_project_context as _has_project_context
+
     return _has_project_context(project_key, profile)

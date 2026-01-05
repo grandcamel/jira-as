@@ -42,12 +42,12 @@ def resolve_user_to_account_id(client, user_identifier: str) -> str:
         >>> account_id = resolve_user_to_account_id(client, "user@example.com")
         >>> print(account_id)  # e.g., "5b10ac8d82e05b22cc7d4ef5"
     """
-    if '@' in user_identifier:
+    if "@" in user_identifier:
         # Treat as email - perform user search
         users = client.search_users(user_identifier, max_results=1)
         if not users:
             raise UserNotFoundError(user_identifier)
-        return users[0]['accountId']
+        return users[0]["accountId"]
     else:
         # Assume it's already an account ID
         return user_identifier
@@ -76,9 +76,9 @@ def get_user_display_info(client, account_id: str) -> Dict[str, Any]:
         >>> print(info['displayName'])  # e.g., "John Doe"
     """
     return client.get(
-        '/rest/api/3/user',
-        params={'accountId': account_id},
-        operation=f"get user {account_id}"
+        "/rest/api/3/user",
+        params={"accountId": account_id},
+        operation=f"get user {account_id}",
     )
 
 

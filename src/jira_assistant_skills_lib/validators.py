@@ -16,7 +16,7 @@ from assistant_skills_lib.validators import (
     validate_url as base_validate_url,
     validate_email as base_validate_email,
     validate_path as base_validate_path,
-    validate_int
+    validate_int,
 )
 
 
@@ -36,12 +36,13 @@ def validate_issue_key(issue_key: str) -> str:
     issue_key = validate_required(issue_key, "issue_key")
     issue_key = issue_key.upper()
 
-    pattern = r'^[A-Z][A-Z0-9]*-[0-9]+$'
+    pattern = r"^[A-Z][A-Z0-9]*-[0-9]+$"
     if not re.match(pattern, issue_key):
         raise ValidationError(
             f"Invalid issue key format: '{issue_key}'. "
             "Expected format: PROJECT-123 (e.g., PROJ-42, DEV-1234)",
-            operation="validation", details={"field": "issue_key", "value": issue_key}
+            operation="validation",
+            details={"field": "issue_key", "value": issue_key},
         )
 
     return issue_key
@@ -63,19 +64,21 @@ def validate_project_key(project_key: str) -> str:
     project_key = validate_required(project_key, "project_key")
     project_key = project_key.upper()
 
-    pattern = r'^[A-Z][A-Z0-9]*$'
+    pattern = r"^[A-Z][A-Z0-9]*$"
     if not re.match(pattern, project_key):
         raise ValidationError(
             f"Invalid project key format: '{project_key}'. "
             "Expected format: 2-10 uppercase letters/numbers, starting with a letter "
             "(e.g., PROJ, DEV, SUPPORT)",
-            operation="validation", details={"field": "project_key", "value": project_key}
+            operation="validation",
+            details={"field": "project_key", "value": project_key},
         )
 
     if len(project_key) < 2 or len(project_key) > 10:
         raise ValidationError(
             f"Project key must be 2-10 characters long (got {len(project_key)})",
-            operation="validation", details={"field": "project_key", "value": project_key}
+            operation="validation",
+            details={"field": "project_key", "value": project_key},
         )
 
     return project_key
@@ -97,25 +100,27 @@ def validate_jql(jql: str) -> str:
     jql = validate_required(jql, "jql")
 
     dangerous_patterns = [
-        r';\s*DROP',
-        r';\s*DELETE',
-        r';\s*INSERT',
-        r';\s*UPDATE',
-        r'<script',
-        r'javascript:',
+        r";\s*DROP",
+        r";\s*DELETE",
+        r";\s*INSERT",
+        r";\s*UPDATE",
+        r"<script",
+        r"javascript:",
     ]
 
     for pattern in dangerous_patterns:
         if re.search(pattern, jql, re.IGNORECASE):
             raise ValidationError(
                 f"JQL query contains potentially dangerous pattern: {pattern}",
-                operation="validation", details={"field": "jql", "value": jql}
+                operation="validation",
+                details={"field": "jql", "value": jql},
             )
 
     if len(jql) > 10000:
         raise ValidationError(
             f"JQL query is too long ({len(jql)} characters). Maximum is 10000.",
-            operation="validation", details={"field": "jql", "value": jql}
+            operation="validation",
+            details={"field": "jql", "value": jql},
         )
 
     return jql
@@ -140,7 +145,7 @@ def validate_file_path(file_path: str, must_exist: bool = True) -> str:
         file_path,
         field_name="file_path",
         must_exist=must_exist,
-        must_be_file=True # Always a file for attachments
+        must_be_file=True,  # Always a file for attachments
     )
     abs_path = str(path_obj.absolute())
 
@@ -151,7 +156,8 @@ def validate_file_path(file_path: str, must_exist: bool = True) -> str:
             raise ValidationError(
                 f"File is too large ({file_size / 1024 / 1024:.1f}MB). "
                 f"Maximum size is {max_size / 1024 / 1024}MB.",
-                operation="validation", details={"field": "file_path", "value": abs_path}
+                operation="validation",
+                details={"field": "file_path", "value": abs_path},
             )
 
     return abs_path
@@ -175,7 +181,7 @@ def validate_url(url: str, require_https: bool = True) -> str:
         url,
         field_name="URL",
         require_https=require_https,
-        allowed_schemes=['https'] # JIRA typically requires HTTPS
+        allowed_schemes=["https"],  # JIRA typically requires HTTPS
     )
 
 
@@ -214,22 +220,22 @@ def validate_transition_id(transition_id: str) -> str:
 
 # ========== Project Administration Validators ==========
 
-VALID_PROJECT_TYPES = ['software', 'business', 'service_desk']
-VALID_ASSIGNEE_TYPES = ['PROJECT_LEAD', 'UNASSIGNED', 'COMPONENT_LEAD']
+VALID_PROJECT_TYPES = ["software", "business", "service_desk"]
+VALID_ASSIGNEE_TYPES = ["PROJECT_LEAD", "UNASSIGNED", "COMPONENT_LEAD"]
 
 # Common project template shortcuts
 PROJECT_TEMPLATES = {
-    'scrum': 'com.pyxis.greenhopper.jira:gh-simplified-agility-scrum',
-    'kanban': 'com.pyxis.greenhopper.jira:gh-simplified-agility-kanban',
-    'basic': 'com.pyxis.greenhopper.jira:gh-simplified-basic',
-    'simplified-scrum': 'com.pyxis.greenhopper.jira:gh-simplified-agility-scrum',
-    'simplified-kanban': 'com.pyxis.greenhopper.jira:gh-simplified-agility-kanban',
-    'classic-scrum': 'com.pyxis.greenhopper.jira:gh-scrum-template',
-    'classic-kanban': 'com.pyxis.greenhopper.jira:gh-kanban-template',
-    'project-management': 'com.atlassian.jira-core-project-templates:jira-core-project-management',
-    'task-management': 'com.atlassian.jira-core-project-templates:jira-core-task-management',
-    'it-service-desk': 'com.atlassian.servicedesk:simplified-it-service-desk',
-    'general-service-desk': 'com.atlassian.servicedesk:simplified-general-service-desk',
+    "scrum": "com.pyxis.greenhopper.jira:gh-simplified-agility-scrum",
+    "kanban": "com.pyxis.greenhopper.jira:gh-simplified-agility-kanban",
+    "basic": "com.pyxis.greenhopper.jira:gh-simplified-basic",
+    "simplified-scrum": "com.pyxis.greenhopper.jira:gh-simplified-agility-scrum",
+    "simplified-kanban": "com.pyxis.greenhopper.jira:gh-simplified-agility-kanban",
+    "classic-scrum": "com.pyxis.greenhopper.jira:gh-scrum-template",
+    "classic-kanban": "com.pyxis.greenhopper.jira:gh-kanban-template",
+    "project-management": "com.atlassian.jira-core-project-templates:jira-core-project-management",
+    "task-management": "com.atlassian.jira-core-project-templates:jira-core-task-management",
+    "it-service-desk": "com.atlassian.servicedesk:simplified-it-service-desk",
+    "general-service-desk": "com.atlassian.servicedesk:simplified-general-service-desk",
 }
 
 
@@ -253,7 +259,8 @@ def validate_project_type(project_type: str) -> str:
         raise ValidationError(
             f"Invalid project type: '{project_type}'. "
             f"Valid types: {', '.join(VALID_PROJECT_TYPES)}",
-            operation="validation", details={"field": "project_type", "value": project_type}
+            operation="validation",
+            details={"field": "project_type", "value": project_type},
         )
 
     return project_type
@@ -279,7 +286,8 @@ def validate_assignee_type(assignee_type: str) -> str:
         raise ValidationError(
             f"Invalid assignee type: '{assignee_type}'. "
             f"Valid types: {', '.join(VALID_ASSIGNEE_TYPES)}",
-            operation="validation", details={"field": "assignee_type", "value": assignee_type}
+            operation="validation",
+            details={"field": "assignee_type", "value": assignee_type},
         )
 
     return assignee_type
@@ -306,16 +314,17 @@ def validate_project_template(template: str) -> str:
         return PROJECT_TEMPLATES[template]
 
     # If it looks like a full template key, return it
-    if '.' in template or ':' in template:
+    if "." in template or ":" in template:
         return template
 
     # Unknown shortcut
-    shortcuts = ', '.join(PROJECT_TEMPLATES.keys())
+    shortcuts = ", ".join(PROJECT_TEMPLATES.keys())
     raise ValidationError(
         f"Unknown template shortcut: '{template}'. "
         f"Valid shortcuts: {shortcuts}\n"
         "Or provide a full template key (e.g., com.pyxis.greenhopper.jira:gh-scrum-template)",
-        operation="validation", details={"field": "project_template", "value": template}
+        operation="validation",
+        details={"field": "project_template", "value": template},
     )
 
 
@@ -337,13 +346,15 @@ def validate_project_name(name: str) -> str:
     if len(name) < 2:
         raise ValidationError(
             "Project name must be at least 2 characters long",
-            operation="validation", details={"field": "project_name", "value": name}
+            operation="validation",
+            details={"field": "project_name", "value": name},
         )
 
     if len(name) > 80:
         raise ValidationError(
             f"Project name is too long ({len(name)} characters). Maximum is 80.",
-            operation="validation", details={"field": "project_name", "value": name}
+            operation="validation",
+            details={"field": "project_name", "value": name},
         )
 
     return name
@@ -367,13 +378,15 @@ def validate_category_name(name: str) -> str:
     if len(name) < 1:
         raise ValidationError(
             "Category name must not be empty",
-            operation="validation", details={"field": "category_name", "value": name}
+            operation="validation",
+            details={"field": "category_name", "value": name},
         )
 
     if len(name) > 255:
         raise ValidationError(
             f"Category name is too long ({len(name)} characters). Maximum is 255.",
-            operation="validation", details={"field": "category_name", "value": name}
+            operation="validation",
+            details={"field": "category_name", "value": name},
         )
 
     return name
@@ -396,14 +409,15 @@ def validate_avatar_file(file_path: str) -> str:
     abs_path = validate_file_path(file_path, must_exist=True)
 
     # Check file extension
-    valid_extensions = ['.png', '.jpg', '.jpeg', '.gif']
+    valid_extensions = [".png", ".jpg", ".jpeg", ".gif"]
     ext = os.path.splitext(abs_path)[1].lower()
 
     if ext not in valid_extensions:
         raise ValidationError(
             f"Invalid avatar file format: '{ext}'. "
             f"Valid formats: {', '.join(valid_extensions)}",
-            operation="validation", details={"field": "file_path", "value": abs_path}
+            operation="validation",
+            details={"field": "file_path", "value": abs_path},
         )
 
     # Check file size (1MB max for avatars)
@@ -413,7 +427,8 @@ def validate_avatar_file(file_path: str) -> str:
         raise ValidationError(
             f"Avatar file is too large ({file_size / 1024:.1f}KB). "
             f"Maximum size is {max_size / 1024}KB.",
-            operation="validation", details={"field": "file_path", "value": abs_path}
+            operation="validation",
+            details={"field": "file_path", "value": abs_path},
         )
 
     return abs_path
