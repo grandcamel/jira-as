@@ -373,11 +373,16 @@ def get_jira_client(profile: Optional[str] = None) -> JiraClient:
         profile: Profile name (default: from config or environment)
 
     Returns:
-        Configured JiraClient instance
+        Configured JiraClient instance (or MockJiraClient if JIRA_MOCK_MODE=true)
 
     Raises:
         ValidationError: If configuration is invalid or incomplete
     """
+    # Check for mock mode first - allows testing without real JIRA credentials
+    from .mock import is_mock_mode, MockJiraClient
+    if is_mock_mode():
+        return MockJiraClient()
+
     config_manager = ConfigManager.get_instance(profile=profile)
     return config_manager.get_client()
 
