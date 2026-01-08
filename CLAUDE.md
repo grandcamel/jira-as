@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is the `jira-assistant-skills-lib` PyPI package - a shared Python library providing HTTP client, configuration management, error handling, and utilities for JIRA REST API automation. It is a dependency of the [JIRA Assistant Skills](https://github.com/grandcamel/Jira-Assistant-Skills) project.
 
+**Usage context**: This library powers the `jira` CLI and skill scripts. When Claude Code invokes a JIRA skill, it loads the SKILL.md context, then uses Bash to execute `jira` CLI commands which call this library.
+
 ## Common Commands
 
 ```bash
