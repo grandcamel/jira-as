@@ -75,8 +75,7 @@ def fuzzy_find_by_name(
     elif len(partial_matches) > 1:
         match_names = [name_getter(i) for i in partial_matches]
         raise ValidationError(
-            f"Ambiguous {item_type} name '{name}'. Matches: "
-            + ", ".join(match_names)
+            f"Ambiguous {item_type} name '{name}'. Matches: " + ", ".join(match_names)
         )
 
     # No matches found
@@ -136,7 +135,8 @@ def fuzzy_find_by_name_optional(
     elif len(partial_matches) > 1:
         match_names = [name_getter(i) for i in partial_matches]
         raise ValidationError(
-            f"Ambiguous name '{name}' matches multiple items: " + ", ".join(match_names)
+            f"Ambiguous name '{name}' matches multiple items: "
+            + ", ".join(match_names)
             + ". Please be more specific."
         )
 
