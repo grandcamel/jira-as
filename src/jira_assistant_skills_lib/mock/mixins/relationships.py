@@ -507,9 +507,11 @@ class RelationshipsMixin:
                     {
                         "issue": self._issues[other_key],
                         "linkType": link["type"],
-                        "direction": "outward"
-                        if link["inwardIssue"]["key"] == issue_key
-                        else "inward",
+                        "direction": (
+                            "outward"
+                            if link["inwardIssue"]["key"] == issue_key
+                            else "inward"
+                        ),
                     }
                 )
 

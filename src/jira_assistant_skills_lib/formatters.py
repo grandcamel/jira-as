@@ -67,7 +67,9 @@ def extract_issue_fields(issue: dict[str, Any]) -> IssueFields:
             sprint_name = sprint.get("name", str(sprint))
         elif isinstance(sprint, list) and sprint:
             first = sprint[0]
-            sprint_name = first.get("name", str(first)) if isinstance(first, dict) else str(first)
+            sprint_name = (
+                first.get("name", str(first)) if isinstance(first, dict) else str(first)
+            )
         else:
             sprint_name = str(sprint)
 
@@ -81,9 +83,21 @@ def extract_issue_fields(issue: dict[str, Any]) -> IssueFields:
         summary=fields.get("summary", "N/A"),
         status=safe_get_nested(fields, "status.name", "N/A"),
         issue_type=safe_get_nested(fields, "issuetype.name", "N/A"),
-        priority=safe_get_nested(fields, "priority.name", "None") if fields.get("priority") else "None",
-        assignee=safe_get_nested(fields, "assignee.displayName", "Unassigned") if fields.get("assignee") else "Unassigned",
-        reporter=safe_get_nested(fields, "reporter.displayName", "N/A") if fields.get("reporter") else "N/A",
+        priority=(
+            safe_get_nested(fields, "priority.name", "None")
+            if fields.get("priority")
+            else "None"
+        ),
+        assignee=(
+            safe_get_nested(fields, "assignee.displayName", "Unassigned")
+            if fields.get("assignee")
+            else "Unassigned"
+        ),
+        reporter=(
+            safe_get_nested(fields, "reporter.displayName", "N/A")
+            if fields.get("reporter")
+            else "N/A"
+        ),
         created=fields.get("created", "N/A"),
         updated=fields.get("updated", "N/A"),
         epic_link=fields.get(EPIC_LINK_FIELD),
@@ -280,9 +294,21 @@ def format_search_results(
             "Key": issue.get("key", ""),
             "Type": safe_get_nested(fields, "issuetype.name", ""),
             "Status": safe_get_nested(fields, "status.name", ""),
-            "Priority": safe_get_nested(fields, "priority.name", "") if fields.get("priority") else "",
-            "Assignee": safe_get_nested(fields, "assignee.displayName", "") if fields.get("assignee") else "",
-            "Reporter": safe_get_nested(fields, "reporter.displayName", "") if fields.get("reporter") else "",
+            "Priority": (
+                safe_get_nested(fields, "priority.name", "")
+                if fields.get("priority")
+                else ""
+            ),
+            "Assignee": (
+                safe_get_nested(fields, "assignee.displayName", "")
+                if fields.get("assignee")
+                else ""
+            ),
+            "Reporter": (
+                safe_get_nested(fields, "reporter.displayName", "")
+                if fields.get("reporter")
+                else ""
+            ),
             "Summary": fields.get("summary", "")[:50],
         }
 
