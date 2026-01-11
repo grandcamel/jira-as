@@ -37,6 +37,7 @@ from .jira_client import JiraClient
 from .validators import (
     validate_email,
 )  # Keep local validate_email for now, will consolidate generic ones
+from .constants import DEFAULT_AGILE_FIELDS
 
 # Try to import credential_manager for keychain support
 try:
@@ -45,16 +46,6 @@ try:
     CREDENTIAL_MANAGER_AVAILABLE = True
 except ImportError:
     CREDENTIAL_MANAGER_AVAILABLE = False
-
-
-# Default Agile field IDs (common defaults, may vary per JIRA instance)
-DEFAULT_AGILE_FIELDS = {
-    "epic_link": "customfield_10014",
-    "story_points": "customfield_10016",
-    "epic_name": "customfield_10011",
-    "epic_color": "customfield_10012",
-    "sprint": "customfield_10020",
-}
 
 
 class ConfigManager(BaseConfigManager):
@@ -141,7 +132,9 @@ class ConfigManager(BaseConfigManager):
             if not (url and email and api_token):
                 try:
                     cred_mgr = CredentialManager()
-                    kc_url, kc_email, kc_token = cred_mgr.get_credentials_from_keychain()
+                    kc_url, kc_email, kc_token = (
+                        cred_mgr.get_credentials_from_keychain()
+                    )
                     url = url or kc_url
                     email = email or kc_email
                     api_token = api_token or kc_token
@@ -363,6 +356,7 @@ def get_jira_client() -> JiraClient:
     """
     # Check for mock mode first - allows testing without real JIRA credentials
     from .mock import MockJiraClient, is_mock_mode
+
     if is_mock_mode():
         return MockJiraClient()
 

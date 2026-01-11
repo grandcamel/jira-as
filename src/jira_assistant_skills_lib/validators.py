@@ -326,6 +326,45 @@ def validate_project_template(template: str) -> str:
     )
 
 
+def _validate_string_length(
+    value: str, field_name: str, min_length: int, max_length: int
+) -> str:
+    """
+    Validate string length within bounds.
+
+    Args:
+        value: String to validate (already stripped by validate_required)
+        field_name: Field name for error messages
+        min_length: Minimum allowed length
+        max_length: Maximum allowed length
+
+    Returns:
+        Validated string
+
+    Raises:
+        ValidationError: If length is out of bounds
+    """
+    value = validate_required(value, field_name)
+
+    if len(value) < min_length:
+        raise ValidationError(
+            f"{field_name.replace('_', ' ').capitalize()} must be at least "
+            f"{min_length} character{'s' if min_length > 1 else ''} long",
+            operation="validation",
+            details={"field": field_name, "value": value},
+        )
+
+    if len(value) > max_length:
+        raise ValidationError(
+            f"{field_name.replace('_', ' ').capitalize()} is too long "
+            f"({len(value)} characters). Maximum is {max_length}.",
+            operation="validation",
+            details={"field": field_name, "value": value},
+        )
+
+    return value
+
+
 def validate_project_name(name: str) -> str:
     """
     Validate project name.
@@ -339,23 +378,7 @@ def validate_project_name(name: str) -> str:
     Raises:
         ValidationError: If name is invalid
     """
-    name = validate_required(name, "project_name")
-
-    if len(name) < 2:
-        raise ValidationError(
-            "Project name must be at least 2 characters long",
-            operation="validation",
-            details={"field": "project_name", "value": name},
-        )
-
-    if len(name) > 80:
-        raise ValidationError(
-            f"Project name is too long ({len(name)} characters). Maximum is 80.",
-            operation="validation",
-            details={"field": "project_name", "value": name},
-        )
-
-    return name
+    return _validate_string_length(name, "project_name", min_length=2, max_length=80)
 
 
 def validate_category_name(name: str) -> str:
@@ -371,23 +394,7 @@ def validate_category_name(name: str) -> str:
     Raises:
         ValidationError: If name is invalid
     """
-    name = validate_required(name, "category_name")
-
-    if len(name) < 1:
-        raise ValidationError(
-            "Category name must not be empty",
-            operation="validation",
-            details={"field": "category_name", "value": name},
-        )
-
-    if len(name) > 255:
-        raise ValidationError(
-            f"Category name is too long ({len(name)} characters). Maximum is 255.",
-            operation="validation",
-            details={"field": "category_name", "value": name},
-        )
-
-    return name
+    return _validate_string_length(name, "category_name", min_length=1, max_length=255)
 
 
 def validate_avatar_file(file_path: str) -> str:

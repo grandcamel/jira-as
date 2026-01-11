@@ -20,9 +20,7 @@ from assistant_skills_lib.formatters import (
 )
 
 from .adf_helper import adf_to_text
-
-EPIC_LINK_FIELD = "customfield_10014"
-STORY_POINTS_FIELD = "customfield_10016"
+from .constants import EPIC_LINK_FIELD, STORY_POINTS_FIELD
 
 
 def format_issue(issue: dict[str, Any], detailed: bool = False) -> str:

@@ -7,6 +7,8 @@ support (case-insensitive, exact and partial matching).
 
 from typing import Any
 
+from .search_helpers import fuzzy_find_by_name
+
 
 def find_transition_by_name(
     transitions: list[dict[str, Any]], name: str
@@ -28,38 +30,7 @@ def find_transition_by_name(
     Raises:
         ValidationError: If transition not found or ambiguous
     """
-    from .error_handler import ValidationError
-
-    if not transitions:
-        raise ValidationError(f"No transitions available to match '{name}'")
-
-    name_lower = name.lower()
-
-    # Phase 1: Exact match (case-insensitive)
-    exact_matches = [t for t in transitions if t["name"].lower() == name_lower]
-    if len(exact_matches) == 1:
-        return exact_matches[0]
-    elif len(exact_matches) > 1:
-        raise ValidationError(
-            f"Multiple exact matches for transition '{name}': "
-            + ", ".join(t["name"] for t in exact_matches)
-        )
-
-    # Phase 2: Partial match (case-insensitive)
-    partial_matches = [t for t in transitions if name_lower in t["name"].lower()]
-    if len(partial_matches) == 1:
-        return partial_matches[0]
-    elif len(partial_matches) > 1:
-        raise ValidationError(
-            f"Ambiguous transition name '{name}'. Matches: "
-            + ", ".join(t["name"] for t in partial_matches)
-        )
-
-    # No matches found
-    raise ValidationError(
-        f"Transition '{name}' not found. Available: "
-        + ", ".join(t["name"] for t in transitions)
-    )
+    return fuzzy_find_by_name(transitions, name, item_type="transition")
 
 
 def find_transition_by_keywords(

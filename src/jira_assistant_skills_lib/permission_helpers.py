@@ -7,6 +7,7 @@ Provides functions for parsing, formatting, and validating permission grants.
 from typing import Any
 
 from .error_handler import ValidationError
+from .search_helpers import fuzzy_find_by_name_optional
 
 # Holder types and whether they require a parameter (single source of truth)
 _HOLDER_TYPE_REQUIRES_PARAM = {
@@ -223,32 +224,7 @@ def find_scheme_by_name(
     Raises:
         ValidationError: If fuzzy match returns multiple results
     """
-    # Try exact match first
-    for scheme in schemes:
-        if scheme.get("name", "").lower() == name.lower():
-            return scheme
-
-    if not fuzzy:
-        return None
-
-    # Try partial match
-    matches = []
-    name_lower = name.lower()
-    for scheme in schemes:
-        scheme_name = scheme.get("name", "").lower()
-        if name_lower in scheme_name:
-            matches.append(scheme)
-
-    if len(matches) == 0:
-        return None
-    elif len(matches) == 1:
-        return matches[0]
-    else:
-        match_names = [m.get("name") for m in matches]
-        raise ValidationError(
-            f"Ambiguous scheme name '{name}' matches multiple schemes: "
-            f"{', '.join(match_names)}. Please be more specific."
-        )
+    return fuzzy_find_by_name_optional(schemes, name, fuzzy=fuzzy)
 
 
 def group_grants_by_permission(
