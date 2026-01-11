@@ -53,9 +53,12 @@ class ConfigManager(BaseConfigManager):
     Manages JIRA configuration from multiple sources.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         """
         Initialize configuration manager.
+
+        Args:
+            **kwargs: Ignored for backward compatibility with base class.
         """
         super().__init__()  # Call BaseConfigManager's init
 
