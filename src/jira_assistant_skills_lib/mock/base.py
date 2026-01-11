@@ -116,6 +116,149 @@ class MockJiraClientBase:
         self._comments: dict[str, list[dict]] = {}
         self._worklogs: dict[str, list[dict]] = {}
 
+    # =========================================================================
+    # Issue Factory Methods
+    # =========================================================================
+
+    def _make_issue(
+        self,
+        key: str,
+        issue_id: str,
+        summary: str,
+        issuetype: dict[str, str],
+        status: dict[str, str],
+        priority: dict[str, str],
+        assignee: dict[str, Any] | None,
+        reporter: dict[str, Any],
+        project: dict[str, str],
+        description: dict[str, Any] | None = None,
+        labels: list[str] | None = None,
+        **extra_fields: Any,
+    ) -> dict[str, Any]:
+        """Factory method to create an issue structure.
+
+        Args:
+            key: Issue key (e.g., 'DEMO-84')
+            issue_id: Issue ID (e.g., '10084')
+            summary: Issue summary
+            issuetype: Issue type dict with name and id
+            status: Status dict with name and id
+            priority: Priority dict with name and id
+            assignee: Assignee user dict or None
+            reporter: Reporter user dict
+            project: Project dict with key, name, id
+            description: Optional ADF description
+            labels: Labels list (default: ['demo'])
+            **extra_fields: Additional top-level fields (e.g., requestTypeId)
+
+        Returns:
+            Complete issue dictionary
+        """
+        issue = {
+            "key": key,
+            "id": issue_id,
+            "self": f"{self.base_url}/rest/api/3/issue/{issue_id}",
+            "fields": {
+                "summary": summary,
+                "description": description,
+                "issuetype": issuetype,
+                "status": status,
+                "priority": priority,
+                "assignee": assignee,
+                "reporter": reporter,
+                "project": project,
+                "created": "2025-01-01T10:00:00.000+0000",
+                "updated": "2025-01-01T10:00:00.000+0000",
+                "labels": labels or ["demo"],
+            },
+        }
+        # Add any extra top-level fields (for service desk issues)
+        issue.update(extra_fields)
+        return issue
+
+    def _make_demo_issue(
+        self,
+        key: str,
+        issue_id: str,
+        summary: str,
+        issuetype_name: str,
+        issuetype_id: str,
+        priority_name: str,
+        priority_id: str,
+        assignee_id: str | None,
+        description: dict[str, Any] | None = None,
+        reporter_id: str = "abc123",
+    ) -> dict[str, Any]:
+        """Factory for DEMO project issues."""
+        return self._make_issue(
+            key=key,
+            issue_id=issue_id,
+            summary=summary,
+            issuetype={"name": issuetype_name, "id": issuetype_id},
+            status={"name": "To Do", "id": "10000"},
+            priority={"name": priority_name, "id": priority_id},
+            assignee=self.USERS.get(assignee_id) if assignee_id else None,
+            reporter={
+                "accountId": reporter_id,
+                "displayName": self.USERS[reporter_id]["displayName"],
+            },
+            project={"key": "DEMO", "name": "Demo Project", "id": "10000"},
+            description=description,
+        )
+
+    def _make_sd_issue(
+        self,
+        key: str,
+        issue_id: str,
+        summary: str,
+        description_text: str,
+        issuetype_name: str,
+        issuetype_id: str,
+        priority_name: str,
+        priority_id: str,
+        reporter_id: str,
+        request_type_id: str,
+    ) -> dict[str, Any]:
+        """Factory for DEMOSD service desk issues."""
+        description = {
+            "type": "doc",
+            "version": 1,
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [{"type": "text", "text": description_text}],
+                }
+            ],
+        }
+        return self._make_issue(
+            key=key,
+            issue_id=issue_id,
+            summary=summary,
+            issuetype={"name": issuetype_name, "id": issuetype_id},
+            status={"name": "Waiting for support", "id": "10100"},
+            priority={"name": priority_name, "id": priority_id},
+            assignee=None,
+            reporter=self.USERS[reporter_id],
+            project={"key": "DEMOSD", "name": "Demo Service Desk", "id": "10001"},
+            description=description,
+            requestTypeId=request_type_id,
+            serviceDeskId="1",
+            currentStatus={"status": "Waiting for support", "statusCategory": "new"},
+        )
+
+    def _make_adf_description(self, text: str) -> dict[str, Any]:
+        """Create an ADF description from plain text."""
+        return {
+            "type": "doc",
+            "version": 1,
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [{"type": "text", "text": text}],
+                }
+            ],
+        }
+
     def _init_issues(self) -> dict[str, dict]:
         """Initialize issue store with seed data matching DEMO project.
 
@@ -123,381 +266,62 @@ class MockJiraClientBase:
             Dictionary of issue key to issue data for DEMO-84 through DEMO-91
             and DEMOSD-1 through DEMOSD-5.
         """
-        return {
-            "DEMO-84": {
-                "key": "DEMO-84",
-                "id": "10084",
-                "self": f"{self.base_url}/rest/api/3/issue/10084",
-                "fields": {
-                    "summary": "Product Launch",
-                    "description": {
-                        "type": "doc",
-                        "version": 1,
-                        "content": [
-                            {
-                                "type": "paragraph",
-                                "content": [
-                                    {
-                                        "type": "text",
-                                        "text": "Epic for product launch activities",
-                                    }
-                                ],
-                            }
-                        ],
-                    },
-                    "issuetype": {"name": "Epic", "id": "10000"},
-                    "status": {"name": "To Do", "id": "10000"},
-                    "priority": {"name": "High", "id": "2"},
-                    "assignee": {
-                        "accountId": "abc123",
-                        "displayName": "Jason Krueger",
-                        "emailAddress": "jasonkrue@gmail.com",
-                    },
-                    "reporter": {
-                        "accountId": "abc123",
-                        "displayName": "Jason Krueger",
-                    },
-                    "project": {"key": "DEMO", "name": "Demo Project", "id": "10000"},
-                    "created": "2025-01-01T10:00:00.000+0000",
-                    "updated": "2025-01-01T10:00:00.000+0000",
-                    "labels": ["demo"],
-                },
-            },
-            "DEMO-85": {
-                "key": "DEMO-85",
-                "id": "10085",
-                "self": f"{self.base_url}/rest/api/3/issue/10085",
-                "fields": {
-                    "summary": "User Authentication",
-                    "description": None,
-                    "issuetype": {"name": "Story", "id": "10001"},
-                    "status": {"name": "To Do", "id": "10000"},
-                    "priority": {"name": "High", "id": "2"},
-                    "assignee": {
-                        "accountId": "abc123",
-                        "displayName": "Jason Krueger",
-                        "emailAddress": "jasonkrue@gmail.com",
-                    },
-                    "reporter": {
-                        "accountId": "abc123",
-                        "displayName": "Jason Krueger",
-                    },
-                    "project": {"key": "DEMO", "name": "Demo Project", "id": "10000"},
-                    "created": "2025-01-01T10:00:00.000+0000",
-                    "updated": "2025-01-01T10:00:00.000+0000",
-                    "labels": ["demo"],
-                },
-            },
-            "DEMO-86": {
-                "key": "DEMO-86",
-                "id": "10086",
-                "self": f"{self.base_url}/rest/api/3/issue/10086",
-                "fields": {
-                    "summary": "Login fails on mobile Safari",
-                    "description": None,
-                    "issuetype": {"name": "Bug", "id": "10002"},
-                    "status": {"name": "To Do", "id": "10000"},
-                    "priority": {"name": "High", "id": "2"},
-                    "assignee": {
-                        "accountId": "def456",
-                        "displayName": "Jane Manager",
-                        "emailAddress": "jane@example.com",
-                    },
-                    "reporter": {
-                        "accountId": "abc123",
-                        "displayName": "Jason Krueger",
-                    },
-                    "project": {"key": "DEMO", "name": "Demo Project", "id": "10000"},
-                    "created": "2025-01-01T10:00:00.000+0000",
-                    "updated": "2025-01-01T10:00:00.000+0000",
-                    "labels": ["demo"],
-                },
-            },
-            "DEMO-87": {
-                "key": "DEMO-87",
-                "id": "10087",
-                "self": f"{self.base_url}/rest/api/3/issue/10087",
-                "fields": {
-                    "summary": "Update API documentation",
-                    "description": None,
-                    "issuetype": {"name": "Task", "id": "10003"},
-                    "status": {"name": "To Do", "id": "10000"},
-                    "priority": {"name": "Medium", "id": "3"},
-                    "assignee": {
-                        "accountId": "def456",
-                        "displayName": "Jane Manager",
-                        "emailAddress": "jane@example.com",
-                    },
-                    "reporter": {
-                        "accountId": "abc123",
-                        "displayName": "Jason Krueger",
-                    },
-                    "project": {"key": "DEMO", "name": "Demo Project", "id": "10000"},
-                    "created": "2025-01-01T10:00:00.000+0000",
-                    "updated": "2025-01-01T10:00:00.000+0000",
-                    "labels": ["demo"],
-                },
-            },
-            "DEMO-91": {
-                "key": "DEMO-91",
-                "id": "10091",
-                "self": f"{self.base_url}/rest/api/3/issue/10091",
-                "fields": {
-                    "summary": "Search pagination bug",
-                    "description": None,
-                    "issuetype": {"name": "Bug", "id": "10002"},
-                    "status": {"name": "To Do", "id": "10000"},
-                    "priority": {"name": "Medium", "id": "3"},
-                    "assignee": {
-                        "accountId": "abc123",
-                        "displayName": "Jason Krueger",
-                        "emailAddress": "jasonkrue@gmail.com",
-                    },
-                    "reporter": {
-                        "accountId": "def456",
-                        "displayName": "Jane Manager",
-                        "emailAddress": "jane@example.com",
-                    },
-                    "project": {"key": "DEMO", "name": "Demo Project", "id": "10000"},
-                    "created": "2025-01-01T10:00:00.000+0000",
-                    "updated": "2025-01-01T10:00:00.000+0000",
-                    "labels": ["demo"],
-                },
-            },
-            # =====================================================================
-            # DEMOSD Service Desk Issues
-            # =====================================================================
-            "DEMOSD-1": {
-                "key": "DEMOSD-1",
-                "id": "20001",
-                "self": f"{self.base_url}/rest/api/3/issue/20001",
-                "fields": {
-                    "summary": "Can't connect to VPN",
-                    "description": {
-                        "type": "doc",
-                        "version": 1,
-                        "content": [
-                            {
-                                "type": "paragraph",
-                                "content": [
-                                    {
-                                        "type": "text",
-                                        "text": "I'm working from home and can't connect to the corporate VPN. Getting 'connection timeout' error.",
-                                    }
-                                ],
-                            }
-                        ],
-                    },
-                    "issuetype": {"name": "IT help", "id": "10100"},
-                    "status": {"name": "Waiting for support", "id": "10100"},
-                    "priority": {"name": "Medium", "id": "3"},
-                    "assignee": None,
-                    "reporter": {
-                        "accountId": "abc123",
-                        "displayName": "Jason Krueger",
-                        "emailAddress": "jasonkrue@gmail.com",
-                    },
-                    "project": {
-                        "key": "DEMOSD",
-                        "name": "Demo Service Desk",
-                        "id": "10001",
-                    },
-                    "created": "2025-01-01T10:00:00.000+0000",
-                    "updated": "2025-01-01T10:00:00.000+0000",
-                    "labels": ["demo"],
-                },
-                "requestTypeId": "1",
-                "serviceDeskId": "1",
-                "currentStatus": {
-                    "status": "Waiting for support",
-                    "statusCategory": "new",
-                },
-            },
-            "DEMOSD-2": {
-                "key": "DEMOSD-2",
-                "id": "20002",
-                "self": f"{self.base_url}/rest/api/3/issue/20002",
-                "fields": {
-                    "summary": "New laptop for development",
-                    "description": {
-                        "type": "doc",
-                        "version": 1,
-                        "content": [
-                            {
-                                "type": "paragraph",
-                                "content": [
-                                    {
-                                        "type": "text",
-                                        "text": "Need a new development laptop with 32GB RAM and SSD.",
-                                    }
-                                ],
-                            }
-                        ],
-                    },
-                    "issuetype": {"name": "Computer support", "id": "10101"},
-                    "status": {"name": "Waiting for support", "id": "10100"},
-                    "priority": {"name": "Medium", "id": "3"},
-                    "assignee": None,
-                    "reporter": {
-                        "accountId": "abc123",
-                        "displayName": "Jason Krueger",
-                        "emailAddress": "jasonkrue@gmail.com",
-                    },
-                    "project": {
-                        "key": "DEMOSD",
-                        "name": "Demo Service Desk",
-                        "id": "10001",
-                    },
-                    "created": "2025-01-01T10:00:00.000+0000",
-                    "updated": "2025-01-01T10:00:00.000+0000",
-                    "labels": ["demo"],
-                },
-                "requestTypeId": "2",
-                "serviceDeskId": "1",
-                "currentStatus": {
-                    "status": "Waiting for support",
-                    "statusCategory": "new",
-                },
-            },
-            "DEMOSD-3": {
-                "key": "DEMOSD-3",
-                "id": "20003",
-                "self": f"{self.base_url}/rest/api/3/issue/20003",
-                "fields": {
-                    "summary": "New hire starting Monday - Alex Chen",
-                    "description": {
-                        "type": "doc",
-                        "version": 1,
-                        "content": [
-                            {
-                                "type": "paragraph",
-                                "content": [
-                                    {
-                                        "type": "text",
-                                        "text": "Please set up accounts and equipment for new hire Alex Chen starting Monday.",
-                                    }
-                                ],
-                            }
-                        ],
-                    },
-                    "issuetype": {"name": "New employee", "id": "10102"},
-                    "status": {"name": "Waiting for support", "id": "10100"},
-                    "priority": {"name": "High", "id": "2"},
-                    "assignee": None,
-                    "reporter": {
-                        "accountId": "def456",
-                        "displayName": "Jane Manager",
-                        "emailAddress": "jane@example.com",
-                    },
-                    "project": {
-                        "key": "DEMOSD",
-                        "name": "Demo Service Desk",
-                        "id": "10001",
-                    },
-                    "created": "2025-01-01T10:00:00.000+0000",
-                    "updated": "2025-01-01T10:00:00.000+0000",
-                    "labels": ["demo"],
-                },
-                "requestTypeId": "3",
-                "serviceDeskId": "1",
-                "currentStatus": {
-                    "status": "Waiting for support",
-                    "statusCategory": "new",
-                },
-            },
-            "DEMOSD-4": {
-                "key": "DEMOSD-4",
-                "id": "20004",
-                "self": f"{self.base_url}/rest/api/3/issue/20004",
-                "fields": {
-                    "summary": "Conference travel to AWS re:Invent",
-                    "description": {
-                        "type": "doc",
-                        "version": 1,
-                        "content": [
-                            {
-                                "type": "paragraph",
-                                "content": [
-                                    {
-                                        "type": "text",
-                                        "text": "Requesting approval for travel to AWS re:Invent in Las Vegas.",
-                                    }
-                                ],
-                            }
-                        ],
-                    },
-                    "issuetype": {"name": "Travel request", "id": "10103"},
-                    "status": {"name": "Waiting for support", "id": "10100"},
-                    "priority": {"name": "Medium", "id": "3"},
-                    "assignee": None,
-                    "reporter": {
-                        "accountId": "abc123",
-                        "displayName": "Jason Krueger",
-                        "emailAddress": "jasonkrue@gmail.com",
-                    },
-                    "project": {
-                        "key": "DEMOSD",
-                        "name": "Demo Service Desk",
-                        "id": "10001",
-                    },
-                    "created": "2025-01-01T10:00:00.000+0000",
-                    "updated": "2025-01-01T10:00:00.000+0000",
-                    "labels": ["demo"],
-                },
-                "requestTypeId": "4",
-                "serviceDeskId": "1",
-                "currentStatus": {
-                    "status": "Waiting for support",
-                    "statusCategory": "new",
-                },
-            },
-            "DEMOSD-5": {
-                "key": "DEMOSD-5",
-                "id": "20005",
-                "self": f"{self.base_url}/rest/api/3/issue/20005",
-                "fields": {
-                    "summary": "Purchase ergonomic keyboard",
-                    "description": {
-                        "type": "doc",
-                        "version": 1,
-                        "content": [
-                            {
-                                "type": "paragraph",
-                                "content": [
-                                    {
-                                        "type": "text",
-                                        "text": "Need to purchase an ergonomic keyboard for RSI prevention. Estimated cost: $150.",
-                                    }
-                                ],
-                            }
-                        ],
-                    },
-                    "issuetype": {"name": "Purchase over $100", "id": "10104"},
-                    "status": {"name": "Waiting for support", "id": "10100"},
-                    "priority": {"name": "Low", "id": "4"},
-                    "assignee": None,
-                    "reporter": {
-                        "accountId": "abc123",
-                        "displayName": "Jason Krueger",
-                        "emailAddress": "jasonkrue@gmail.com",
-                    },
-                    "project": {
-                        "key": "DEMOSD",
-                        "name": "Demo Service Desk",
-                        "id": "10001",
-                    },
-                    "created": "2025-01-01T10:00:00.000+0000",
-                    "updated": "2025-01-01T10:00:00.000+0000",
-                    "labels": ["demo"],
-                },
-                "requestTypeId": "5",
-                "serviceDeskId": "1",
-                "currentStatus": {
-                    "status": "Waiting for support",
-                    "statusCategory": "new",
-                },
-            },
+        # DEMO project issues
+        demo_issues = {
+            "DEMO-84": self._make_demo_issue(
+                "DEMO-84", "10084", "Product Launch",
+                "Epic", "10000", "High", "2", "abc123",
+                description=self._make_adf_description("Epic for product launch activities"),
+            ),
+            "DEMO-85": self._make_demo_issue(
+                "DEMO-85", "10085", "User Authentication",
+                "Story", "10001", "High", "2", "abc123",
+            ),
+            "DEMO-86": self._make_demo_issue(
+                "DEMO-86", "10086", "Login fails on mobile Safari",
+                "Bug", "10002", "High", "2", "def456",
+            ),
+            "DEMO-87": self._make_demo_issue(
+                "DEMO-87", "10087", "Update API documentation",
+                "Task", "10003", "Medium", "3", "def456",
+            ),
+            "DEMO-91": self._make_demo_issue(
+                "DEMO-91", "10091", "Search pagination bug",
+                "Bug", "10002", "Medium", "3", "abc123",
+                reporter_id="def456",
+            ),
         }
+
+        # DEMOSD service desk issues
+        sd_issues = {
+            "DEMOSD-1": self._make_sd_issue(
+                "DEMOSD-1", "20001", "Can't connect to VPN",
+                "I'm working from home and can't connect to the corporate VPN. Getting 'connection timeout' error.",
+                "IT help", "10100", "Medium", "3", "abc123", "1",
+            ),
+            "DEMOSD-2": self._make_sd_issue(
+                "DEMOSD-2", "20002", "New laptop for development",
+                "Need a new development laptop with 32GB RAM and SSD.",
+                "Computer support", "10101", "Medium", "3", "abc123", "2",
+            ),
+            "DEMOSD-3": self._make_sd_issue(
+                "DEMOSD-3", "20003", "New hire starting Monday - Alex Chen",
+                "Please set up accounts and equipment for new hire Alex Chen starting Monday.",
+                "New employee", "10102", "High", "2", "def456", "3",
+            ),
+            "DEMOSD-4": self._make_sd_issue(
+                "DEMOSD-4", "20004", "Conference travel to AWS re:Invent",
+                "Requesting approval for travel to AWS re:Invent in Las Vegas.",
+                "Travel request", "10103", "Medium", "3", "abc123", "4",
+            ),
+            "DEMOSD-5": self._make_sd_issue(
+                "DEMOSD-5", "20005", "Purchase ergonomic keyboard",
+                "Need to purchase an ergonomic keyboard for RSI prevention. Estimated cost: $150.",
+                "Purchase over $100", "10104", "Low", "4", "abc123", "5",
+            ),
+        }
+
+        return {**demo_issues, **sd_issues}
 
     # =========================================================================
     # Issue Operations
