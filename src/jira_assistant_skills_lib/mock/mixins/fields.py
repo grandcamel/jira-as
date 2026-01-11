@@ -19,22 +19,102 @@ class FieldsMixin:
     # =========================================================================
 
     SYSTEM_FIELDS: ClassVar[list[dict[str, Any]]] = [
-        {"id": "summary", "name": "Summary", "schema": {"type": "string"}, "custom": False},
-        {"id": "description", "name": "Description", "schema": {"type": "doc"}, "custom": False},
-        {"id": "issuetype", "name": "Issue Type", "schema": {"type": "issuetype"}, "custom": False},
-        {"id": "status", "name": "Status", "schema": {"type": "status"}, "custom": False},
-        {"id": "priority", "name": "Priority", "schema": {"type": "priority"}, "custom": False},
-        {"id": "assignee", "name": "Assignee", "schema": {"type": "user"}, "custom": False},
-        {"id": "reporter", "name": "Reporter", "schema": {"type": "user"}, "custom": False},
-        {"id": "labels", "name": "Labels", "schema": {"type": "array", "items": "string"}, "custom": False},
-        {"id": "created", "name": "Created", "schema": {"type": "datetime"}, "custom": False},
-        {"id": "updated", "name": "Updated", "schema": {"type": "datetime"}, "custom": False},
-        {"id": "duedate", "name": "Due Date", "schema": {"type": "date"}, "custom": False},
-        {"id": "resolution", "name": "Resolution", "schema": {"type": "resolution"}, "custom": False},
-        {"id": "components", "name": "Components", "schema": {"type": "array", "items": "component"}, "custom": False},
-        {"id": "fixVersions", "name": "Fix Versions", "schema": {"type": "array", "items": "version"}, "custom": False},
-        {"id": "project", "name": "Project", "schema": {"type": "project"}, "custom": False},
-        {"id": "parent", "name": "Parent", "schema": {"type": "issuelink"}, "custom": False},
+        {
+            "id": "summary",
+            "name": "Summary",
+            "schema": {"type": "string"},
+            "custom": False,
+        },
+        {
+            "id": "description",
+            "name": "Description",
+            "schema": {"type": "doc"},
+            "custom": False,
+        },
+        {
+            "id": "issuetype",
+            "name": "Issue Type",
+            "schema": {"type": "issuetype"},
+            "custom": False,
+        },
+        {
+            "id": "status",
+            "name": "Status",
+            "schema": {"type": "status"},
+            "custom": False,
+        },
+        {
+            "id": "priority",
+            "name": "Priority",
+            "schema": {"type": "priority"},
+            "custom": False,
+        },
+        {
+            "id": "assignee",
+            "name": "Assignee",
+            "schema": {"type": "user"},
+            "custom": False,
+        },
+        {
+            "id": "reporter",
+            "name": "Reporter",
+            "schema": {"type": "user"},
+            "custom": False,
+        },
+        {
+            "id": "labels",
+            "name": "Labels",
+            "schema": {"type": "array", "items": "string"},
+            "custom": False,
+        },
+        {
+            "id": "created",
+            "name": "Created",
+            "schema": {"type": "datetime"},
+            "custom": False,
+        },
+        {
+            "id": "updated",
+            "name": "Updated",
+            "schema": {"type": "datetime"},
+            "custom": False,
+        },
+        {
+            "id": "duedate",
+            "name": "Due Date",
+            "schema": {"type": "date"},
+            "custom": False,
+        },
+        {
+            "id": "resolution",
+            "name": "Resolution",
+            "schema": {"type": "resolution"},
+            "custom": False,
+        },
+        {
+            "id": "components",
+            "name": "Components",
+            "schema": {"type": "array", "items": "component"},
+            "custom": False,
+        },
+        {
+            "id": "fixVersions",
+            "name": "Fix Versions",
+            "schema": {"type": "array", "items": "version"},
+            "custom": False,
+        },
+        {
+            "id": "project",
+            "name": "Project",
+            "schema": {"type": "project"},
+            "custom": False,
+        },
+        {
+            "id": "parent",
+            "name": "Parent",
+            "schema": {"type": "issuelink"},
+            "custom": False,
+        },
     ]
 
     # =========================================================================
@@ -45,43 +125,65 @@ class FieldsMixin:
         {
             "id": "customfield_10016",
             "name": "Story Points",
-            "schema": {"type": "number", "custom": "com.atlassian.jira.plugin.system.customfieldtypes:float"},
+            "schema": {
+                "type": "number",
+                "custom": "com.atlassian.jira.plugin.system.customfieldtypes:float",
+            },
             "custom": True,
         },
         {
             "id": "customfield_10017",
             "name": "Sprint",
-            "schema": {"type": "array", "items": "string", "custom": "com.pyxis.greenhopper.jira:gh-sprint"},
+            "schema": {
+                "type": "array",
+                "items": "string",
+                "custom": "com.pyxis.greenhopper.jira:gh-sprint",
+            },
             "custom": True,
         },
         {
             "id": "customfield_10018",
             "name": "Epic Link",
-            "schema": {"type": "string", "custom": "com.pyxis.greenhopper.jira:gh-epic-link"},
+            "schema": {
+                "type": "string",
+                "custom": "com.pyxis.greenhopper.jira:gh-epic-link",
+            },
             "custom": True,
         },
         {
             "id": "customfield_10019",
             "name": "Rank",
-            "schema": {"type": "string", "custom": "com.pyxis.greenhopper.jira:gh-lexo-rank"},
+            "schema": {
+                "type": "string",
+                "custom": "com.pyxis.greenhopper.jira:gh-lexo-rank",
+            },
             "custom": True,
         },
         {
             "id": "customfield_10020",
             "name": "Epic Name",
-            "schema": {"type": "string", "custom": "com.pyxis.greenhopper.jira:gh-epic-label"},
+            "schema": {
+                "type": "string",
+                "custom": "com.pyxis.greenhopper.jira:gh-epic-label",
+            },
             "custom": True,
         },
         {
             "id": "customfield_10021",
             "name": "Team",
-            "schema": {"type": "option", "custom": "com.atlassian.jira.plugin.system.customfieldtypes:select"},
+            "schema": {
+                "type": "option",
+                "custom": "com.atlassian.jira.plugin.system.customfieldtypes:select",
+            },
             "custom": True,
         },
         {
             "id": "customfield_10022",
             "name": "Start Date",
-            "schema": {"type": "date", "custom": "com.atlassian.jira.plugin.system.customfieldtypes:datepicker"},
+            "schema": {
+                "type": "date",
+                "custom": "com.atlassian.jira.plugin.system.customfieldtypes:datepicker",
+            },
             "custom": True,
         },
     ]
@@ -91,9 +193,21 @@ class FieldsMixin:
     # =========================================================================
 
     SCREENS: ClassVar[list[dict[str, str]]] = [
-        {"id": "1", "name": "Default Screen", "description": "Default screen for all issue operations"},
-        {"id": "2", "name": "Resolve Issue Screen", "description": "Screen for resolving issues"},
-        {"id": "3", "name": "Workflow Screen", "description": "Screen for workflow transitions"},
+        {
+            "id": "1",
+            "name": "Default Screen",
+            "description": "Default screen for all issue operations",
+        },
+        {
+            "id": "2",
+            "name": "Resolve Issue Screen",
+            "description": "Screen for resolving issues",
+        },
+        {
+            "id": "3",
+            "name": "Workflow Screen",
+            "description": "Screen for workflow transitions",
+        },
     ]
 
     # =========================================================================
@@ -125,6 +239,7 @@ class FieldsMixin:
                 return field
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Field {field_id} not found")
 
     def get_system_fields(self) -> list[dict[str, Any]]:
@@ -228,11 +343,13 @@ class FieldsMixin:
                 },
             ]
 
-            projects.append({
-                "key": project["key"],
-                "name": project["name"],
-                "issuetypes": issue_types,
-            })
+            projects.append(
+                {
+                    "key": project["key"],
+                    "name": project["name"],
+                    "issuetypes": issue_types,
+                }
+            )
 
         return {"projects": projects}
 
@@ -253,6 +370,7 @@ class FieldsMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         return {
@@ -364,6 +482,7 @@ class FieldsMixin:
                 return screen
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Screen {screen_id} not found")
 
     def get_screen_tabs(self, screen_id: str) -> list[dict[str, Any]]:
@@ -379,7 +498,9 @@ class FieldsMixin:
             {"id": "1", "name": "Field Tab", "position": 0},
         ]
 
-    def get_screen_tab_fields(self, screen_id: str, tab_id: str) -> list[dict[str, Any]]:
+    def get_screen_tab_fields(
+        self, screen_id: str, tab_id: str
+    ) -> list[dict[str, Any]]:
         """Get fields in a screen tab.
 
         Args:

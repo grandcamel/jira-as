@@ -79,7 +79,12 @@ class AdminMixin:
         {"id": "10001", "name": "Story", "description": "A user story"},
         {"id": "10002", "name": "Bug", "description": "A bug"},
         {"id": "10003", "name": "Task", "description": "A task"},
-        {"id": "10004", "name": "Sub-task", "description": "A sub-task", "subtask": True},
+        {
+            "id": "10004",
+            "name": "Sub-task",
+            "description": "A sub-task",
+            "subtask": True,
+        },
     ]
 
     # =========================================================================
@@ -87,11 +92,36 @@ class AdminMixin:
     # =========================================================================
 
     PRIORITIES: ClassVar[list[dict[str, str]]] = [
-        {"id": "1", "name": "Highest", "description": "Critical", "iconUrl": "icons/priorities/highest.svg"},
-        {"id": "2", "name": "High", "description": "Important", "iconUrl": "icons/priorities/high.svg"},
-        {"id": "3", "name": "Medium", "description": "Normal", "iconUrl": "icons/priorities/medium.svg"},
-        {"id": "4", "name": "Low", "description": "Low priority", "iconUrl": "icons/priorities/low.svg"},
-        {"id": "5", "name": "Lowest", "description": "Trivial", "iconUrl": "icons/priorities/lowest.svg"},
+        {
+            "id": "1",
+            "name": "Highest",
+            "description": "Critical",
+            "iconUrl": "icons/priorities/highest.svg",
+        },
+        {
+            "id": "2",
+            "name": "High",
+            "description": "Important",
+            "iconUrl": "icons/priorities/high.svg",
+        },
+        {
+            "id": "3",
+            "name": "Medium",
+            "description": "Normal",
+            "iconUrl": "icons/priorities/medium.svg",
+        },
+        {
+            "id": "4",
+            "name": "Low",
+            "description": "Low priority",
+            "iconUrl": "icons/priorities/low.svg",
+        },
+        {
+            "id": "5",
+            "name": "Lowest",
+            "description": "Trivial",
+            "iconUrl": "icons/priorities/lowest.svg",
+        },
     ]
 
     # =========================================================================
@@ -134,6 +164,7 @@ class AdminMixin:
                 }
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Role {role_id} not found")
 
     def get_project_roles(self, project_key: str) -> dict[str, str]:
@@ -146,7 +177,9 @@ class AdminMixin:
             Dictionary mapping role names to role URLs.
         """
         return {
-            role["name"]: f"{self.base_url}/rest/api/3/project/{project_key}/role/{role['id']}"
+            role[
+                "name"
+            ]: f"{self.base_url}/rest/api/3/project/{project_key}/role/{role['id']}"
             for role in self.ROLES
         }
 
@@ -240,6 +273,7 @@ class AdminMixin:
                 return group
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Group {group_name} not found")
 
     def create_group(self, name: str) -> dict[str, Any]:
@@ -397,6 +431,7 @@ class AdminMixin:
                 return scheme
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Permission scheme {scheme_id} not found")
 
     # =========================================================================
@@ -428,6 +463,7 @@ class AdminMixin:
                 return it
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Issue type {issue_type_id} not found")
 
     def get_issue_types_for_project(self, project_key: str) -> list[dict[str, Any]]:
@@ -470,6 +506,7 @@ class AdminMixin:
                 return p
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Priority {priority_id} not found")
 
     # =========================================================================
@@ -558,6 +595,7 @@ class AdminMixin:
                 return updated
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Project {project_key} not found")
 
     # =========================================================================
@@ -594,7 +632,9 @@ class AdminMixin:
         ]
 
         if workflow_name:
-            workflows = [w for w in workflows if workflow_name.lower() in w["name"].lower()]
+            workflows = [
+                w for w in workflows if workflow_name.lower() in w["name"].lower()
+            ]
 
         return {
             "startAt": start_at,

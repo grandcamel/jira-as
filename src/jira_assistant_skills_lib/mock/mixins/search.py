@@ -74,6 +74,7 @@ class SearchMixin:
             validation = self.validate_jql(jql)
             if validation.get("errors"):
                 from ...error_handler import JiraError
+
                 raise JiraError(f"Invalid JQL: {validation['errors']}")
 
         issues = list(self._issues.values())
@@ -116,66 +117,110 @@ class SearchMixin:
             if project == "DEMOSD":
                 issues = [i for i in issues if i["key"].startswith("DEMOSD-")]
             elif project == "DEMO":
-                issues = [i for i in issues if i["key"].startswith("DEMO-") and not i["key"].startswith("DEMOSD-")]
+                issues = [
+                    i
+                    for i in issues
+                    if i["key"].startswith("DEMO-")
+                    and not i["key"].startswith("DEMOSD-")
+                ]
 
         # Issue type filter
         type_match = re.search(r"ISSUETYPE\s*=\s*[\"']?(\w+)[\"']?", jql_upper)
         if type_match:
             issue_type = type_match.group(1).title()
-            issues = [i for i in issues if i["fields"]["issuetype"]["name"].lower() == issue_type.lower()]
+            issues = [
+                i
+                for i in issues
+                if i["fields"]["issuetype"]["name"].lower() == issue_type.lower()
+            ]
 
         # Status filter
-        status_match = re.search(r'STATUS\s*=\s*["\']?([^"\']+)["\']?', jql, re.IGNORECASE)
+        status_match = re.search(
+            r'STATUS\s*=\s*["\']?([^"\']+)["\']?', jql, re.IGNORECASE
+        )
         if status_match:
             status = status_match.group(1).strip()
-            issues = [i for i in issues if i["fields"]["status"]["name"].lower() == status.lower()]
+            issues = [
+                i
+                for i in issues
+                if i["fields"]["status"]["name"].lower() == status.lower()
+            ]
 
         # Status NOT filter
-        status_not_match = re.search(r'STATUS\s*!=\s*["\']?([^"\']+)["\']?', jql, re.IGNORECASE)
+        status_not_match = re.search(
+            r'STATUS\s*!=\s*["\']?([^"\']+)["\']?', jql, re.IGNORECASE
+        )
         if status_not_match:
             status = status_not_match.group(1).strip()
-            issues = [i for i in issues if i["fields"]["status"]["name"].lower() != status.lower()]
+            issues = [
+                i
+                for i in issues
+                if i["fields"]["status"]["name"].lower() != status.lower()
+            ]
 
         # Assignee filter
         if "ASSIGNEE" in jql_upper:
             if "CURRENTUSER()" in jql_upper:
                 issues = [
-                    i for i in issues
+                    i
+                    for i in issues
                     if i["fields"].get("assignee", {}).get("accountId") == "abc123"
                 ]
             elif "EMPTY" in jql_upper or "NULL" in jql_upper:
                 issues = [i for i in issues if not i["fields"].get("assignee")]
             else:
-                assignee_match = re.search(r'ASSIGNEE\s*=\s*["\']?([^"\']+)["\']?', jql, re.IGNORECASE)
+                assignee_match = re.search(
+                    r'ASSIGNEE\s*=\s*["\']?([^"\']+)["\']?', jql, re.IGNORECASE
+                )
                 if assignee_match:
                     assignee = assignee_match.group(1).strip().lower()
                     issues = [
-                        i for i in issues
-                        if i["fields"].get("assignee", {}).get("displayName", "").lower() == assignee
-                        or i["fields"].get("assignee", {}).get("accountId", "").lower() == assignee
+                        i
+                        for i in issues
+                        if i["fields"]
+                        .get("assignee", {})
+                        .get("displayName", "")
+                        .lower()
+                        == assignee
+                        or i["fields"].get("assignee", {}).get("accountId", "").lower()
+                        == assignee
                     ]
 
         # Reporter filter
         if "REPORTER" in jql_upper:
             if "CURRENTUSER()" in jql_upper:
                 issues = [
-                    i for i in issues
+                    i
+                    for i in issues
                     if i["fields"].get("reporter", {}).get("accountId") == "abc123"
                 ]
             else:
-                reporter_match = re.search(r'REPORTER\s*=\s*["\']?([^"\']+)["\']?', jql, re.IGNORECASE)
+                reporter_match = re.search(
+                    r'REPORTER\s*=\s*["\']?([^"\']+)["\']?', jql, re.IGNORECASE
+                )
                 if reporter_match:
                     reporter = reporter_match.group(1).strip().lower()
                     issues = [
-                        i for i in issues
-                        if i["fields"].get("reporter", {}).get("displayName", "").lower() == reporter
+                        i
+                        for i in issues
+                        if i["fields"]
+                        .get("reporter", {})
+                        .get("displayName", "")
+                        .lower()
+                        == reporter
                     ]
 
         # Priority filter
-        priority_match = re.search(r'PRIORITY\s*=\s*["\']?(\w+)["\']?', jql, re.IGNORECASE)
+        priority_match = re.search(
+            r'PRIORITY\s*=\s*["\']?(\w+)["\']?', jql, re.IGNORECASE
+        )
         if priority_match:
             priority = priority_match.group(1).strip()
-            issues = [i for i in issues if i["fields"]["priority"]["name"].lower() == priority.lower()]
+            issues = [
+                i
+                for i in issues
+                if i["fields"]["priority"]["name"].lower() == priority.lower()
+            ]
 
         # Label filter
         label_match = re.search(r'LABELS\s*=\s*["\']?(\w+)["\']?', jql, re.IGNORECASE)
@@ -188,27 +233,36 @@ class SearchMixin:
         if text_match:
             search_term = text_match.group(1).lower()
             issues = [
-                i for i in issues
+                i
+                for i in issues
                 if search_term in i["fields"].get("summary", "").lower()
                 or search_term in str(i["fields"].get("description", "")).lower()
             ]
 
         # Summary contains
-        summary_match = re.search(r'SUMMARY\s*~\s*["\']([^"\']+)["\']', jql, re.IGNORECASE)
+        summary_match = re.search(
+            r'SUMMARY\s*~\s*["\']([^"\']+)["\']', jql, re.IGNORECASE
+        )
         if summary_match:
             search_term = summary_match.group(1).lower()
-            issues = [i for i in issues if search_term in i["fields"].get("summary", "").lower()]
+            issues = [
+                i
+                for i in issues
+                if search_term in i["fields"].get("summary", "").lower()
+            ]
 
         # Issue key filter
-        key_match = re.search(r'KEY\s*=\s*(\w+-\d+)', jql, re.IGNORECASE)
+        key_match = re.search(r"KEY\s*=\s*(\w+-\d+)", jql, re.IGNORECASE)
         if key_match:
             key = key_match.group(1).upper()
             issues = [i for i in issues if i["key"] == key]
 
         # Key IN filter
-        key_in_match = re.search(r'KEY\s+IN\s*\(([^)]+)\)', jql, re.IGNORECASE)
+        key_in_match = re.search(r"KEY\s+IN\s*\(([^)]+)\)", jql, re.IGNORECASE)
         if key_in_match:
-            keys = [k.strip().strip("'\"").upper() for k in key_in_match.group(1).split(",")]
+            keys = [
+                k.strip().strip("'\"").upper() for k in key_in_match.group(1).split(",")
+            ]
             issues = [i for i in issues if i["key"] in keys]
 
         return issues
@@ -223,7 +277,9 @@ class SearchMixin:
         Returns:
             Sorted list of issues.
         """
-        order_match = re.search(r'ORDER\s+BY\s+(\w+)(?:\s+(ASC|DESC))?', jql, re.IGNORECASE)
+        order_match = re.search(
+            r"ORDER\s+BY\s+(\w+)(?:\s+(ASC|DESC))?", jql, re.IGNORECASE
+        )
         if not order_match:
             return issues
 
@@ -282,14 +338,29 @@ class SearchMixin:
 
         # Check for known fields
         known_fields = [
-            "project", "issuetype", "status", "priority", "assignee",
-            "reporter", "summary", "description", "labels", "created",
-            "updated", "key", "text", "sprint", "fixversion", "component",
+            "project",
+            "issuetype",
+            "status",
+            "priority",
+            "assignee",
+            "reporter",
+            "summary",
+            "description",
+            "labels",
+            "created",
+            "updated",
+            "key",
+            "text",
+            "sprint",
+            "fixversion",
+            "component",
         ]
         field_pattern = r"(\w+)\s*[=!~<>]+"
         used_fields = re.findall(field_pattern, jql, re.IGNORECASE)
         for field in used_fields:
-            if field.lower() not in known_fields and not field.startswith("customfield_"):
+            if field.lower() not in known_fields and not field.startswith(
+                "customfield_"
+            ):
                 warnings.append(f"Unknown field: {field}")
 
         return {
@@ -315,19 +386,23 @@ class SearchMixin:
         }
 
         # Extract ORDER BY
-        order_match = re.search(r'ORDER\s+BY\s+(.+)$', jql, re.IGNORECASE)
+        order_match = re.search(r"ORDER\s+BY\s+(.+)$", jql, re.IGNORECASE)
         if order_match:
             result["orderBy"] = order_match.group(1).strip()
-            jql = jql[:order_match.start()].strip()
+            jql = jql[: order_match.start()].strip()
 
         # Parse clauses (simplified)
-        clause_pattern = r"(\w+)\s*([=!<>~]+|IN|NOT IN)\s*([^\s]+|\([^)]+\)|\"[^\"]+\"|'[^']+')"
+        clause_pattern = (
+            r"(\w+)\s*([=!<>~]+|IN|NOT IN)\s*([^\s]+|\([^)]+\)|\"[^\"]+\"|'[^']+')"
+        )
         for match in re.finditer(clause_pattern, jql, re.IGNORECASE):
-            result["clauses"].append({
-                "field": match.group(1),
-                "operator": match.group(2),
-                "value": match.group(3).strip("'\""),
-            })
+            result["clauses"].append(
+                {
+                    "field": match.group(1),
+                    "operator": match.group(2),
+                    "value": match.group(3).strip("'\""),
+                }
+            )
 
         return result
 
@@ -352,6 +427,7 @@ class SearchMixin:
                 return f
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Filter {filter_id} not found")
 
     def get_favourite_filters(self) -> list[dict[str, Any]]:
@@ -469,6 +545,7 @@ class SearchMixin:
                 return updated
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Filter {filter_id} not found")
 
     def delete_filter(self, filter_id: str) -> None:
@@ -485,6 +562,7 @@ class SearchMixin:
                 return  # Mock deletion
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Filter {filter_id} not found")
 
     def set_filter_favourite(self, filter_id: str, favourite: bool) -> dict[str, Any]:
@@ -504,6 +582,7 @@ class SearchMixin:
                 return updated
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Filter {filter_id} not found")
 
     # =========================================================================
@@ -524,10 +603,7 @@ class SearchMixin:
         Returns:
             List of issues.
         """
-        return [
-            self._issues[key] for key in keys
-            if key in self._issues
-        ]
+        return [self._issues[key] for key in keys if key in self._issues]
 
     def count_issues(self, jql: str) -> int:
         """Count issues matching a JQL query.
@@ -568,7 +644,9 @@ class SearchMixin:
                     "summary": issue["fields"].get("summary", ""),
                     "status": issue["fields"]["status"]["name"],
                     "priority": issue["fields"]["priority"]["name"],
-                    "assignee": issue["fields"].get("assignee", {}).get("displayName", "Unassigned"),
+                    "assignee": issue["fields"]
+                    .get("assignee", {})
+                    .get("displayName", "Unassigned"),
                 }
                 rows.append(row)
             return {"format": "csv", "data": rows}

@@ -98,6 +98,7 @@ class RelationshipsMixin:
                 return lt
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Link type {link_type_id} not found")
 
     # =========================================================================
@@ -126,10 +127,12 @@ class RelationshipsMixin:
 
         if inward_issue not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {inward_issue} not found")
 
         if outward_issue not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {outward_issue} not found")
 
         # Find link type
@@ -181,6 +184,7 @@ class RelationshipsMixin:
                     return link
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Link {link_id} not found")
 
     def delete_issue_link(self, link_id: str) -> None:
@@ -197,12 +201,14 @@ class RelationshipsMixin:
         found = False
         for issue_key in list(self._issue_links.keys()):
             self._issue_links[issue_key] = [
-                link for link in self._issue_links[issue_key]
+                link
+                for link in self._issue_links[issue_key]
                 if link["id"] != link_id or not (found := True)
             ]
 
         if not found:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Link {link_id} not found")
 
     def get_issue_links(self, issue_key: str) -> list[dict[str, Any]]:
@@ -221,6 +227,7 @@ class RelationshipsMixin:
 
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         return self._issue_links.get(issue_key, [])
@@ -243,6 +250,7 @@ class RelationshipsMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         # Return mock remote links
@@ -290,6 +298,7 @@ class RelationshipsMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         return {
@@ -309,6 +318,7 @@ class RelationshipsMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
         # In mock, this is a no-op
 
@@ -343,6 +353,7 @@ class RelationshipsMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         source = self._issues[issue_key]
@@ -375,7 +386,9 @@ class RelationshipsMixin:
     # Dependency Analysis Operations
     # =========================================================================
 
-    def get_blockers(self, issue_key: str, recursive: bool = False) -> list[dict[str, Any]]:
+    def get_blockers(
+        self, issue_key: str, recursive: bool = False
+    ) -> list[dict[str, Any]]:
         """Get issues that block this issue.
 
         Args:
@@ -392,6 +405,7 @@ class RelationshipsMixin:
 
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         blockers = []
@@ -407,11 +421,15 @@ class RelationshipsMixin:
 
                         if recursive:
                             # Get blockers of blockers
-                            blockers.extend(self.get_blockers(blocker_key, recursive=True))
+                            blockers.extend(
+                                self.get_blockers(blocker_key, recursive=True)
+                            )
 
         return blockers
 
-    def get_blocked_by(self, issue_key: str, recursive: bool = False) -> list[dict[str, Any]]:
+    def get_blocked_by(
+        self, issue_key: str, recursive: bool = False
+    ) -> list[dict[str, Any]]:
         """Get issues that are blocked by this issue.
 
         Args:
@@ -428,6 +446,7 @@ class RelationshipsMixin:
 
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         blocked = []
@@ -442,11 +461,15 @@ class RelationshipsMixin:
                         blocked.append(self._issues[blocked_key])
 
                         if recursive:
-                            blocked.extend(self.get_blocked_by(blocked_key, recursive=True))
+                            blocked.extend(
+                                self.get_blocked_by(blocked_key, recursive=True)
+                            )
 
         return blocked
 
-    def get_related_issues(self, issue_key: str, link_type: str | None = None) -> list[dict[str, Any]]:
+    def get_related_issues(
+        self, issue_key: str, link_type: str | None = None
+    ) -> list[dict[str, Any]]:
         """Get all related issues.
 
         Args:
@@ -463,6 +486,7 @@ class RelationshipsMixin:
 
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         related = []
@@ -479,10 +503,14 @@ class RelationshipsMixin:
                 other_key = link["inwardIssue"]["key"]
 
             if other_key in self._issues:
-                related.append({
-                    "issue": self._issues[other_key],
-                    "linkType": link["type"],
-                    "direction": "outward" if link["inwardIssue"]["key"] == issue_key else "inward",
-                })
+                related.append(
+                    {
+                        "issue": self._issues[other_key],
+                        "linkType": link["type"],
+                        "direction": "outward"
+                        if link["inwardIssue"]["key"] == issue_key
+                        else "inward",
+                    }
+                )
 
         return related

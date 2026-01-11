@@ -88,6 +88,7 @@ class TimeTrackingMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         issue = self._issues[issue_key]
@@ -98,8 +99,12 @@ class TimeTrackingMixin:
         time_spent_seconds = sum(w.get("timeSpentSeconds", 0) for w in worklogs)
 
         # Default estimates
-        original_estimate_seconds = fields.get("timeoriginalestimate", 28800)  # 8h default
-        remaining_estimate_seconds = max(0, original_estimate_seconds - time_spent_seconds)
+        original_estimate_seconds = fields.get(
+            "timeoriginalestimate", 28800
+        )  # 8h default
+        remaining_estimate_seconds = max(
+            0, original_estimate_seconds - time_spent_seconds
+        )
 
         return {
             "originalEstimate": self._format_time(original_estimate_seconds),
@@ -128,13 +133,18 @@ class TimeTrackingMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         if original_estimate:
-            self._issues[issue_key]["fields"]["timeoriginalestimate"] = self._parse_time(original_estimate)
+            self._issues[issue_key]["fields"]["timeoriginalestimate"] = (
+                self._parse_time(original_estimate)
+            )
 
         if remaining_estimate:
-            self._issues[issue_key]["fields"]["timeestimate"] = self._parse_time(remaining_estimate)
+            self._issues[issue_key]["fields"]["timeestimate"] = self._parse_time(
+                remaining_estimate
+            )
 
     def adjust_remaining_estimate(
         self,
@@ -154,14 +164,19 @@ class TimeTrackingMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         if new_estimate:
-            self._issues[issue_key]["fields"]["timeestimate"] = self._parse_time(new_estimate)
+            self._issues[issue_key]["fields"]["timeestimate"] = self._parse_time(
+                new_estimate
+            )
         elif reduce_by:
             current = self._issues[issue_key]["fields"].get("timeestimate", 28800)
             reduction = self._parse_time(reduce_by)
-            self._issues[issue_key]["fields"]["timeestimate"] = max(0, current - reduction)
+            self._issues[issue_key]["fields"]["timeestimate"] = max(
+                0, current - reduction
+            )
 
     # =========================================================================
     # Worklog Operations (Extended)
@@ -182,6 +197,7 @@ class TimeTrackingMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         for worklog in self._worklogs.get(issue_key, []):
@@ -189,6 +205,7 @@ class TimeTrackingMixin:
                 return worklog
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Worklog {worklog_id} not found")
 
     def update_worklog(
@@ -222,6 +239,7 @@ class TimeTrackingMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         for worklog in self._worklogs.get(issue_key, []):
@@ -242,6 +260,7 @@ class TimeTrackingMixin:
                 return worklog
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Worklog {worklog_id} not found")
 
     def delete_worklog(
@@ -266,6 +285,7 @@ class TimeTrackingMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         worklogs = self._worklogs.get(issue_key, [])
@@ -274,6 +294,7 @@ class TimeTrackingMixin:
 
         if len(self._worklogs[issue_key]) == original_length:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Worklog {worklog_id} not found")
 
     def get_worklog_ids_modified_since(
@@ -457,13 +478,14 @@ class TimeTrackingMixin:
         time_str = time_str.lower().strip()
 
         import re
+
         # Match patterns like "1d", "2h", "30m", "1d 2h 30m"
         patterns = [
             (r"(\d+)w", 5 * 8 * 3600),  # weeks (5 working days)
-            (r"(\d+)d", 8 * 3600),      # days (8 hours)
-            (r"(\d+)h", 3600),          # hours
-            (r"(\d+)m", 60),            # minutes
-            (r"(\d+)s", 1),             # seconds
+            (r"(\d+)d", 8 * 3600),  # days (8 hours)
+            (r"(\d+)h", 3600),  # hours
+            (r"(\d+)m", 60),  # minutes
+            (r"(\d+)s", 1),  # seconds
         ]
 
         for pattern, multiplier in patterns:

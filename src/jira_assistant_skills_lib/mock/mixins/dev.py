@@ -33,6 +33,7 @@ class DevMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         # Return mock development data
@@ -72,6 +73,7 @@ class DevMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         return [
@@ -105,6 +107,7 @@ class DevMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         return [
@@ -136,6 +139,7 @@ class DevMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         return [
@@ -188,6 +192,7 @@ class DevMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         issue = self._issues[issue_key]
@@ -200,7 +205,11 @@ class DevMixin:
             if sanitized:
                 branch_parts.append(sanitized)
 
-        branch_name = "/".join(branch_parts[:2]) + "-" + "-".join(branch_parts[2:]) if len(branch_parts) > 2 else "/".join(branch_parts)
+        branch_name = (
+            "/".join(branch_parts[:2]) + "-" + "-".join(branch_parts[2:])
+            if len(branch_parts) > 2
+            else "/".join(branch_parts)
+        )
 
         # Truncate if too long
         if len(branch_name) > max_length:
@@ -218,6 +227,7 @@ class DevMixin:
             Sanitized text safe for branch names.
         """
         import re
+
         # Convert to lowercase
         text = text.lower()
         # Replace spaces and special chars with hyphens
@@ -253,6 +263,7 @@ class DevMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         issue = self._issues[issue_key]
@@ -326,6 +337,7 @@ class DevMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         issue = self._issues[issue_key]
@@ -340,22 +352,26 @@ class DevMixin:
         ]
 
         if changes_summary:
-            lines.extend([
-                "## Changes",
-                "",
-                changes_summary,
-                "",
-            ])
+            lines.extend(
+                [
+                    "## Changes",
+                    "",
+                    changes_summary,
+                    "",
+                ]
+            )
 
         if include_checklist:
-            lines.extend([
-                "## Checklist",
-                "",
-                "- [ ] Tests added/updated",
-                "- [ ] Documentation updated",
-                "- [ ] Code reviewed",
-                "- [ ] Ready for merge",
-            ])
+            lines.extend(
+                [
+                    "## Checklist",
+                    "",
+                    "- [ ] Tests added/updated",
+                    "- [ ] Documentation updated",
+                    "- [ ] Code reviewed",
+                    "- [ ] Ready for merge",
+                ]
+            )
 
         return "\n".join(lines)
 
@@ -377,6 +393,7 @@ class DevMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         return {
@@ -431,6 +448,7 @@ class DevMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         return [
@@ -461,6 +479,7 @@ class DevMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         return [

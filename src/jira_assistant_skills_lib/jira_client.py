@@ -346,9 +346,7 @@ class JiraClient:
             "/rest/api/3/search/jql", params=params, operation="search issues"
         )
 
-    def get_issue(
-        self, issue_key: str, fields: list | None = None
-    ) -> dict[str, Any]:
+    def get_issue(self, issue_key: str, fields: list | None = None) -> dict[str, Any]:
         """
         Get a specific issue.
 
@@ -2083,7 +2081,10 @@ class JiraClient:
         )
 
     def delete_version(
-        self, version_id: str, move_fixed_to: str | None = None, move_affected_to: str | None = None
+        self,
+        version_id: str,
+        move_fixed_to: str | None = None,
+        move_affected_to: str | None = None,
     ) -> None:
         """
         Delete a version.
@@ -2253,7 +2254,9 @@ class JiraClient:
             operation=f"update component {component_id}",
         )
 
-    def delete_component(self, component_id: str, move_issues_to: str | None = None) -> None:
+    def delete_component(
+        self, component_id: str, move_issues_to: str | None = None
+    ) -> None:
         """
         Delete a component.
 
@@ -2784,9 +2787,7 @@ class JiraClient:
             operation="create service request",
         )
 
-    def get_request(
-        self, issue_key: str, expand: list | None = None
-    ) -> dict[str, Any]:
+    def get_request(self, issue_key: str, expand: list | None = None) -> dict[str, Any]:
         """
         Get request details via JSM API.
 
@@ -3553,7 +3554,10 @@ class JiraClient:
             return False
 
     def list_assets(
-        self, object_type: str | None = None, iql: str | None = None, max_results: int = 100
+        self,
+        object_type: str | None = None,
+        iql: str | None = None,
+        max_results: int = 100,
     ) -> list:
         """
         List assets with optional IQL filtering.
@@ -5578,7 +5582,6 @@ class JiraClient:
         params = {"x": x, "y": y, "size": size}
         endpoint = f"/rest/api/3/project/{project_key}/avatar2"
         url = f"{self.base_url}{endpoint}"
-
 
         with open(file_path, "rb") as f:
             content_type = "image/png"

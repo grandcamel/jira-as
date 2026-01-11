@@ -112,7 +112,8 @@ class AgileMixin:
 
         if project_key_or_id:
             boards = [
-                b for b in boards
+                b
+                for b in boards
                 if b["location"]["projectKey"] == project_key_or_id
                 or str(b["location"]["projectId"]) == str(project_key_or_id)
             ]
@@ -151,6 +152,7 @@ class AgileMixin:
                 return board
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Board {board_id} not found")
 
     def get_board_configuration(self, board_id: int) -> dict[str, Any]:
@@ -173,7 +175,13 @@ class AgileMixin:
                     {"name": "Done", "statuses": [{"id": "10002"}]},
                 ]
             },
-            "estimation": {"type": "field", "field": {"fieldId": "customfield_10016", "displayName": "Story Points"}},
+            "estimation": {
+                "type": "field",
+                "field": {
+                    "fieldId": "customfield_10016",
+                    "displayName": "Story Points",
+                },
+            },
             "ranking": {"rankCustomFieldId": 10019},
         }
 
@@ -231,6 +239,7 @@ class AgileMixin:
                 return sprint
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Sprint {sprint_id} not found")
 
     def create_sprint(
@@ -335,7 +344,8 @@ class AgileMixin:
         """
         # For mock, return DEMO issues (in real JIRA, issues would be assigned to sprints)
         demo_issues = [
-            i for i in self._issues.values()
+            i
+            for i in self._issues.values()
             if i["key"].startswith("DEMO-") and not i["key"].startswith("DEMOSD-")
         ]
 
@@ -384,7 +394,8 @@ class AgileMixin:
         """
         # For mock, return DEMO issues not in any sprint
         demo_issues = [
-            i for i in self._issues.values()
+            i
+            for i in self._issues.values()
             if i["key"].startswith("DEMO-") and not i["key"].startswith("DEMOSD-")
         ]
 
@@ -445,7 +456,8 @@ class AgileMixin:
             Paginated list of epics.
         """
         epics = [
-            i for i in self._issues.values()
+            i
+            for i in self._issues.values()
             if i["fields"]["issuetype"]["name"] == "Epic"
             and i["key"].startswith("DEMO-")
         ]
@@ -489,7 +501,8 @@ class AgileMixin:
         # For mock, return issues that could be in this epic
         # In real JIRA, issues would have an epic link field
         demo_issues = [
-            i for i in self._issues.values()
+            i
+            for i in self._issues.values()
             if i["key"].startswith("DEMO-")
             and not i["key"].startswith("DEMOSD-")
             and i["fields"]["issuetype"]["name"] != "Epic"

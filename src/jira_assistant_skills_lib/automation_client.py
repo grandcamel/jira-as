@@ -319,9 +319,7 @@ class AutomationClient:
     # Rule Discovery & Inspection
     # -------------------------------------------------------------------------
 
-    def get_rules(
-        self, limit: int = 50, cursor: str | None = None
-    ) -> dict[str, Any]:
+    def get_rules(self, limit: int = 50, cursor: str | None = None) -> dict[str, Any]:
         """
         List automation rules with pagination.
 

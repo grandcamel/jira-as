@@ -173,9 +173,7 @@ def format_seconds_long(seconds: int) -> str:
     return " ".join(parts) if parts else "0 minutes"
 
 
-def parse_relative_date(
-    date_str: str, base_date: datetime | None = None
-) -> datetime:
+def parse_relative_date(date_str: str, base_date: datetime | None = None) -> datetime:
     """
     Parse relative or absolute date strings.
 

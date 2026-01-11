@@ -137,7 +137,9 @@ class CredentialManager:
 
         return url, email, api_token
 
-    def get_credentials_from_keychain(self) -> tuple[str | None, str | None, str | None]:
+    def get_credentials_from_keychain(
+        self,
+    ) -> tuple[str | None, str | None, str | None]:
         """
         Get credentials from system keychain.
 
@@ -319,9 +321,7 @@ class CredentialManager:
                 f"Failed to store credentials in keychain: {sanitize_error_message(str(e))}"
             )
 
-    def _store_to_json(
-        self, url: str, email: str, api_token: str
-    ) -> CredentialBackend:
+    def _store_to_json(self, url: str, email: str, api_token: str) -> CredentialBackend:
         """Store credentials in settings.local.json."""
         if not self._claude_dir:
             raise JiraError("Cannot find .claude directory. Run from project root.")

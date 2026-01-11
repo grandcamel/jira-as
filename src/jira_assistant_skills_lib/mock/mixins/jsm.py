@@ -36,10 +36,26 @@ class JSMMixin:
     REQUEST_TYPES: ClassVar[dict[str, list[dict[str, str]]]] = {
         "1": [  # Service desk ID 1
             {"id": "1", "name": "IT help", "description": "Get help from IT"},
-            {"id": "2", "name": "Computer support", "description": "Computer hardware/software issues"},
-            {"id": "3", "name": "New employee", "description": "Onboard a new team member"},
-            {"id": "4", "name": "Travel request", "description": "Request travel approval"},
-            {"id": "5", "name": "Purchase over $100", "description": "Purchase request over $100"},
+            {
+                "id": "2",
+                "name": "Computer support",
+                "description": "Computer hardware/software issues",
+            },
+            {
+                "id": "3",
+                "name": "New employee",
+                "description": "Onboard a new team member",
+            },
+            {
+                "id": "4",
+                "name": "Travel request",
+                "description": "Request travel approval",
+            },
+            {
+                "id": "5",
+                "name": "Purchase over $100",
+                "description": "Purchase request over $100",
+            },
         ]
     }
 
@@ -113,6 +129,7 @@ class JSMMixin:
             if sd["id"] == service_desk_id:
                 return sd
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Service desk {service_desk_id} not found")
 
     def lookup_service_desk_by_project_key(self, project_key: str) -> dict[str, Any]:
@@ -131,6 +148,7 @@ class JSMMixin:
             if sd.get("projectKey") == project_key:
                 return sd
         from ...error_handler import JiraError
+
         raise JiraError(f"No service desk found for project key: {project_key}")
 
     # =========================================================================
@@ -182,7 +200,9 @@ class JSMMixin:
         Returns:
             A paginated list of queues for the service desk.
         """
-        return self.get_service_desk_queues(service_desk_id, include_count, start, limit)
+        return self.get_service_desk_queues(
+            service_desk_id, include_count, start, limit
+        )
 
     def get_queue(self, service_desk_id: int, queue_id: int) -> dict[str, Any]:
         """Get a specific queue by ID.
@@ -202,7 +222,10 @@ class JSMMixin:
             if queue["id"] == str(queue_id):
                 return queue
         from ...error_handler import NotFoundError
-        raise NotFoundError(f"Queue {queue_id} not found in service desk {service_desk_id}")
+
+        raise NotFoundError(
+            f"Queue {queue_id} not found in service desk {service_desk_id}"
+        )
 
     def get_queue_issues(
         self,
@@ -223,16 +246,24 @@ class JSMMixin:
             A paginated list of issues in the queue.
         """
         # Get all DEMOSD issues
-        demosd_issues = [i for i in self._issues.values() if i["key"].startswith("DEMOSD-")]
+        demosd_issues = [
+            i for i in self._issues.values() if i["key"].startswith("DEMOSD-")
+        ]
 
         # Filter based on queue type
         queue = self.get_queue(service_desk_id, queue_id)
         queue_name = queue.get("name", "").lower()
 
         if "unassigned" in queue_name:
-            demosd_issues = [i for i in demosd_issues if i["fields"].get("assignee") is None]
+            demosd_issues = [
+                i for i in demosd_issues if i["fields"].get("assignee") is None
+            ]
         elif "assigned to me" in queue_name:
-            demosd_issues = [i for i in demosd_issues if i["fields"].get("assignee", {}).get("accountId") == "abc123"]
+            demosd_issues = [
+                i
+                for i in demosd_issues
+                if i["fields"].get("assignee", {}).get("accountId") == "abc123"
+            ]
 
         paginated = demosd_issues[start : start + limit]
         return {
@@ -291,6 +322,7 @@ class JSMMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Request {issue_key} not found")
 
         issue = self._issues[issue_key]
@@ -303,8 +335,16 @@ class JSMMixin:
             "currentStatus": issue.get("currentStatus", {"status": "Open"}),
             "reporter": issue["fields"].get("reporter"),
             "requestFieldValues": [
-                {"fieldId": "summary", "label": "Summary", "value": issue["fields"].get("summary")},
-                {"fieldId": "description", "label": "Description", "value": issue["fields"].get("description")},
+                {
+                    "fieldId": "summary",
+                    "label": "Summary",
+                    "value": issue["fields"].get("summary"),
+                },
+                {
+                    "fieldId": "description",
+                    "label": "Description",
+                    "value": issue["fields"].get("description"),
+                },
             ],
         }
 
@@ -322,6 +362,7 @@ class JSMMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Request {issue_key} not found")
 
         issue = self._issues[issue_key]
@@ -369,7 +410,11 @@ class JSMMixin:
                 "priority": {"name": "Medium", "id": "3"},
                 "assignee": None,
                 "reporter": self.USERS.get(raise_on_behalf_of, self.USERS["abc123"]),
-                "project": {"key": "DEMOSD", "name": "Demo Service Desk", "id": "10001"},
+                "project": {
+                    "key": "DEMOSD",
+                    "name": "Demo Service Desk",
+                    "id": "10001",
+                },
                 "created": "2025-01-08T10:00:00.000+0000",
                 "updated": "2025-01-08T10:00:00.000+0000",
                 "labels": [],
@@ -414,6 +459,7 @@ class JSMMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Request {issue_key} not found")
 
         # Return mock SLA data
@@ -471,6 +517,7 @@ class JSMMixin:
                 if sla["id"] == sla_metric_id:
                     return sla
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"SLA {sla_metric_id} not found")
         return self.get_request_slas(issue_key)
 
@@ -499,6 +546,7 @@ class JSMMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Request {issue_key} not found")
 
         if issue_key not in self._comments:
@@ -540,6 +588,7 @@ class JSMMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Request {issue_key} not found")
 
         comments = self._comments.get(issue_key, [])
@@ -576,6 +625,7 @@ class JSMMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Request {issue_key} not found")
         return self.JSM_TRANSITIONS
 
@@ -599,11 +649,15 @@ class JSMMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Request {issue_key} not found")
 
         for t in self.JSM_TRANSITIONS:
             if t["id"] == transition_id:
-                self._issues[issue_key]["fields"]["status"] = {"name": t["name"], "id": t["id"]}
+                self._issues[issue_key]["fields"]["status"] = {
+                    "name": t["name"],
+                    "id": t["id"],
+                }
                 if issue_key.startswith("DEMOSD"):
                     self._issues[issue_key]["currentStatus"] = {"status": t["name"]}
                 break
@@ -637,7 +691,8 @@ class JSMMixin:
         if query:
             query_lower = query.lower()
             customers = [
-                c for c in customers
+                c
+                for c in customers
                 if query_lower in c["displayName"].lower()
                 or query_lower in c.get("emailAddress", "").lower()
             ]
@@ -706,12 +761,16 @@ class JSMMixin:
             {
                 "id": "1",
                 "name": "Acme Corp",
-                "links": {"self": f"{self.base_url}/rest/servicedeskapi/organization/1"},
+                "links": {
+                    "self": f"{self.base_url}/rest/servicedeskapi/organization/1"
+                },
             },
             {
                 "id": "2",
                 "name": "Demo Org",
-                "links": {"self": f"{self.base_url}/rest/servicedeskapi/organization/2"},
+                "links": {
+                    "self": f"{self.base_url}/rest/servicedeskapi/organization/2"
+                },
             },
         ]
 
@@ -750,7 +809,9 @@ class JSMMixin:
         return {
             "id": organization_id,
             "name": f"Organization {organization_id}",
-            "links": {"self": f"{self.base_url}/rest/servicedeskapi/organization/{organization_id}"},
+            "links": {
+                "self": f"{self.base_url}/rest/servicedeskapi/organization/{organization_id}"
+            },
         }
 
     def delete_organization(self, organization_id: str) -> None:

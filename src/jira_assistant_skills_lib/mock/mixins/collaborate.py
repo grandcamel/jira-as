@@ -49,6 +49,7 @@ class CollaborateMixin:
 
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         watchers = self._watchers.get(issue_key, [])
@@ -80,16 +81,20 @@ class CollaborateMixin:
 
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         if issue_key not in self._watchers:
             self._watchers[issue_key] = []
 
         # Get user info
-        user = self.USERS.get(account_id, {
-            "accountId": account_id,
-            "displayName": "Unknown User",
-        })
+        user = self.USERS.get(
+            account_id,
+            {
+                "accountId": account_id,
+                "displayName": "Unknown User",
+            },
+        )
 
         # Avoid duplicates
         if not any(w.get("accountId") == account_id for w in self._watchers[issue_key]):
@@ -109,12 +114,12 @@ class CollaborateMixin:
 
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         if issue_key in self._watchers:
             self._watchers[issue_key] = [
-                w for w in self._watchers[issue_key]
-                if w.get("accountId") != account_id
+                w for w in self._watchers[issue_key] if w.get("accountId") != account_id
             ]
 
     # =========================================================================
@@ -142,6 +147,7 @@ class CollaborateMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         # Return mock changelog
@@ -207,6 +213,7 @@ class CollaborateMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         issue = dict(self._issues[issue_key])
@@ -234,6 +241,7 @@ class CollaborateMixin:
 
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         return self._attachments.get(issue_key, [])
@@ -263,6 +271,7 @@ class CollaborateMixin:
 
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         if issue_key not in self._attachments:
@@ -292,8 +301,7 @@ class CollaborateMixin:
 
         for issue_key in list(self._attachments.keys()):
             self._attachments[issue_key] = [
-                a for a in self._attachments[issue_key]
-                if a["id"] != attachment_id
+                a for a in self._attachments[issue_key] if a["id"] != attachment_id
             ]
 
     def get_attachment(self, attachment_id: str) -> dict[str, Any]:
@@ -316,6 +324,7 @@ class CollaborateMixin:
                     return attachment
 
         from ...error_handler import NotFoundError
+
         raise NotFoundError(f"Attachment {attachment_id} not found")
 
     # =========================================================================
@@ -348,6 +357,7 @@ class CollaborateMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         # In mock, this is a no-op
@@ -411,6 +421,7 @@ class CollaborateMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         # Combine changelog and comments into activity
@@ -419,22 +430,28 @@ class CollaborateMixin:
         # Add changelog entries
         changelog = self.get_changelog(issue_key)
         for entry in changelog.get("values", []):
-            activities.append({
-                "type": "history",
-                "timestamp": entry["created"],
-                "author": entry["author"],
-                "changes": entry["items"],
-            })
+            activities.append(
+                {
+                    "type": "history",
+                    "timestamp": entry["created"],
+                    "author": entry["author"],
+                    "changes": entry["items"],
+                }
+            )
 
         # Add comments
-        comments = self._comments.get(issue_key, []) if hasattr(self, "_comments") else []
+        comments = (
+            self._comments.get(issue_key, []) if hasattr(self, "_comments") else []
+        )
         for comment in comments:
-            activities.append({
-                "type": "comment",
-                "timestamp": comment.get("created"),
-                "author": comment.get("author"),
-                "body": comment.get("body"),
-            })
+            activities.append(
+                {
+                    "type": "comment",
+                    "timestamp": comment.get("created"),
+                    "author": comment.get("author"),
+                    "body": comment.get("body"),
+                }
+            )
 
         # Sort by timestamp descending
         activities.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
@@ -487,6 +504,7 @@ class CollaborateMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         return {
@@ -507,6 +525,7 @@ class CollaborateMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
         # In mock, this is a no-op
 
@@ -521,5 +540,6 @@ class CollaborateMixin:
         """
         if issue_key not in self._issues:
             from ...error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
         # In mock, this is a no-op

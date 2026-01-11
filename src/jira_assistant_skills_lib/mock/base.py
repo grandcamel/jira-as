@@ -72,7 +72,11 @@ class MockJiraClientBase:
 
     TRANSITIONS: ClassVar[list[dict[str, Any]]] = [
         {"id": "11", "name": "To Do", "to": {"name": "To Do", "id": "10000"}},
-        {"id": "21", "name": "In Progress", "to": {"name": "In Progress", "id": "10001"}},
+        {
+            "id": "21",
+            "name": "In Progress",
+            "to": {"name": "In Progress", "id": "10001"},
+        },
         {"id": "31", "name": "Done", "to": {"name": "Done", "id": "10002"}},
     ]
 
@@ -133,7 +137,10 @@ class MockJiraClientBase:
                             {
                                 "type": "paragraph",
                                 "content": [
-                                    {"type": "text", "text": "Epic for product launch activities"}
+                                    {
+                                        "type": "text",
+                                        "text": "Epic for product launch activities",
+                                    }
                                 ],
                             }
                         ],
@@ -290,14 +297,21 @@ class MockJiraClientBase:
                         "displayName": "Jason Krueger",
                         "emailAddress": "jasonkrue@gmail.com",
                     },
-                    "project": {"key": "DEMOSD", "name": "Demo Service Desk", "id": "10001"},
+                    "project": {
+                        "key": "DEMOSD",
+                        "name": "Demo Service Desk",
+                        "id": "10001",
+                    },
                     "created": "2025-01-01T10:00:00.000+0000",
                     "updated": "2025-01-01T10:00:00.000+0000",
                     "labels": ["demo"],
                 },
                 "requestTypeId": "1",
                 "serviceDeskId": "1",
-                "currentStatus": {"status": "Waiting for support", "statusCategory": "new"},
+                "currentStatus": {
+                    "status": "Waiting for support",
+                    "statusCategory": "new",
+                },
             },
             "DEMOSD-2": {
                 "key": "DEMOSD-2",
@@ -329,14 +343,21 @@ class MockJiraClientBase:
                         "displayName": "Jason Krueger",
                         "emailAddress": "jasonkrue@gmail.com",
                     },
-                    "project": {"key": "DEMOSD", "name": "Demo Service Desk", "id": "10001"},
+                    "project": {
+                        "key": "DEMOSD",
+                        "name": "Demo Service Desk",
+                        "id": "10001",
+                    },
                     "created": "2025-01-01T10:00:00.000+0000",
                     "updated": "2025-01-01T10:00:00.000+0000",
                     "labels": ["demo"],
                 },
                 "requestTypeId": "2",
                 "serviceDeskId": "1",
-                "currentStatus": {"status": "Waiting for support", "statusCategory": "new"},
+                "currentStatus": {
+                    "status": "Waiting for support",
+                    "statusCategory": "new",
+                },
             },
             "DEMOSD-3": {
                 "key": "DEMOSD-3",
@@ -368,14 +389,21 @@ class MockJiraClientBase:
                         "displayName": "Jane Manager",
                         "emailAddress": "jane@example.com",
                     },
-                    "project": {"key": "DEMOSD", "name": "Demo Service Desk", "id": "10001"},
+                    "project": {
+                        "key": "DEMOSD",
+                        "name": "Demo Service Desk",
+                        "id": "10001",
+                    },
                     "created": "2025-01-01T10:00:00.000+0000",
                     "updated": "2025-01-01T10:00:00.000+0000",
                     "labels": ["demo"],
                 },
                 "requestTypeId": "3",
                 "serviceDeskId": "1",
-                "currentStatus": {"status": "Waiting for support", "statusCategory": "new"},
+                "currentStatus": {
+                    "status": "Waiting for support",
+                    "statusCategory": "new",
+                },
             },
             "DEMOSD-4": {
                 "key": "DEMOSD-4",
@@ -407,14 +435,21 @@ class MockJiraClientBase:
                         "displayName": "Jason Krueger",
                         "emailAddress": "jasonkrue@gmail.com",
                     },
-                    "project": {"key": "DEMOSD", "name": "Demo Service Desk", "id": "10001"},
+                    "project": {
+                        "key": "DEMOSD",
+                        "name": "Demo Service Desk",
+                        "id": "10001",
+                    },
                     "created": "2025-01-01T10:00:00.000+0000",
                     "updated": "2025-01-01T10:00:00.000+0000",
                     "labels": ["demo"],
                 },
                 "requestTypeId": "4",
                 "serviceDeskId": "1",
-                "currentStatus": {"status": "Waiting for support", "statusCategory": "new"},
+                "currentStatus": {
+                    "status": "Waiting for support",
+                    "statusCategory": "new",
+                },
             },
             "DEMOSD-5": {
                 "key": "DEMOSD-5",
@@ -446,14 +481,21 @@ class MockJiraClientBase:
                         "displayName": "Jason Krueger",
                         "emailAddress": "jasonkrue@gmail.com",
                     },
-                    "project": {"key": "DEMOSD", "name": "Demo Service Desk", "id": "10001"},
+                    "project": {
+                        "key": "DEMOSD",
+                        "name": "Demo Service Desk",
+                        "id": "10001",
+                    },
                     "created": "2025-01-01T10:00:00.000+0000",
                     "updated": "2025-01-01T10:00:00.000+0000",
                     "labels": ["demo"],
                 },
                 "requestTypeId": "5",
                 "serviceDeskId": "1",
-                "currentStatus": {"status": "Waiting for support", "statusCategory": "new"},
+                "currentStatus": {
+                    "status": "Waiting for support",
+                    "statusCategory": "new",
+                },
             },
         }
 
@@ -461,7 +503,9 @@ class MockJiraClientBase:
     # Issue Operations
     # =========================================================================
 
-    def get_issue(self, issue_key: str, fields: str | None = None, expand: str | None = None) -> dict[str, Any]:
+    def get_issue(
+        self, issue_key: str, fields: str | None = None, expand: str | None = None
+    ) -> dict[str, Any]:
         """Get issue by key.
 
         Args:
@@ -477,6 +521,7 @@ class MockJiraClientBase:
         """
         if issue_key not in self._issues:
             from ..error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
         return self._issues[issue_key]
 
@@ -510,20 +555,30 @@ class MockJiraClientBase:
             issues = [i for i in issues if i["key"].startswith("DEMOSD-")]
         elif "PROJECT = DEMO" in jql_upper or "PROJECT=DEMO" in jql_upper:
             # Filter DEMO but exclude DEMOSD
-            issues = [i for i in issues if i["key"].startswith("DEMO-") and not i["key"].startswith("DEMOSD-")]
+            issues = [
+                i
+                for i in issues
+                if i["key"].startswith("DEMO-") and not i["key"].startswith("DEMOSD-")
+            ]
 
         # Filter by assignee
         if "ASSIGNEE" in jql_upper:
             jql_lower = jql.lower()
             if "jane" in jql_lower:
                 issues = [
-                    i for i in issues
-                    if i["fields"].get("assignee") and i["fields"]["assignee"].get("displayName", "").lower() == "jane manager"
+                    i
+                    for i in issues
+                    if i["fields"].get("assignee")
+                    and i["fields"]["assignee"].get("displayName", "").lower()
+                    == "jane manager"
                 ]
             elif "jason" in jql_lower:
                 issues = [
-                    i for i in issues
-                    if i["fields"].get("assignee") and i["fields"]["assignee"].get("displayName", "").lower() == "jason krueger"
+                    i
+                    for i in issues
+                    if i["fields"].get("assignee")
+                    and i["fields"]["assignee"].get("displayName", "").lower()
+                    == "jason krueger"
                 ]
 
         # Filter by issue type
@@ -537,9 +592,11 @@ class MockJiraClientBase:
             issues = [i for i in issues if i["fields"]["issuetype"]["name"] == "Task"]
 
         # Filter by status
-        if "STATUS = \"IN PROGRESS\"" in jql_upper or "STATUS=\"IN PROGRESS\"" in jql_upper:
-            issues = [i for i in issues if i["fields"]["status"]["name"] == "In Progress"]
-        elif "STATUS = \"TO DO\"" in jql_upper or "STATUS=\"TO DO\"" in jql_upper:
+        if 'STATUS = "IN PROGRESS"' in jql_upper or 'STATUS="IN PROGRESS"' in jql_upper:
+            issues = [
+                i for i in issues if i["fields"]["status"]["name"] == "In Progress"
+            ]
+        elif 'STATUS = "TO DO"' in jql_upper or 'STATUS="TO DO"' in jql_upper:
             issues = [i for i in issues if i["fields"]["status"]["name"] == "To Do"]
 
         # Filter by reporter
@@ -547,22 +604,28 @@ class MockJiraClientBase:
             jql_lower = jql.lower()
             if "jane" in jql_lower:
                 issues = [
-                    i for i in issues
-                    if i["fields"].get("reporter", {}).get("displayName", "").lower() == "jane manager"
+                    i
+                    for i in issues
+                    if i["fields"].get("reporter", {}).get("displayName", "").lower()
+                    == "jane manager"
                 ]
             elif "jason" in jql_lower:
                 issues = [
-                    i for i in issues
-                    if i["fields"].get("reporter", {}).get("displayName", "").lower() == "jason krueger"
+                    i
+                    for i in issues
+                    if i["fields"].get("reporter", {}).get("displayName", "").lower()
+                    == "jason krueger"
                 ]
 
         # Text search (text ~ "keyword")
         import re
+
         text_match = re.search(r'TEXT\s*~\s*["\']([^"\']+)["\']', jql, re.IGNORECASE)
         if text_match:
             search_term = text_match.group(1).lower()
             issues = [
-                i for i in issues
+                i
+                for i in issues
                 if search_term in i["fields"].get("summary", "").lower()
             ]
 
@@ -647,6 +710,7 @@ class MockJiraClientBase:
         """
         if issue_key not in self._issues:
             from ..error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         if fields:
@@ -665,6 +729,7 @@ class MockJiraClientBase:
         """
         if issue_key not in self._issues:
             from ..error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
         del self._issues[issue_key]
 
@@ -680,6 +745,7 @@ class MockJiraClientBase:
         """
         if issue_key not in self._issues:
             from ..error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         if account_id is None:
@@ -711,6 +777,7 @@ class MockJiraClientBase:
         """
         if issue_key not in self._issues:
             from ..error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
         return self.TRANSITIONS
 
@@ -736,6 +803,7 @@ class MockJiraClientBase:
         """
         if issue_key not in self._issues:
             from ..error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         # Find the transition
@@ -763,6 +831,7 @@ class MockJiraClientBase:
         """
         if issue_key not in self._issues:
             from ..error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         if issue_key not in self._comments:
@@ -800,6 +869,7 @@ class MockJiraClientBase:
         """
         if issue_key not in self._issues:
             from ..error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         comments = self._comments.get(issue_key, [])
@@ -825,6 +895,7 @@ class MockJiraClientBase:
         """
         if issue_key not in self._issues:
             from ..error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         for comment in self._comments.get(issue_key, []):
@@ -832,6 +903,7 @@ class MockJiraClientBase:
                 return comment
 
         from ..error_handler import NotFoundError
+
         raise NotFoundError(f"Comment {comment_id} not found")
 
     def update_comment(
@@ -855,6 +927,7 @@ class MockJiraClientBase:
         """
         if issue_key not in self._issues:
             from ..error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         for comment in self._comments.get(issue_key, []):
@@ -863,6 +936,7 @@ class MockJiraClientBase:
                 return comment
 
         from ..error_handler import NotFoundError
+
         raise NotFoundError(f"Comment {comment_id} not found")
 
     def delete_comment(self, issue_key: str, comment_id: str) -> None:
@@ -877,6 +951,7 @@ class MockJiraClientBase:
         """
         if issue_key not in self._issues:
             from ..error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         comments = self._comments.get(issue_key, [])
@@ -917,6 +992,7 @@ class MockJiraClientBase:
         """
         if issue_key not in self._issues:
             from ..error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         if issue_key not in self._worklogs:
@@ -957,6 +1033,7 @@ class MockJiraClientBase:
         """
         if issue_key not in self._issues:
             from ..error_handler import NotFoundError
+
             raise NotFoundError(f"Issue {issue_key} not found")
 
         worklogs = self._worklogs.get(issue_key, [])
@@ -995,7 +1072,8 @@ class MockJiraClientBase:
         if query:
             query_lower = query.lower()
             return [
-                u for u in self.USERS.values()
+                u
+                for u in self.USERS.values()
                 if query_lower in u["displayName"].lower()
                 or query_lower in u.get("emailAddress", "").lower()
             ]
@@ -1033,6 +1111,7 @@ class MockJiraClientBase:
                     return user
 
         from ..error_handler import NotFoundError
+
         raise NotFoundError("User not found")
 
     def get_current_user(self, expand: list | None = None) -> dict[str, Any]:
@@ -1104,6 +1183,7 @@ class MockJiraClientBase:
                 return project
 
         from ..error_handler import NotFoundError
+
         raise NotFoundError(f"Project {project_key} not found")
 
     def get_project_statuses(self, project_key: str) -> list:
