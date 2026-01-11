@@ -7,6 +7,7 @@ and other inputs before making API calls.
 
 import os
 import re
+from typing import Any
 
 from assistant_skills_lib.error_handler import ValidationError
 from assistant_skills_lib.validators import (
@@ -16,6 +17,48 @@ from assistant_skills_lib.validators import (
     validate_required,
     validate_url as base_validate_url,
 )
+
+
+def safe_get_nested(obj: dict, path: str, default: Any = None) -> Any:
+    """
+    Safely access nested dict values using dot notation.
+
+    Replaces verbose chains like:
+        fields.get("status", {}).get("name", "N/A")
+    with:
+        safe_get_nested(fields, "status.name", "N/A")
+
+    Args:
+        obj: Dictionary to access
+        path: Dot-separated path (e.g., "fields.status.name")
+        default: Default value if path not found
+
+    Returns:
+        Value at path or default
+
+    Examples:
+        >>> issue = {"fields": {"status": {"name": "Open"}}}
+        >>> safe_get_nested(issue, "fields.status.name", "N/A")
+        'Open'
+        >>> safe_get_nested(issue, "fields.assignee.displayName", "Unassigned")
+        'Unassigned'
+        >>> safe_get_nested({}, "a.b.c", "default")
+        'default'
+    """
+    if not obj or not isinstance(obj, dict):
+        return default
+
+    keys = path.split(".")
+    current = obj
+
+    for key in keys:
+        if not isinstance(current, dict):
+            return default
+        current = current.get(key)
+        if current is None:
+            return default
+
+    return current
 
 
 def validate_issue_key(issue_key: str) -> str:
