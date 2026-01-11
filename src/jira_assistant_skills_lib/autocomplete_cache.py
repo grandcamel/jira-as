@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Caching layer for JQL autocomplete data.
 
