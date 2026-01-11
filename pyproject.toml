@@ -41,7 +41,7 @@ dependencies = [
     "colorama>=0.4.6",
     "python-dotenv>=1.0.0",
     "tqdm>=4.66.0",
-    "assistant-skills-lib>=0.2.1",
+    "assistant-skills-lib>=0.2.0",
 ]
 
 [project.optional-dependencies]
