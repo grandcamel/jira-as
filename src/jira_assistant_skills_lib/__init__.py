@@ -26,8 +26,8 @@ __version__ = "0.2.4"
 
 # Error handling
 # ADF Helper
+from .adf_helper import _parse_wiki_inline  # Exposed for testing
 from .adf_helper import (
-    _parse_wiki_inline,  # Exposed for testing
     adf_to_text,
     create_adf_code_block,
     create_adf_heading,

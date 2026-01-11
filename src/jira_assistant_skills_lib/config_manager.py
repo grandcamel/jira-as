@@ -25,19 +25,19 @@ if os.environ.get("JIRA_PROFILE"):
     )
 
 from assistant_skills_lib.config_manager import BaseConfigManager
-from assistant_skills_lib.error_handler import (
+from assistant_skills_lib.error_handler import (  # Assuming error_handler is consolidated next
     ValidationError,
-)  # Assuming error_handler is consolidated next
-from assistant_skills_lib.validators import (
+)
+from assistant_skills_lib.validators import (  # Assuming validate_url is consolidated next
     validate_url,
-)  # Assuming validate_url is consolidated next
+)
 
 from .automation_client import AutomationClient
-from .jira_client import JiraClient
-from .validators import (
-    validate_email,
-)  # Keep local validate_email for now, will consolidate generic ones
 from .constants import DEFAULT_AGILE_FIELDS
+from .jira_client import JiraClient
+from .validators import (  # Keep local validate_email for now, will consolidate generic ones
+    validate_email,
+)
 
 # Try to import credential_manager for keychain support
 try:
@@ -444,8 +444,8 @@ def get_project_defaults(
     """
     from project_context import (
         get_defaults_for_issue_type,
-        get_project_context as _get_project_context,
     )
+    from project_context import get_project_context as _get_project_context
 
     context = _get_project_context(project_key)
 
