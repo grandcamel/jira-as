@@ -5,6 +5,7 @@ Provides functions to format JIRA API responses as tables, JSON,
 CSV, and human-readable text.
 """
 
+from dataclasses import dataclass
 from typing import Any
 
 # Import generic formatters from the base library
@@ -21,6 +22,76 @@ from assistant_skills_lib.formatters import (
 
 from .adf_helper import adf_to_text
 from .constants import EPIC_LINK_FIELD, STORY_POINTS_FIELD
+from .validators import safe_get_nested
+
+
+@dataclass
+class IssueFields:
+    """Extracted issue fields for display formatting."""
+
+    key: str
+    summary: str
+    status: str
+    issue_type: str
+    priority: str
+    assignee: str
+    reporter: str
+    created: str
+    updated: str
+    epic_link: str | None = None
+    story_points: float | None = None
+    sprint: str | None = None
+    parent_key: str | None = None
+    parent_summary: str | None = None
+
+
+def extract_issue_fields(issue: dict[str, Any]) -> IssueFields:
+    """
+    Extract and normalize issue fields for display.
+
+    Centralizes nested dict access patterns used across formatting functions.
+
+    Args:
+        issue: Issue data from JIRA API
+
+    Returns:
+        IssueFields dataclass with normalized values
+    """
+    fields = issue.get("fields", {})
+
+    # Extract sprint name from various formats
+    sprint = fields.get("sprint")
+    sprint_name = None
+    if sprint:
+        if isinstance(sprint, dict):
+            sprint_name = sprint.get("name", str(sprint))
+        elif isinstance(sprint, list) and sprint:
+            first = sprint[0]
+            sprint_name = first.get("name", str(first)) if isinstance(first, dict) else str(first)
+        else:
+            sprint_name = str(sprint)
+
+    # Extract parent info
+    parent = fields.get("parent")
+    parent_key = safe_get_nested(parent, "key") if parent else None
+    parent_summary = safe_get_nested(parent, "fields.summary", "") if parent else None
+
+    return IssueFields(
+        key=issue.get("key", "N/A"),
+        summary=fields.get("summary", "N/A"),
+        status=safe_get_nested(fields, "status.name", "N/A"),
+        issue_type=safe_get_nested(fields, "issuetype.name", "N/A"),
+        priority=safe_get_nested(fields, "priority.name", "None") if fields.get("priority") else "None",
+        assignee=safe_get_nested(fields, "assignee.displayName", "Unassigned") if fields.get("assignee") else "Unassigned",
+        reporter=safe_get_nested(fields, "reporter.displayName", "N/A") if fields.get("reporter") else "N/A",
+        created=fields.get("created", "N/A"),
+        updated=fields.get("updated", "N/A"),
+        epic_link=fields.get(EPIC_LINK_FIELD),
+        story_points=fields.get(STORY_POINTS_FIELD),
+        sprint=sprint_name,
+        parent_key=parent_key,
+        parent_summary=parent_summary,
+    )
 
 
 def format_issue(issue: dict[str, Any], detailed: bool = False) -> str:
@@ -34,73 +105,35 @@ def format_issue(issue: dict[str, Any], detailed: bool = False) -> str:
     Returns:
         Formatted issue string
     """
+    f = extract_issue_fields(issue)
     fields = issue.get("fields", {})
-    key = issue.get("key", "N/A")
-    summary = fields.get("summary", "N/A")
-    status = fields.get("status", {}).get("name", "N/A")
-    issue_type = fields.get("issuetype", {}).get("name", "N/A")
-    priority = (
-        fields.get("priority", {}).get("name", "N/A")
-        if fields.get("priority")
-        else "None"
-    )
-    assignee = (
-        fields.get("assignee", {}).get("displayName", "Unassigned")
-        if fields.get("assignee")
-        else "Unassigned"
-    )
-    reporter = (
-        fields.get("reporter", {}).get("displayName", "N/A")
-        if fields.get("reporter")
-        else "N/A"
-    )
-    created = fields.get("created", "N/A")
-    updated = fields.get("updated", "N/A")
 
     output = []
-    output.append(f"Key:      {key}")
-    output.append(f"Type:     {issue_type}")
-    output.append(f"Summary:  {summary}")
-    output.append(f"Status:   {status}")
-    output.append(f"Priority: {priority}")
-    output.append(f"Assignee: {assignee}")
+    output.append(f"Key:      {f.key}")
+    output.append(f"Type:     {f.issue_type}")
+    output.append(f"Summary:  {f.summary}")
+    output.append(f"Status:   {f.status}")
+    output.append(f"Priority: {f.priority}")
+    output.append(f"Assignee: {f.assignee}")
 
     # Agile fields
-    epic_link = fields.get(EPIC_LINK_FIELD)
-    if epic_link:
-        output.append(f"Epic:     {epic_link}")
+    if f.epic_link:
+        output.append(f"Epic:     {f.epic_link}")
 
-    story_points = fields.get(STORY_POINTS_FIELD)
-    if story_points is not None:
-        output.append(f"Points:   {story_points}")
+    if f.story_points is not None:
+        output.append(f"Points:   {f.story_points}")
 
-    # Sprint info (from customfield or sprint field)
-    sprint = fields.get("sprint")
-    if sprint:
-        if isinstance(sprint, dict):
-            sprint_name = sprint.get("name", str(sprint))
-        elif isinstance(sprint, list) and sprint:
-            sprint_name = (
-                sprint[0].get("name", str(sprint[0]))
-                if isinstance(sprint[0], dict)
-                else str(sprint[0])
-            )
-        else:
-            sprint_name = str(sprint)
-        output.append(f"Sprint:   {sprint_name}")
+    if f.sprint:
+        output.append(f"Sprint:   {f.sprint}")
 
     # Parent (for subtasks)
-    parent = fields.get("parent")
-    if parent:
-        parent_key = parent.get("key", "")
-        parent_summary = parent.get("fields", {}).get("summary", "")
-        if parent_key:
-            output.append(f"Parent:   {parent_key} - {parent_summary}")
+    if f.parent_key:
+        output.append(f"Parent:   {f.parent_key} - {f.parent_summary}")
 
     if detailed:
-        output.append(f"Reporter: {reporter}")
-        output.append(f"Created:  {format_timestamp(created)}")
-        output.append(f"Updated:  {format_timestamp(updated)}")
+        output.append(f"Reporter: {f.reporter}")
+        output.append(f"Created:  {format_timestamp(f.created)}")
+        output.append(f"Updated:  {format_timestamp(f.updated)}")
 
         description = fields.get("description")
         if description:
@@ -245,17 +278,11 @@ def format_search_results(
         fields = issue.get("fields", {})
         row = {
             "Key": issue.get("key", ""),
-            "Type": fields.get("issuetype", {}).get("name", ""),
-            "Status": fields.get("status", {}).get("name", ""),
-            "Priority": fields.get("priority", {}).get("name", "")
-            if fields.get("priority")
-            else "",
-            "Assignee": fields.get("assignee", {}).get("displayName", "")
-            if fields.get("assignee")
-            else "",
-            "Reporter": fields.get("reporter", {}).get("displayName", "")
-            if fields.get("reporter")
-            else "",
+            "Type": safe_get_nested(fields, "issuetype.name", ""),
+            "Status": safe_get_nested(fields, "status.name", ""),
+            "Priority": safe_get_nested(fields, "priority.name", "") if fields.get("priority") else "",
+            "Assignee": safe_get_nested(fields, "assignee.displayName", "") if fields.get("assignee") else "",
+            "Reporter": safe_get_nested(fields, "reporter.displayName", "") if fields.get("reporter") else "",
             "Summary": fields.get("summary", "")[:50],
         }
 
@@ -269,9 +296,7 @@ def format_search_results(
             links = fields.get("issuelinks", [])
             link_count = len(links)
             if link_count > 0:
-                link_types = set()
-                for link in links:
-                    link_types.add(link.get("type", {}).get("name", ""))
+                link_types = {safe_get_nested(link, "type.name", "") for link in links}
                 row["Links"] = f"{link_count} ({', '.join(link_types)})"
             else:
                 row["Links"] = ""

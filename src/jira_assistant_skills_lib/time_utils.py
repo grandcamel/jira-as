@@ -95,16 +95,22 @@ def _parse_time_components(seconds: int) -> tuple[int, int, int, int]:
     return weeks, days, hours, minutes
 
 
-def format_seconds(seconds: int, compact: bool = False) -> str:
+def _pluralize(value: int, singular: str) -> str:
+    """Return singular or plural form based on value."""
+    return singular if value == 1 else f"{singular}s"
+
+
+def format_seconds(seconds: int, compact: bool = False, verbose: bool = False) -> str:
     """
     Format seconds to human-readable JIRA time format.
 
     Args:
         seconds: Time in seconds
-        compact: If True, use minimal spacing
+        compact: If True, use minimal spacing (no spaces between units)
+        verbose: If True, use long form ('2 hours' vs '2h')
 
     Returns:
-        Human-readable string like '1d 4h 30m'
+        Human-readable string like '1d 4h 30m' or '1 day 4 hours 30 minutes'
 
     Examples:
         >>> format_seconds(7200)
@@ -113,32 +119,52 @@ def format_seconds(seconds: int, compact: bool = False) -> str:
         '1d 4h'
         >>> format_seconds(0)
         '0m'
+        >>> format_seconds(7200, verbose=True)
+        '2 hours'
+        >>> format_seconds(43200, verbose=True)
+        '1 day 4 hours'
+        >>> format_seconds(7200, compact=True)
+        '2h'
     """
+    zero_value = "0 minutes" if verbose else "0m"
+
     if seconds == 0:
-        return "0m"
+        return zero_value
 
     if seconds < 0:
-        return "-" + format_seconds(abs(seconds), compact)
+        return "-" + format_seconds(abs(seconds), compact, verbose)
 
     weeks, days, hours, minutes = _parse_time_components(seconds)
 
     parts = []
-    if weeks:
-        parts.append(f"{weeks}w")
-    if days:
-        parts.append(f"{days}d")
-    if hours:
-        parts.append(f"{hours}h")
-    if minutes:
-        parts.append(f"{minutes}m")
+    if verbose:
+        if weeks:
+            parts.append(f"{weeks} {_pluralize(weeks, 'week')}")
+        if days:
+            parts.append(f"{days} {_pluralize(days, 'day')}")
+        if hours:
+            parts.append(f"{hours} {_pluralize(hours, 'hour')}")
+        if minutes:
+            parts.append(f"{minutes} {_pluralize(minutes, 'minute')}")
+    else:
+        if weeks:
+            parts.append(f"{weeks}w")
+        if days:
+            parts.append(f"{days}d")
+        if hours:
+            parts.append(f"{hours}h")
+        if minutes:
+            parts.append(f"{minutes}m")
 
     separator = "" if compact else " "
-    return separator.join(parts) if parts else "0m"
+    return separator.join(parts) if parts else zero_value
 
 
 def format_seconds_long(seconds: int) -> str:
     """
     Format seconds to verbose human-readable format.
+
+    This is a convenience wrapper around format_seconds(verbose=True).
 
     Args:
         seconds: Time in seconds
@@ -152,25 +178,7 @@ def format_seconds_long(seconds: int) -> str:
         >>> format_seconds_long(43200)
         '1 day 4 hours'
     """
-    if seconds == 0:
-        return "0 minutes"
-
-    if seconds < 0:
-        return "-" + format_seconds_long(abs(seconds))
-
-    weeks, days, hours, minutes = _parse_time_components(seconds)
-
-    parts = []
-    if weeks:
-        parts.append(f"{weeks} {'week' if weeks == 1 else 'weeks'}")
-    if days:
-        parts.append(f"{days} {'day' if days == 1 else 'days'}")
-    if hours:
-        parts.append(f"{hours} {'hour' if hours == 1 else 'hours'}")
-    if minutes:
-        parts.append(f"{minutes} {'minute' if minutes == 1 else 'minutes'}")
-
-    return " ".join(parts) if parts else "0 minutes"
+    return format_seconds(seconds, verbose=True)
 
 
 def parse_relative_date(date_str: str, base_date: datetime | None = None) -> datetime:
