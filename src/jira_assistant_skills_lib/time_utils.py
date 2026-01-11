@@ -5,6 +5,8 @@ Provides functions to parse JIRA time format strings (e.g., '2h', '1d 4h 30m')
 and convert between seconds and human-readable formats.
 """
 
+from __future__ import annotations
+
 import re
 from datetime import datetime, timedelta
 

@@ -4,6 +4,8 @@ Helper utilities for permission scheme operations.
 Provides functions for parsing, formatting, and validating permission grants.
 """
 
+from __future__ import annotations
+
 from typing import Any
 
 from .error_handler import ValidationError

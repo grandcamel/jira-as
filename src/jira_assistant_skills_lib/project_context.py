@@ -10,6 +10,8 @@ metadata, workflows, patterns, and defaults. Context is loaded from:
 4. Hardcoded defaults (fallback)
 """
 
+from __future__ import annotations
+
 import json
 from dataclasses import dataclass, field
 from pathlib import Path

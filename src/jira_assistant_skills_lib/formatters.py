@@ -5,6 +5,8 @@ Provides functions to format JIRA API responses as tables, JSON,
 CSV, and human-readable text.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Any
 

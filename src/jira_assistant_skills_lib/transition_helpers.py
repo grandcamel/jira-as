@@ -5,6 +5,8 @@ Provides functions to find transitions by name with fuzzy matching
 support (case-insensitive, exact and partial matching).
 """
 
+from __future__ import annotations
+
 from typing import Any
 
 from .search_helpers import fuzzy_find_by_name

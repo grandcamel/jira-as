@@ -7,6 +7,8 @@ which uses a different base URL than the standard Jira REST API.
 API Documentation: https://developer.atlassian.com/cloud/automation/rest/
 """
 
+from __future__ import annotations
+
 from typing import Any
 
 import requests

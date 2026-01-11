@@ -6,6 +6,8 @@ Provides reusable utilities for resolving user identifiers
 (email addresses, usernames) to JIRA account IDs.
 """
 
+from __future__ import annotations
+
 from typing import Any
 
 

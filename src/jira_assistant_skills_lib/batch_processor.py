@@ -8,6 +8,8 @@ Provides:
 - Rate limiting between batches
 """
 
+from __future__ import annotations
+
 import json
 import time
 from collections.abc import Callable

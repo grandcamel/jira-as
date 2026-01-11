@@ -5,6 +5,8 @@ Provides a robust HTTP client for interacting with the JIRA REST API v3,
 including automatic retries, exponential backoff, and unified error handling.
 """
 
+from __future__ import annotations
+
 from typing import Any
 
 import requests

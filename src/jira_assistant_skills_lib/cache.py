@@ -13,6 +13,8 @@ Features:
 - Cache hit/miss statistics
 """
 
+from __future__ import annotations
+
 import fnmatch
 import hashlib
 import json

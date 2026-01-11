@@ -11,6 +11,8 @@ Security considerations:
 - Uses sanitize_error_message() from error_handler for exception messages
 """
 
+from __future__ import annotations
+
 import gc
 import json
 import os

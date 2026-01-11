@@ -11,6 +11,8 @@ Handles loading and merging configuration from multiple sources:
 Supports configurable Agile field IDs with automatic discovery fallback.
 """
 
+from __future__ import annotations
+
 import os
 import warnings
 from typing import Any

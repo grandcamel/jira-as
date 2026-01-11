@@ -8,6 +8,8 @@ Security Note: Error messages may contain sensitive data from JIRA responses.
 Use sanitize_error_message() before logging errors in production environments.
 """
 
+from __future__ import annotations
+
 import functools
 import re
 import sys

@@ -4,6 +4,8 @@ Generic search and matching helpers.
 Provides reusable fuzzy matching functions for finding items by name.
 """
 
+from __future__ import annotations
+
 from typing import Any, Callable
 
 from .error_handler import ValidationError
