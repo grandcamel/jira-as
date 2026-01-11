@@ -77,6 +77,9 @@ packages = ["src/jira_assistant_skills_lib"]
 testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "-v --tb=short"
+markers = [
+    "unit: marks tests as unit tests",
+]
 
 [tool.black]
 line-length = 88
