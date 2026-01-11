@@ -76,24 +76,3 @@ def find_transition_by_keywords(
 
     # Return first match
     return matching[0]
-
-
-def format_transition_list(transitions: list[dict[str, Any]]) -> str:
-    """
-    Format a list of transitions for display.
-
-    Args:
-        transitions: List of transition objects
-
-    Returns:
-        Formatted string with transition names and IDs
-    """
-    if not transitions:
-        return "No transitions available"
-
-    lines = []
-    for t in transitions:
-        target = t.get("to", {}).get("name", "Unknown")
-        lines.append(f"  - {t['name']} (ID: {t['id']}) -> {target}")
-
-    return "\n".join(lines)

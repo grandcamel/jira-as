@@ -125,10 +125,11 @@ from .formatters import (
 # JIRA Client
 from .jira_client import JiraClient
 
-# JSM utilities
-from .jsm_utils import (
+# JSM / SLA utilities (now in formatters)
+from .formatters import (
     calculate_sla_percentage,
-    format_duration,
+    format_duration,  # backwards-compatible alias
+    format_sla_duration,
     format_sla_time,
     get_sla_status_emoji,
     get_sla_status_text,
@@ -200,7 +201,6 @@ from .time_utils import (
 from .transition_helpers import (
     find_transition_by_keywords,
     find_transition_by_name,
-    format_transition_list,
 )
 
 # User helpers
@@ -311,7 +311,7 @@ __all__ = [
     "format_comments",
     "format_context_summary",
     "format_datetime_for_jira",
-    "format_duration",
+    "format_duration",  # backwards-compatible alias for format_sla_duration
     "format_grant",
     "format_grant_for_export",
     # Formatters
@@ -322,10 +322,10 @@ __all__ = [
     "format_search_results",
     "format_seconds",
     "format_seconds_long",
-    # JSM Utilities
+    # JSM / SLA Utilities
+    "format_sla_duration",
     "format_sla_time",
     "format_table",
-    "format_transition_list",
     "format_transitions",
     "generate_operation_id",
     "get_agile_field",

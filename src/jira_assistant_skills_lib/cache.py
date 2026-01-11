@@ -48,72 +48,6 @@ class CacheStats:
         return self.hits / total
 
 
-def is_simple_glob_pattern(pattern: str) -> bool:
-    """
-    Check if a glob pattern is simple enough to convert to SQL LIKE.
-
-    Simple patterns only use:
-    - * for any characters (converted to %)
-    - ? for single character (converted to _)
-    - No character classes like [abc]
-    - No nested patterns
-
-    Args:
-        pattern: Glob pattern to check
-
-    Returns:
-        True if pattern can be converted to SQL LIKE
-    """
-    # Patterns with character classes are not simple
-    if "[" in pattern or "]" in pattern:
-        return False
-
-    # Patterns with special glob syntax are not simple
-    if "{" in pattern or "}" in pattern:
-        return False
-
-    # Patterns with ** (recursive) need special handling
-    if "**" in pattern:
-        # **/ can be handled as % in SQL
-        return True
-
-    return True
-
-
-def glob_to_sql_like(pattern: str) -> tuple[str, bool]:
-    """
-    Convert a glob pattern to SQL LIKE pattern if possible.
-
-    Args:
-        pattern: Glob pattern (e.g., "PROJ-*", "issue:*:detail")
-
-    Returns:
-        Tuple of (sql_pattern, is_converted) where:
-        - sql_pattern: The SQL LIKE pattern if converted, else original
-        - is_converted: True if successfully converted to SQL LIKE
-    """
-    if not is_simple_glob_pattern(pattern):
-        return pattern, False
-
-    # Escape SQL LIKE special characters that aren't glob chars
-    sql_pattern = pattern
-
-    # Escape % and _ that are literal in glob but special in SQL
-    sql_pattern = sql_pattern.replace("%", r"\%")
-    sql_pattern = sql_pattern.replace("_", r"\_")
-
-    # Convert glob wildcards to SQL LIKE
-    # ** matches any path including /
-    sql_pattern = sql_pattern.replace("**/", "%")
-    sql_pattern = sql_pattern.replace("**", "%")
-    # * matches any characters except /
-    sql_pattern = sql_pattern.replace("*", "%")
-    # ? matches single character
-    sql_pattern = sql_pattern.replace("?", "_")
-
-    return sql_pattern, True
-
-
 class JiraCache:
     """
     Caching layer for JIRA API responses.
@@ -380,10 +314,6 @@ class JiraCache:
         """
         Invalidate cache entries.
 
-        Uses SQL LIKE for simple glob patterns (containing only * and ?)
-        for better performance on large caches. Falls back to Python
-        fnmatch for complex patterns with character classes.
-
         Args:
             key: Specific key to invalidate
             pattern: Glob pattern for keys to invalidate (e.g., "PROJ-*")
@@ -406,61 +336,31 @@ class JiraCache:
                     return cursor.rowcount
 
                 elif pattern is not None:
-                    # Try to use SQL LIKE for simple patterns (performance optimization)
-                    sql_pattern, can_use_like = glob_to_sql_like(pattern)
-
-                    if can_use_like:
-                        # Use SQL LIKE directly - much faster for large caches
-                        if category is not None:
-                            cursor = conn.execute(
-                                """
-                                DELETE FROM cache_entries
-                                WHERE key LIKE ? ESCAPE '\\' AND category = ?
-                            """,
-                                (sql_pattern, category),
-                            )
-                        else:
-                            cursor = conn.execute(
-                                """
-                                DELETE FROM cache_entries
-                                WHERE key LIKE ? ESCAPE '\\'
-                            """,
-                                (sql_pattern,),
-                            )
-                        conn.commit()
-                        return cursor.rowcount
+                    # Use fnmatch for glob pattern matching
+                    if category is not None:
+                        cursor = conn.execute(
+                            "SELECT key FROM cache_entries WHERE category = ?",
+                            (category,),
+                        )
                     else:
-                        # Fall back to Python fnmatch for complex patterns
-                        if category is not None:
-                            cursor = conn.execute(
-                                """
-                                SELECT key FROM cache_entries WHERE category = ?
-                            """,
-                                (category,),
-                            )
-                        else:
-                            cursor = conn.execute(
-                                "SELECT key, category FROM cache_entries"
-                            )
+                        cursor = conn.execute(
+                            "SELECT key, category FROM cache_entries"
+                        )
 
-                        to_delete = []
-                        for row in cursor:
-                            if fnmatch.fnmatch(row["key"], pattern):
-                                if category is not None:
-                                    to_delete.append((row["key"], category))
-                                else:
-                                    to_delete.append((row["key"], row["category"]))
+                    to_delete = []
+                    for row in cursor:
+                        if fnmatch.fnmatch(row["key"], pattern):
+                            cat = category if category is not None else row["category"]
+                            to_delete.append((row["key"], cat))
 
-                        for k, cat in to_delete:
-                            conn.execute(
-                                """
-                                DELETE FROM cache_entries WHERE key = ? AND category = ?
-                            """,
-                                (k, cat),
-                            )
+                    for k, cat in to_delete:
+                        conn.execute(
+                            "DELETE FROM cache_entries WHERE key = ? AND category = ?",
+                            (k, cat),
+                        )
 
-                        conn.commit()
-                        return len(to_delete)
+                    conn.commit()
+                    return len(to_delete)
 
                 elif category is not None:
                     # Invalidate entire category
