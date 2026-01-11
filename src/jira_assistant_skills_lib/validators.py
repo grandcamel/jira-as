@@ -282,6 +282,38 @@ PROJECT_TEMPLATES = {
 }
 
 
+def _validate_enum(
+    value: str, field_name: str, valid_values: list[str], normalize: str = "lower"
+) -> str:
+    """
+    Validate value is in a list of valid options.
+
+    Args:
+        value: Value to validate
+        field_name: Field name for error messages
+        valid_values: List of valid options
+        normalize: "lower" or "upper" for case normalization
+
+    Returns:
+        Normalized, validated value
+
+    Raises:
+        ValidationError: If value is not in valid_values
+    """
+    value = validate_required(value, field_name)
+    value = value.lower() if normalize == "lower" else value.upper()
+
+    if value not in valid_values:
+        raise ValidationError(
+            f"Invalid {field_name.replace('_', ' ')}: '{value}'. "
+            f"Valid types: {', '.join(valid_values)}",
+            operation="validation",
+            details={"field": field_name, "value": value},
+        )
+
+    return value
+
+
 def validate_project_type(project_type: str) -> str:
     """
     Validate project type.
@@ -295,18 +327,7 @@ def validate_project_type(project_type: str) -> str:
     Raises:
         ValidationError: If project type is invalid
     """
-    project_type = validate_required(project_type, "project_type")
-    project_type = project_type.lower()
-
-    if project_type not in VALID_PROJECT_TYPES:
-        raise ValidationError(
-            f"Invalid project type: '{project_type}'. "
-            f"Valid types: {', '.join(VALID_PROJECT_TYPES)}",
-            operation="validation",
-            details={"field": "project_type", "value": project_type},
-        )
-
-    return project_type
+    return _validate_enum(project_type, "project_type", VALID_PROJECT_TYPES, "lower")
 
 
 def validate_assignee_type(assignee_type: str) -> str:
@@ -322,18 +343,7 @@ def validate_assignee_type(assignee_type: str) -> str:
     Raises:
         ValidationError: If assignee type is invalid
     """
-    assignee_type = validate_required(assignee_type, "assignee_type")
-    assignee_type = assignee_type.upper()
-
-    if assignee_type not in VALID_ASSIGNEE_TYPES:
-        raise ValidationError(
-            f"Invalid assignee type: '{assignee_type}'. "
-            f"Valid types: {', '.join(VALID_ASSIGNEE_TYPES)}",
-            operation="validation",
-            details={"field": "assignee_type", "value": assignee_type},
-        )
-
-    return assignee_type
+    return _validate_enum(assignee_type, "assignee_type", VALID_ASSIGNEE_TYPES, "upper")
 
 
 def validate_project_template(template: str) -> str:
