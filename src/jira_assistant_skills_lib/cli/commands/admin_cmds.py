@@ -2356,6 +2356,28 @@ def permission_list(ctx, output):
                 click.echo(f"- {perm.get('key', 'N/A')}: {perm.get('name', 'N/A')}")
 
 
+@permission_group.command(name="check")
+@click.option("--project", "-p", required=True, help="Project key to check permissions for")
+@click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
+@click.pass_context
+@handle_jira_errors
+def permission_check(ctx, project, output):
+    """Check your permissions on a project."""
+    client = get_jira_client()
+    result = client.get_my_permissions(project_key=project)
+
+    if output == "json":
+        click.echo(format_json(result))
+    else:
+        click.echo(f"\nYour permissions on project {project}:")
+        permissions = result.get("permissions", {})
+        for perm_key, perm_info in permissions.items():
+            has_perm = perm_info.get("havePermission", False)
+            status = "✓" if has_perm else "✗"
+            name = perm_info.get("name", perm_key)
+            click.echo(f"  {status} {name}")
+
+
 # =============================================================================
 # Notification Scheme Commands
 # =============================================================================
