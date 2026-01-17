@@ -863,6 +863,8 @@ class MockJiraClientBase:
         adjust_estimate: str | None = None,
         new_estimate: str | None = None,
         reduce_by: str | None = None,
+        visibility_type: str | None = None,
+        visibility_value: str | None = None,
     ) -> dict[str, Any]:
         """Add a worklog to an issue.
 
@@ -875,6 +877,8 @@ class MockJiraClientBase:
             adjust_estimate: How to adjust the estimate.
             new_estimate: New estimate value.
             reduce_by: Amount to reduce estimate by.
+            visibility_type: 'role' or 'group' to restrict visibility (ignored in mock).
+            visibility_value: Role or group name for visibility restriction (ignored in mock).
 
         Returns:
             The created worklog.
@@ -898,6 +902,15 @@ class MockJiraClientBase:
             "created": "2025-01-08T10:00:00.000+0000",
             "updated": "2025-01-08T10:00:00.000+0000",
         }
+
+        # Add visibility if specified
+        if visibility_type and visibility_value:
+            worklog["visibility"] = {
+                "type": visibility_type,
+                "value": visibility_value,
+                "identifier": visibility_value,
+            }
+
         self._worklogs[issue_key].append(worklog)
         return worklog
 
