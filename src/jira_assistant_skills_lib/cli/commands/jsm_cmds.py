@@ -96,8 +96,7 @@ def _list_service_desks_impl(
     start: int = 0, limit: int = 50, project_key_filter: str | None = None
 ) -> dict[str, Any]:
     """List all JSM service desks."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         service_desks = client.get_service_desks(start=start, limit=limit)
 
         # Apply filter if specified
@@ -114,17 +113,12 @@ def _list_service_desks_impl(
             }
 
         return service_desks
-    finally:
-        client.close()
 
 
 def _get_service_desk_impl(service_desk_id: str) -> dict[str, Any]:
     """Get service desk details by ID."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_service_desk(service_desk_id)
-    finally:
-        client.close()
 
 
 def _create_service_desk_impl(
@@ -188,8 +182,7 @@ def _list_request_types_impl(
     name_filter: str | None = None,
 ) -> dict[str, Any]:
     """List request types for a service desk."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         request_types = client.get_request_types(
             service_desk_id, start=start, limit=limit
         )
@@ -207,19 +200,14 @@ def _list_request_types_impl(
             }
 
         return request_types
-    finally:
-        client.close()
 
 
 def _get_request_type_impl(
     service_desk_id: str, request_type_id: str
 ) -> dict[str, Any]:
     """Get request type details."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_request_type(service_desk_id, request_type_id)
-    finally:
-        client.close()
 
 
 def _get_request_type_fields_impl(

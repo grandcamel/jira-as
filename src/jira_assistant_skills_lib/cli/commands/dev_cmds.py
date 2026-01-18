@@ -280,11 +280,8 @@ def _create_branch_name_impl(
     """
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         issue = client.get_issue(issue_key, fields=["summary", "issuetype"])
-    finally:
-        client.close()
 
     fields = issue.get("fields", {})
     summary = fields.get("summary", "")
@@ -348,8 +345,7 @@ def _create_pr_description_impl(
     """
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         issue = client.get_issue(
             issue_key,
             fields=[
@@ -361,8 +357,6 @@ def _create_pr_description_impl(
                 "priority",
             ],
         )
-    finally:
-        client.close()
 
     fields = issue.get("fields", {})
     summary = fields.get("summary", "")
@@ -553,8 +547,7 @@ def _link_commit_impl(
 
     comment_body = "\n".join(lines)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         comment_data = {"body": wiki_markup_to_adf(comment_body)}
 
         result = client.post(
@@ -569,8 +562,6 @@ def _link_commit_impl(
             "commit_sha": commit,
             "comment_id": result.get("id"),
         }
-    finally:
-        client.close()
 
 
 def _link_pr_impl(
@@ -616,8 +607,7 @@ def _link_pr_impl(
 
     comment_body = "\n".join(lines)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         comment_data = {"body": wiki_markup_to_adf(comment_body)}
 
         result = client.post(
@@ -634,8 +624,6 @@ def _link_pr_impl(
             "provider": pr_info["provider"],
             "comment_id": result.get("id"),
         }
-    finally:
-        client.close()
 
 
 def _get_commits_impl(
@@ -656,8 +644,7 @@ def _get_commits_impl(
     """
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         issue = client.get_issue(issue_key, fields=["id"])
         issue_id = issue.get("id")
 
@@ -671,46 +658,44 @@ def _get_commits_impl(
             operation=f"get development info for {issue_key}",
         )
 
-        commits = []
-        detail = dev_info.get("detail", [])
+    commits = []
+    detail = dev_info.get("detail", [])
 
-        for detail_item in detail:
-            repositories = detail_item.get("repositories", [])
+    for detail_item in detail:
+        repositories = detail_item.get("repositories", [])
 
-            for repo in repositories:
-                repo_name = repo.get("name", "")
+        for repo in repositories:
+            repo_name = repo.get("name", "")
 
-                if repo_filter and repo_filter.lower() not in repo_name.lower():
-                    continue
+            if repo_filter and repo_filter.lower() not in repo_name.lower():
+                continue
 
-                repo_commits = repo.get("commits", [])
+            repo_commits = repo.get("commits", [])
 
-                for commit in repo_commits:
-                    commit_data = {
-                        "id": commit.get("id", ""),
-                        "sha": commit.get("id", ""),
-                        "display_id": commit.get("displayId", commit.get("id", "")[:7]),
-                        "repository": repo_name,
-                        "url": commit.get("url", ""),
-                    }
+            for commit in repo_commits:
+                commit_data = {
+                    "id": commit.get("id", ""),
+                    "sha": commit.get("id", ""),
+                    "display_id": commit.get("displayId", commit.get("id", "")[:7]),
+                    "repository": repo_name,
+                    "url": commit.get("url", ""),
+                }
 
-                    if detailed:
-                        commit_data.update(
-                            {
-                                "message": commit.get("message", ""),
-                                "author": commit.get("author", {}).get("name", ""),
-                                "author_email": commit.get("author", {}).get(
-                                    "email", ""
-                                ),
-                                "timestamp": commit.get("authorTimestamp", ""),
-                            }
-                        )
+                if detailed:
+                    commit_data.update(
+                        {
+                            "message": commit.get("message", ""),
+                            "author": commit.get("author", {}).get("name", ""),
+                            "author_email": commit.get("author", {}).get(
+                                "email", ""
+                            ),
+                            "timestamp": commit.get("authorTimestamp", ""),
+                        }
+                    )
 
-                    commits.append(commit_data)
+                commits.append(commit_data)
 
-        return commits
-    finally:
-        client.close()
+    return commits
 
 
 # =============================================================================

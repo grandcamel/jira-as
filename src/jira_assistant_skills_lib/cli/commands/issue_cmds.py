@@ -91,12 +91,8 @@ def _get_issue_impl(issue_key: str, fields: list[str] | None = None) -> dict:
     """
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
-        issue = client.get_issue(issue_key, fields=fields)
-        return issue
-    finally:
-        client.close()
+    with get_jira_client() as client:
+        return client.get_issue(issue_key, fields=fields)
 
 
 def _create_issue_impl(
@@ -191,10 +187,9 @@ def _create_issue_impl(
 
     if assignee:
         if assignee.lower() == "self":
-            client = get_jira_client()
-            account_id = client.get_current_user_id()
+            with get_jira_client() as client:
+                account_id = client.get_current_user_id()
             fields["assignee"] = {"accountId": account_id}
-            client.close()
         elif "@" in assignee:
             fields["assignee"] = {"emailAddress": assignee}
         else:
@@ -224,8 +219,7 @@ def _create_issue_impl(
     if estimate:
         fields["timetracking"] = {"originalEstimate": estimate}
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         result = client.create_issue(fields)
 
         # Add to sprint after creation (sprint assignment requires issue to exist)
@@ -262,8 +256,6 @@ def _create_issue_impl(
             result["defaults_applied"] = defaults_applied
 
         return result
-    finally:
-        client.close()
 
 
 def _update_issue_impl(
@@ -315,10 +307,9 @@ def _update_issue_impl(
         if assignee.lower() in ("none", "unassigned"):
             fields["assignee"] = None
         elif assignee.lower() == "self":
-            client = get_jira_client()
-            account_id = client.get_current_user_id()
+            with get_jira_client() as client:
+                account_id = client.get_current_user_id()
             fields["assignee"] = {"accountId": account_id}
-            client.close()
         elif "@" in assignee:
             fields["assignee"] = {"emailAddress": assignee}
         else:
@@ -336,11 +327,8 @@ def _update_issue_impl(
     if not fields:
         raise ValueError("No fields specified for update")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         client.update_issue(issue_key, fields, notify_users=notify_users)
-    finally:
-        client.close()
 
 
 def _delete_issue_impl(issue_key: str, force: bool = False) -> dict | None:
@@ -356,8 +344,7 @@ def _delete_issue_impl(issue_key: str, force: bool = False) -> dict | None:
     """
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if not force:
             # Get issue details for confirmation
             try:
@@ -377,18 +364,13 @@ def _delete_issue_impl(issue_key: str, force: bool = False) -> dict | None:
         else:
             client.delete_issue(issue_key)
             return None
-    finally:
-        client.close()
 
 
 def _confirm_and_delete(issue_key: str) -> None:
     """Actually delete the issue after confirmation."""
     issue_key = validate_issue_key(issue_key)
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         client.delete_issue(issue_key)
-    finally:
-        client.close()
 
 
 # =============================================================================

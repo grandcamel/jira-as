@@ -29,6 +29,8 @@ from typing import Any
 import click
 
 from jira_assistant_skills_lib import (
+    EPIC_LINK_FIELD,
+    STORY_POINTS_FIELD,
     ValidationError,
     export_csv,
     format_search_results,
@@ -39,13 +41,6 @@ from jira_assistant_skills_lib import (
 )
 
 from ..cli_utils import format_json, handle_jira_errors, parse_comma_list
-
-# =============================================================================
-# Constants
-# =============================================================================
-
-EPIC_LINK_FIELD = "customfield_10014"
-STORY_POINTS_FIELD = "customfield_10016"
 
 # Common JQL fields for suggestions
 COMMON_FIELDS = [
@@ -189,8 +184,7 @@ def _search_issues_impl(
     if not jql and not filter_id:
         raise ValidationError("Either JQL query or filter_id is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         actual_jql = jql
         filter_name = None
 
@@ -239,8 +233,6 @@ def _search_issues_impl(
         results["_jql"] = actual_jql
 
         return results
-    finally:
-        client.close()
 
 
 def _export_results_impl(
@@ -266,8 +258,7 @@ def _export_results_impl(
             "updated",
         ]
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         results = client.search_issues(
             jql, fields=fields, max_results=max_results, start_at=0
         )
@@ -323,8 +314,6 @@ def _export_results_impl(
             "output_file": output_file,
             "format": format_type,
         }
-    finally:
-        client.close()
 
 
 def _validate_jql_impl(
@@ -334,8 +323,7 @@ def _validate_jql_impl(
     if not queries:
         raise ValidationError("At least one query is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         result = client.parse_jql(queries)
         results = []
 
@@ -354,8 +342,6 @@ def _validate_jql_impl(
             )
 
         return results
-    finally:
-        client.close()
 
 
 def _build_jql_impl(
@@ -384,15 +370,12 @@ def _build_jql_impl(
     result = {"jql": jql}
 
     if validate:
-        client = get_jira_client()
-        try:
+        with get_jira_client() as client:
             parse_result = client.parse_jql([jql])
             parsed = parse_result.get("queries", [{}])[0]
             errors = parsed.get("errors", [])
             result["valid"] = len(errors) == 0
             result["errors"] = errors
-        finally:
-            client.close()
 
     return result
 
@@ -404,8 +387,7 @@ def _get_suggestions_impl(
     refresh_cache: bool = False,
 ) -> list[dict[str, Any]]:
     """Get autocomplete suggestions for a field value."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if use_cache:
             cache = get_autocomplete_cache()
             return cache.get_suggestions(
@@ -414,8 +396,6 @@ def _get_suggestions_impl(
         else:
             result = client.get_jql_suggestions(field_name, prefix)
             return result.get("results", [])
-    finally:
-        client.close()
 
 
 def _get_fields_impl(
@@ -426,8 +406,7 @@ def _get_fields_impl(
     refresh_cache: bool = False,
 ) -> list[dict[str, Any]]:
     """Get JQL searchable fields."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if use_cache:
             cache = get_autocomplete_cache()
             fields = cache.get_fields(client, force_refresh=refresh_cache)
@@ -450,8 +429,6 @@ def _get_fields_impl(
             fields = [f for f in fields if f.get("cfid") is None]
 
         return fields
-    finally:
-        client.close()
 
 
 def _get_functions_impl(
@@ -460,8 +437,7 @@ def _get_functions_impl(
     type_filter: str | None = None,
 ) -> list[dict[str, Any]]:
     """Get JQL functions."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         data = client.get_jql_autocomplete()
         functions = data.get("visibleFunctionNames", [])
 
@@ -486,8 +462,6 @@ def _get_functions_impl(
             ]
 
         return functions
-    finally:
-        client.close()
 
 
 def _bulk_update_impl(
@@ -501,8 +475,7 @@ def _bulk_update_impl(
     """Bulk update issues from search results."""
     jql = validate_jql(jql)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         results = client.search_issues(
             jql, fields=["key", "summary", "labels"], max_results=max_issues
         )
@@ -554,8 +527,6 @@ def _bulk_update_impl(
                 failures.append({"issue": issue["key"], "error": str(e)})
 
         return {"updated": updated, "failed": failed, "failures": failures}
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -572,8 +543,7 @@ def _get_filters_impl(
     project: str | None = None,
 ) -> dict[str, Any]:
     """Get saved filters."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if filter_id:
             filter_data = client.get_filter(filter_id)
             return {"type": "single", "filter": filter_data}
@@ -602,8 +572,6 @@ def _get_filters_impl(
             return {"type": "search", "filters": result.get("values", [])}
 
         raise ValidationError("Specify --my, --favourites, --search, or --id")
-    finally:
-        client.close()
 
 
 def _create_filter_impl(
@@ -629,8 +597,7 @@ def _create_filter_impl(
     if share_global:
         permissions.append({"type": "global"})
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.create_filter(
             name=name,
             jql=jql,
@@ -638,8 +605,6 @@ def _create_filter_impl(
             favourite=favourite,
             share_permissions=permissions if permissions else None,
         )
-    finally:
-        client.close()
 
 
 def _run_filter_impl(
@@ -651,8 +616,7 @@ def _run_filter_impl(
     if not filter_id and not filter_name:
         raise ValidationError("Either filter_id or filter_name is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if filter_name:
             filters = client.get("/rest/api/3/filter/my", operation="get filters")
             if isinstance(filters, list):
@@ -677,8 +641,6 @@ def _run_filter_impl(
         results["_filter"] = filter_data
 
         return results
-    finally:
-        client.close()
 
 
 def _update_filter_impl(
@@ -691,19 +653,15 @@ def _update_filter_impl(
     if not any([name, jql, description]):
         raise ValidationError("At least one of name, jql, or description is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.update_filter(
             filter_id, name=name, jql=jql, description=description
         )
-    finally:
-        client.close()
 
 
 def _delete_filter_impl(filter_id: str, dry_run: bool = False) -> dict[str, Any]:
     """Delete a filter."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         filter_data = client.get_filter(filter_id)
 
         if dry_run:
@@ -720,8 +678,6 @@ def _delete_filter_impl(filter_id: str, dry_run: bool = False) -> dict[str, Any]
             "filter_id": filter_id,
             "filter_name": filter_data.get("name"),
         }
-    finally:
-        client.close()
 
 
 def _share_filter_impl(
@@ -735,8 +691,7 @@ def _share_filter_impl(
     unshare: str | None = None,
 ) -> dict[str, Any]:
     """Manage filter sharing permissions."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if list_permissions:
             permissions = client.get_filter_permissions(filter_id)
             return {"action": "list", "permissions": permissions}
@@ -785,8 +740,6 @@ def _share_filter_impl(
         raise ValidationError(
             "Specify --project, --group, --global, --user, --list, or --unshare"
         )
-    finally:
-        client.close()
 
 
 def _favourite_filter_impl(
@@ -795,8 +748,7 @@ def _favourite_filter_impl(
     remove: bool = False,
 ) -> dict[str, Any]:
     """Manage filter favourite status."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if add:
             result = client.add_filter_favourite(filter_id)
             return {"action": "added", "filter": result}
@@ -816,8 +768,6 @@ def _favourite_filter_impl(
         else:
             result = client.add_filter_favourite(filter_id)
             return {"action": "added", "filter": result}
-    finally:
-        client.close()
 
 
 # =============================================================================

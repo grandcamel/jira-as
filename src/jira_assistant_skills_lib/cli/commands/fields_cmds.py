@@ -214,9 +214,7 @@ def _list_fields_impl(
     Returns:
         List of field dictionaries
     """
-    client = get_jira_client()
-
-    try:
+    with get_jira_client() as client:
         fields = client.get("/rest/api/3/field")
 
         result = []
@@ -250,9 +248,6 @@ def _list_fields_impl(
         result.sort(key=lambda x: x["name"].lower())
         return result
 
-    finally:
-        client.close()
-
 
 def _create_field_impl(
     name: str,
@@ -279,9 +274,7 @@ def _create_field_impl(
             f"Valid types: {', '.join(FIELD_TYPES.keys())}"
         )
 
-    client = get_jira_client()
-
-    try:
+    with get_jira_client() as client:
         type_config = FIELD_TYPES[field_type]
 
         data = {
@@ -295,9 +288,6 @@ def _create_field_impl(
 
         result = client.post("/rest/api/3/field", data=data)
         return result
-
-    finally:
-        client.close()
 
 
 def _check_project_fields_impl(
@@ -316,9 +306,7 @@ def _check_project_fields_impl(
     Returns:
         Dictionary with project info and available fields
     """
-    client = get_jira_client()
-
-    try:
+    with get_jira_client() as client:
         project = client.get(f"/rest/api/3/project/{project_key}")
 
         result = {
@@ -380,9 +368,6 @@ def _check_project_fields_impl(
 
         return result
 
-    finally:
-        client.close()
-
 
 def _configure_agile_fields_impl(
     project_key: str,
@@ -407,9 +392,7 @@ def _configure_agile_fields_impl(
     Raises:
         ValidationError: If project is team-managed
     """
-    client = get_jira_client()
-
-    try:
+    with get_jira_client() as client:
         project = client.get(f"/rest/api/3/project/{project_key}")
 
         if project.get("style") == "next-gen":
@@ -466,9 +449,6 @@ def _configure_agile_fields_impl(
                         )
 
         return result
-
-    finally:
-        client.close()
 
 
 # =============================================================================

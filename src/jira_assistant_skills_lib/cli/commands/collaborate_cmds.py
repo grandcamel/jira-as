@@ -70,8 +70,7 @@ def _add_comment_impl(
     else:
         comment_body = text_to_adf(body)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if visibility_type:
             result = client.add_comment_with_visibility(
                 issue_key,
@@ -82,8 +81,6 @@ def _add_comment_impl(
         else:
             result = client.add_comment(issue_key, comment_body)
         return result
-    finally:
-        client.close()
 
 
 def _get_comments_impl(
@@ -109,15 +106,12 @@ def _get_comments_impl(
     issue_key = validate_issue_key(issue_key)
     order_by = "+created" if order == "asc" else "-created"
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if comment_id:
             return client.get_comment(issue_key, comment_id)
         return client.get_comments(
             issue_key, max_results=limit, start_at=offset, order_by=order_by
         )
-    finally:
-        client.close()
 
 
 def _update_comment_impl(
@@ -147,11 +141,8 @@ def _update_comment_impl(
     else:
         comment_body = text_to_adf(body)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.update_comment(issue_key, comment_id, comment_body)
-    finally:
-        client.close()
 
 
 def _delete_comment_impl(
@@ -174,8 +165,7 @@ def _delete_comment_impl(
     """
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if dry_run or not force:
             comment = client.get_comment(issue_key, comment_id)
 
@@ -198,8 +188,6 @@ def _delete_comment_impl(
 
         client.delete_comment(issue_key, comment_id)
         return None
-    finally:
-        client.close()
 
 
 def _format_comment_body(body: dict[str, Any], max_length: int = 50) -> str:
@@ -276,27 +264,21 @@ def _upload_attachment_impl(
     issue_key = validate_issue_key(issue_key)
     file_path = validate_file_path(file_path, must_exist=True)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.upload_file(
             f"/rest/api/3/issue/{issue_key}/attachments",
             file_path,
             file_name=file_name,
             operation=f"upload attachment to {issue_key}",
         )
-    finally:
-        client.close()
 
 
 def _list_attachments_impl(issue_key: str) -> list[dict[str, Any]]:
     """List all attachments for an issue."""
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_attachments(issue_key)
-    finally:
-        client.close()
 
 
 def _download_attachment_impl(
@@ -319,8 +301,7 @@ def _download_attachment_impl(
     """
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         attachments = client.get_attachments(issue_key)
 
         target = None
@@ -362,8 +343,6 @@ def _download_attachment_impl(
             content_url, output_path, operation=f"download attachment {filename}"
         )
         return output_path
-    finally:
-        client.close()
 
 
 def _download_all_attachments_impl(
@@ -372,8 +351,7 @@ def _download_all_attachments_impl(
     """Download all attachments from an issue."""
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         attachments = client.get_attachments(issue_key)
 
         if not attachments:
@@ -408,8 +386,6 @@ def _download_all_attachments_impl(
             downloaded.append(output_path)
 
         return downloaded
-    finally:
-        client.close()
 
 
 def _format_attachment_list(attachments: list[dict[str, Any]]) -> str:
@@ -454,23 +430,19 @@ def _list_watchers_impl(issue_key: str) -> list:
     """List watchers on an issue."""
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         result = client.get(
             f"/rest/api/3/issue/{issue_key}/watchers",
             operation=f"get watchers for {issue_key}",
         )
         return result.get("watchers", [])
-    finally:
-        client.close()
 
 
 def _add_watcher_impl(issue_key: str, user: str) -> None:
     """Add a watcher to an issue."""
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         try:
             account_id = resolve_user_to_account_id(client, user)
         except UserNotFoundError as e:
@@ -481,16 +453,13 @@ def _add_watcher_impl(issue_key: str, user: str) -> None:
             data=f'"{account_id}"',
             operation=f"add watcher to {issue_key}",
         )
-    finally:
-        client.close()
 
 
 def _remove_watcher_impl(issue_key: str, user: str) -> None:
     """Remove a watcher from an issue."""
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         try:
             account_id = resolve_user_to_account_id(client, user)
         except UserNotFoundError as e:
@@ -500,8 +469,6 @@ def _remove_watcher_impl(issue_key: str, user: str) -> None:
             f"/rest/api/3/issue/{issue_key}/watchers?accountId={account_id}",
             operation=f"remove watcher from {issue_key}",
         )
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -515,11 +482,8 @@ def _get_activity_impl(
     """Get activity/changelog for an issue."""
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_changelog(issue_key, max_results=limit, start_at=offset)
-    finally:
-        client.close()
 
 
 def _parse_changelog(
@@ -654,12 +618,9 @@ def _send_notification_impl(
     if groups:
         to["groups"] = [{"name": group_name} for group_name in groups]
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         client.notify_issue(issue_key, subject=subject, text_body=body, to=to)
         return None
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -695,11 +656,8 @@ def _update_custom_fields_impl(
             "Either --field and --value, or --fields must be specified"
         )
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         client.update_issue(issue_key, fields, notify_users=True)
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -922,11 +880,8 @@ def comment_delete(ctx, issue_key: str, comment_id: str, yes: bool, dry_run: boo
         click.echo()
 
         if click.confirm("Are you sure?"):
-            client = get_jira_client()
-            try:
+            with get_jira_client() as client:
                 client.delete_comment(issue_key, comment_id)
-            finally:
-                client.close()
             print_success(f"Comment {comment_id} deleted from {issue_key}")
         else:
             click.echo("Deletion cancelled.")

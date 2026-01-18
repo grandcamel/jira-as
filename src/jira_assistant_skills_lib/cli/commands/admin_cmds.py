@@ -72,8 +72,7 @@ def _list_projects_impl(
     max_results: int = 50,
 ) -> dict[str, Any]:
     """List and search projects."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         status = ["live"]
         if include_archived:
             status.append("archived")
@@ -88,33 +87,25 @@ def _list_projects_impl(
             max_results=max_results,
         )
         return result
-    finally:
-        client.close()
 
 
 def _list_trash_projects_impl(
     start_at: int = 0, max_results: int = 50
 ) -> dict[str, Any]:
     """List projects in trash."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         result = client.search_projects(
             status=["deleted"], start_at=start_at, max_results=max_results
         )
         return result
-    finally:
-        client.close()
 
 
 def _get_project_impl(
     project_key: str, expand: list[str] | None = None
 ) -> dict[str, Any]:
     """Get project details."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_project(project_key, expand=expand)
-    finally:
-        client.close()
 
 
 def _create_project_impl(
@@ -142,8 +133,7 @@ def _create_project_impl(
         }
         template_key = default_templates.get(project_type)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         lead_account_id = None
         if lead:
             if "@" in lead:
@@ -171,8 +161,6 @@ def _create_project_impl(
                 pass
 
         return result
-    finally:
-        client.close()
 
 
 def _update_project_impl(
@@ -183,8 +171,7 @@ def _update_project_impl(
     category_id: int | None = None,
 ) -> dict[str, Any]:
     """Update a JIRA project."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         lead_account_id = None
         if lead:
             if "@" in lead:
@@ -203,50 +190,38 @@ def _update_project_impl(
             lead_account_id=lead_account_id,
             category_id=category_id,
         )
-    finally:
-        client.close()
 
 
 def _delete_project_impl(project_key: str, dry_run: bool = False) -> dict[str, Any]:
     """Delete a JIRA project."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         project = client.get_project(project_key)
         if dry_run:
             return {"action": "dry_run", "project": project, "would_delete": True}
 
         client.delete_project(project_key)
         return {"action": "deleted", "project": project}
-    finally:
-        client.close()
 
 
 def _archive_project_impl(project_key: str) -> dict[str, Any]:
     """Archive a JIRA project."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         client.archive_project(project_key)
         return {"action": "archived", "project_key": project_key}
-    finally:
-        client.close()
 
 
 def _restore_project_impl(project_key: str) -> dict[str, Any]:
     """Restore an archived or deleted project."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         client.restore_project(project_key)
         return {"action": "restored", "project_key": project_key}
-    finally:
-        client.close()
 
 
 def _get_project_config_impl(
     project_key: str, show_schemes: bool = False
 ) -> dict[str, Any]:
     """Get project configuration."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         project = client.get_project(project_key, expand="description,lead,issueTypes")
         config = {"project": project}
 
@@ -266,8 +241,6 @@ def _get_project_config_impl(
                 config["schemes"]["notification"] = None
 
         return config
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -277,29 +250,20 @@ def _get_project_config_impl(
 
 def _list_categories_impl() -> list[dict[str, Any]]:
     """List project categories."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_project_categories()
-    finally:
-        client.close()
 
 
 def _create_category_impl(name: str, description: str | None = None) -> dict[str, Any]:
     """Create a project category."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.create_project_category(name=name, description=description)
-    finally:
-        client.close()
 
 
 def _assign_category_impl(project_key: str, category_id: int) -> dict[str, Any]:
     """Assign a category to a project."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.update_project(project_key, category_id=category_id)
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -317,8 +281,7 @@ def _search_users_impl(
     assignable: bool = False,
 ) -> list[dict[str, Any]]:
     """Search for users."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if assignable and project:
             users = client.find_assignable_users(
                 query=query,
@@ -342,17 +305,12 @@ def _search_users_impl(
                     user["groups"] = []
 
         return users
-    finally:
-        client.close()
 
 
 def _get_user_impl(account_id: str) -> dict[str, Any]:
     """Get user details."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_user(account_id)
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -366,8 +324,7 @@ def _list_groups_impl(
     include_members: bool = False,
 ) -> list[dict[str, Any]]:
     """List all groups."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         result = client.find_groups(
             query=query or "", max_results=max_results, caseInsensitive=True
         )
@@ -384,45 +341,33 @@ def _list_groups_impl(
                     group["memberCount"] = "N/A"
 
         return groups
-    finally:
-        client.close()
 
 
 def _get_group_members_impl(group_name: str, max_results: int = 50) -> dict[str, Any]:
     """Get members of a group."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_group_members(group_name=group_name, max_results=max_results)
-    finally:
-        client.close()
 
 
 def _create_group_impl(group_name: str) -> dict[str, Any]:
     """Create a new group."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.create_group(group_name)
-    finally:
-        client.close()
 
 
 def _delete_group_impl(group_name: str, dry_run: bool = False) -> dict[str, Any]:
     """Delete a group."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if dry_run:
             return {"action": "dry_run", "group_name": group_name, "would_delete": True}
 
         client.delete_group(group_name)
         return {"action": "deleted", "group_name": group_name}
-    finally:
-        client.close()
 
 
 def _add_user_to_group_impl(group_name: str, user: str) -> dict[str, Any]:
     """Add a user to a group."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         account_id = user
         if "@" in user:
             users = client.search_users(user, max_results=1)
@@ -433,14 +378,11 @@ def _add_user_to_group_impl(group_name: str, user: str) -> dict[str, Any]:
 
         client.add_user_to_group(group_name=group_name, account_id=account_id)
         return {"action": "added", "group_name": group_name, "account_id": account_id}
-    finally:
-        client.close()
 
 
 def _remove_user_from_group_impl(group_name: str, user: str) -> dict[str, Any]:
     """Remove a user from a group."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         account_id = user
         if "@" in user:
             users = client.search_users(user, max_results=1)
@@ -451,8 +393,6 @@ def _remove_user_from_group_impl(group_name: str, user: str) -> dict[str, Any]:
 
         client.remove_user_from_group(group_name=group_name, account_id=account_id)
         return {"action": "removed", "group_name": group_name, "account_id": account_id}
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -574,8 +514,7 @@ def _list_permission_schemes_impl(
     name_filter: str | None = None, show_grants: bool = False
 ) -> list[dict[str, Any]]:
     """List permission schemes."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         expand = "permissions" if show_grants else None
         response = client.get_permission_schemes(expand=expand)
         schemes = response.get("permissionSchemes", [])
@@ -585,16 +524,13 @@ def _list_permission_schemes_impl(
             schemes = [s for s in schemes if filter_lower in s.get("name", "").lower()]
 
         return schemes
-    finally:
-        client.close()
 
 
 def _get_permission_scheme_impl(
     scheme_id: str, show_projects: bool = False
 ) -> dict[str, Any]:
     """Get permission scheme details."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         scheme = client.get_permission_scheme(scheme_id, expand="permissions")
         result = {"scheme": scheme}
 
@@ -603,27 +539,21 @@ def _get_permission_scheme_impl(
             result["projects"] = projects
 
         return result
-    finally:
-        client.close()
 
 
 def _create_permission_scheme_impl(
     name: str, description: str | None = None
 ) -> dict[str, Any]:
     """Create a permission scheme."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.create_permission_scheme(name=name, description=description)
-    finally:
-        client.close()
 
 
 def _assign_permission_scheme_impl(
     project_key: str, scheme_id: str, dry_run: bool = False
 ) -> dict[str, Any]:
     """Assign a permission scheme to a project."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if dry_run:
             scheme = client.get_permission_scheme(scheme_id)
             project = client.get_project(project_key)
@@ -641,18 +571,13 @@ def _assign_permission_scheme_impl(
             "scheme_id": scheme_id,
             "result": result,
         }
-    finally:
-        client.close()
 
 
 def _list_permissions_impl() -> list[dict[str, Any]]:
     """List available permissions."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         response = client.get_all_permissions()
         return response.get("permissions", {})
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -662,59 +587,44 @@ def _list_permissions_impl() -> list[dict[str, Any]]:
 
 def _list_notification_schemes_impl() -> list[dict[str, Any]]:
     """List notification schemes."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         response = client.get_notification_schemes()
         return response.get("values", [])
-    finally:
-        client.close()
 
 
 def _get_notification_scheme_impl(scheme_id: str) -> dict[str, Any]:
     """Get notification scheme details."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_notification_scheme(scheme_id, expand="all")
-    finally:
-        client.close()
 
 
 def _create_notification_scheme_impl(
     name: str, description: str | None = None
 ) -> dict[str, Any]:
     """Create a notification scheme."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.create_notification_scheme(name=name, description=description)
-    finally:
-        client.close()
 
 
 def _add_notification_impl(
     scheme_id: str, event: str, recipient: str
 ) -> dict[str, Any]:
     """Add a notification to a scheme."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.add_notification(
             scheme_id, event_type=event, notification_type=recipient
         )
-    finally:
-        client.close()
 
 
 def _remove_notification_impl(scheme_id: str, notification_id: str) -> dict[str, Any]:
     """Remove a notification from a scheme."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         client.remove_notification(scheme_id, notification_id)
         return {
             "action": "removed",
             "scheme_id": scheme_id,
             "notification_id": notification_id,
         }
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -729,8 +639,7 @@ def _list_screens_impl(
     max_results: int = 100,
 ) -> list[dict[str, Any]]:
     """List all screens."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         screens = []
         start_at = 0
 
@@ -762,34 +671,25 @@ def _list_screens_impl(
             ]
 
         return screens
-    finally:
-        client.close()
 
 
 def _get_screen_impl(screen_id: str) -> dict[str, Any]:
     """Get screen details."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_screen(screen_id)
-    finally:
-        client.close()
 
 
 def _list_screen_tabs_impl(screen_id: str) -> list[dict[str, Any]]:
     """List screen tabs."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_screen_tabs(screen_id)
-    finally:
-        client.close()
 
 
 def _get_screen_fields_impl(
     screen_id: str, tab_id: str | None = None
 ) -> list[dict[str, Any]]:
     """Get fields on a screen."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if tab_id:
             return client.get_screen_tab_fields(screen_id, tab_id)
         else:
@@ -801,16 +701,13 @@ def _get_screen_fields_impl(
                     field["tab"] = tab["name"]
                 all_fields.extend(fields)
             return all_fields
-    finally:
-        client.close()
 
 
 def _add_field_to_screen_impl(
     screen_id: str, field_id: str, tab_id: str | None = None
 ) -> dict[str, Any]:
     """Add a field to a screen."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if not tab_id:
             tabs = client.get_screen_tabs(screen_id)
             if tabs:
@@ -819,16 +716,13 @@ def _add_field_to_screen_impl(
                 raise ValidationError("No tabs found on screen")
 
         return client.add_field_to_screen_tab(screen_id, tab_id, field_id)
-    finally:
-        client.close()
 
 
 def _remove_field_from_screen_impl(
     screen_id: str, field_id: str, tab_id: str | None = None
 ) -> dict[str, Any]:
     """Remove a field from a screen."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if not tab_id:
             tabs = client.get_screen_tabs(screen_id)
             for tab in tabs:
@@ -842,27 +736,19 @@ def _remove_field_from_screen_impl(
 
         client.remove_field_from_screen_tab(screen_id, tab_id, field_id)
         return {"action": "removed", "screen_id": screen_id, "field_id": field_id}
-    finally:
-        client.close()
 
 
 def _list_screen_schemes_impl() -> list[dict[str, Any]]:
     """List screen schemes."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         response = client.get_screen_schemes()
         return response.get("values", [])
-    finally:
-        client.close()
 
 
 def _get_screen_scheme_impl(scheme_id: str) -> dict[str, Any]:
     """Get screen scheme details."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_screen_scheme(scheme_id)
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -876,8 +762,7 @@ def _list_issue_types_impl(
     hierarchy_level: int | None = None,
 ) -> list[dict[str, Any]]:
     """List issue types."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         issue_types = client.get_issue_types()
 
         if subtask_only:
@@ -891,55 +776,41 @@ def _list_issue_types_impl(
             ]
 
         return issue_types
-    finally:
-        client.close()
 
 
 def _get_issue_type_impl(issue_type_id: str) -> dict[str, Any]:
     """Get issue type details."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_issue_type(issue_type_id)
-    finally:
-        client.close()
 
 
 def _create_issue_type_impl(
     name: str, description: str | None = None, issue_type: str = "standard"
 ) -> dict[str, Any]:
     """Create an issue type."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.create_issue_type(
             name=name,
             description=description,
             type=issue_type,
         )
-    finally:
-        client.close()
 
 
 def _update_issue_type_impl(
     issue_type_id: str, name: str | None = None, description: str | None = None
 ) -> dict[str, Any]:
     """Update an issue type."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.update_issue_type(
             issue_type_id, name=name, description=description
         )
-    finally:
-        client.close()
 
 
 def _delete_issue_type_impl(issue_type_id: str) -> dict[str, Any]:
     """Delete an issue type."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         client.delete_issue_type(issue_type_id)
         return {"action": "deleted", "issue_type_id": issue_type_id}
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -949,50 +820,35 @@ def _delete_issue_type_impl(issue_type_id: str) -> dict[str, Any]:
 
 def _list_issue_type_schemes_impl() -> list[dict[str, Any]]:
     """List issue type schemes."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         response = client.get_issue_type_schemes()
         return response.get("values", [])
-    finally:
-        client.close()
 
 
 def _get_issue_type_scheme_impl(scheme_id: str) -> dict[str, Any]:
     """Get issue type scheme details."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_issue_type_scheme(scheme_id)
-    finally:
-        client.close()
 
 
 def _create_issue_type_scheme_impl(
     name: str, description: str | None = None
 ) -> dict[str, Any]:
     """Create an issue type scheme."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.create_issue_type_scheme(name=name, description=description)
-    finally:
-        client.close()
 
 
 def _assign_issue_type_scheme_impl(project_key: str, scheme_id: str) -> dict[str, Any]:
     """Assign an issue type scheme to a project."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.assign_issue_type_scheme(project_key, scheme_id)
-    finally:
-        client.close()
 
 
 def _get_project_issue_type_scheme_impl(project_id: str) -> dict[str, Any]:
     """Get the issue type scheme for a project."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_project_issue_type_scheme(project_id)
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -1009,8 +865,7 @@ def _list_workflows_impl(
     fetch_all: bool = False,
 ) -> dict[str, Any]:
     """List all workflows."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         all_workflows = []
         start_at = 0
         has_more = True
@@ -1085,8 +940,6 @@ def _list_workflows_impl(
             "total": len(all_workflows) if fetch_all else total,
             "has_more": not is_last if not fetch_all else False,
         }
-    finally:
-        client.close()
 
 
 def _parse_workflow(
@@ -1134,8 +987,7 @@ def _parse_workflow(
 
 def _get_workflow_impl(name: str) -> dict[str, Any]:
     """Get workflow details."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         response = client.search_workflows(
             workflow_name=name, expand="transitions,statuses"
         )
@@ -1143,8 +995,6 @@ def _get_workflow_impl(name: str) -> dict[str, Any]:
         if not workflows:
             raise JiraError(f"Workflow not found: {name}")
         return _parse_workflow(workflows[0], include_details=True)
-    finally:
-        client.close()
 
 
 def _search_workflows_impl(query: str) -> list[dict[str, Any]]:
@@ -1155,8 +1005,7 @@ def _search_workflows_impl(query: str) -> list[dict[str, Any]]:
 
 def _get_workflow_for_issue_impl(issue_key: str) -> dict[str, Any]:
     """Get the workflow for an issue."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         issue = client.get_issue(issue_key, fields="project,issuetype,status")
         project_key = issue["fields"]["project"]["key"]
         issue_type_id = issue["fields"]["issuetype"]["id"]
@@ -1174,8 +1023,6 @@ def _get_workflow_for_issue_impl(issue_key: str) -> dict[str, Any]:
             return _get_workflow_impl(workflow_name)
         else:
             return {"issue_key": issue_key, "workflow": None}
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -1185,20 +1032,16 @@ def _get_workflow_for_issue_impl(issue_key: str) -> dict[str, Any]:
 
 def _list_workflow_schemes_impl() -> list[dict[str, Any]]:
     """List workflow schemes."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         response = client.get_workflow_schemes()
         return response.get("values", [])
-    finally:
-        client.close()
 
 
 def _get_workflow_scheme_impl(
     scheme_id: str, show_projects: bool = False
 ) -> dict[str, Any]:
     """Get workflow scheme details."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         scheme = client.get_workflow_scheme(scheme_id)
         result = {"scheme": scheme}
 
@@ -1207,17 +1050,12 @@ def _get_workflow_scheme_impl(
             result["projects"] = projects.get("values", [])
 
         return result
-    finally:
-        client.close()
 
 
 def _assign_workflow_scheme_impl(project_key: str, scheme_id: str) -> dict[str, Any]:
     """Assign a workflow scheme to a project."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.assign_workflow_scheme(project_key, scheme_id)
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -1227,11 +1065,8 @@ def _assign_workflow_scheme_impl(project_key: str, scheme_id: str) -> dict[str, 
 
 def _list_statuses_impl() -> list[dict[str, Any]]:
     """List all statuses."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_statuses()
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -2363,8 +2198,8 @@ def permission_list(ctx, output):
 @handle_jira_errors
 def permission_check(ctx, project, output):
     """Check your permissions on a project."""
-    client = get_jira_client()
-    result = client.get_my_permissions(project_key=project)
+    with get_jira_client() as client:
+        result = client.get_my_permissions(project_key=project)
 
     if output == "json":
         click.echo(format_json(result))

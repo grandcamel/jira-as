@@ -346,10 +346,9 @@ def _cache_warm_impl(
     if not any([projects, fields, users, warm_all]):
         raise ValueError("At least one warming option is required")
 
-    client = get_jira_client()
     cache = JiraCache(cache_dir=cache_dir)
 
-    try:
+    with get_jira_client() as client:
         total_cached = 0
         critical_errors = []
         warmed = []
@@ -404,8 +403,6 @@ def _cache_warm_impl(
             result["errors"] = critical_errors
 
         return result
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -719,8 +716,7 @@ def _discover_project_impl(
     """
     project_key = project_key.upper()
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         metadata = _discover_metadata(client, project_key, verbose)
         patterns = _discover_patterns(
             client, project_key, sample_size, sample_period_days, verbose
@@ -730,8 +726,6 @@ def _discover_project_impl(
             "metadata": metadata,
             "patterns": patterns,
         }
-    finally:
-        client.close()
 
 
 # =============================================================================

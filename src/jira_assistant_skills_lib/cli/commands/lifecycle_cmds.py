@@ -107,8 +107,7 @@ def _transition_issue_impl(
     if not transition_id and not transition_name:
         raise ValidationError("Either --id or --to must be specified")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         # Get issue details first for context hints
         issue = client.get_issue(issue_key, fields=["status", "issuetype", "project"])
         current_status = (
@@ -203,8 +202,6 @@ def _transition_issue_impl(
             client.move_issues_to_sprint(sprint_id, [issue_key])
 
         return result
-    finally:
-        client.close()
 
 
 def _get_transitions_impl(issue_key: str) -> list:
@@ -219,11 +216,8 @@ def _get_transitions_impl(issue_key: str) -> list:
     """
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_transitions(issue_key)
-    finally:
-        client.close()
 
 
 def _assign_issue_impl(
@@ -251,8 +245,7 @@ def _assign_issue_impl(
     if sum([bool(user), assign_to_self, unassign]) != 1:
         raise ValidationError("Specify exactly one of: --user, --self, or --unassign")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if unassign:
             account_id = None
             action = "unassign"
@@ -291,8 +284,6 @@ def _assign_issue_impl(
 
         client.assign_issue(issue_key, account_id)
         return result
-    finally:
-        client.close()
 
 
 # Keywords for resolve/reopen transitions
@@ -315,8 +306,7 @@ def _resolve_issue_impl(
     """
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         transitions = client.get_transitions(issue_key)
 
         if not transitions:
@@ -339,8 +329,6 @@ def _resolve_issue_impl(
             fields["comment"] = text_to_adf(comment)
 
         client.transition_issue(issue_key, transition["id"], fields=fields)
-    finally:
-        client.close()
 
 
 def _reopen_issue_impl(issue_key: str, comment: str | None = None) -> None:
@@ -353,8 +341,7 @@ def _reopen_issue_impl(issue_key: str, comment: str | None = None) -> None:
     """
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         transitions = client.get_transitions(issue_key)
 
         if not transitions:
@@ -384,8 +371,6 @@ def _reopen_issue_impl(issue_key: str, comment: str | None = None) -> None:
             fields = {"comment": text_to_adf(comment)}
 
         client.transition_issue(issue_key, transition["id"], fields=fields)
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -411,8 +396,7 @@ def _get_versions_impl(
     Returns:
         List of version data
     """
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         versions = client.get_versions(project)
 
         # Apply filters
@@ -425,8 +409,6 @@ def _get_versions_impl(
             versions = [v for v in versions if v.get("archived")]
 
         return versions
-    finally:
-        client.close()
 
 
 def _create_version_impl(
@@ -469,8 +451,7 @@ def _create_version_impl(
         click.echo("\nNo version created (dry-run mode).")
         return None
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.create_version(
             project=project,
             name=name,
@@ -480,8 +461,6 @@ def _create_version_impl(
             released=released,
             archived=archived,
         )
-    finally:
-        client.close()
 
 
 def _release_version_impl(
@@ -500,8 +479,7 @@ def _release_version_impl(
     Returns:
         Updated version data
     """
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         versions = client.get_versions(project_key)
 
         # Find version by name
@@ -534,8 +512,6 @@ def _release_version_impl(
                 pass
 
         return result
-    finally:
-        client.close()
 
 
 def _archive_version_impl(
@@ -552,8 +528,7 @@ def _archive_version_impl(
     Returns:
         Updated version data
     """
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         versions = client.get_versions(project_key)
 
         # Find version by name
@@ -569,8 +544,6 @@ def _archive_version_impl(
             )
 
         return client.update_version(version_id, archived=True)
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -588,11 +561,8 @@ def _get_components_impl(project: str) -> list[dict[str, Any]]:
     Returns:
         List of component data
     """
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.get_components(project)
-    finally:
-        client.close()
 
 
 def _create_component_impl(
@@ -629,8 +599,7 @@ def _create_component_impl(
         click.echo("\nNo component created (dry-run mode).")
         return None
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.create_component(
             project=project,
             name=name,
@@ -638,8 +607,6 @@ def _create_component_impl(
             lead_account_id=lead_account_id,
             assignee_type=assignee_type,
         )
-    finally:
-        client.close()
 
 
 def _update_component_impl(
@@ -692,11 +659,8 @@ def _update_component_impl(
     if assignee_type:
         update_data["assigneeType"] = assignee_type
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.update_component(component_id, **update_data)
-    finally:
-        client.close()
 
 
 def _delete_component_impl(
@@ -717,8 +681,7 @@ def _delete_component_impl(
     Returns:
         Component info if not force (for confirmation), None otherwise
     """
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if dry_run:
             component = client.get_component(component_id)
             print_info(f"[DRY RUN] Would delete component {component_id}:")
@@ -745,8 +708,6 @@ def _delete_component_impl(
 
         client.delete_component(component_id, **kwargs)
         return None
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -1279,14 +1240,11 @@ def component_delete(
 
         if click.confirm("Are you sure?"):
             # Actually delete
-            client = get_jira_client()
-            try:
+            with get_jira_client() as client:
                 kwargs = {}
                 if move_to:
                     kwargs["moveIssuesTo"] = move_to
                 client.delete_component(component_id, **kwargs)
-            finally:
-                client.close()
             print_success(f"Deleted component {component_id}")
         else:
             click.echo("Deletion cancelled.")

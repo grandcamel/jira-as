@@ -183,8 +183,7 @@ def _bulk_transition_impl(
     if not target_status:
         raise ValidationError("Target status is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         issues = _get_issues_to_process(
             client,
             issue_keys=issue_keys,
@@ -277,8 +276,6 @@ def _bulk_transition_impl(
             "errors": errors,
             "processed": processed,
         }
-    finally:
-        client.close()
 
 
 def _bulk_assign_impl(
@@ -294,8 +291,7 @@ def _bulk_assign_impl(
     if not assignee and not unassign:
         raise ValidationError("Either --assignee or --unassign must be provided")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         account_id = None
         action = "unassign"
         if not unassign:
@@ -380,8 +376,6 @@ def _bulk_assign_impl(
             "processed": processed,
             "action": action,
         }
-    finally:
-        client.close()
 
 
 def _bulk_set_priority_impl(
@@ -398,8 +392,7 @@ def _bulk_set_priority_impl(
 
     priority = _validate_priority(priority)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         issues = _get_issues_to_process(
             client,
             issue_keys=issue_keys,
@@ -475,8 +468,6 @@ def _bulk_set_priority_impl(
             "errors": errors,
             "processed": processed,
         }
-    finally:
-        client.close()
 
 
 def _clone_issue(
@@ -643,8 +634,7 @@ def _bulk_clone_impl(
     if target_project:
         target_project = validate_project_key(target_project)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         # Clone requires full issue data
         if issue_keys:
             issue_keys = [validate_issue_key(k) for k in issue_keys[:max_issues]]
@@ -745,8 +735,6 @@ def _bulk_clone_impl(
             "created_issues": created_issues,
             "retrieval_failed": len(retrieval_errors),
         }
-    finally:
-        client.close()
 
 
 def _bulk_delete_impl(
@@ -758,8 +746,7 @@ def _bulk_delete_impl(
     delay: float = 0.1,
 ) -> dict[str, Any]:
     """Delete multiple issues permanently."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         issues = _get_issues_to_process(
             client,
             issue_keys=issue_keys,
@@ -844,8 +831,6 @@ def _bulk_delete_impl(
             "errors": errors,
             "processed": processed,
         }
-    finally:
-        client.close()
 
 
 # =============================================================================

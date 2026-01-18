@@ -102,8 +102,7 @@ def _add_worklog_impl(
     if comment:
         comment_adf = text_to_adf(comment)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.add_worklog(
             issue_key=issue_key,
             time_spent=time_spent,
@@ -115,8 +114,6 @@ def _add_worklog_impl(
             visibility_type=visibility_type,
             visibility_value=visibility_value,
         )
-    finally:
-        client.close()
 
 
 def _get_worklogs_impl(
@@ -139,8 +136,7 @@ def _get_worklogs_impl(
     """
     validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         # Handle currentUser() filter
         if author_filter == "currentUser()":
             current_user = client.get(
@@ -189,8 +185,6 @@ def _get_worklogs_impl(
             "startAt": result.get("startAt", 0),
             "maxResults": result.get("maxResults", len(filtered)),
         }
-    finally:
-        client.close()
 
 
 def _update_worklog_impl(
@@ -241,8 +235,7 @@ def _update_worklog_impl(
     if comment:
         comment_adf = text_to_adf(comment)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.update_worklog(
             issue_key=issue_key,
             worklog_id=worklog_id,
@@ -252,8 +245,6 @@ def _update_worklog_impl(
             adjust_estimate=adjust_estimate,
             new_estimate=new_estimate,
         )
-    finally:
-        client.close()
 
 
 def _delete_worklog_impl(
@@ -280,8 +271,7 @@ def _delete_worklog_impl(
     """
     validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         worklog = client.get_worklog(issue_key, worklog_id)
 
         if dry_run:
@@ -304,8 +294,6 @@ def _delete_worklog_impl(
             "worklog": worklog,
             "deleted": True,
         }
-    finally:
-        client.close()
 
 
 def _set_estimate_impl(
@@ -341,8 +329,7 @@ def _set_estimate_impl(
             f"Invalid time format: '{remaining_estimate}'. Use format like '2h', '1d 4h', '30m'"
         )
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         current = client.get_time_tracking(issue_key)
 
         client.set_time_tracking(
@@ -357,8 +344,6 @@ def _set_estimate_impl(
             "previous": current,
             "current": updated,
         }
-    finally:
-        client.close()
 
 
 def _get_time_tracking_impl(issue_key: str) -> dict[str, Any]:
@@ -373,13 +358,10 @@ def _get_time_tracking_impl(issue_key: str) -> dict[str, Any]:
     """
     validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         result = client.get_time_tracking(issue_key)
         result["progress"] = _calculate_progress(result)
         return result
-    finally:
-        client.close()
 
 
 def _generate_report_impl(
@@ -402,8 +384,7 @@ def _generate_report_impl(
     Returns:
         Report data dict with entries, totals, and grouping
     """
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         jql_parts = []
         if project:
             jql_parts.append(f"project = {project}")
@@ -485,8 +466,6 @@ def _generate_report_impl(
             result["grouped"] = _group_entries(entries, group_by)
 
         return result
-    finally:
-        client.close()
 
 
 def _export_timesheets_impl(
@@ -507,8 +486,7 @@ def _export_timesheets_impl(
     Returns:
         Timesheet data dict with entries
     """
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         jql_parts = []
         if project:
             jql_parts.append(f"project = {project}")
@@ -594,8 +572,6 @@ def _export_timesheets_impl(
                 "until": until,
             },
         }
-    finally:
-        client.close()
 
 
 def _bulk_log_time_impl(
@@ -627,8 +603,7 @@ def _bulk_log_time_impl(
 
     time_seconds = parse_time_string(time_spent)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if jql:
             search_result = client.search_issues(
                 jql, fields=["summary"], max_results=100
@@ -711,8 +686,6 @@ def _bulk_log_time_impl(
             "failures": failures,
             "dry_run": False,
         }
-    finally:
-        client.close()
 
 
 # =============================================================================

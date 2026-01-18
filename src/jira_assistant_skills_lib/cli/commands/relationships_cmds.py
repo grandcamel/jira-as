@@ -468,9 +468,7 @@ def _link_issue_impl(
     if issue_key.upper() == resolved_target.upper():
         raise ValidationError("Cannot link an issue to itself")
 
-    client = get_jira_client()
-
-    try:
+    with get_jira_client() as client:
         link_types = client.get_link_types()
         link_type_obj = _find_link_type(link_types, resolved_type)
 
@@ -501,9 +499,6 @@ def _link_issue_impl(
 
         client.create_link(link_type_obj["name"], inward_key, outward_key, adf_comment)
 
-    finally:
-        client.close()
-
     return None
 
 
@@ -523,9 +518,7 @@ def _unlink_issue_impl(
     if from_issue:
         from_issue = validate_issue_key(from_issue)
 
-    client = get_jira_client()
-
-    try:
+    with get_jira_client() as client:
         links = client.get_issue_links(issue_key)
         links_to_delete = []
 
@@ -565,10 +558,7 @@ def _unlink_issue_impl(
         for link in links_to_delete:
             client.delete_link(link["id"])
 
-    finally:
-        client.close()
-
-    return {"deleted_count": len(links_to_delete)}
+        return {"deleted_count": len(links_to_delete)}
 
 
 def _get_links_impl(
@@ -579,11 +569,8 @@ def _get_links_impl(
     """Get links for an issue."""
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         links = client.get_issue_links(issue_key)
-    finally:
-        client.close()
 
     if direction == "outward":
         links = [l for l in links if "inwardIssue" in l]
@@ -606,9 +593,7 @@ def _get_blockers_impl(
     """Get blockers for an issue."""
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-
-    try:
+    with get_jira_client() as client:
         if recursive:
             visited: set[str] = set()
             tree = _get_blockers_recursive(
@@ -641,8 +626,6 @@ def _get_blockers_impl(
                 "blockers": blockers,
                 "total": len(blockers),
             }
-    finally:
-        client.close()
 
 
 def _get_dependencies_impl(
@@ -652,12 +635,8 @@ def _get_dependencies_impl(
     """Get all dependencies for an issue."""
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-
-    try:
+    with get_jira_client() as client:
         links = client.get_issue_links(issue_key)
-    finally:
-        client.close()
 
     dependencies = []
     status_counts = defaultdict(int)
@@ -702,11 +681,8 @@ def _get_dependencies_impl(
 
 def _get_link_types_impl(filter_pattern: str | None = None) -> list:
     """Get all available issue link types."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         link_types = client.get_link_types()
-    finally:
-        client.close()
 
     if filter_pattern:
         pattern_lower = filter_pattern.lower()
@@ -732,9 +708,7 @@ def _clone_issue_impl(
     """Clone a JIRA issue."""
     issue_key = validate_issue_key(issue_key)
 
-    client = get_jira_client()
-
-    try:
+    with get_jira_client() as client:
         original = client.get_issue(issue_key)
         new_fields = _extract_cloneable_fields(original, to_project)
 
@@ -799,9 +773,6 @@ def _clone_issue_impl(
 
         return result
 
-    finally:
-        client.close()
-
 
 def _bulk_link_impl(
     issues: list[str] | None = None,
@@ -814,9 +785,7 @@ def _bulk_link_impl(
     """Bulk link multiple issues to a target."""
     target = validate_issue_key(target)
 
-    client = get_jira_client()
-
-    try:
+    with get_jira_client() as client:
         if jql and not issues:
             results = client.search_issues(jql, fields=["key"], max_results=100)
             issues = [issue["key"] for issue in results.get("issues", [])]
@@ -882,9 +851,6 @@ def _bulk_link_impl(
             "dry_run": False,
         }
 
-    finally:
-        client.close()
-
 
 def _get_link_stats_impl(
     issue_key: str | None = None,
@@ -906,11 +872,8 @@ def _get_link_stats_impl(
 
 def _get_single_issue_stats(issue_key: str) -> dict[str, Any]:
     """Get link statistics for a single issue."""
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         links = client.get_issue_links(issue_key)
-    finally:
-        client.close()
 
     stats = {
         "issue_key": issue_key,
@@ -950,85 +913,80 @@ def _get_single_issue_stats(issue_key: str) -> dict[str, Any]:
 
 def _get_project_stats(jql: str, max_results: int = 500) -> dict[str, Any]:
     """Get link statistics for issues matching a JQL query."""
-    client = get_jira_client()
-
-    try:
+    with get_jira_client() as client:
         results = client.search_issues(
             jql,
             fields=["key", "summary", "issuelinks", "status"],
             max_results=max_results,
         )
 
-        issues = results.get("issues", [])
-        total_issues = results.get("total", 0)
+    issues = results.get("issues", [])
+    total_issues = results.get("total", 0)
 
-        stats = {
-            "jql": jql,
-            "issues_analyzed": len(issues),
-            "total_matching": total_issues,
-            "total_links": 0,
-            "by_type": defaultdict(int),
-            "by_direction": {"inward": 0, "outward": 0},
-            "orphaned_count": 0,
-            "orphaned_issues": [],
-            "most_connected": [],
-            "by_status": defaultdict(int),
-        }
+    stats = {
+        "jql": jql,
+        "issues_analyzed": len(issues),
+        "total_matching": total_issues,
+        "total_links": 0,
+        "by_type": defaultdict(int),
+        "by_direction": {"inward": 0, "outward": 0},
+        "orphaned_count": 0,
+        "orphaned_issues": [],
+        "most_connected": [],
+        "by_status": defaultdict(int),
+    }
 
-        issue_link_counts = []
+    issue_link_counts = []
 
-        for issue in issues:
-            issue_key = issue["key"]
-            links = issue.get("fields", {}).get("issuelinks", [])
-            link_count = len(links)
+    for issue in issues:
+        issue_key = issue["key"]
+        links = issue.get("fields", {}).get("issuelinks", [])
+        link_count = len(links)
 
-            stats["total_links"] += link_count
+        stats["total_links"] += link_count
 
-            if link_count == 0:
-                stats["orphaned_count"] += 1
-                stats["orphaned_issues"].append(
-                    {
-                        "key": issue_key,
-                        "summary": issue.get("fields", {}).get("summary", "")[:50],
-                    }
-                )
+        if link_count == 0:
+            stats["orphaned_count"] += 1
+            stats["orphaned_issues"].append(
+                {
+                    "key": issue_key,
+                    "summary": issue.get("fields", {}).get("summary", "")[:50],
+                }
+            )
+        else:
+            issue_link_counts.append(
+                {
+                    "key": issue_key,
+                    "summary": issue.get("fields", {}).get("summary", "")[:50],
+                    "link_count": link_count,
+                }
+            )
+
+        for link in links:
+            link_type = link["type"]["name"]
+            stats["by_type"][link_type] += 1
+
+            if "outwardIssue" in link:
+                stats["by_direction"]["inward"] += 1
+                linked_issue = link["outwardIssue"]
             else:
-                issue_link_counts.append(
-                    {
-                        "key": issue_key,
-                        "summary": issue.get("fields", {}).get("summary", "")[:50],
-                        "link_count": link_count,
-                    }
-                )
+                stats["by_direction"]["outward"] += 1
+                linked_issue = link["inwardIssue"]
 
-            for link in links:
-                link_type = link["type"]["name"]
-                stats["by_type"][link_type] += 1
+            status = (
+                linked_issue.get("fields", {})
+                .get("status", {})
+                .get("name", "Unknown")
+            )
+            stats["by_status"][status] += 1
 
-                if "outwardIssue" in link:
-                    stats["by_direction"]["inward"] += 1
-                    linked_issue = link["outwardIssue"]
-                else:
-                    stats["by_direction"]["outward"] += 1
-                    linked_issue = link["inwardIssue"]
+    issue_link_counts.sort(key=lambda x: x["link_count"], reverse=True)
+    stats["most_connected"] = issue_link_counts[:20]
 
-                status = (
-                    linked_issue.get("fields", {})
-                    .get("status", {})
-                    .get("name", "Unknown")
-                )
-                stats["by_status"][status] += 1
+    stats["by_type"] = dict(stats["by_type"])
+    stats["by_status"] = dict(stats["by_status"])
 
-        issue_link_counts.sort(key=lambda x: x["link_count"], reverse=True)
-        stats["most_connected"] = issue_link_counts[:20]
-
-        stats["by_type"] = dict(stats["by_type"])
-        stats["by_status"] = dict(stats["by_status"])
-
-        return stats
-
-    finally:
-        client.close()
+    return stats
 
 
 # =============================================================================

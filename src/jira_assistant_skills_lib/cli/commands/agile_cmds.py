@@ -79,13 +79,8 @@ FIBONACCI_SEQUENCE = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 
 def _get_board_for_project(project_key: str, client=None) -> dict | None:
     """Find the first Scrum board for a project."""
-    if not client:
-        client = get_jira_client()
-        should_close = True
-    else:
-        should_close = False
-
-    try:
+    if client:
+        # Use provided client directly (caller manages lifecycle)
         result = client.get_all_boards(project_key=project_key)
         boards = result.get("values", [])
         scrum_boards = [b for b in boards if b.get("type") == "scrum"]
@@ -94,9 +89,17 @@ def _get_board_for_project(project_key: str, client=None) -> dict | None:
         if boards:
             return boards[0]
         return None
-    finally:
-        if should_close:
-            client.close()
+
+    # Create and manage our own client
+    with get_jira_client() as new_client:
+        result = new_client.get_all_boards(project_key=project_key)
+        boards = result.get("values", [])
+        scrum_boards = [b for b in boards if b.get("type") == "scrum"]
+        if scrum_boards:
+            return scrum_boards[0]
+        if boards:
+            return boards[0]
+        return None
 
 
 def _get_board_id_for_project(project_key: str, client=None) -> int:
@@ -177,8 +180,7 @@ def _create_epic_impl(
     if labels:
         fields["labels"] = labels
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if assignee:
             if assignee.lower() == "self":
                 account_id = client.get_current_user_id()
@@ -200,16 +202,13 @@ def _create_epic_impl(
             fields.update(custom_fields)
 
         return client.create_issue(fields)
-    finally:
-        client.close()
 
 
 def _get_epic_impl(epic_key: str, with_children: bool = False) -> dict[str, Any]:
     """Get epic details and optionally calculate progress."""
     epic_key = validate_issue_key(epic_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         agile_fields = get_agile_fields()
         story_points_field = agile_fields["story_points"]
 
@@ -270,8 +269,6 @@ def _get_epic_impl(epic_key: str, with_children: bool = False) -> dict[str, Any]
                 }
 
         return result
-    finally:
-        client.close()
 
 
 def _add_to_epic_impl(
@@ -287,8 +284,7 @@ def _add_to_epic_impl(
     if not issue_keys:
         raise ValidationError("At least one issue key is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         result = {"added": 0, "removed": 0, "failed": 0, "failures": []}
 
         if not remove:
@@ -322,8 +318,6 @@ def _add_to_epic_impl(
                 result["failures"].append({"issue": issue_key, "error": str(e)})
 
         return result
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -341,8 +335,7 @@ def _list_sprints_impl(
     if not board_id and not project_key:
         raise ValidationError("Either board_id or project_key is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         board = None
         actual_board_id = board_id
 
@@ -367,8 +360,6 @@ def _list_sprints_impl(
             "state_filter": state,
             "total": len(sprints),
         }
-    finally:
-        client.close()
 
 
 def _create_sprint_impl(
@@ -393,8 +384,7 @@ def _create_sprint_impl(
         if end_dt <= start_dt:
             raise ValidationError("End date must be after start date")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.create_sprint(
             board_id=board_id,
             name=name,
@@ -402,8 +392,6 @@ def _create_sprint_impl(
             start_date=parsed_start,
             end_date=parsed_end,
         )
-    finally:
-        client.close()
 
 
 def _get_sprint_impl(sprint_id: int, with_issues: bool = False) -> dict[str, Any]:
@@ -411,8 +399,7 @@ def _get_sprint_impl(sprint_id: int, with_issues: bool = False) -> dict[str, Any
     if not sprint_id:
         raise ValidationError("Sprint ID is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         story_points_field = get_agile_field("story_points")
 
         sprint = client.get_sprint(sprint_id)
@@ -462,8 +449,6 @@ def _get_sprint_impl(sprint_id: int, with_issues: bool = False) -> dict[str, Any
                 }
 
         return result
-    finally:
-        client.close()
 
 
 def _get_active_sprint_impl(board_id: int) -> dict[str, Any] | None:
@@ -471,13 +456,10 @@ def _get_active_sprint_impl(board_id: int) -> dict[str, Any] | None:
     if not board_id:
         raise ValidationError("Board ID is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         result = client.get_board_sprints(board_id, state="active")
         sprints = result.get("values", [])
         return sprints[0] if sprints else None
-    finally:
-        client.close()
 
 
 def _start_sprint_impl(
@@ -489,8 +471,7 @@ def _start_sprint_impl(
     if not sprint_id:
         raise ValidationError("Sprint ID is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         update_data = {"state": "active"}
         if start_date:
             update_data["start_date"] = _parse_date_safe(start_date)
@@ -498,8 +479,6 @@ def _start_sprint_impl(
             update_data["end_date"] = _parse_date_safe(end_date)
 
         return client.update_sprint(sprint_id, **update_data)
-    finally:
-        client.close()
 
 
 def _close_sprint_impl(
@@ -510,8 +489,7 @@ def _close_sprint_impl(
     if not sprint_id:
         raise ValidationError("Sprint ID is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         result = {}
 
         if move_incomplete_to:
@@ -523,8 +501,6 @@ def _close_sprint_impl(
         result.update(sprint_result)
 
         return result
-    finally:
-        client.close()
 
 
 def _update_sprint_impl(
@@ -551,11 +527,8 @@ def _update_sprint_impl(
     if not update_data:
         raise ValidationError("At least one field to update is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         return client.update_sprint(sprint_id, **update_data)
-    finally:
-        client.close()
 
 
 def _move_to_sprint_impl(
@@ -572,8 +545,7 @@ def _move_to_sprint_impl(
     if not issue_keys and not jql:
         raise ValidationError("Either issue_keys or jql is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         issues_to_move = []
 
         if issue_keys:
@@ -593,8 +565,6 @@ def _move_to_sprint_impl(
         client.move_issues_to_sprint(sprint_id, issues_to_move, rank=rank_position)
 
         return {"moved": len(issues_to_move), "failed": 0}
-    finally:
-        client.close()
 
 
 def _move_to_backlog_impl(
@@ -606,8 +576,7 @@ def _move_to_backlog_impl(
     if not issue_keys and not jql:
         raise ValidationError("Either issue_keys or jql is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         issues_to_move = []
 
         if issue_keys:
@@ -630,8 +599,6 @@ def _move_to_backlog_impl(
         client.move_issues_to_backlog(issues_to_move)
 
         return {"moved_to_backlog": len(issues_to_move)}
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -650,8 +617,7 @@ def _get_backlog_impl(
     if not board_id and not project_key:
         raise ValidationError("Either board_id or project_key is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if not board_id and project_key:
             board_id = _get_board_id_for_project(project_key, client)
 
@@ -678,8 +644,6 @@ def _get_backlog_impl(
             result["no_epic"] = no_epic
 
         return result
-    finally:
-        client.close()
 
 
 def _rank_issue_impl(
@@ -705,8 +669,7 @@ def _rank_issue_impl(
     if after_key:
         after_key = validate_issue_key(after_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if before_key:
             client.rank_issues(issue_keys, rank_before=before_key)
         elif after_key:
@@ -717,8 +680,6 @@ def _rank_issue_impl(
             )
 
         return {"ranked": len(issue_keys), "issues": issue_keys}
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -744,8 +705,7 @@ def _estimate_issue_impl(
             f"Points {points} is not a valid Fibonacci value. Valid values: {FIBONACCI_SEQUENCE}"
         )
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         if jql and not issue_keys:
             search_result = client.search_issues(jql)
             issue_keys = [issue["key"] for issue in search_result.get("issues", [])]
@@ -763,8 +723,6 @@ def _estimate_issue_impl(
             updated += 1
 
         return {"updated": updated, "issues": issue_keys, "points": points}
-    finally:
-        client.close()
 
 
 def _get_estimates_impl(
@@ -777,8 +735,7 @@ def _get_estimates_impl(
     if not sprint_id and not project_key and not epic_key:
         raise ValidationError("Either sprint_id, project_key, or epic_key is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         sprint_name = None
 
         if project_key and not sprint_id:
@@ -851,8 +808,6 @@ def _get_estimates_impl(
             response["epic_key"] = epic_key
 
         return response
-    finally:
-        client.close()
 
 
 def _get_velocity_impl(
@@ -864,8 +819,7 @@ def _get_velocity_impl(
     if not board_id and not project_key:
         raise ValidationError("Either board_id or project_key is required")
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         actual_board_id = board_id
         board_name = None
 
@@ -950,8 +904,6 @@ def _get_velocity_impl(
             "total_points": total_points,
             "sprints": sprint_data,
         }
-    finally:
-        client.close()
 
 
 def _create_subtask_impl(
@@ -972,8 +924,7 @@ def _create_subtask_impl(
 
     parent_key = validate_issue_key(parent_key)
 
-    client = get_jira_client()
-    try:
+    with get_jira_client() as client:
         parent = client.get_issue(parent_key)
 
         if parent["fields"]["issuetype"].get("subtask", False):
@@ -1023,8 +974,6 @@ def _create_subtask_impl(
             fields.update(custom_fields)
 
         return client.create_issue(fields)
-    finally:
-        client.close()
 
 
 # =============================================================================
@@ -1345,13 +1294,10 @@ def epic_add_issues(ctx, epic_key, issues, jql, dry_run, output):
     issue_list = parse_comma_list(issues) or []
 
     if jql:
-        client = get_jira_client()
-        try:
+        with get_jira_client() as client:
             jql_results = client.search_issues(jql)
             jql_keys = [issue["key"] for issue in jql_results.get("issues", [])]
             issue_list.extend(jql_keys)
-        finally:
-            client.close()
 
     result = _add_to_epic_impl(
         epic_key=epic_key, issue_keys=issue_list, dry_run=dry_run
