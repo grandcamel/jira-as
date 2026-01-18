@@ -380,7 +380,7 @@ class SearchMixin(_Base):
         Returns:
             Parsed JQL structure.
         """
-        result = {
+        result: dict[str, Any] = {
             "clauses": [],
             "orderBy": None,
             "raw": jql,

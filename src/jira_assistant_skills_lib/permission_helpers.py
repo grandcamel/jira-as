@@ -237,7 +237,7 @@ def group_grants_by_permission(
     Returns:
         Dict mapping permission keys to lists of grants
     """
-    grouped = {}
+    grouped: dict[str, list] = {}
     for grant in grants:
         permission = grant.get("permission", "UNKNOWN")
         if permission not in grouped:
