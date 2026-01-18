@@ -501,14 +501,15 @@ class JiraClient:
         Raises:
             JiraError or subclass on failure
         """
+        data: dict[str, Any] | None
         if account_id == "-1":
             # Get current user's account ID
             account_id = self.get_current_user_id()
-            data: dict[str, Any] = {"accountId": account_id}
+            data = {"accountId": account_id}
         elif account_id is None:
             data = None
         else:
-            data: dict[str, Any] = {"accountId": account_id}
+            data = {"accountId": account_id}
 
         self.put(
             f"/rest/api/3/issue/{issue_key}/assignee",
@@ -1292,7 +1293,7 @@ class JiraClient:
         Raises:
             JiraError or subclass on failure
         """
-        payload = {"timeSpent": time_spent}
+        payload: dict[str, Any] = {"timeSpent": time_spent}
         if started:
             payload["started"] = started
         if comment:
@@ -1393,7 +1394,7 @@ class JiraClient:
         Raises:
             JiraError or subclass on failure
         """
-        payload = {}
+        payload: dict[str, Any] = {}
         if time_spent:
             payload["timeSpent"] = time_spent
         if started:
@@ -1661,7 +1662,7 @@ class JiraClient:
         Raises:
             JiraError or subclass on failure
         """
-        payload = {}
+        payload: dict[str, Any] = {}
         if name is not None:
             payload["name"] = name
         if jql is not None:
@@ -2869,7 +2870,7 @@ class JiraClient:
         Raises:
             JiraError or subclass on failure
         """
-        payload = {"id": transition_id}
+        payload: dict[str, Any] = {"id": transition_id}
 
         if comment:
             payload["additionalComment"] = {"body": comment, "public": public}
@@ -3535,7 +3536,7 @@ class JiraClient:
             return []
 
         # Search KB with derived query
-        return self.search_kb_articles(service_desk_id, query, max_results)
+        return self.search_kb_articles(service_desk_id, query, limit=max_results)
 
     # ==========================================
     # Assets/Insight Methods (Requires JSM Premium)
@@ -4466,7 +4467,7 @@ class JiraClient:
             This is an experimental API endpoint.
             Requires 'Administer Jira' global permission.
         """
-        payload = {
+        payload: dict[str, Any] = {
             "projectId": project_key_or_id,
             "workflowSchemeId": workflow_scheme_id,
         }
