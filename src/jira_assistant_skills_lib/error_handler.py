@@ -36,6 +36,17 @@ from assistant_skills_lib.error_handler import (
 )
 
 
+# -----------------------------------------------------------------------------
+# Exception Pattern Note:
+# The kwargs.pop("message", None) pattern in exception constructors prevents
+# "got multiple values for argument 'message'" errors when:
+# 1. handle_jira_error() passes message in error_kwargs dict
+# 2. The constructor modifies message (e.g., appending hints) before super()
+# 3. The base class hierarchy also accepts message
+# This defensive pop ensures message isn't accidentally passed twice.
+# -----------------------------------------------------------------------------
+
+
 class JiraError(BaseAPIError):
     """Base exception for all JIRA-related errors."""
 
