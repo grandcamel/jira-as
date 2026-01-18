@@ -197,5 +197,5 @@ mock_client.close.assert_called_once()
 ## Version Management
 
 Version is defined in two places that must stay in sync:
-- `pyproject.toml`: `version = "0.2.3"` (source of truth for publishing)
-- `src/jira_assistant_skills_lib/__init__.py`: `__version__ = "0.2.3"` (runtime access)
+- `pyproject.toml`: `version = "1.1.0"` (source of truth for publishing)
+- `src/jira_assistant_skills_lib/__init__.py`: `__version__ = "1.1.0"` (runtime access)
