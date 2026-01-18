@@ -23,6 +23,8 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import Any
 
+from .error_handler import JiraError
+
 
 @dataclass
 class BatchResult:
@@ -37,10 +39,12 @@ class BatchResult:
     duration_ms: float = 0
 
 
-class BatchError(Exception):
+class BatchError(JiraError):
     """Error during batch execution."""
 
-    pass
+    def __init__(self, message: str = "Batch execution failed", **kwargs: Any):
+        kwargs.pop("message", None)
+        super().__init__(message, **kwargs)
 
 
 class RequestBatcher:

@@ -10,16 +10,16 @@ from __future__ import annotations
 
 from typing import Any
 
+from .error_handler import NotFoundError
 
-class UserNotFoundError(Exception):
+
+class UserNotFoundError(NotFoundError):
     """Raised when a user cannot be found in JIRA."""
 
     def __init__(self, identifier: str, message: str | None = None):
         self.identifier = identifier
-        if message:
-            super().__init__(message)
-        else:
-            super().__init__(f"User not found: {identifier}")
+        display_message = message if message else f"User not found: {identifier}"
+        super().__init__(resource_type="User", resource_id=identifier, message=display_message)
 
 
 def resolve_user_to_account_id(client, user_identifier: str) -> str:
