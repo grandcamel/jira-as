@@ -91,6 +91,26 @@ All public APIs are exported from `__init__.py`. Consumer scripts should use:
 from jira_assistant_skills_lib import get_jira_client, ValidationError, validate_issue_key
 ```
 
+### JiraClient Usage Pattern
+
+**Always use context manager** for JiraClient to ensure proper resource cleanup:
+
+```python
+# Correct - context manager handles cleanup automatically
+with get_jira_client() as client:
+    issue = client.get_issue("PROJ-123")
+    return issue
+
+# Wrong - manual try/finally is deprecated
+client = get_jira_client()
+try:
+    issue = client.get_issue("PROJ-123")
+finally:
+    client.close()  # Don't do this
+```
+
+Both `JiraClient` and `MockJiraClient` implement `__enter__` and `__exit__` methods.
+
 ## Adding New Functionality
 
 When adding new modules:
@@ -137,8 +157,37 @@ Mock client provides deterministic test data:
 - **DEMOSD project**: DEMOSD-1 through DEMOSD-5 (Service desk requests)
 - **Users**: Jason Krueger (abc123), Jane Manager (def456)
 
+## Testing Patterns
+
+### Mock Client Fixtures
+
+When mocking `get_jira_client()` in tests, always add context manager support:
+
+```python
+@pytest.fixture
+def mock_client():
+    """Create mock JIRA client with context manager support."""
+    client = MagicMock()
+    client.__enter__ = MagicMock(return_value=client)
+    client.__exit__ = MagicMock(return_value=None)
+    return client
+```
+
+To verify cleanup, assert on `__exit__` instead of `close`:
+```python
+# Correct
+mock_client.__exit__.assert_called_once()
+
+# Wrong - close() is no longer called directly
+mock_client.close.assert_called_once()
+```
+
 ## Gotchas
 
+- **Context manager required**: Always use `with get_jira_client() as client:` pattern. Manual `try/finally` with `close()` is deprecated.
+- **Test mock context manager**: Mock fixtures must include `__enter__` and `__exit__` methods or tests will fail with context manager usage.
+- **Exception hierarchy**: Custom exceptions must inherit from base classes in `error_handler.py` (e.g., `JiraError`, `NotFoundError`, `ValidationError`). Never inherit directly from `Exception`.
+- **Constants in constants.py**: Field IDs like `EPIC_LINK_FIELD`, `STORY_POINTS_FIELD` are defined in `constants.py`. Import them, don't duplicate.
 - **Mock API parity**: Mock methods must match `JiraClient` signatures exactly. If real client adds parameters (e.g., `next_page_token`), mock must accept them too or skills will fail with `TypeError: got unexpected keyword argument`.
 - **Version sync**: `pyproject.toml` version and `__init__.py` `__version__` must match. Use `./scripts/sync-version.sh` if available.
 - **Import from package**: Always `from jira_assistant_skills_lib import ...`, never import internal modules directly.
