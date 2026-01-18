@@ -2,7 +2,6 @@
 Tests for mock factory classes.
 """
 
-import pytest
 
 from jira_assistant_skills_lib.mock.factories import (
     CommentFactory,
@@ -48,7 +47,9 @@ class TestResponseFactory:
     def test_paginated_jsm_format(self):
         """Test JSM paginated response format."""
         items = ["a", "b", "c"]
-        result = ResponseFactory.paginated(items, start_at=0, max_results=10, format="jsm")
+        result = ResponseFactory.paginated(
+            items, start_at=0, max_results=10, format="jsm"
+        )
 
         assert result["size"] == 3
         assert result["start"] == 0
@@ -266,7 +267,9 @@ class TestCommentFactory:
         adf_body = {
             "version": 1,
             "type": "doc",
-            "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Hello"}]}],
+            "content": [
+                {"type": "paragraph", "content": [{"type": "text", "text": "Hello"}]}
+            ],
         }
         comment = CommentFactory.standard(
             comment_id="10001",

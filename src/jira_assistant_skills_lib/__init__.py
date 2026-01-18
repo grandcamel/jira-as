@@ -26,8 +26,8 @@ __version__ = "1.1.0"
 
 # Error handling
 # ADF Helper
-from .adf_helper import _parse_wiki_inline  # Exposed for testing
 from .adf_helper import (
+    _parse_wiki_inline,  # Exposed for testing
     adf_to_text,
     create_adf_code_block,
     create_adf_heading,
@@ -105,7 +105,6 @@ from .error_handler import (
 
 # JSM / SLA utilities (now in formatters)
 # Formatters
-from .formatters import format_duration  # backwards-compatible alias
 from .formatters import (
     EPIC_LINK_FIELD,
     STORY_POINTS_FIELD,
@@ -114,6 +113,7 @@ from .formatters import (
     export_csv,
     extract_issue_fields,
     format_comments,
+    format_duration,  # backwards-compatible alias
     format_issue,
     format_json,
     format_search_results,

@@ -107,8 +107,7 @@ class JiraCache:
     def _init_db(self) -> None:
         """Initialize SQLite database for cache storage."""
         with self._get_connection() as conn:
-            conn.execute(
-                """
+            conn.execute("""
                 CREATE TABLE IF NOT EXISTS cache_entries (
                     key TEXT NOT NULL,
                     category TEXT NOT NULL,
@@ -119,23 +118,16 @@ class JiraCache:
                     last_accessed_at REAL NOT NULL,
                     PRIMARY KEY (key, category)
                 )
-            """
-            )
-            conn.execute(
-                """
+            """)
+            conn.execute("""
                 CREATE INDEX IF NOT EXISTS idx_cache_category ON cache_entries(category)
-            """
-            )
-            conn.execute(
-                """
+            """)
+            conn.execute("""
                 CREATE INDEX IF NOT EXISTS idx_cache_expires ON cache_entries(expires_at)
-            """
-            )
-            conn.execute(
-                """
+            """)
+            conn.execute("""
                 CREATE INDEX IF NOT EXISTS idx_cache_lru ON cache_entries(last_accessed_at)
-            """
-            )
+            """)
             conn.commit()
 
     @contextmanager
@@ -281,12 +273,10 @@ class JiraCache:
             space_needed = current_size + new_entry_size - self.max_size
             freed = 0
 
-            cursor = conn.execute(
-                """
+            cursor = conn.execute("""
                 SELECT key, category, size_bytes FROM cache_entries
                 ORDER BY last_accessed_at ASC
-            """
-            )
+            """)
 
             entries_to_delete = []
             for row in cursor:
@@ -400,24 +390,20 @@ class JiraCache:
 
             with self._get_connection() as conn:
                 # Total count and size
-                cursor = conn.execute(
-                    """
+                cursor = conn.execute("""
                     SELECT COUNT(*) as count, COALESCE(SUM(size_bytes), 0) as total_size
                     FROM cache_entries
-                """
-                )
+                """)
                 row = cursor.fetchone()
                 stats.entry_count = row["count"]
                 stats.total_size_bytes = row["total_size"]
 
                 # Stats by category
-                cursor = conn.execute(
-                    """
+                cursor = conn.execute("""
                     SELECT category, COUNT(*) as count, SUM(size_bytes) as size
                     FROM cache_entries
                     GROUP BY category
-                """
-                )
+                """)
                 for row in cursor:
                     stats.by_category[row["category"]] = {
                         "count": row["count"],
