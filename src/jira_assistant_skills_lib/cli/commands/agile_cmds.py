@@ -621,8 +621,8 @@ def _get_backlog_impl(
         result["_agile_fields"] = agile_fields
 
         if group_by_epic:
-            by_epic = {}
-            no_epic = []
+            by_epic: dict[str, list] = {}
+            no_epic: list = []
             for issue in result.get("issues", []):
                 epic_key = issue["fields"].get(epic_link_field)
                 if epic_key:
@@ -765,8 +765,8 @@ def _get_estimates_impl(
             issues = result.get("issues", [])
 
         total_points = 0
-        by_status = defaultdict(float)
-        by_assignee = defaultdict(float)
+        by_status: dict[str, float] = defaultdict(float)
+        by_assignee: dict[str, float] = defaultdict(float)
 
         for issue in issues:
             fields = issue.get("fields", {})

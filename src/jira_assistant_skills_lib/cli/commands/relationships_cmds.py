@@ -637,8 +637,8 @@ def _get_dependencies_impl(
     with get_jira_client() as client:
         links = client.get_issue_links(issue_key)
 
-    dependencies = []
-    status_counts = defaultdict(int)
+    dependencies: list[dict[str, Any]] = []
+    status_counts: dict[str, int] = defaultdict(int)
 
     for link in links:
         lt = link["type"]["name"]

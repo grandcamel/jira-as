@@ -700,9 +700,9 @@ def _bulk_clone_impl(
 
         success = 0
         failed = 0
-        errors = {}
-        created_issues = []
-        created_mapping = {}
+        errors: dict[str, str] = {}
+        created_issues: list[dict[str, Any]] = []
+        created_mapping: dict[str, str] = {}
 
         for i, issue in enumerate(issues, 1):
             issue_key = issue.get("key")

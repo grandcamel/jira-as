@@ -716,7 +716,7 @@ def _generate_progress_bar(progress: int, width: int = 20) -> str:
 
 def _group_entries(entries: list[dict], group_by: str) -> dict[str, Any]:
     """Group entries by the specified field."""
-    grouped = defaultdict(lambda: {"entries": [], "total_seconds": 0})
+    grouped: dict[str, Any] = defaultdict(lambda: {"entries": [], "total_seconds": 0})
 
     for entry in entries:
         if group_by == "issue":
