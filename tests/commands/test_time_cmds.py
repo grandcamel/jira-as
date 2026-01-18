@@ -136,9 +136,12 @@ def sample_report_entries():
 
 @pytest.fixture
 def mock_client():
-    """Create a mock JIRA client."""
+    """Create a mock JIRA client with context manager support."""
     client = MagicMock()
     client.close = MagicMock()
+    # Support context manager pattern: with get_jira_client() as client:
+    client.__enter__ = MagicMock(return_value=client)
+    client.__exit__ = MagicMock(return_value=None)
     return client
 
 
@@ -599,7 +602,8 @@ class TestAddWorklogImpl:
 
         assert result == sample_worklog
         mock_client.add_worklog.assert_called_once()
-        mock_client.close.assert_called_once()
+        mock_client.__enter__.assert_called_once()
+        mock_client.__exit__.assert_called_once()
 
     def test_add_worklog_with_options(self, mock_client, sample_worklog):
         """Test worklog with all options."""
@@ -660,7 +664,8 @@ class TestGetWorklogsImpl:
             result = _get_worklogs_impl("PROJ-123")
 
         assert result["total"] == 2
-        mock_client.close.assert_called_once()
+        mock_client.__enter__.assert_called_once()
+        mock_client.__exit__.assert_called_once()
 
     def test_filter_by_author(self, mock_client, sample_worklogs_response):
         """Test filtering by author."""
@@ -689,7 +694,8 @@ class TestUpdateWorklogImpl:
             result = _update_worklog_impl("PROJ-123", "12345", time_spent="3h")
 
         assert result == sample_worklog
-        mock_client.close.assert_called_once()
+        mock_client.__enter__.assert_called_once()
+        mock_client.__exit__.assert_called_once()
 
     def test_no_updates_raises(self):
         """Test no updates raises validation error."""
@@ -767,7 +773,8 @@ class TestGetTimeTrackingImpl:
             result = _get_time_tracking_impl("PROJ-123")
 
         assert "progress" in result
-        mock_client.close.assert_called_once()
+        mock_client.__enter__.assert_called_once()
+        mock_client.__exit__.assert_called_once()
 
 
 class TestGenerateReportImpl:
@@ -800,7 +807,8 @@ class TestGenerateReportImpl:
             result = _generate_report_impl(project="PROJ")
 
         assert result["entry_count"] == 1
-        mock_client.close.assert_called_once()
+        mock_client.__enter__.assert_called_once()
+        mock_client.__exit__.assert_called_once()
 
 
 class TestExportTimesheetsImpl:

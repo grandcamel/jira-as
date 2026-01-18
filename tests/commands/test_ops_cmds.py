@@ -277,6 +277,10 @@ class TestCacheWarmImpl:
             {"key": "PROJ2", "name": "Project 2"},
         ]
 
+        # Configure mock to work as a context manager
+        mock_jira_client.__enter__ = MagicMock(return_value=mock_jira_client)
+        mock_jira_client.__exit__ = MagicMock(return_value=False)
+
         with (
             patch(
                 "jira_assistant_skills_lib.cli.commands.ops_cmds.get_jira_client",
@@ -291,7 +295,7 @@ class TestCacheWarmImpl:
 
         assert result["total_cached"] == 2
         assert "projects" in result["warmed"]
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
     def test_cache_warm_fields(self, mock_jira_client):
         """Test warming field cache."""
@@ -402,6 +406,10 @@ class TestDiscoverProjectImpl:
         mock_jira_client.find_assignable_users.return_value = []
         mock_jira_client.search_issues.return_value = {"issues": []}
 
+        # Configure mock to work as a context manager
+        mock_jira_client.__enter__ = MagicMock(return_value=mock_jira_client)
+        mock_jira_client.__exit__ = MagicMock(return_value=False)
+
         with patch(
             "jira_assistant_skills_lib.cli.commands.ops_cmds.get_jira_client",
             return_value=mock_jira_client,
@@ -411,7 +419,7 @@ class TestDiscoverProjectImpl:
         assert "metadata" in result
         assert "patterns" in result
         assert result["metadata"]["project_key"] == "PROJ"
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
 
 @pytest.mark.unit

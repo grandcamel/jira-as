@@ -55,7 +55,8 @@ class TestLinkIssueImpl:
 
         assert result is None
         mock_jira_client.create_link.assert_called_once()
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__enter__.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
     def test_link_issue_relates_to(self, mock_jira_client, sample_link_types):
         """Test creating a relates to link."""

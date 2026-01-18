@@ -55,7 +55,8 @@ class TestAddCommentImpl:
 
         assert result["id"] == "10001"
         mock_jira_client.add_comment.assert_called_once()
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__enter__.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
     def test_add_comment_with_visibility(self, mock_jira_client, sample_comment):
         """Test adding a comment with visibility restrictions."""

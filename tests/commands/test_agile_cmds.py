@@ -47,9 +47,12 @@ from jira_assistant_skills_lib import JiraError, ValidationError
 
 @pytest.fixture
 def mock_client():
-    """Create a mock JIRA client."""
+    """Create a mock JIRA client with context manager support."""
     client = MagicMock()
     client.close = MagicMock()
+    # Support context manager pattern: with get_jira_client() as client:
+    client.__enter__ = MagicMock(return_value=client)
+    client.__exit__ = MagicMock(return_value=None)
     return client
 
 
@@ -198,7 +201,7 @@ class TestHelperFunctions:
 
         assert result["id"] == 1
         assert result["type"] == "scrum"
-        mock_client.close.assert_called_once()
+        mock_client.__exit__.assert_called_once()
 
     def test_get_board_for_project_kanban_fallback(self, mock_client):
         """Test falling back to any board when no scrum board."""
@@ -350,7 +353,8 @@ class TestEpicImplementation:
 
         assert result["key"] == "PROJ-100"
         mock_client.create_issue.assert_called_once()
-        mock_client.close.assert_called_once()
+        mock_client.__enter__.assert_called_once()
+        mock_client.__exit__.assert_called_once()
 
     def test_create_epic_impl_missing_project(self):
         """Test error when project missing."""
@@ -413,7 +417,8 @@ class TestEpicImplementation:
 
         assert result["key"] == "PROJ-100"
         assert "children" not in result
-        mock_client.close.assert_called_once()
+        mock_client.__enter__.assert_called_once()
+        mock_client.__exit__.assert_called_once()
 
     def test_get_epic_impl_with_children(self, mock_client, sample_epic, sample_issues):
         """Test getting epic with children."""
@@ -461,7 +466,8 @@ class TestEpicImplementation:
         assert result["added"] == 2
         assert result["failed"] == 0
         assert mock_client.update_issue.call_count == 2
-        mock_client.close.assert_called_once()
+        mock_client.__enter__.assert_called_once()
+        mock_client.__exit__.assert_called_once()
 
     def test_add_to_epic_impl_dry_run(self, mock_client, sample_epic):
         """Test dry run for adding issues to epic."""
@@ -520,7 +526,8 @@ class TestSprintImplementation:
 
         assert len(result["sprints"]) == 1
         assert result["sprints"][0]["name"] == "Sprint 1"
-        mock_client.close.assert_called_once()
+        mock_client.__enter__.assert_called_once()
+        mock_client.__exit__.assert_called_once()
 
     def test_list_sprints_impl_by_project(
         self, mock_client, sample_board, sample_sprint
@@ -571,7 +578,8 @@ class TestSprintImplementation:
 
         assert result["name"] == "Sprint 1"
         mock_client.create_sprint.assert_called_once()
-        mock_client.close.assert_called_once()
+        mock_client.__enter__.assert_called_once()
+        mock_client.__exit__.assert_called_once()
 
     def test_create_sprint_impl_missing_board(self):
         """Test error when board missing."""
@@ -617,7 +625,8 @@ class TestSprintImplementation:
 
         assert result["name"] == "Sprint 1"
         assert "issues" not in result
-        mock_client.close.assert_called_once()
+        mock_client.__enter__.assert_called_once()
+        mock_client.__exit__.assert_called_once()
 
     def test_get_sprint_impl_with_issues(
         self, mock_client, sample_sprint, sample_issues
@@ -829,7 +838,8 @@ class TestBacklogRankImplementation:
             result = _get_backlog_impl(board_id=123)
 
         assert len(result["issues"]) == 3
-        mock_client.close.assert_called_once()
+        mock_client.__enter__.assert_called_once()
+        mock_client.__exit__.assert_called_once()
 
     def test_get_backlog_impl_group_by_epic(self, mock_client):
         """Test getting backlog grouped by epic."""

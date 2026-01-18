@@ -77,8 +77,10 @@ class TestGetTransitionsImpl:
 
         assert result == []
 
-    def test_get_transitions_closes_client(self, mock_jira_client, sample_transitions):
-        """Test that client is closed after operation."""
+    def test_get_transitions_uses_context_manager(
+        self, mock_jira_client, sample_transitions
+    ):
+        """Test that client is used as context manager."""
         mock_jira_client.get_transitions.return_value = deepcopy(sample_transitions)
 
         with patch(
@@ -87,7 +89,8 @@ class TestGetTransitionsImpl:
         ):
             _get_transitions_impl(issue_key="PROJ-123")
 
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__enter__.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
 
 # =============================================================================
@@ -216,10 +219,10 @@ class TestTransitionIssueImpl:
         ):
             _transition_issue_impl(issue_key="PROJ-123")
 
-    def test_transition_closes_client(
+    def test_transition_uses_context_manager(
         self, mock_jira_client, sample_issue, sample_transitions
     ):
-        """Test that client is closed after operation."""
+        """Test that client is used as context manager."""
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
         mock_jira_client.get_transitions.return_value = deepcopy(sample_transitions)
 
@@ -238,7 +241,8 @@ class TestTransitionIssueImpl:
                 transition_name="In Progress",
             )
 
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__enter__.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
 
 # =============================================================================
@@ -335,8 +339,8 @@ class TestAssignIssueImpl:
                 assign_to_self=True,
             )
 
-    def test_assign_closes_client(self, mock_jira_client, sample_issue):
-        """Test that client is closed after operation."""
+    def test_assign_uses_context_manager(self, mock_jira_client, sample_issue):
+        """Test that client is used as context manager."""
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with patch(
@@ -348,7 +352,8 @@ class TestAssignIssueImpl:
                 user="user@example.com",
             )
 
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__enter__.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
 
 # =============================================================================
@@ -530,8 +535,8 @@ class TestGetVersionsImpl:
 
         assert all(not v.get("released") for v in result)
 
-    def test_get_versions_closes_client(self, mock_jira_client, sample_versions):
-        """Test that client is closed after operation."""
+    def test_get_versions_uses_context_manager(self, mock_jira_client, sample_versions):
+        """Test that client is used as context manager."""
         mock_jira_client.get_versions.return_value = deepcopy(sample_versions)
 
         with patch(
@@ -540,7 +545,8 @@ class TestGetVersionsImpl:
         ):
             _get_versions_impl(project="PROJ")
 
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__enter__.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
 
 @pytest.mark.unit
@@ -594,8 +600,10 @@ class TestGetComponentsImpl:
         assert len(result) == 2
         mock_jira_client.get_components.assert_called_once_with("PROJ")
 
-    def test_get_components_closes_client(self, mock_jira_client, sample_components):
-        """Test that client is closed after operation."""
+    def test_get_components_uses_context_manager(
+        self, mock_jira_client, sample_components
+    ):
+        """Test that client is used as context manager."""
         mock_jira_client.get_components.return_value = deepcopy(sample_components)
 
         with patch(
@@ -604,7 +612,8 @@ class TestGetComponentsImpl:
         ):
             _get_components_impl(project="PROJ")
 
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__enter__.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
 
 @pytest.mark.unit

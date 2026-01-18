@@ -43,9 +43,12 @@ from jira_assistant_skills_lib import JiraError, ValidationError
 
 @pytest.fixture
 def mock_client():
-    """Create mock JIRA client."""
+    """Create mock JIRA client with context manager support."""
     client = MagicMock()
     client.close = MagicMock()
+    # Support context manager pattern: with get_jira_client() as client:
+    client.__enter__ = MagicMock(return_value=client)
+    client.__exit__ = MagicMock(return_value=None)
     return client
 
 
@@ -1012,6 +1015,8 @@ class TestErrorHandling:
     def test_jira_error_handling(self, mock_get_client, runner):
         """Test JiraError is handled properly."""
         mock_client = MagicMock()
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=None)
         mock_get_client.return_value = mock_client
         mock_client.search_issues.side_effect = JiraError("API Error")
 

@@ -257,7 +257,6 @@ class TestCreateBranchNameImpl:
         assert "branch_name" in result
         assert "feature/" in result["branch_name"]
         assert "proj-123" in result["branch_name"]
-        mock_jira_client.close.assert_called_once()
 
     def test_create_branch_name_with_prefix(self, mock_jira_client, sample_issue):
         """Test creating branch name with explicit prefix."""

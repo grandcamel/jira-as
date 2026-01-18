@@ -197,7 +197,8 @@ class TestListFieldsImpl:
         # Should exclude 'summary' which has custom=False
         assert len(result) == 4
         assert all(f["custom"] for f in result)
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__enter__.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
     def test_list_fields_all(self, mock_jira_client, sample_fields):
         """Test listing all fields including system fields."""
@@ -277,7 +278,8 @@ class TestCreateFieldImpl:
         mock_jira_client.post.assert_called_once()
         call_args = mock_jira_client.post.call_args
         assert call_args[1]["data"]["name"] == "Custom Text Field"
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__enter__.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
     def test_create_field_with_description(
         self, mock_jira_client, sample_created_field
@@ -343,7 +345,8 @@ class TestCheckProjectFieldsImpl:
         assert result["project"]["key"] == "PROJ"
         assert result["is_team_managed"] is False
         assert len(result["issue_types"]) == 2
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__enter__.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
     def test_check_project_fields_team_managed(
         self, mock_jira_client, sample_project_nextgen, sample_project_meta
@@ -434,7 +437,8 @@ class TestConfigureAgileFieldsImpl:
         assert result["dry_run"] is True
         assert result["project"] == "PROJ"
         assert "fields_found" in result
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__enter__.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
     def test_configure_agile_fields_team_managed_error(
         self, mock_jira_client, sample_project_nextgen

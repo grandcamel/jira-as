@@ -124,8 +124,8 @@ class TestGetIssueImpl:
 
         assert "not found" in str(exc_info.value).lower()
 
-    def test_get_issue_closes_client(self, mock_jira_client, sample_issue):
-        """Test that client is closed after operation."""
+    def test_get_issue_uses_context_manager(self, mock_jira_client, sample_issue):
+        """Test that client is used as context manager."""
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with patch(
@@ -134,7 +134,8 @@ class TestGetIssueImpl:
         ):
             _get_issue_impl(issue_key="PROJ-123")
 
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__enter__.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
 
 # =============================================================================
@@ -221,8 +222,10 @@ class TestCreateIssueImpl:
         call_args = mock_jira_client.create_issue.call_args[0][0]
         assert call_args["labels"] == ["urgent", "backend"]
 
-    def test_create_issue_closes_client(self, mock_jira_client, sample_created_issue):
-        """Test that client is closed after operation."""
+    def test_create_issue_uses_context_manager(
+        self, mock_jira_client, sample_created_issue
+    ):
+        """Test that client is used as context manager."""
         mock_jira_client.create_issue.return_value = deepcopy(sample_created_issue)
 
         with (
@@ -241,7 +244,8 @@ class TestCreateIssueImpl:
                 summary="Test bug",
             )
 
-        mock_jira_client.close.assert_called()
+        mock_jira_client.__enter__.assert_called()
+        mock_jira_client.__exit__.assert_called()
 
 
 # =============================================================================
@@ -299,15 +303,16 @@ class TestUpdateIssueImpl:
         ):
             _update_issue_impl(issue_key="PROJ-123")
 
-    def test_update_issue_closes_client(self, mock_jira_client):
-        """Test that client is closed after operation."""
+    def test_update_issue_uses_context_manager(self, mock_jira_client):
+        """Test that client is used as context manager."""
         with patch(
             "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _update_issue_impl(issue_key="PROJ-123", summary="New summary")
 
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__enter__.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
 
 # =============================================================================
@@ -345,15 +350,16 @@ class TestDeleteIssueImpl:
         assert result["key"] == "PROJ-123"
         assert result["summary"] == "Test Issue Summary"
 
-    def test_delete_issue_closes_client(self, mock_jira_client):
-        """Test that client is closed after operation."""
+    def test_delete_issue_uses_context_manager(self, mock_jira_client):
+        """Test that client is used as context manager."""
         with patch(
             "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _delete_issue_impl(issue_key="PROJ-123", force=True)
 
-        mock_jira_client.close.assert_called_once()
+        mock_jira_client.__enter__.assert_called_once()
+        mock_jira_client.__exit__.assert_called_once()
 
 
 # =============================================================================

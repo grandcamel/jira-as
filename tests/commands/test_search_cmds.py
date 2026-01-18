@@ -62,9 +62,12 @@ from jira_assistant_skills_lib import JiraError, ValidationError
 
 @pytest.fixture
 def mock_client():
-    """Create mock JIRA client."""
+    """Create mock JIRA client with context manager support."""
     client = MagicMock()
     client.close = MagicMock()
+    # Support context manager pattern
+    client.__enter__ = MagicMock(return_value=client)
+    client.__exit__ = MagicMock(return_value=False)
     return client
 
 
@@ -371,7 +374,7 @@ class TestSearchImplementation:
         assert result["total"] == 3
         assert len(result["issues"]) == 3
         assert result["_jql"] == "project = TEST"
-        mock_client.close.assert_called_once()
+        mock_client.__exit__.assert_called_once()
 
     @patch("jira_assistant_skills_lib.cli.commands.search_cmds.get_jira_client")
     @patch("jira_assistant_skills_lib.cli.commands.search_cmds.validate_jql")
@@ -1697,6 +1700,8 @@ class TestErrorHandling:
     def test_jira_error_handling(self, mock_get_client, runner):
         """Test JiraError is handled properly."""
         mock_client = MagicMock()
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=False)
         mock_get_client.return_value = mock_client
         mock_client.get_my_filters.side_effect = JiraError("API Error")
 
@@ -1725,6 +1730,8 @@ class TestErrorHandling:
     def test_partial_bulk_update_failure(self, mock_get_client):
         """Test bulk update handles partial failures."""
         mock_client = MagicMock()
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=False)
         mock_get_client.return_value = mock_client
         mock_client.search_issues.return_value = {
             "issues": [
