@@ -18,8 +18,9 @@ class UserNotFoundError(NotFoundError):
 
     def __init__(self, identifier: str, message: str | None = None):
         self.identifier = identifier
-        display_message = message if message else f"User not found: {identifier}"
-        super().__init__(resource_type="User", resource_id=identifier, message=display_message)
+        # Note: NotFoundError constructs message as "{resource_type} not found: {resource_id}"
+        # Custom messages are not supported by the current exception hierarchy
+        super().__init__(resource_type="User", resource_id=identifier)
 
 
 def resolve_user_to_account_id(client, user_identifier: str) -> str:

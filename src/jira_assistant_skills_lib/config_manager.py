@@ -205,8 +205,7 @@ class ConfigManager(BaseConfigManager):
         Raises:
             ValidationError: If configuration is invalid or incomplete
         """
-        profile = profile or self.profile
-        url, email, api_token = self.get_credentials(profile)
+        url, email, api_token = self.get_credentials()
         api_config = self.get_api_config()
 
         return JiraClient(
@@ -326,8 +325,7 @@ class ConfigManager(BaseConfigManager):
         Raises:
             ValidationError: If configuration is invalid or incomplete
         """
-        profile = profile or self.profile
-        url, email, api_token = self.get_credentials(profile)
+        url, email, api_token = self.get_credentials()
         api_config = self.get_api_config()
 
         # Check for optional automation-specific config
@@ -424,7 +422,7 @@ def get_project_context(project_key: str):
     Returns:
         ProjectContext object with metadata, workflows, patterns, and defaults
     """
-    from project_context import get_project_context as _get_project_context
+    from .project_context import get_project_context as _get_project_context
 
     return _get_project_context(project_key)
 
@@ -444,10 +442,10 @@ def get_project_defaults(
         Dict with default values: priority, assignee, labels, components, etc.
         Returns empty dict if no project context exists.
     """
-    from project_context import (
+    from .project_context import (
         get_defaults_for_issue_type,
     )
-    from project_context import get_project_context as _get_project_context
+    from .project_context import get_project_context as _get_project_context
 
     context = _get_project_context(project_key)
 
@@ -470,6 +468,6 @@ def has_project_context(project_key: str) -> bool:
     Returns:
         True if skill directory or settings config exists for this project
     """
-    from project_context import has_project_context as _has_project_context
+    from .project_context import has_project_context as _has_project_context
 
     return _has_project_context(project_key)
