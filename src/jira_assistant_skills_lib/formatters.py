@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-# Import generic formatters from the base library
+# Import generic formatters from the base library (re-exported for convenience)
 from assistant_skills_lib.formatters import (
     export_csv,
     format_json,
@@ -25,6 +25,35 @@ from assistant_skills_lib.formatters import (
 from .adf_helper import adf_to_text
 from .constants import EPIC_LINK_FIELD, STORY_POINTS_FIELD
 from .validators import safe_get_nested
+
+# Explicit exports (includes re-exports from base library)
+__all__ = [
+    # Re-exports from assistant_skills_lib.formatters
+    "export_csv",
+    "format_json",
+    "format_table",
+    "format_timestamp",
+    "get_csv_string",
+    "print_info",
+    "print_success",
+    "print_warning",
+    # Local exports
+    "EPIC_LINK_FIELD",
+    "STORY_POINTS_FIELD",
+    "IssueFields",
+    "calculate_sla_percentage",
+    "extract_issue_fields",
+    "format_comments",
+    "format_duration",
+    "format_issue",
+    "format_search_results",
+    "format_sla_duration",
+    "format_sla_time",
+    "format_transitions",
+    "get_sla_status_emoji",
+    "get_sla_status_text",
+    "is_sla_at_risk",
+]
 
 
 @dataclass
