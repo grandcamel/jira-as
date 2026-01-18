@@ -103,20 +103,28 @@ from .error_handler import (
     sanitize_error_message,
 )
 
+# JSM / SLA utilities (now in formatters)
 # Formatters
+from .formatters import format_duration  # backwards-compatible alias
 from .formatters import (
     EPIC_LINK_FIELD,
     STORY_POINTS_FIELD,
     IssueFields,
+    calculate_sla_percentage,
     export_csv,
     extract_issue_fields,
     format_comments,
     format_issue,
     format_json,
     format_search_results,
+    format_sla_duration,
+    format_sla_time,
     format_table,
     format_transitions,
     get_csv_string,
+    get_sla_status_emoji,
+    get_sla_status_text,
+    is_sla_at_risk,
     print_info,
     print_success,
     print_warning,
@@ -124,17 +132,6 @@ from .formatters import (
 
 # JIRA Client
 from .jira_client import JiraClient
-
-# JSM / SLA utilities (now in formatters)
-from .formatters import (
-    calculate_sla_percentage,
-    format_duration,  # backwards-compatible alias
-    format_sla_duration,
-    format_sla_time,
-    get_sla_status_emoji,
-    get_sla_status_text,
-    is_sla_at_risk,
-)
 
 # Permission helpers
 from .permission_helpers import (

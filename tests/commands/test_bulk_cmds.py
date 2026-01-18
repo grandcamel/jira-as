@@ -13,28 +13,23 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
-from jira_assistant_skills_lib.cli.commands.bulk_cmds import (
-    # Constants
+from jira_assistant_skills_lib import JiraError, ValidationError
+from jira_assistant_skills_lib.cli.commands.bulk_cmds import (  # Constants; Implementation functions; Helper functions; Formatting functions; Click commands
     CLONE_FIELDS,
     STANDARD_PRIORITIES,
-    # Implementation functions
     _bulk_assign_impl,
     _bulk_clone_impl,
     _bulk_delete_impl,
     _bulk_set_priority_impl,
     _bulk_transition_impl,
     _clone_issue,
-    # Helper functions
     _find_transition,
-    # Formatting functions
     _format_bulk_result,
     _get_issues_to_process,
     _resolve_user_id,
     _validate_priority,
-    # Click commands
     bulk,
 )
-from jira_assistant_skills_lib import JiraError, ValidationError
 
 # =============================================================================
 # Fixtures

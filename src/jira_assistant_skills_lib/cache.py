@@ -343,9 +343,7 @@ class JiraCache:
                             (category,),
                         )
                     else:
-                        cursor = conn.execute(
-                            "SELECT key, category FROM cache_entries"
-                        )
+                        cursor = conn.execute("SELECT key, category FROM cache_entries")
 
                     to_delete = []
                     for row in cursor:

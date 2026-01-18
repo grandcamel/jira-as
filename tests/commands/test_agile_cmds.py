@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
+from jira_assistant_skills_lib import JiraError, ValidationError
 from jira_assistant_skills_lib.cli.commands.agile_cmds import (
     FIBONACCI_SEQUENCE,
     VALID_EPIC_COLORS,
@@ -38,7 +39,6 @@ from jira_assistant_skills_lib.cli.commands.agile_cmds import (
     _update_sprint_impl,
     agile,
 )
-from jira_assistant_skills_lib import JiraError, ValidationError
 
 # =============================================================================
 # Fixtures

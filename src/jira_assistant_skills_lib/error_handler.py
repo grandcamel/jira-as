@@ -35,7 +35,6 @@ from assistant_skills_lib.error_handler import (
     sanitize_error_message as base_sanitize_error_message,
 )
 
-
 # -----------------------------------------------------------------------------
 # Exception Pattern Note:
 # The kwargs.pop("message", None) pattern in exception constructors prevents

@@ -2192,7 +2192,9 @@ def permission_list(ctx, output):
 
 
 @permission_group.command(name="check")
-@click.option("--project", "-p", required=True, help="Project key to check permissions for")
+@click.option(
+    "--project", "-p", required=True, help="Project key to check permissions for"
+)
 @click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
 @click.pass_context
 @handle_jira_errors

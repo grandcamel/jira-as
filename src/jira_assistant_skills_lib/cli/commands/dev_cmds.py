@@ -12,7 +12,6 @@ from urllib.parse import urlparse
 
 import click
 
-from ..cli_utils import format_json, handle_jira_errors
 from jira_assistant_skills_lib import (
     ConfigManager,
     ValidationError,
@@ -22,6 +21,8 @@ from jira_assistant_skills_lib import (
     validate_issue_key,
     wiki_markup_to_adf,
 )
+
+from ..cli_utils import format_json, handle_jira_errors
 
 # =============================================================================
 # Constants
@@ -686,9 +687,7 @@ def _get_commits_impl(
                         {
                             "message": commit.get("message", ""),
                             "author": commit.get("author", {}).get("name", ""),
-                            "author_email": commit.get("author", {}).get(
-                                "email", ""
-                            ),
+                            "author_email": commit.get("author", {}).get("email", ""),
                             "timestamp": commit.get("authorTimestamp", ""),
                         }
                     )

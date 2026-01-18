@@ -11,7 +11,6 @@ from typing import Any
 
 import click
 
-from ..cli_utils import format_json, handle_jira_errors
 from jira_assistant_skills_lib import (
     JiraError,
     ValidationError,
@@ -20,6 +19,8 @@ from jira_assistant_skills_lib import (
     validate_issue_key,
     validate_jql,
 )
+
+from ..cli_utils import format_json, handle_jira_errors
 
 # =============================================================================
 # Constants
@@ -277,9 +278,7 @@ def _format_dot(issue_key: str, dependencies: list) -> str:
         color = (
             "lightgreen"
             if status == "Done"
-            else "lightyellow"
-            if status == "In Progress"
-            else "white"
+            else "lightyellow" if status == "In Progress" else "white"
         )
         lines.append(f'    "{dep_key}" [style=filled, fillcolor={color}];')
 
@@ -974,9 +973,7 @@ def _get_project_stats(jql: str, max_results: int = 500) -> dict[str, Any]:
                 linked_issue = link["inwardIssue"]
 
             status = (
-                linked_issue.get("fields", {})
-                .get("status", {})
-                .get("name", "Unknown")
+                linked_issue.get("fields", {}).get("status", {}).get("name", "Unknown")
             )
             stats["by_status"][status] += 1
 

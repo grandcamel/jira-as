@@ -557,9 +557,11 @@ def _clone_issue(
             subtask_new_fields = {
                 "project": fields["project"],
                 "parent": {"key": new_key},
-                "summary": f"{prefix} {subtask_fields.get('summary', '')}"
-                if prefix
-                else subtask_fields.get("summary", ""),
+                "summary": (
+                    f"{prefix} {subtask_fields.get('summary', '')}"
+                    if prefix
+                    else subtask_fields.get("summary", "")
+                ),
                 "issuetype": {
                     "name": subtask_fields.get("issuetype", {}).get("name", "Sub-task")
                 },

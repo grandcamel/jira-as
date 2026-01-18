@@ -6,7 +6,6 @@ import os
 import tempfile
 
 import pytest
-
 from assistant_skills_lib.error_handler import ValidationError
 
 from jira_assistant_skills_lib.validators import (
@@ -41,7 +40,10 @@ class TestSafeGetNested:
     def test_missing_path_returns_default(self):
         """Test that missing path returns default value."""
         obj = {"fields": {"status": {"name": "Open"}}}
-        assert safe_get_nested(obj, "fields.assignee.displayName", "Unassigned") == "Unassigned"
+        assert (
+            safe_get_nested(obj, "fields.assignee.displayName", "Unassigned")
+            == "Unassigned"
+        )
 
     def test_empty_dict_returns_default(self):
         """Test that empty dict returns default."""

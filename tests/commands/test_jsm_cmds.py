@@ -5,35 +5,26 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
-from jira_assistant_skills_lib.cli.commands.jsm_cmds import (
-    # Approval impl
+from jira_assistant_skills_lib.cli.commands.jsm_cmds import (  # Approval impl; Asset impl; Customer impl; KB impl; Organization impl; Participant impl; Queue impl; Request impl; SLA impl; Request Type impl; Helper functions; CLI commands
     _format_approvals,
     _format_asset,
-    # Asset impl
     _format_assets,
-    # Customer impl
     _format_customers,
     _format_datetime,
     _format_kb_article,
-    # KB impl
     _format_kb_search_results,
     _format_organization,
-    # Organization impl
     _format_organizations,
-    # Participant impl
     _format_participants,
     _format_pending_approvals,
     _format_queue,
-    # Queue impl
     _format_queues,
     _format_request,
     _format_request_type_fields,
     _format_request_types,
-    # Request impl
     _format_requests,
     _format_service_desk,
     _format_service_desks,
-    # SLA impl
     _format_sla,
     _format_sla_breach_check,
     _format_sla_report_csv,
@@ -41,11 +32,8 @@ from jira_assistant_skills_lib.cli.commands.jsm_cmds import (
     _format_sla_time,
     _format_transitions,
     _is_sla_breached,
-    # Request Type impl
     _parse_attributes,
-    # Helper functions
     _parse_comma_list,
-    # CLI commands
     jsm,
 )
 

@@ -14,7 +14,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
-from jira_assistant_skills_lib.cli.commands.admin_cmds import (
+from jira_assistant_skills_lib import JiraError, ValidationError
+from jira_assistant_skills_lib.cli.commands.admin_cmds import (  # Formatting functions; Automation implementation functions; Group implementation functions; Notification scheme implementation functions; Permission scheme implementation functions; Screen implementation functions; Helper functions; Click commands
     SYSTEM_GROUPS,
     _add_user_to_group_impl,
     _archive_project_impl,
@@ -35,7 +36,6 @@ from jira_assistant_skills_lib.cli.commands.admin_cmds import (
     _format_issue_types,
     _format_permission_schemes,
     _format_project,
-    # Formatting functions
     _format_projects,
     _format_screens,
     _format_statuses,
@@ -52,34 +52,26 @@ from jira_assistant_skills_lib.cli.commands.admin_cmds import (
     _get_workflow_for_issue_impl,
     _get_workflow_impl,
     _is_system_group,
-    # Automation implementation functions
     _list_automation_rules_impl,
     _list_categories_impl,
-    # Group implementation functions
     _list_groups_impl,
     _list_issue_types_impl,
-    # Notification scheme implementation functions
     _list_notification_schemes_impl,
-    # Permission scheme implementation functions
     _list_permission_schemes_impl,
     _list_projects_impl,
     _list_screen_tabs_impl,
-    # Screen implementation functions
     _list_screens_impl,
     _list_statuses_impl,
     _list_trash_projects_impl,
     _list_workflows_impl,
-    # Helper functions
     _parse_comma_list,
     _remove_user_from_group_impl,
     _restore_project_impl,
     _search_users_impl,
     _toggle_automation_rule_impl,
     _update_project_impl,
-    # Click commands
     admin,
 )
-from jira_assistant_skills_lib import JiraError, ValidationError
 
 # =============================================================================
 # Fixtures
@@ -430,7 +422,9 @@ class TestProjectImplementation:
     @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.validate_project_key")
     @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.validate_project_name")
     @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.validate_project_type")
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.validate_project_template")
+    @patch(
+        "jira_assistant_skills_lib.cli.commands.admin_cmds.validate_project_template"
+    )
     def test_create_project_impl(
         self,
         mock_validate_template,

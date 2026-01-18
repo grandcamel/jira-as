@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
+from jira_assistant_skills_lib import ValidationError
 from jira_assistant_skills_lib.cli.commands.time_cmds import (
     _add_worklog_impl,
     _bulk_log_time_impl,
@@ -33,7 +34,6 @@ from jira_assistant_skills_lib.cli.commands.time_cmds import (
     _update_worklog_impl,
     time,
 )
-from jira_assistant_skills_lib import ValidationError
 
 # =============================================================================
 # Fixtures

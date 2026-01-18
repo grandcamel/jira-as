@@ -16,20 +16,17 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
-from jira_assistant_skills_lib.cli.commands.search_cmds import (
-    # Constants
+from jira_assistant_skills_lib import JiraError, ValidationError
+from jira_assistant_skills_lib.cli.commands.search_cmds import (  # Constants; Search implementation functions; Filter implementation functions; Formatting functions; Helper functions; Click commands
     COMMON_FIELDS,
     FUNCTION_EXAMPLES,
     JQL_TEMPLATES,
-    # Search implementation functions
     _build_jql_impl,
     _bulk_update_impl,
-    # Filter implementation functions
     _create_filter_impl,
     _delete_filter_impl,
     _export_results_impl,
     _favourite_filter_impl,
-    # Formatting functions
     _format_fields,
     _format_filter_detail,
     _format_filters,
@@ -37,7 +34,6 @@ from jira_assistant_skills_lib.cli.commands.search_cmds import (
     _format_search_output,
     _format_suggestions,
     _format_validation_result,
-    # Helper functions
     _format_value_for_jql,
     _get_fields_impl,
     _get_filters_impl,
@@ -50,10 +46,8 @@ from jira_assistant_skills_lib.cli.commands.search_cmds import (
     _suggest_correction,
     _update_filter_impl,
     _validate_jql_impl,
-    # Click commands
     search,
 )
-from jira_assistant_skills_lib import JiraError, ValidationError
 
 # =============================================================================
 # Fixtures

@@ -287,9 +287,11 @@ def _export_results_impl(
                         value = str(value)
                 elif isinstance(value, list):
                     value = ", ".join(
-                        item.get("name", str(item))
-                        if isinstance(item, dict)
-                        else str(item)
+                        (
+                            item.get("name", str(item))
+                            if isinstance(item, dict)
+                            else str(item)
+                        )
                         for item in value
                     )
 

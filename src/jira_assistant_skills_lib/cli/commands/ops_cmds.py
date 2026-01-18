@@ -11,11 +11,12 @@ from typing import Any
 
 import click
 
-from ..cli_utils import format_json, handle_jira_errors
 from jira_assistant_skills_lib import (
     JiraCache,
     get_jira_client,
 )
+
+from ..cli_utils import format_json, handle_jira_errors
 
 # =============================================================================
 # Helper Functions
