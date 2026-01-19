@@ -6,263 +6,52 @@ Provides:
 - Checkpoint/resume capability for long-running operations
 - Progress tracking with callbacks
 - Rate limiting between batches
+
+This module re-exports the base batch processing classes from assistant-skills-lib
+with JIRA-specific defaults and helper functions.
 """
 
 from __future__ import annotations
 
-import json
-import time
-from collections.abc import Callable
-from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Generic, TypeVar
+from typing import Any
 
-T = TypeVar("T")
+# Re-export base classes
+from assistant_skills_lib import (
+    BatchConfig as BaseBatchConfig,
+    BatchProcessor,
+    BatchProgress,
+    CheckpointManager,
+    generate_operation_id,
+)
 
-
-@dataclass
-class BatchProgress:
-    """Tracks progress of a batch operation."""
-
-    total_items: int = 0
-    processed_items: int = 0
-    successful_items: int = 0
-    failed_items: int = 0
-    current_batch: int = 0
-    total_batches: int = 0
-    started_at: str = ""
-    updated_at: str = ""
-    errors: dict[str, str] = field(default_factory=dict)
-    processed_keys: list[str] = field(default_factory=list)
-
-    @property
-    def is_complete(self) -> bool:
-        """Check if processing is complete."""
-        return self.processed_items >= self.total_items
-
-    @property
-    def percent_complete(self) -> float:
-        """Calculate completion percentage."""
-        if self.total_items == 0:
-            return 100.0
-        return (self.processed_items / self.total_items) * 100
+# For backward compatibility, re-export all symbols
+__all__ = [
+    "BatchConfig",
+    "BatchProcessor",
+    "BatchProgress",
+    "CheckpointManager",
+    "generate_operation_id",
+    "get_recommended_batch_size",
+    "list_pending_checkpoints",
+]
 
 
-@dataclass
-class BatchConfig:
-    """Configuration for batch processing."""
+class BatchConfig(BaseBatchConfig):
+    """
+    Configuration for JIRA batch processing.
 
-    batch_size: int = 50
-    delay_between_batches: float = 1.0
-    delay_between_items: float = 0.1
-    max_items: int = 10000
-    enable_checkpoints: bool = True
-    checkpoint_dir: str | None = None
-    operation_id: str | None = None
+    Extends BaseBatchConfig with JIRA-specific defaults.
+    """
 
-    def __post_init__(self):
-        # Enforce reasonable limits
-        self.batch_size = max(1, min(self.batch_size, 500))
-        self.delay_between_batches = max(0.0, min(self.delay_between_batches, 60.0))
-        self.delay_between_items = max(0.0, min(self.delay_between_items, 10.0))
-
-        # Set default checkpoint directory
+    def __post_init__(self) -> None:
+        # Set JIRA-specific default checkpoint directory if not specified
         if self.checkpoint_dir is None:
             self.checkpoint_dir = str(Path.home() / ".jira-skills" / "checkpoints")
 
-
-class CheckpointManager:
-    """Manages checkpoints for resumable operations."""
-
-    def __init__(self, checkpoint_dir: str, operation_id: str):
-        """
-        Initialize checkpoint manager.
-
-        Args:
-            checkpoint_dir: Directory to store checkpoint files
-            operation_id: Unique identifier for this operation
-        """
-        self.checkpoint_dir = Path(checkpoint_dir)
-        self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
-        self.operation_id = operation_id
-        self.checkpoint_file = self.checkpoint_dir / f"{operation_id}.checkpoint.json"
-
-    def save(self, progress: BatchProgress) -> None:
-        """
-        Save current progress to checkpoint file.
-
-        Args:
-            progress: Current batch progress
-        """
-        progress.updated_at = datetime.now().isoformat()
-        data = asdict(progress)
-
-        # Write to temp file first, then rename for atomicity
-        temp_file = self.checkpoint_file.with_suffix(".tmp")
-        with open(temp_file, "w") as f:
-            json.dump(data, f, indent=2)
-        temp_file.rename(self.checkpoint_file)
-
-    def load(self) -> BatchProgress | None:
-        """
-        Load progress from checkpoint file.
-
-        Returns:
-            BatchProgress if checkpoint exists, None otherwise
-        """
-        if not self.checkpoint_file.exists():
-            return None
-
-        try:
-            with open(self.checkpoint_file) as f:
-                data = json.load(f)
-            return BatchProgress(**data)
-        except (json.JSONDecodeError, TypeError, KeyError):
-            return None
-
-    def clear(self) -> None:
-        """Remove checkpoint file."""
-        if self.checkpoint_file.exists():
-            self.checkpoint_file.unlink()
-
-    def exists(self) -> bool:
-        """Check if a checkpoint exists."""
-        return self.checkpoint_file.exists()
-
-
-class BatchProcessor(Generic[T]):
-    """
-    Processes items in batches with checkpoint/resume support.
-
-    Usage:
-        processor = BatchProcessor(config, process_fn)
-        result = processor.process(items, operation_id="bulk-transition-123")
-    """
-
-    def __init__(
-        self,
-        config: BatchConfig | None = None,
-        process_item: Callable[[T], bool] | None = None,
-        progress_callback: Callable[[BatchProgress], None] | None = None,
-    ):
-        """
-        Initialize batch processor.
-
-        Args:
-            config: Batch configuration
-            process_item: Function to process each item (returns True on success)
-            progress_callback: Optional callback for progress updates
-        """
-        self.config = config or BatchConfig()
-        self.process_item = process_item
-        self.progress_callback = progress_callback
-
-    def process(
-        self,
-        items: list[T],
-        get_key: Callable[[T], str],
-        resume: bool = True,
-        dry_run: bool = False,
-    ) -> BatchProgress:
-        """
-        Process items in batches.
-
-        Args:
-            items: List of items to process
-            get_key: Function to extract unique key from item
-            resume: Whether to resume from checkpoint if available
-            dry_run: If True, simulate processing without changes
-
-        Returns:
-            Final BatchProgress with results
-        """
-        # Apply max_items limit
-        items = items[: self.config.max_items]
-
-        # Initialize progress
-        progress = BatchProgress(
-            total_items=len(items),
-            total_batches=(len(items) + self.config.batch_size - 1)
-            // self.config.batch_size,
-            started_at=datetime.now().isoformat(),
-        )
-
-        # Setup checkpoint manager if enabled
-        checkpoint_mgr = None
-        if self.config.enable_checkpoints and self.config.operation_id:
-            checkpoint_dir = self.config.checkpoint_dir or ".checkpoints"
-            checkpoint_mgr = CheckpointManager(checkpoint_dir, self.config.operation_id)
-
-            # Try to resume from checkpoint
-            if resume and checkpoint_mgr.exists():
-                saved_progress = checkpoint_mgr.load()
-                if saved_progress and not saved_progress.is_complete:
-                    progress = saved_progress
-                    # Filter out already processed items
-                    processed_set = set(progress.processed_keys)
-                    items = [
-                        item for item in items if get_key(item) not in processed_set
-                    ]
-
-        if dry_run:
-            progress.total_batches = (
-                len(items) + self.config.batch_size - 1
-            ) // self.config.batch_size
-            return progress
-
-        # Process in batches
-        batches = self._create_batches(items)
-
-        for batch_idx, batch in enumerate(batches):
-            progress.current_batch = batch_idx + 1
-
-            for item in batch:
-                key = get_key(item)
-
-                try:
-                    if self.process_item:
-                        success = self.process_item(item)
-                        if success:
-                            progress.successful_items += 1
-                        else:
-                            progress.failed_items += 1
-                            progress.errors[key] = "Processing returned False"
-                except Exception as e:
-                    progress.failed_items += 1
-                    progress.errors[key] = str(e)
-
-                progress.processed_items += 1
-                progress.processed_keys.append(key)
-
-                # Delay between items
-                if self.config.delay_between_items > 0:
-                    time.sleep(self.config.delay_between_items)
-
-            # Save checkpoint after each batch
-            if checkpoint_mgr:
-                checkpoint_mgr.save(progress)
-
-            # Notify progress
-            if self.progress_callback:
-                self.progress_callback(progress)
-
-            # Delay between batches
-            if batch_idx < len(batches) - 1 and self.config.delay_between_batches > 0:
-                time.sleep(self.config.delay_between_batches)
-
-        # Clear checkpoint on completion
-        if checkpoint_mgr and progress.is_complete:
-            checkpoint_mgr.clear()
-
-        return progress
-
-    def _create_batches(self, items: list[T]) -> list[list[T]]:
-        """Split items into batches."""
-        return [
-            items[i : i + self.config.batch_size]
-            for i in range(0, len(items), self.config.batch_size)
-        ]
+        # Call parent validation
+        super().__post_init__()
 
 
 def get_recommended_batch_size(total_items: int, operation_type: str = "simple") -> int:
@@ -271,19 +60,30 @@ def get_recommended_batch_size(total_items: int, operation_type: str = "simple")
 
     Args:
         total_items: Total number of items to process
-        operation_type: Type of operation (simple, complex, clone)
+        operation_type: Type of operation:
+            - "simple": Simple field updates (default: 100)
+            - "complex": Multi-step operations (default: 50)
+            - "clone": Cloning (creates new issues) (default: 25)
+            - "transition": Status transitions (default: 50)
+            - "assign": Assignments (default: 100)
+            - "priority": Priority changes (default: 100)
+            - "create": Creating new items (default: 25)
+            - "delete": Deleting items (default: 50)
 
     Returns:
         Recommended batch size
     """
-    # Base batch sizes by operation complexity
+    # Base batch sizes by operation complexity (includes JIRA-specific types)
     base_sizes = {
-        "simple": 100,  # Simple field updates
-        "complex": 50,  # Transitions, multi-field updates
-        "clone": 25,  # Cloning (creates new issues)
-        "transition": 50,  # Status transitions
-        "assign": 100,  # Assignments
-        "priority": 100,  # Priority changes
+        "simple": 100,
+        "complex": 50,
+        "clone": 25,
+        "transition": 50,
+        "assign": 100,
+        "priority": 100,
+        "create": 25,
+        "delete": 50,
+        "update": 100,
     }
 
     base = base_sizes.get(operation_type, 50)
@@ -297,25 +97,6 @@ def get_recommended_batch_size(total_items: int, operation_type: str = "simple")
     return base
 
 
-def generate_operation_id(
-    operation_type: str, timestamp: datetime | None = None
-) -> str:
-    """
-    Generate unique operation ID for checkpointing.
-
-    Args:
-        operation_type: Type of operation (e.g., "bulk-transition")
-        timestamp: Optional timestamp (default: now)
-
-    Returns:
-        Unique operation ID string
-    """
-    if timestamp is None:
-        timestamp = datetime.now()
-
-    return f"{operation_type}-{timestamp.strftime('%Y%m%d-%H%M%S')}"
-
-
 def list_pending_checkpoints(
     checkpoint_dir: str | None = None,
 ) -> list[dict[str, Any]]:
@@ -323,11 +104,13 @@ def list_pending_checkpoints(
     List all pending checkpoints that can be resumed.
 
     Args:
-        checkpoint_dir: Directory containing checkpoints
+        checkpoint_dir: Directory containing checkpoints (default: ~/.jira-skills/checkpoints)
 
     Returns:
         List of checkpoint info dicts
     """
+    import json
+
     if checkpoint_dir is None:
         checkpoint_dir = str(Path.home() / ".jira-skills" / "checkpoints")
 
