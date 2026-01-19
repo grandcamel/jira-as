@@ -64,7 +64,7 @@ class JiraError(BaseAPIError):
         )
 
 
-class AuthenticationError(BaseAuthenticationError):
+class AuthenticationError(BaseAuthenticationError, JiraError):
     """Raised when authentication fails."""
 
     def __init__(self, message: str = "Authentication failed", **kwargs: Any):
@@ -78,7 +78,7 @@ class AuthenticationError(BaseAuthenticationError):
         super().__init__(message + hint, **kwargs)
 
 
-class PermissionError(BasePermissionError):
+class PermissionError(BasePermissionError, JiraError):
     """Raised when the user lacks permissions for an operation."""
 
     def __init__(self, message: str = "Permission denied", **kwargs: Any):
@@ -91,7 +91,7 @@ class PermissionError(BasePermissionError):
         super().__init__(message + hint, **kwargs)
 
 
-class ValidationError(BaseValidationError):
+class ValidationError(BaseValidationError, JiraError):
     """Raised when input validation fails."""
 
     def __init__(
@@ -108,7 +108,7 @@ class ValidationError(BaseValidationError):
         super().__init__(message, **kwargs)
 
 
-class NotFoundError(BaseNotFoundError):
+class NotFoundError(BaseNotFoundError, JiraError):
     """Raised when a resource is not found."""
 
     def __init__(
@@ -122,7 +122,7 @@ class NotFoundError(BaseNotFoundError):
         super().__init__(message, **kwargs)
 
 
-class RateLimitError(BaseRateLimitError):
+class RateLimitError(BaseRateLimitError, JiraError):
     """Raised when API rate limit is exceeded."""
 
     def __init__(self, retry_after: int | None = None, **kwargs: Any):
@@ -137,13 +137,18 @@ class RateLimitError(BaseRateLimitError):
         super().__init__(message, retry_after=retry_after, **kwargs)
 
 
-class ConflictError(BaseConflictError):
+class ConflictError(BaseConflictError, JiraError):
     """Raised when there's a conflict (e.g., duplicate, concurrent modification)."""
 
-    pass
+    def __init__(self, message: str = "Resource conflict", **kwargs: Any):
+        # Remove 'message' from kwargs if present to avoid duplicate argument
+        kwargs.pop("message", None)
+        hint = "\n\nThis usually means the resource was modified by another user."
+        hint += "\nTry refreshing and applying your changes again."
+        super().__init__(message + hint, **kwargs)
 
 
-class ServerError(BaseServerError):
+class ServerError(BaseServerError, JiraError):
     """Raised when the JIRA server encounters an error."""
 
     def __init__(self, message: str = "JIRA server error", **kwargs: Any):
