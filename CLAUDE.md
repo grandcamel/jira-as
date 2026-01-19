@@ -84,6 +84,18 @@ All modules use a consistent 4-layer approach:
 3. Retry logic in JiraClient for [429, 500, 502, 503, 504]
 4. User messages with troubleshooting hints in exception messages
 
+### CLI Module
+
+- **cli/main.py**: Entry point for `jira-as` command
+- **cli/cli_utils.py**: Shared CLI utilities including:
+  - `get_client_from_context(ctx)` - shared JiraClient via Click context (preferred over direct `get_jira_client()`)
+  - `handle_jira_errors` - exception handling decorator with distinct exit codes
+  - `output_results` - unified output formatting (text/json/table)
+  - `parse_comma_list`, `parse_json_arg` - input parsing with security limits (1MB max JSON)
+  - `validate_positive_int`, `validate_non_negative_int` - Click callbacks
+  - `get_output_format` - context-aware output format resolution
+- **cli/commands/**: 13 command groups (issue, search, lifecycle, fields, ops, bulk, dev, relationships, time, collaborate, agile, jsm, admin)
+
 ### Export Pattern
 
 All public APIs are exported from `__init__.py`. Consumer scripts should use:
