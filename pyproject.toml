@@ -85,11 +85,105 @@ python_files = ["test_*.py"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short"
 markers = [
+    # Core markers
     "unit: Unit tests (fast, no external calls)",
     "integration: Integration tests (may require credentials)",
     "slow: Slow running tests",
-    "live: Tests requiring live credentials",
-    "destructive: Tests that modify data",
+    "live: Tests requiring live JIRA credentials",
+    "destructive: Tests that modify or delete data",
+    "e2e: End-to-end tests requiring Claude Code CLI",
+    # Issue skill markers
+    "issue: Issue operation tests",
+    "issue_create: Issue creation tests",
+    "issue_update: Issue update tests",
+    "issue_delete: Issue deletion tests",
+    "issue_assign: Issue assignment tests",
+    "issue_fields: Issue field tests",
+    # Search skill markers
+    "search: JQL search tests",
+    "jql: JQL query construction tests",
+    "search_pagination: Search pagination tests",
+    "search_export: Search export tests",
+    "filters: Saved filter tests",
+    # Lifecycle skill markers
+    "lifecycle: Issue lifecycle tests",
+    "transitions: Workflow transition tests",
+    "status: Status change tests",
+    "resolution: Resolution tests",
+    # Agile skill markers
+    "agile: Agile/Scrum tests",
+    "sprint: Sprint management tests",
+    "board: Board operation tests",
+    "backlog: Backlog management tests",
+    "epic: Epic operation tests",
+    "story_points: Story point tests",
+    "velocity: Velocity tests",
+    # JSM skill markers
+    "jsm: Jira Service Management tests",
+    "service_desk: Service desk tests",
+    "request: Request type tests",
+    "sla: SLA tests",
+    "queue: Queue tests",
+    "customer: Customer management tests",
+    "approval: Approval tests",
+    # Admin skill markers
+    "admin: Administrative tests",
+    "project: Project management tests",
+    "users: User management tests",
+    "roles: Role management tests",
+    "permissions: Permission tests",
+    "workflows: Workflow tests",
+    "screens: Screen configuration tests",
+    "issue_types: Issue type tests",
+    # Relationships skill markers
+    "relationships: Issue relationship tests",
+    "links: Issue link tests",
+    "remote_links: Remote link tests",
+    "clone: Issue clone tests",
+    "dependencies: Dependency analysis tests",
+    # Collaborate skill markers
+    "collaborate: Collaboration tests",
+    "comments: Comment tests",
+    "watchers: Watcher tests",
+    "attachments: Attachment tests",
+    "changelog: Changelog tests",
+    "votes: Vote tests",
+    "notifications: Notification tests",
+    # Time skill markers
+    "time: Time tracking tests",
+    "worklogs: Worklog tests",
+    "estimates: Estimate tests",
+    "time_reports: Time report tests",
+    # Fields skill markers
+    "fields: Field metadata tests",
+    "custom_fields: Custom field tests",
+    "system_fields: System field tests",
+    "field_config: Field configuration tests",
+    # Dev skill markers
+    "dev: Development integration tests",
+    "branches: Branch name tests",
+    "commits: Commit message tests",
+    "pull_requests: PR description tests",
+    # Bulk skill markers
+    "bulk: Bulk operation tests",
+    "bulk_update: Bulk update tests",
+    "bulk_transition: Bulk transition tests",
+    "bulk_assign: Bulk assignment tests",
+    # Ops skill markers
+    "ops: Operational tests",
+    "cache: Cache tests",
+    "batching: Request batching tests",
+    # Environment markers
+    "cloud_only: JIRA Cloud only tests",
+    "dc_only: JIRA Data Center only tests",
+    "docker_required: Tests requiring Docker container",
+    "external_required: Tests requiring external JIRA instance",
+    # Mock markers
+    "mock: Tests using mock client",
+    "mock_issue: Mock issue tests",
+    "mock_search: Mock search tests",
+    "mock_agile: Mock agile tests",
+    "mock_jsm: Mock JSM tests",
 ]
 
 [tool.black]
