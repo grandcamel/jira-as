@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
-from jira_assistant_skills_lib.cli.commands.jsm_cmds import (  # Approval impl; Asset impl; Customer impl; KB impl; Organization impl; Participant impl; Queue impl; Request impl; SLA impl; Request Type impl; Helper functions; CLI commands
+from jira_as.cli.commands.jsm_cmds import (  # Approval impl; Asset impl; Customer impl; KB impl; Organization impl; Participant impl; Queue impl; Request impl; SLA impl; Request Type impl; Helper functions; CLI commands
     _format_approvals,
     _format_asset,
     _format_assets,
@@ -848,7 +848,7 @@ class TestFormatParticipants:
 class TestServiceDeskListCommand:
     """Tests for service-desk list command."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.jsm_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
     def test_list_service_desks(
         self, mock_get_client, runner, mock_client, sample_service_desks
     ):
@@ -860,7 +860,7 @@ class TestServiceDeskListCommand:
         assert result.exit_code == 0
         assert "SD" in result.output
 
-    @patch("jira_assistant_skills_lib.cli.commands.jsm_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
     def test_list_service_desks_json(
         self, mock_get_client, runner, mock_client, sample_service_desks
     ):
@@ -876,7 +876,7 @@ class TestServiceDeskListCommand:
 class TestServiceDeskGetCommand:
     """Tests for service-desk get command."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.jsm_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
     def test_get_service_desk(self, mock_get_client, runner, mock_client):
         """Test getting service desk details."""
         mock_get_client.return_value = mock_client
@@ -895,7 +895,7 @@ class TestServiceDeskGetCommand:
 class TestServiceDeskCreateCommand:
     """Tests for service-desk create command."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.jsm_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
     def test_create_service_desk_dry_run(self, mock_get_client, runner):
         """Test creating service desk with dry run."""
         result = runner.invoke(
@@ -909,7 +909,7 @@ class TestServiceDeskCreateCommand:
 class TestRequestTypeListCommand:
     """Tests for request-type list command."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.jsm_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
     def test_list_request_types(
         self, mock_get_client, runner, mock_client, sample_request_types
     ):
@@ -925,7 +925,7 @@ class TestRequestTypeListCommand:
 class TestRequestListCommand:
     """Tests for request list command."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.jsm_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
     def test_list_requests(self, mock_get_client, runner, mock_client):
         """Test listing requests."""
         mock_get_client.return_value.__enter__.return_value = mock_client
@@ -966,7 +966,7 @@ class TestRequestCreateCommand:
 class TestRequestTransitionCommand:
     """Tests for request transition command."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.jsm_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
     def test_show_transitions(self, mock_get_client, runner, mock_client):
         """Test showing available transitions."""
         mock_get_client.return_value.__enter__.return_value = mock_client
@@ -994,7 +994,7 @@ class TestRequestTransitionCommand:
 class TestCustomerListCommand:
     """Tests for customer list command."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.jsm_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
     def test_list_customers(
         self, mock_get_client, runner, mock_client, sample_customers
     ):
@@ -1011,7 +1011,7 @@ class TestCustomerListCommand:
 class TestOrganizationListCommand:
     """Tests for organization list command."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.jsm_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
     def test_list_organizations(
         self, mock_get_client, runner, mock_client, sample_organizations
     ):
@@ -1041,7 +1041,7 @@ class TestOrganizationCreateCommand:
 class TestQueueListCommand:
     """Tests for queue list command."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.jsm_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
     def test_list_queues(self, mock_get_client, runner, mock_client, sample_queues):
         """Test listing queues."""
         mock_get_client.return_value.__enter__.return_value = mock_client
@@ -1056,7 +1056,7 @@ class TestQueueListCommand:
 class TestSlaGetCommand:
     """Tests for sla get command."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.jsm_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
     def test_get_sla(self, mock_get_client, runner, mock_client, sample_sla_data):
         """Test getting SLA information."""
         mock_get_client.return_value.__enter__.return_value = mock_client
@@ -1081,7 +1081,7 @@ class TestSlaReportCommand:
 class TestApprovalListCommand:
     """Tests for approval list command."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.jsm_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
     def test_list_approvals(
         self, mock_get_client, runner, mock_client, sample_approvals
     ):
@@ -1098,7 +1098,7 @@ class TestApprovalListCommand:
 class TestKbSearchCommand:
     """Tests for kb search command."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.jsm_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
     def test_search_kb(self, mock_get_client, runner, mock_client, sample_kb_articles):
         """Test searching KB articles."""
         mock_get_client.return_value.__enter__.return_value = mock_client
@@ -1115,7 +1115,7 @@ class TestKbSearchCommand:
 class TestAssetListCommand:
     """Tests for asset list command."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.jsm_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
     def test_list_assets(self, mock_get_client, runner, mock_client, sample_assets):
         """Test listing assets."""
         mock_get_client.return_value.__enter__.return_value = mock_client

@@ -15,7 +15,7 @@ from unittest.mock import patch
 
 import pytest
 
-from jira_assistant_skills_lib.cli.commands.collaborate_cmds import (
+from jira_as.cli.commands.collaborate_cmds import (
     _add_comment_impl,
     _add_watcher_impl,
     _delete_comment_impl,
@@ -45,7 +45,7 @@ class TestAddCommentImpl:
         mock_jira_client.add_comment.return_value = deepcopy(sample_comment)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _add_comment_impl(
@@ -65,7 +65,7 @@ class TestAddCommentImpl:
         )
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _add_comment_impl(
@@ -87,7 +87,7 @@ class TestGetCommentsImpl:
         mock_jira_client.get_comments.return_value = deepcopy(sample_comments_response)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_comments_impl(issue_key="PROJ-123")
@@ -101,7 +101,7 @@ class TestGetCommentsImpl:
         mock_jira_client.get_comment.return_value = deepcopy(sample_comment)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_comments_impl(issue_key="PROJ-123", comment_id="10001")
@@ -119,7 +119,7 @@ class TestUpdateCommentImpl:
         mock_jira_client.update_comment.return_value = deepcopy(sample_comment)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _update_comment_impl(
@@ -139,7 +139,7 @@ class TestDeleteCommentImpl:
     def test_delete_comment_force(self, mock_jira_client):
         """Test deleting a comment with force."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _delete_comment_impl(
@@ -156,7 +156,7 @@ class TestDeleteCommentImpl:
         mock_jira_client.get_comment.return_value = deepcopy(sample_comment)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _delete_comment_impl(
@@ -184,7 +184,7 @@ class TestListAttachmentsImpl:
         mock_jira_client.get_attachments.return_value = deepcopy(sample_attachments)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _list_attachments_impl(issue_key="PROJ-123")
@@ -207,7 +207,7 @@ class TestWatchersImpl:
         mock_jira_client.get.return_value = {"watchers": deepcopy(sample_watchers)}
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _list_watchers_impl(issue_key="PROJ-123")
@@ -219,11 +219,11 @@ class TestWatchersImpl:
         """Test adding a watcher."""
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+                "jira_as.cli.commands.collaborate_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.collaborate_cmds.resolve_user_to_account_id",
+                "jira_as.cli.commands.collaborate_cmds.resolve_user_to_account_id",
                 return_value="user-123",
             ),
         ):
@@ -235,11 +235,11 @@ class TestWatchersImpl:
         """Test removing a watcher."""
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+                "jira_as.cli.commands.collaborate_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.collaborate_cmds.resolve_user_to_account_id",
+                "jira_as.cli.commands.collaborate_cmds.resolve_user_to_account_id",
                 return_value="user-123",
             ),
         ):
@@ -262,7 +262,7 @@ class TestActivityImpl:
         mock_jira_client.get_changelog.return_value = deepcopy(sample_changelog)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_activity_impl(issue_key="PROJ-123")
@@ -298,7 +298,7 @@ class TestNotificationImpl:
     def test_send_notification_dry_run(self, mock_jira_client):
         """Test notification dry-run mode."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _send_notification_impl(
@@ -316,7 +316,7 @@ class TestNotificationImpl:
     def test_send_notification(self, mock_jira_client):
         """Test sending notification."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _send_notification_impl(
@@ -342,7 +342,7 @@ class TestUpdateCustomFieldsImpl:
     def test_update_custom_fields_json(self, mock_jira_client):
         """Test updating custom fields with JSON."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _update_custom_fields_impl(
@@ -356,11 +356,11 @@ class TestUpdateCustomFieldsImpl:
 
     def test_update_custom_fields_no_fields_raises_error(self, mock_jira_client):
         """Test that no fields raises error."""
-        from jira_assistant_skills_lib import ValidationError
+        from jira_as import ValidationError
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_jira_client",
+                "jira_as.cli.commands.collaborate_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             pytest.raises(ValidationError, match="Either --field"),
@@ -382,7 +382,7 @@ class TestCommentCommands:
         mock_jira_client.add_comment.return_value = deepcopy(sample_comment)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_client_from_context",
+            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(
@@ -400,7 +400,7 @@ class TestCommentCommands:
         mock_jira_client.get_comments.return_value = deepcopy(sample_comments_response)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_client_from_context",
+            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(
@@ -421,7 +421,7 @@ class TestWatchersCommand:
         mock_jira_client.get.return_value = {"watchers": deepcopy(sample_watchers)}
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_client_from_context",
+            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(
@@ -441,7 +441,7 @@ class TestActivityCommand:
         mock_jira_client.get_changelog.return_value = deepcopy(sample_changelog)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_client_from_context",
+            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(
@@ -460,7 +460,7 @@ class TestNotifyCommand:
     def test_notify_cli_dry_run(self, cli_runner, mock_jira_client):
         """Test CLI notify command with dry-run."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.collaborate_cmds.get_client_from_context",
+            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(

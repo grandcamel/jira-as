@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
-from jira_assistant_skills_lib import ValidationError
-from jira_assistant_skills_lib.cli.commands.time_cmds import (
+from jira_as import ValidationError
+from jira_as.cli.commands.time_cmds import (
     _add_worklog_impl,
     _bulk_log_time_impl,
     _calculate_progress,
@@ -604,7 +604,7 @@ class TestAddWorklogImpl:
         mock_client.add_worklog.return_value = sample_worklog
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.parse_relative_date"
+            "jira_as.cli.commands.time_cmds.parse_relative_date"
         ) as mock_parse:
             mock_parse.return_value = datetime(2025, 1, 15, 9, 0)
             result = _add_worklog_impl(
@@ -649,7 +649,7 @@ class TestGetWorklogsImpl:
         mock_client.get_worklogs.return_value = sample_worklogs_response
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_jira_client",
+            "jira_as.cli.commands.time_cmds.get_jira_client",
             return_value=mock_client,
         ):
             result = _get_worklogs_impl("PROJ-123")
@@ -663,7 +663,7 @@ class TestGetWorklogsImpl:
         mock_client.get_worklogs.return_value = sample_worklogs_response
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_jira_client",
+            "jira_as.cli.commands.time_cmds.get_jira_client",
             return_value=mock_client,
         ):
             result = _get_worklogs_impl("PROJ-123", author_filter="john@example.com")
@@ -679,7 +679,7 @@ class TestUpdateWorklogImpl:
         mock_client.update_worklog.return_value = sample_worklog
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_jira_client",
+            "jira_as.cli.commands.time_cmds.get_jira_client",
             return_value=mock_client,
         ):
             result = _update_worklog_impl("PROJ-123", "12345", time_spent="3h")
@@ -702,7 +702,7 @@ class TestDeleteWorklogImpl:
         mock_client.get_worklog.return_value = sample_worklog
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_jira_client",
+            "jira_as.cli.commands.time_cmds.get_jira_client",
             return_value=mock_client,
         ):
             result = _delete_worklog_impl("PROJ-123", "12345", dry_run=True)
@@ -717,7 +717,7 @@ class TestDeleteWorklogImpl:
         mock_client.delete_worklog.return_value = None
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_jira_client",
+            "jira_as.cli.commands.time_cmds.get_jira_client",
             return_value=mock_client,
         ):
             result = _delete_worklog_impl("PROJ-123", "12345")
@@ -735,7 +735,7 @@ class TestSetEstimateImpl:
         mock_client.get_time_tracking.return_value = sample_time_tracking
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_jira_client",
+            "jira_as.cli.commands.time_cmds.get_jira_client",
             return_value=mock_client,
         ):
             result = _set_estimate_impl("PROJ-123", original_estimate="2d")
@@ -758,7 +758,7 @@ class TestGetTimeTrackingImpl:
         mock_client.get_time_tracking.return_value = sample_time_tracking
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_jira_client",
+            "jira_as.cli.commands.time_cmds.get_jira_client",
             return_value=mock_client,
         ):
             result = _get_time_tracking_impl("PROJ-123")
@@ -792,7 +792,7 @@ class TestGenerateReportImpl:
         }
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_jira_client",
+            "jira_as.cli.commands.time_cmds.get_jira_client",
             return_value=mock_client,
         ):
             result = _generate_report_impl(project="PROJ")
@@ -826,7 +826,7 @@ class TestExportTimesheetsImpl:
         }
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_jira_client",
+            "jira_as.cli.commands.time_cmds.get_jira_client",
             return_value=mock_client,
         ):
             result = _export_timesheets_impl(project="PROJ")
@@ -846,7 +846,7 @@ class TestBulkLogTimeImpl:
         }
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_jira_client",
+            "jira_as.cli.commands.time_cmds.get_jira_client",
             return_value=mock_client,
         ):
             result = _bulk_log_time_impl(
@@ -864,7 +864,7 @@ class TestBulkLogTimeImpl:
         mock_client.add_worklog.return_value = sample_worklog
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_jira_client",
+            "jira_as.cli.commands.time_cmds.get_jira_client",
             return_value=mock_client,
         ):
             result = _bulk_log_time_impl(
@@ -894,7 +894,7 @@ class TestTimeLogCommand:
         mock_client.add_worklog.return_value = sample_worklog
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_client_from_context",
+            "jira_as.cli.commands.time_cmds.get_client_from_context",
             return_value=mock_client,
         ):
             runner = CliRunner()
@@ -908,7 +908,7 @@ class TestTimeLogCommand:
         mock_client.add_worklog.return_value = sample_worklog
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_client_from_context",
+            "jira_as.cli.commands.time_cmds.get_client_from_context",
             return_value=mock_client,
         ):
             runner = CliRunner()
@@ -928,7 +928,7 @@ class TestTimeWorklogsCommand:
         mock_client.get_worklogs.return_value = sample_worklogs_response
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_client_from_context",
+            "jira_as.cli.commands.time_cmds.get_client_from_context",
             return_value=mock_client,
         ):
             runner = CliRunner()
@@ -946,7 +946,7 @@ class TestTimeUpdateWorklogCommand:
         mock_client.update_worklog.return_value = sample_worklog
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_client_from_context",
+            "jira_as.cli.commands.time_cmds.get_client_from_context",
             return_value=mock_client,
         ):
             runner = CliRunner()
@@ -966,7 +966,7 @@ class TestTimeDeleteWorklogCommand:
         mock_client.get_worklog.return_value = sample_worklog
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_client_from_context",
+            "jira_as.cli.commands.time_cmds.get_client_from_context",
             return_value=mock_client,
         ):
             runner = CliRunner()
@@ -986,7 +986,7 @@ class TestTimeEstimateCommand:
         mock_client.get_time_tracking.return_value = sample_time_tracking
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_client_from_context",
+            "jira_as.cli.commands.time_cmds.get_client_from_context",
             return_value=mock_client,
         ):
             runner = CliRunner()
@@ -1011,7 +1011,7 @@ class TestTimeTrackingCommand:
         mock_client.get_time_tracking.return_value = sample_time_tracking
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_client_from_context",
+            "jira_as.cli.commands.time_cmds.get_client_from_context",
             return_value=mock_client,
         ):
             runner = CliRunner()
@@ -1029,7 +1029,7 @@ class TestTimeReportCommand:
         mock_client.search_issues.return_value = {"issues": []}
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_client_from_context",
+            "jira_as.cli.commands.time_cmds.get_client_from_context",
             return_value=mock_client,
         ):
             runner = CliRunner()
@@ -1047,7 +1047,7 @@ class TestTimeExportCommand:
         mock_client.search_issues.return_value = {"issues": []}
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_client_from_context",
+            "jira_as.cli.commands.time_cmds.get_client_from_context",
             return_value=mock_client,
         ):
             runner = CliRunner()
@@ -1068,7 +1068,7 @@ class TestTimeBulkLogCommand:
         }
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.time_cmds.get_client_from_context",
+            "jira_as.cli.commands.time_cmds.get_client_from_context",
             return_value=mock_client,
         ):
             runner = CliRunner()

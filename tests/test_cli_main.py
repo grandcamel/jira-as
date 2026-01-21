@@ -7,7 +7,7 @@ import os
 import pytest
 from click.testing import CliRunner
 
-from jira_assistant_skills_lib.cli.main import cli, get_version
+from jira_as.cli.main import cli, get_version
 
 
 class TestGetVersion:

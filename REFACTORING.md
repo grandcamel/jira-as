@@ -26,7 +26,7 @@ The `JiraClient` class contains all JIRA API operations in a single file:
 Use Python mixins to split functionality while maintaining a single `JiraClient` class:
 
 ```
-src/jira_assistant_skills_lib/
+src/jira_as/
 ├── __init__.py              # Public exports
 ├── jira_client.py           # Slim JiraClient combining all mixins
 ├── _base.py                 # BaseJiraClient with HTTP methods
@@ -184,8 +184,8 @@ For users who only need specific functionality:
 
 ```python
 # Lightweight client for issue operations only
-from jira_assistant_skills_lib import BaseJiraClient
-from jira_assistant_skills_lib._mixins import IssuesMixin
+from jira_as import BaseJiraClient
+from jira_as._mixins import IssuesMixin
 
 class IssueClient(IssuesMixin, BaseJiraClient):
     """Lightweight client for issue operations only."""

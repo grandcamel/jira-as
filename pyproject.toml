@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "jira-assistant-skills"
-version = "1.2.0"
+name = "jira-as"
+version = "1.0.0"
 description = "JIRA Assistant Skills library and CLI - HTTP client, configuration, error handling, and jira-as command for JIRA REST API automation"
 readme = "README.md"
 license = "MIT"
@@ -47,7 +47,7 @@ dependencies = [
 ]
 
 [project.scripts]
-jira-as = "jira_assistant_skills_lib.cli.main:cli"
+jira-as = "jira_as.cli.main:cli"
 
 [project.optional-dependencies]
 keyring = [
@@ -65,10 +65,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/grandcamel/jira-assistant-skills-lib"
-Repository = "https://github.com/grandcamel/jira-assistant-skills-lib"
-Issues = "https://github.com/grandcamel/jira-assistant-skills-lib/issues"
-Changelog = "https://github.com/grandcamel/jira-assistant-skills-lib/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/grandcamel/jira-as-lib"
+Repository = "https://github.com/grandcamel/jira-as-lib"
+Issues = "https://github.com/grandcamel/jira-as-lib/issues"
+Changelog = "https://github.com/grandcamel/jira-as-lib/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.sdist]
 include = [
@@ -76,7 +76,7 @@ include = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/jira_assistant_skills_lib"]
+packages = ["src/jira_as"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -210,11 +210,11 @@ ignore = ["E501"]  # Line too long (handled by black)
 
 [tool.ruff.lint.per-file-ignores]
 # CLI main.py imports commands after defining the cli group (intentional)
-"src/jira_assistant_skills_lib/cli/main.py" = ["E402"]
+"src/jira_as/cli/main.py" = ["E402"]
 # autocomplete_cache has module docstring before imports
-"src/jira_assistant_skills_lib/autocomplete_cache.py" = ["E402"]
+"src/jira_as/autocomplete_cache.py" = ["E402"]
 # relationships_cmds uses 'l' for link in list comprehensions (readable in context)
-"src/jira_assistant_skills_lib/cli/commands/relationships_cmds.py" = ["E741"]
+"src/jira_as/cli/commands/relationships_cmds.py" = ["E741"]
 
 [tool.bandit]
 exclude_dirs = ["tests", "venv", ".venv"]

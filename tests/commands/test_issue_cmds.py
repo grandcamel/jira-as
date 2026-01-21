@@ -14,7 +14,7 @@ from unittest.mock import patch
 
 import pytest
 
-from jira_assistant_skills_lib.cli.commands.issue_cmds import (
+from jira_as.cli.commands.issue_cmds import (
     _create_issue_impl,
     _delete_issue_impl,
     _get_issue_impl,
@@ -36,7 +36,7 @@ class TestGetIssueImpl:
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+            "jira_as.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_issue_impl(issue_key="PROJ-123")
@@ -50,7 +50,7 @@ class TestGetIssueImpl:
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+            "jira_as.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_issue_impl(issue_key="proj-123")
@@ -65,7 +65,7 @@ class TestGetIssueImpl:
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue_minimal)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+            "jira_as.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_issue_impl(issue_key="PROJ-124", fields=["summary", "status"])
@@ -80,7 +80,7 @@ class TestGetIssueImpl:
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue_with_links)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+            "jira_as.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_issue_impl(issue_key="PROJ-126")
@@ -97,7 +97,7 @@ class TestGetIssueImpl:
         )
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+            "jira_as.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_issue_impl(issue_key="PROJ-125")
@@ -109,13 +109,13 @@ class TestGetIssueImpl:
 
     def test_get_issue_not_found(self, mock_jira_client):
         """Test handling issue not found error."""
-        from jira_assistant_skills_lib import NotFoundError
+        from jira_as import NotFoundError
 
         mock_jira_client.get_issue.side_effect = NotFoundError("Issue", "PROJ-999")
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+                "jira_as.cli.commands.issue_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             pytest.raises(NotFoundError) as exc_info,
@@ -129,7 +129,7 @@ class TestGetIssueImpl:
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+            "jira_as.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _get_issue_impl(issue_key="PROJ-123")
@@ -153,11 +153,11 @@ class TestCreateIssueImpl:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+                "jira_as.cli.commands.issue_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.issue_cmds.has_project_context",
+                "jira_as.cli.commands.issue_cmds.has_project_context",
                 return_value=False,
             ),
         ):
@@ -178,11 +178,11 @@ class TestCreateIssueImpl:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+                "jira_as.cli.commands.issue_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.issue_cmds.has_project_context",
+                "jira_as.cli.commands.issue_cmds.has_project_context",
                 return_value=False,
             ),
         ):
@@ -203,11 +203,11 @@ class TestCreateIssueImpl:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+                "jira_as.cli.commands.issue_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.issue_cmds.has_project_context",
+                "jira_as.cli.commands.issue_cmds.has_project_context",
                 return_value=False,
             ),
         ):
@@ -230,11 +230,11 @@ class TestCreateIssueImpl:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+                "jira_as.cli.commands.issue_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.issue_cmds.has_project_context",
+                "jira_as.cli.commands.issue_cmds.has_project_context",
                 return_value=False,
             ),
         ):
@@ -260,7 +260,7 @@ class TestUpdateIssueImpl:
     def test_update_issue_summary(self, mock_jira_client):
         """Test updating issue summary."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+            "jira_as.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _update_issue_impl(issue_key="PROJ-123", summary="New summary")
@@ -273,7 +273,7 @@ class TestUpdateIssueImpl:
     def test_update_issue_priority(self, mock_jira_client):
         """Test updating issue priority."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+            "jira_as.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _update_issue_impl(issue_key="PROJ-123", priority="High")
@@ -284,7 +284,7 @@ class TestUpdateIssueImpl:
     def test_update_issue_labels(self, mock_jira_client):
         """Test updating issue labels."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+            "jira_as.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _update_issue_impl(issue_key="PROJ-123", labels=["bug", "urgent"])
@@ -296,7 +296,7 @@ class TestUpdateIssueImpl:
         """Test that updating with no fields raises ValueError."""
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+                "jira_as.cli.commands.issue_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             pytest.raises(ValueError, match="No fields specified"),
@@ -306,7 +306,7 @@ class TestUpdateIssueImpl:
     def test_update_issue_uses_context_manager(self, mock_jira_client):
         """Test that client is used as context manager."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+            "jira_as.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _update_issue_impl(issue_key="PROJ-123", summary="New summary")
@@ -327,7 +327,7 @@ class TestDeleteIssueImpl:
     def test_delete_issue_force(self, mock_jira_client):
         """Test force deleting an issue."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+            "jira_as.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _delete_issue_impl(issue_key="PROJ-123", force=True)
@@ -340,7 +340,7 @@ class TestDeleteIssueImpl:
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+            "jira_as.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _delete_issue_impl(issue_key="PROJ-123", force=False)
@@ -353,7 +353,7 @@ class TestDeleteIssueImpl:
     def test_delete_issue_uses_context_manager(self, mock_jira_client):
         """Test that client is used as context manager."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_jira_client",
+            "jira_as.cli.commands.issue_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _delete_issue_impl(issue_key="PROJ-123", force=True)
@@ -376,7 +376,7 @@ class TestGetIssueCommand:
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_client_from_context",
+            "jira_as.cli.commands.issue_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(issue, ["get", "PROJ-123"])
@@ -391,7 +391,7 @@ class TestGetIssueCommand:
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_client_from_context",
+            "jira_as.cli.commands.issue_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(issue, ["get", "PROJ-123", "--output", "json"])
@@ -413,11 +413,11 @@ class TestCreateIssueCommand:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.issue_cmds.get_client_from_context",
+                "jira_as.cli.commands.issue_cmds.get_client_from_context",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.issue_cmds.has_project_context",
+                "jira_as.cli.commands.issue_cmds.has_project_context",
                 return_value=False,
             ),
         ):
@@ -445,7 +445,7 @@ class TestUpdateIssueCommand:
     def test_update_issue_cli_success(self, cli_runner, mock_jira_client):
         """Test CLI update issue command success."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_client_from_context",
+            "jira_as.cli.commands.issue_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(
@@ -464,7 +464,7 @@ class TestDeleteIssueCommand:
     def test_delete_issue_cli_force(self, cli_runner, mock_jira_client):
         """Test CLI delete issue command with force flag."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.issue_cmds.get_client_from_context",
+            "jira_as.cli.commands.issue_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(

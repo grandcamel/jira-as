@@ -4,7 +4,7 @@ This module is maintained for backwards compatibility. All functionality
 has been refactored into the mock/ package with a mixin-based architecture.
 
 For new code, prefer importing directly from the mock package:
-    from jira_assistant_skills_lib.mock import MockJiraClient, is_mock_mode
+    from jira_as.mock import MockJiraClient, is_mock_mode
 
 Architecture:
     The mock client is now built using composable mixins:

@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any
 
 import click
 
-from jira_assistant_skills_lib import (
+from jira_as import (
     JiraError,
     ValidationError,
     get_jira_client,
@@ -20,7 +20,7 @@ from jira_assistant_skills_lib import (
 from ..cli_utils import format_json, get_client_from_context, handle_jira_errors
 
 if TYPE_CHECKING:
-    from jira_assistant_skills_lib import JiraClient
+    from jira_as import JiraClient
 
 # =============================================================================
 # Constants

@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jira_assistant_skills_lib.user_helpers import (
+from jira_as.user_helpers import (
     UserNotFoundError,
     get_user_display_info,
     resolve_user_to_account_id,
@@ -31,7 +31,7 @@ class TestUserNotFoundError:
 
     def test_error_is_not_found_error(self):
         """Test that error inherits from NotFoundError."""
-        from jira_assistant_skills_lib.error_handler import NotFoundError
+        from jira_as.error_handler import NotFoundError
 
         error = UserNotFoundError("test")
         assert isinstance(error, NotFoundError)

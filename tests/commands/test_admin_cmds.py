@@ -14,8 +14,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
-from jira_assistant_skills_lib import JiraError, ValidationError
-from jira_assistant_skills_lib.cli.commands.admin_cmds import (  # Formatting functions; Automation implementation functions; Group implementation functions; Notification scheme implementation functions; Permission scheme implementation functions; Screen implementation functions; Helper functions; Click commands
+from jira_as import JiraError, ValidationError
+from jira_as.cli.commands.admin_cmds import (  # Formatting functions; Automation implementation functions; Group implementation functions; Notification scheme implementation functions; Permission scheme implementation functions; Screen implementation functions; Helper functions; Click commands
     SYSTEM_GROUPS,
     _add_user_to_group_impl,
     _archive_project_impl,
@@ -357,7 +357,7 @@ class TestHelperFunctions:
 class TestProjectImplementation:
     """Tests for project implementation functions."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_projects_impl(self, mock_get_client, mock_client, sample_projects):
         """Test listing projects."""
         mock_get_client.return_value = mock_client
@@ -367,7 +367,7 @@ class TestProjectImplementation:
 
         assert result == sample_projects
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_projects_with_query(
         self, mock_get_client, mock_client, sample_projects
     ):
@@ -381,7 +381,7 @@ class TestProjectImplementation:
         call_args = mock_client.search_projects.call_args
         assert call_args.kwargs["query"] == "test"
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_projects_include_archived(
         self, mock_get_client, mock_client, sample_projects
     ):
@@ -394,7 +394,7 @@ class TestProjectImplementation:
         call_args = mock_client.search_projects.call_args
         assert "archived" in call_args.kwargs["status"]
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_trash_projects_impl(self, mock_get_client, mock_client):
         """Test listing trashed projects."""
         mock_get_client.return_value = mock_client
@@ -407,7 +407,7 @@ class TestProjectImplementation:
         call_args = mock_client.search_projects.call_args
         assert call_args.kwargs["status"] == ["deleted"]
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_get_project_impl(self, mock_get_client, mock_client, sample_project):
         """Test getting a project."""
         mock_get_client.return_value = mock_client
@@ -418,12 +418,12 @@ class TestProjectImplementation:
         assert result == sample_project
         mock_client.get_project.assert_called_once_with("TEST", expand=None)
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.validate_project_key")
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.validate_project_name")
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.validate_project_type")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.validate_project_key")
+    @patch("jira_as.cli.commands.admin_cmds.validate_project_name")
+    @patch("jira_as.cli.commands.admin_cmds.validate_project_type")
     @patch(
-        "jira_assistant_skills_lib.cli.commands.admin_cmds.validate_project_template"
+        "jira_as.cli.commands.admin_cmds.validate_project_template"
     )
     def test_create_project_impl(
         self,
@@ -457,7 +457,7 @@ class TestProjectImplementation:
         assert result == sample_project
         mock_client.create_project.assert_called_once()
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_update_project_impl(self, mock_get_client, mock_client, sample_project):
         """Test updating a project."""
         mock_get_client.return_value = mock_client
@@ -467,7 +467,7 @@ class TestProjectImplementation:
 
         mock_client.update_project.assert_called_once()
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_delete_project_impl_dry_run(
         self, mock_get_client, mock_client, sample_project
     ):
@@ -482,7 +482,7 @@ class TestProjectImplementation:
         assert result["project"]["key"] == "TEST"
         mock_client.delete_project.assert_not_called()
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_delete_project_impl_actual(
         self, mock_get_client, mock_client, sample_project
     ):
@@ -496,7 +496,7 @@ class TestProjectImplementation:
         assert result["action"] == "deleted"
         mock_client.delete_project.assert_called_once_with("TEST")
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_archive_project_impl(self, mock_get_client, mock_client):
         """Test archiving a project."""
         mock_get_client.return_value = mock_client
@@ -505,7 +505,7 @@ class TestProjectImplementation:
 
         mock_client.archive_project.assert_called_once_with("TEST")
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_restore_project_impl(self, mock_get_client, mock_client):
         """Test restoring a project."""
         mock_get_client.return_value = mock_client
@@ -523,7 +523,7 @@ class TestProjectImplementation:
 class TestCategoryImplementation:
     """Tests for category implementation functions."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_categories_impl(self, mock_get_client, mock_client):
         """Test listing categories."""
         mock_get_client.return_value = mock_client
@@ -535,7 +535,7 @@ class TestCategoryImplementation:
         assert result == categories
         mock_client.get_project_categories.assert_called_once()
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_create_category_impl(self, mock_get_client, mock_client):
         """Test creating a category."""
         mock_get_client.return_value = mock_client
@@ -546,7 +546,7 @@ class TestCategoryImplementation:
 
         assert result == new_category
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_assign_category_impl(self, mock_get_client, mock_client, sample_project):
         """Test assigning category to project."""
         mock_get_client.return_value = mock_client
@@ -565,7 +565,7 @@ class TestCategoryImplementation:
 class TestUserImplementation:
     """Tests for user implementation functions."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_search_users_impl(self, mock_get_client, mock_client, sample_users):
         """Test searching users - default filters inactive."""
         mock_get_client.return_value = mock_client
@@ -577,7 +577,7 @@ class TestUserImplementation:
         assert len(result) == 2
         assert all(u["active"] for u in result)
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_search_users_impl_include_inactive(
         self, mock_get_client, mock_client, sample_users
     ):
@@ -590,7 +590,7 @@ class TestUserImplementation:
         # Should include all 3 users
         assert len(result) == 3
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_search_users_impl_with_groups(
         self, mock_get_client, mock_client, sample_users
     ):
@@ -603,7 +603,7 @@ class TestUserImplementation:
 
         assert result[0]["groups"] == ["developers"]
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_search_users_impl_assignable(
         self, mock_get_client, mock_client, sample_users
     ):
@@ -616,7 +616,7 @@ class TestUserImplementation:
         mock_client.find_assignable_users.assert_called_once()
         assert len(result) == 2
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_get_user_impl(self, mock_get_client, mock_client, sample_users):
         """Test getting a user by account ID."""
         mock_get_client.return_value = mock_client
@@ -635,7 +635,7 @@ class TestUserImplementation:
 class TestGroupImplementation:
     """Tests for group implementation functions."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_groups_impl(self, mock_get_client, mock_client, sample_groups):
         """Test listing groups."""
         mock_get_client.return_value = mock_client
@@ -646,7 +646,7 @@ class TestGroupImplementation:
         assert len(result) == 4
         mock_client.find_groups.assert_called_once()
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_groups_impl_with_query(
         self, mock_get_client, mock_client, sample_groups
     ):
@@ -660,7 +660,7 @@ class TestGroupImplementation:
         call_args = mock_client.find_groups.call_args
         assert call_args.kwargs["query"] == "dev"
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_get_group_members_impl(self, mock_get_client, mock_client, sample_users):
         """Test getting group members."""
         mock_get_client.return_value = mock_client
@@ -673,7 +673,7 @@ class TestGroupImplementation:
 
         mock_client.get_group_members.assert_called_once()
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_create_group_impl(self, mock_get_client, mock_client):
         """Test creating a group."""
         mock_get_client.return_value = mock_client
@@ -684,7 +684,7 @@ class TestGroupImplementation:
 
         assert result == new_group
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_delete_group_impl_dry_run(self, mock_get_client, mock_client):
         """Test deleting a group with dry run."""
         mock_get_client.return_value = mock_client
@@ -695,7 +695,7 @@ class TestGroupImplementation:
         assert result["would_delete"] is True
         mock_client.delete_group.assert_not_called()
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_delete_group_impl_actual(self, mock_get_client, mock_client):
         """Test actually deleting a group."""
         mock_get_client.return_value = mock_client
@@ -706,7 +706,7 @@ class TestGroupImplementation:
         assert result["action"] == "deleted"
         mock_client.delete_group.assert_called_once()
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_add_user_to_group_impl(self, mock_get_client, mock_client):
         """Test adding user to group."""
         mock_get_client.return_value = mock_client
@@ -717,7 +717,7 @@ class TestGroupImplementation:
 
         mock_client.add_user_to_group.assert_called_once()
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_remove_user_from_group_impl(self, mock_get_client, mock_client):
         """Test removing user from group."""
         mock_get_client.return_value = mock_client
@@ -737,7 +737,7 @@ class TestGroupImplementation:
 class TestAutomationImplementation:
     """Tests for automation implementation functions."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_automation_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
     def test_list_automation_rules_impl(
         self, mock_get_client, mock_automation_client, sample_automation_rules
     ):
@@ -753,7 +753,7 @@ class TestAutomationImplementation:
         assert len(result) == 2
         # Note: automation client doesn't call close()
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_automation_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
     def test_list_automation_rules_impl_with_project(
         self, mock_get_client, mock_automation_client, sample_automation_rules
     ):
@@ -769,7 +769,7 @@ class TestAutomationImplementation:
         mock_automation_client.search_rules.assert_called_once()
         assert len(result) == 2
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_automation_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
     def test_get_automation_rule_impl(self, mock_get_client, mock_automation_client):
         """Test getting an automation rule."""
         mock_get_client.return_value = mock_automation_client
@@ -780,7 +780,7 @@ class TestAutomationImplementation:
 
         assert result == rule
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_automation_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
     def test_enable_automation_rule_impl(self, mock_get_client, mock_automation_client):
         """Test enabling an automation rule."""
         mock_get_client.return_value = mock_automation_client
@@ -791,7 +791,7 @@ class TestAutomationImplementation:
 
         assert result == rule
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_automation_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
     def test_disable_automation_rule_impl(
         self, mock_get_client, mock_automation_client
     ):
@@ -804,7 +804,7 @@ class TestAutomationImplementation:
 
         assert result == rule
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_automation_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
     def test_toggle_automation_rule_impl(self, mock_get_client, mock_automation_client):
         """Test toggling an automation rule."""
         mock_get_client.return_value = mock_automation_client
@@ -827,7 +827,7 @@ class TestAutomationImplementation:
 class TestPermissionSchemeImplementation:
     """Tests for permission scheme implementation functions."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_permission_schemes_impl(
         self, mock_get_client, mock_client, sample_permission_schemes
     ):
@@ -842,7 +842,7 @@ class TestPermissionSchemeImplementation:
         # Returns a list of schemes, not the whole dict
         assert len(result) == 2
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_get_permission_scheme_impl(self, mock_get_client, mock_client):
         """Test getting a permission scheme."""
         mock_get_client.return_value = mock_client
@@ -854,7 +854,7 @@ class TestPermissionSchemeImplementation:
         # Returns {"scheme": scheme, ...}
         assert result["scheme"] == scheme
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_create_permission_scheme_impl(self, mock_get_client, mock_client):
         """Test creating a permission scheme."""
         mock_get_client.return_value = mock_client
@@ -874,7 +874,7 @@ class TestPermissionSchemeImplementation:
 class TestNotificationSchemeImplementation:
     """Tests for notification scheme implementation functions."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_notification_schemes_impl(self, mock_get_client, mock_client):
         """Test listing notification schemes."""
         mock_get_client.return_value = mock_client
@@ -885,7 +885,7 @@ class TestNotificationSchemeImplementation:
 
         assert len(result) == 1
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_get_notification_scheme_impl(self, mock_get_client, mock_client):
         """Test getting a notification scheme."""
         mock_get_client.return_value = mock_client
@@ -905,7 +905,7 @@ class TestNotificationSchemeImplementation:
 class TestScreenImplementation:
     """Tests for screen implementation functions."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_screens_impl(self, mock_get_client, mock_client, sample_screens):
         """Test listing screens."""
         mock_get_client.return_value = mock_client
@@ -915,7 +915,7 @@ class TestScreenImplementation:
 
         assert len(result) == 2
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_get_screen_impl(self, mock_get_client, mock_client):
         """Test getting a screen."""
         mock_get_client.return_value = mock_client
@@ -926,7 +926,7 @@ class TestScreenImplementation:
 
         assert result == screen
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_screen_tabs_impl(self, mock_get_client, mock_client):
         """Test listing screen tabs."""
         mock_get_client.return_value = mock_client
@@ -946,7 +946,7 @@ class TestScreenImplementation:
 class TestIssueTypeImplementation:
     """Tests for issue type implementation functions."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_issue_types_impl(
         self, mock_get_client, mock_client, sample_issue_types
     ):
@@ -958,7 +958,7 @@ class TestIssueTypeImplementation:
 
         assert len(result) == 3
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_issue_types_impl_subtask_only(
         self, mock_get_client, mock_client, sample_issue_types
     ):
@@ -971,7 +971,7 @@ class TestIssueTypeImplementation:
         assert len(result) == 1
         assert result[0]["name"] == "Sub-task"
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_get_issue_type_impl(self, mock_get_client, mock_client):
         """Test getting an issue type."""
         mock_get_client.return_value = mock_client
@@ -982,7 +982,7 @@ class TestIssueTypeImplementation:
 
         assert result == issue_type
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_create_issue_type_impl(self, mock_get_client, mock_client):
         """Test creating an issue type."""
         mock_get_client.return_value = mock_client
@@ -995,7 +995,7 @@ class TestIssueTypeImplementation:
 
         assert result == issue_type
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_delete_issue_type_impl(self, mock_get_client, mock_client):
         """Test deleting an issue type."""
         mock_get_client.return_value = mock_client
@@ -1014,7 +1014,7 @@ class TestIssueTypeImplementation:
 class TestWorkflowImplementation:
     """Tests for workflow implementation functions."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_workflows_impl(self, mock_get_client, mock_client, sample_workflows):
         """Test listing workflows."""
         mock_get_client.return_value = mock_client
@@ -1025,7 +1025,7 @@ class TestWorkflowImplementation:
         # Returns a dict with "workflows" key
         assert "workflows" in result
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_get_workflow_impl(self, mock_get_client, mock_client, sample_workflows):
         """Test getting a workflow."""
         mock_get_client.return_value = mock_client
@@ -1036,7 +1036,7 @@ class TestWorkflowImplementation:
 
         assert result["name"] == "Default Workflow"
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_get_workflow_for_issue_impl(
         self, mock_get_client, mock_client, sample_workflows
     ):
@@ -1060,7 +1060,7 @@ class TestWorkflowImplementation:
 
         assert result["name"] == "Default Workflow"
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
     def test_list_statuses_impl(self, mock_get_client, mock_client, sample_statuses):
         """Test listing statuses."""
         mock_get_client.return_value = mock_client
@@ -1192,7 +1192,7 @@ class TestFormattingFunctions:
 class TestProjectCLI:
     """Tests for project CLI commands."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_client_from_context")
+    @patch("jira_as.cli.commands.admin_cmds.get_client_from_context")
     def test_project_list_command(
         self, mock_get_client, mock_client, sample_projects, cli_runner
     ):
@@ -1205,7 +1205,7 @@ class TestProjectCLI:
         assert result.exit_code == 0
         assert "PROJ1" in result.output
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_client_from_context")
+    @patch("jira_as.cli.commands.admin_cmds.get_client_from_context")
     def test_project_list_json_output(
         self, mock_get_client, mock_client, sample_projects, cli_runner
     ):
@@ -1219,7 +1219,7 @@ class TestProjectCLI:
         data = json.loads(result.output)
         assert "values" in data
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_client_from_context")
+    @patch("jira_as.cli.commands.admin_cmds.get_client_from_context")
     def test_project_get_command(
         self, mock_get_client, mock_client, sample_project, cli_runner
     ):
@@ -1241,7 +1241,7 @@ class TestProjectCLI:
 class TestUserCLI:
     """Tests for user CLI commands."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_client_from_context")
+    @patch("jira_as.cli.commands.admin_cmds.get_client_from_context")
     def test_user_search_command(
         self, mock_get_client, mock_client, sample_users, cli_runner
     ):
@@ -1254,7 +1254,7 @@ class TestUserCLI:
         assert result.exit_code == 0
         assert "John Doe" in result.output
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_client_from_context")
+    @patch("jira_as.cli.commands.admin_cmds.get_client_from_context")
     def test_user_get_command(
         self, mock_get_client, mock_client, sample_users, cli_runner
     ):
@@ -1276,7 +1276,7 @@ class TestUserCLI:
 class TestGroupCLI:
     """Tests for group CLI commands."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_client_from_context")
+    @patch("jira_as.cli.commands.admin_cmds.get_client_from_context")
     def test_group_list_command(
         self, mock_get_client, mock_client, sample_groups, cli_runner
     ):
@@ -1289,7 +1289,7 @@ class TestGroupCLI:
         assert result.exit_code == 0
         assert "developers" in result.output
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_client_from_context")
+    @patch("jira_as.cli.commands.admin_cmds.get_client_from_context")
     def test_group_create_command(self, mock_get_client, mock_client, cli_runner):
         """Test group create command."""
         mock_get_client.return_value = mock_client
@@ -1300,7 +1300,7 @@ class TestGroupCLI:
         assert result.exit_code == 0
         assert "new-team" in result.output
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_client_from_context")
+    @patch("jira_as.cli.commands.admin_cmds.get_client_from_context")
     def test_group_delete_dry_run(self, mock_get_client, mock_client, cli_runner):
         """Test group delete with dry run."""
         mock_get_client.return_value = mock_client
@@ -1321,7 +1321,7 @@ class TestGroupCLI:
 class TestAutomationCLI:
     """Tests for automation CLI commands."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_automation_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
     def test_automation_list_command(
         self,
         mock_get_client,
@@ -1341,7 +1341,7 @@ class TestAutomationCLI:
         assert result.exit_code == 0
         assert "Auto-assign bugs" in result.output
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_automation_client")
+    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
     def test_automation_enable_command(
         self, mock_get_client, mock_automation_client, cli_runner
     ):
@@ -1365,7 +1365,7 @@ class TestAutomationCLI:
 class TestIssueTypeCLI:
     """Tests for issue type CLI commands."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_client_from_context")
+    @patch("jira_as.cli.commands.admin_cmds.get_client_from_context")
     def test_issue_type_list_command(
         self, mock_get_client, mock_client, sample_issue_types, cli_runner
     ):
@@ -1388,7 +1388,7 @@ class TestIssueTypeCLI:
 class TestWorkflowCLI:
     """Tests for workflow CLI commands."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_client_from_context")
+    @patch("jira_as.cli.commands.admin_cmds.get_client_from_context")
     def test_workflow_list_command(
         self, mock_get_client, mock_client, sample_workflows, cli_runner
     ):
@@ -1409,7 +1409,7 @@ class TestWorkflowCLI:
 class TestStatusCLI:
     """Tests for status CLI commands."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_client_from_context")
+    @patch("jira_as.cli.commands.admin_cmds.get_client_from_context")
     def test_status_list_command(
         self, mock_get_client, mock_client, sample_statuses, cli_runner
     ):
@@ -1432,7 +1432,7 @@ class TestStatusCLI:
 class TestErrorHandling:
     """Tests for error handling in CLI commands."""
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_client_from_context")
+    @patch("jira_as.cli.commands.admin_cmds.get_client_from_context")
     def test_jira_error_handling(self, mock_get_client, mock_client, cli_runner):
         """Test JiraError handling in CLI."""
         mock_get_client.return_value = mock_client
@@ -1442,7 +1442,7 @@ class TestErrorHandling:
 
         assert result.exit_code != 0
 
-    @patch("jira_assistant_skills_lib.cli.commands.admin_cmds.get_client_from_context")
+    @patch("jira_as.cli.commands.admin_cmds.get_client_from_context")
     def test_validation_error_handling(self, mock_get_client, mock_client, cli_runner):
         """Test ValidationError handling in CLI."""
         mock_get_client.return_value = mock_client

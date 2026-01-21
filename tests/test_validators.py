@@ -8,7 +8,7 @@ import tempfile
 import pytest
 from assistant_skills_lib.error_handler import ValidationError
 
-from jira_assistant_skills_lib.validators import (
+from jira_as.validators import (
     PROJECT_TEMPLATES,
     VALID_ASSIGNEE_TYPES,
     VALID_PROJECT_TYPES,

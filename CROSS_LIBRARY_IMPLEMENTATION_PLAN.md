@@ -4,7 +4,7 @@
 
 This document outlines refactoring opportunities and patterns that can be standardized across the four Assistant Skills libraries:
 - `assistant-skills-lib` (base library)
-- `jira-assistant-skills-lib`
+- `jira-as-lib`
 - `confluence-assistant-skills-lib`
 - `splunk-assistant-skills-lib`
 
@@ -70,7 +70,7 @@ class BaseConfigManager:
 
 **Files to update**:
 - `assistant-skills-lib/src/assistant_skills_lib/__init__.py` - export BaseConfigManager
-- `jira-assistant-skills-lib/.../config_manager.py` - extend BaseConfigManager
+- `jira-as-lib/.../config_manager.py` - extend BaseConfigManager
 - `confluence-assistant-skills-lib/.../config_manager.py` - extend BaseConfigManager
 - `splunk-assistant-skills-lib/.../config_manager.py` - extend BaseConfigManager
 

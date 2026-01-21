@@ -1,7 +1,7 @@
 """
-JIRA Assistant Skills Library
+JIRA AS
 
-A shared library for interacting with the JIRA REST API, providing:
+A Python library for interacting with the JIRA REST API, providing:
     - jira_client: HTTP client with retry logic and error handling
     - config_manager: Multi-source configuration management
     - error_handler: Exception hierarchy and error handling
@@ -13,7 +13,7 @@ A shared library for interacting with the JIRA REST API, providing:
     - credential_manager: Secure credential storage
 
 Example usage:
-    from jira_assistant_skills_lib import get_jira_client, handle_errors
+    from jira_as import get_jira_client, handle_errors
 
     @handle_errors
     def main():
@@ -22,7 +22,7 @@ Example usage:
         print(issue['fields']['summary'])
 """
 
-__version__ = "1.1.0"
+__version__ = "1.0.0"
 
 # Error handling
 # ADF Helper

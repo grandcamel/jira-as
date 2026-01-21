@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 import click
 
-from jira_assistant_skills_lib import (
+from jira_as import (
     JiraError,
     NotFoundError,
     PermissionError,
@@ -34,7 +34,7 @@ from jira_assistant_skills_lib import (
 from ..cli_utils import get_client_from_context, parse_comma_list, parse_json_arg
 
 if TYPE_CHECKING:
-    from jira_assistant_skills_lib import JiraClient
+    from jira_as import JiraClient
 
 # =============================================================================
 # Implementation Functions
@@ -69,7 +69,7 @@ def _load_template(template_name: str) -> dict:
         plugin_template = (
             Path(__file__).parent.parent.parent.parent.parent
             / "plugins"
-            / "jira-assistant-skills"
+            / "jira-as"
             / "skills"
             / "jira-issue"
             / "assets"

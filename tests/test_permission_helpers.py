@@ -5,7 +5,7 @@ Tests for permission_helpers module.
 import pytest
 from assistant_skills_lib.error_handler import ValidationError
 
-from jira_assistant_skills_lib.permission_helpers import (
+from jira_as.permission_helpers import (
     HOLDER_TYPES_WITH_PARAMETER,
     HOLDER_TYPES_WITHOUT_PARAMETER,
     VALID_HOLDER_TYPES,

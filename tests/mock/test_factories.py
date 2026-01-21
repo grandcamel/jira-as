@@ -3,7 +3,7 @@ Tests for mock factory classes.
 """
 
 
-from jira_assistant_skills_lib.mock.factories import (
+from jira_as.mock.factories import (
     CommentFactory,
     ResponseFactory,
     StatusFactory,

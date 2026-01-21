@@ -278,14 +278,14 @@ If issues arise:
 
 Start with:
 ```
-Fix the CLI client pattern in jira-assistant-skills-lib following the PRD in CLI_CLIENT_PATTERN_PRD.md.
+Fix the CLI client pattern in jira-as-lib following the PRD in CLI_CLIENT_PATTERN_PRD.md.
 Start with issue_cmds.py as a reference implementation, then proceed file by file.
 Run tests after each file to catch regressions early.
 ```
 
 ## References
 
-- JIRA cli_utils.py: `src/jira_assistant_skills_lib/cli/cli_utils.py`
-- JIRA main.py: `src/jira_assistant_skills_lib/cli/main.py`
+- JIRA cli_utils.py: `src/jira_as/cli/cli_utils.py`
+- JIRA main.py: `src/jira_as/cli/main.py`
 - Confluence cli_utils.py: `src/confluence_assistant_skills_lib/cli/cli_utils.py`
 - Splunk pattern (reference): `src/splunk_assistant_skills_lib/cli/cli_utils.py`

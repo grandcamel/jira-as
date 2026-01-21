@@ -18,7 +18,7 @@ from unittest.mock import patch
 
 import pytest
 
-from jira_assistant_skills_lib.cli.commands.relationships_cmds import (
+from jira_as.cli.commands.relationships_cmds import (
     _bulk_link_impl,
     _clone_issue_impl,
     _get_blockers_impl,
@@ -45,7 +45,7 @@ class TestLinkIssueImpl:
         mock_jira_client.get_link_types.return_value = deepcopy(sample_link_types)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _link_issue_impl(
@@ -63,7 +63,7 @@ class TestLinkIssueImpl:
         mock_jira_client.get_link_types.return_value = deepcopy(sample_link_types)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _link_issue_impl(
@@ -78,7 +78,7 @@ class TestLinkIssueImpl:
         mock_jira_client.get_link_types.return_value = deepcopy(sample_link_types)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _link_issue_impl(
@@ -98,7 +98,7 @@ class TestLinkIssueImpl:
         mock_jira_client.get_link_types.return_value = deepcopy(sample_link_types)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _link_issue_impl(
@@ -116,13 +116,13 @@ class TestLinkIssueImpl:
         self, mock_jira_client, sample_link_types
     ):
         """Test that self-reference raises error."""
-        from jira_assistant_skills_lib import ValidationError
+        from jira_as import ValidationError
 
         mock_jira_client.get_link_types.return_value = deepcopy(sample_link_types)
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+                "jira_as.cli.commands.relationships_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             pytest.raises(ValidationError, match="Cannot link an issue to itself"),
@@ -142,7 +142,7 @@ class TestUnlinkIssueImpl:
         mock_jira_client.get_issue_links.return_value = deepcopy(sample_issue_links)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _unlink_issue_impl(
@@ -158,7 +158,7 @@ class TestUnlinkIssueImpl:
         mock_jira_client.get_issue_links.return_value = deepcopy(sample_blocker_links)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _unlink_issue_impl(
@@ -175,7 +175,7 @@ class TestUnlinkIssueImpl:
         mock_jira_client.get_issue_links.return_value = deepcopy(sample_issue_links)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _unlink_issue_impl(
@@ -203,7 +203,7 @@ class TestGetLinksImpl:
         mock_jira_client.get_issue_links.return_value = deepcopy(sample_issue_links)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_links_impl(issue_key="PROJ-123")
@@ -216,7 +216,7 @@ class TestGetLinksImpl:
         mock_jira_client.get_issue_links.return_value = deepcopy(sample_issue_links)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_links_impl(issue_key="PROJ-123", link_type="Blocks")
@@ -239,7 +239,7 @@ class TestGetBlockersImpl:
         mock_jira_client.get_issue_links.return_value = deepcopy(sample_blocker_links)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_blockers_impl(issue_key="PROJ-123", direction="inward")
@@ -253,7 +253,7 @@ class TestGetBlockersImpl:
         mock_jira_client.get_issue_links.return_value = []
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_blockers_impl(issue_key="PROJ-123")
@@ -276,7 +276,7 @@ class TestGetDependenciesImpl:
         mock_jira_client.get_issue_links.return_value = deepcopy(sample_issue_links)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_dependencies_impl(issue_key="PROJ-123")
@@ -292,7 +292,7 @@ class TestGetDependenciesImpl:
         mock_jira_client.get_issue_links.return_value = deepcopy(sample_issue_links)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_dependencies_impl(issue_key="PROJ-123", link_types=["Blocks"])
@@ -314,7 +314,7 @@ class TestGetLinkTypesImpl:
         mock_jira_client.get_link_types.return_value = deepcopy(sample_link_types)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_link_types_impl()
@@ -327,7 +327,7 @@ class TestGetLinkTypesImpl:
         mock_jira_client.get_link_types.return_value = deepcopy(sample_link_types)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_link_types_impl(filter_pattern="block")
@@ -353,7 +353,7 @@ class TestCloneIssueImpl:
         mock_jira_client.create_issue.return_value = deepcopy(sample_cloned_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _clone_issue_impl(issue_key="PROJ-123")
@@ -371,7 +371,7 @@ class TestCloneIssueImpl:
         mock_jira_client.create_issue.return_value = deepcopy(sample_cloned_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _clone_issue_impl(issue_key="PROJ-123", create_clone_link=False)
@@ -387,7 +387,7 @@ class TestCloneIssueImpl:
         mock_jira_client.create_issue.return_value = deepcopy(sample_cloned_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _clone_issue_impl(issue_key="PROJ-123", to_project="OTHER")
@@ -407,7 +407,7 @@ class TestBulkLinkImpl:
     def test_bulk_link_issues(self, mock_jira_client):
         """Test bulk linking issues."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _bulk_link_impl(
@@ -423,7 +423,7 @@ class TestBulkLinkImpl:
     def test_bulk_link_dry_run(self, mock_jira_client):
         """Test bulk link dry run."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _bulk_link_impl(
@@ -444,7 +444,7 @@ class TestBulkLinkImpl:
         }
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _bulk_link_impl(
@@ -471,7 +471,7 @@ class TestGetLinkStatsImpl:
         mock_jira_client.get_issue_links.return_value = deepcopy(sample_issue_links)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_link_stats_impl(issue_key="PROJ-123")
@@ -489,7 +489,7 @@ class TestGetLinkStatsImpl:
         }
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_jira_client",
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_link_stats_impl(project="PROJ")
@@ -513,7 +513,7 @@ class TestLinkCommand:
         mock_jira_client.get_link_types.return_value = deepcopy(sample_link_types)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_client_from_context",
+            "jira_as.cli.commands.relationships_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(
@@ -529,7 +529,7 @@ class TestLinkCommand:
         mock_jira_client.get_link_types.return_value = deepcopy(sample_link_types)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_client_from_context",
+            "jira_as.cli.commands.relationships_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(
@@ -550,7 +550,7 @@ class TestGetLinksCommand:
         mock_jira_client.get_issue_links.return_value = deepcopy(sample_issue_links)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_client_from_context",
+            "jira_as.cli.commands.relationships_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(
@@ -571,7 +571,7 @@ class TestLinkTypesCommand:
         mock_jira_client.get_link_types.return_value = deepcopy(sample_link_types)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_client_from_context",
+            "jira_as.cli.commands.relationships_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(
@@ -595,7 +595,7 @@ class TestCloneCommand:
         mock_jira_client.create_issue.return_value = deepcopy(sample_cloned_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_client_from_context",
+            "jira_as.cli.commands.relationships_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(
@@ -615,7 +615,7 @@ class TestBulkLinkCommand:
     def test_bulk_link_cli(self, cli_runner, mock_jira_client):
         """Test CLI bulk-link command."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.relationships_cmds.get_client_from_context",
+            "jira_as.cli.commands.relationships_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(

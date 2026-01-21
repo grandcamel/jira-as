@@ -9,7 +9,7 @@ import tempfile
 import pytest
 import responses
 
-from jira_assistant_skills_lib.error_handler import (
+from jira_as.error_handler import (
     AuthenticationError,
     NotFoundError,
     PermissionError,
@@ -17,7 +17,7 @@ from jira_assistant_skills_lib.error_handler import (
     ServerError,
     ValidationError,
 )
-from jira_assistant_skills_lib.jira_client import JiraClient
+from jira_as.jira_client import JiraClient
 
 
 @pytest.fixture

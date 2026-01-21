@@ -19,7 +19,7 @@ from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 import click
 
-from jira_assistant_skills_lib import (
+from jira_as import (
     AuthenticationError,
     ConflictError,
     JiraError,
@@ -33,7 +33,7 @@ from jira_assistant_skills_lib import (
 )
 
 if TYPE_CHECKING:
-    from jira_assistant_skills_lib import JiraClient
+    from jira_as import JiraClient
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -267,7 +267,7 @@ def output_results(
         columns: Column names for table output
         success_msg: Optional success message for text output
     """
-    from jira_assistant_skills_lib import (
+    from jira_as import (
         format_json,
         format_table,
         print_success,

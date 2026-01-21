@@ -17,7 +17,7 @@ from unittest.mock import patch
 
 import pytest
 
-from jira_assistant_skills_lib.cli.commands.lifecycle_cmds import (
+from jira_as.cli.commands.lifecycle_cmds import (
     _assign_issue_impl,
     _create_component_impl,
     _create_version_impl,
@@ -44,7 +44,7 @@ class TestGetTransitionsImpl:
         mock_jira_client.get_transitions.return_value = deepcopy(sample_transitions)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_transitions_impl(issue_key="PROJ-123")
@@ -58,7 +58,7 @@ class TestGetTransitionsImpl:
         mock_jira_client.get_transitions.return_value = deepcopy(sample_transitions)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _get_transitions_impl(issue_key="proj-123")
@@ -70,7 +70,7 @@ class TestGetTransitionsImpl:
         mock_jira_client.get_transitions.return_value = []
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_transitions_impl(issue_key="PROJ-123")
@@ -84,7 +84,7 @@ class TestGetTransitionsImpl:
         mock_jira_client.get_transitions.return_value = deepcopy(sample_transitions)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _get_transitions_impl(issue_key="PROJ-123")
@@ -111,11 +111,11 @@ class TestTransitionIssueImpl:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+                "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.has_project_context",
+                "jira_as.cli.commands.lifecycle_cmds.has_project_context",
                 return_value=False,
             ),
         ):
@@ -135,11 +135,11 @@ class TestTransitionIssueImpl:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+                "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.has_project_context",
+                "jira_as.cli.commands.lifecycle_cmds.has_project_context",
                 return_value=False,
             ),
         ):
@@ -160,11 +160,11 @@ class TestTransitionIssueImpl:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+                "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.has_project_context",
+                "jira_as.cli.commands.lifecycle_cmds.has_project_context",
                 return_value=False,
             ),
         ):
@@ -187,11 +187,11 @@ class TestTransitionIssueImpl:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+                "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.has_project_context",
+                "jira_as.cli.commands.lifecycle_cmds.has_project_context",
                 return_value=False,
             ),
         ):
@@ -206,13 +206,13 @@ class TestTransitionIssueImpl:
 
     def test_transition_no_target_raises_error(self, mock_jira_client, sample_issue):
         """Test that not specifying transition raises error."""
-        from jira_assistant_skills_lib import ValidationError
+        from jira_as import ValidationError
 
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+                "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             pytest.raises(ValidationError, match="Either --id or --to"),
@@ -228,11 +228,11 @@ class TestTransitionIssueImpl:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+                "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.has_project_context",
+                "jira_as.cli.commands.lifecycle_cmds.has_project_context",
                 return_value=False,
             ),
         ):
@@ -259,7 +259,7 @@ class TestAssignIssueImpl:
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _assign_issue_impl(
@@ -278,7 +278,7 @@ class TestAssignIssueImpl:
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _assign_issue_impl(
@@ -294,7 +294,7 @@ class TestAssignIssueImpl:
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _assign_issue_impl(
@@ -310,7 +310,7 @@ class TestAssignIssueImpl:
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _assign_issue_impl(
@@ -324,11 +324,11 @@ class TestAssignIssueImpl:
 
     def test_assign_multiple_options_raises_error(self, mock_jira_client):
         """Test that specifying multiple assignment options raises error."""
-        from jira_assistant_skills_lib import ValidationError
+        from jira_as import ValidationError
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+                "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             pytest.raises(ValidationError, match="Specify exactly one"),
@@ -344,7 +344,7 @@ class TestAssignIssueImpl:
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _assign_issue_impl(
@@ -374,7 +374,7 @@ class TestResolveIssueImpl:
         )
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _resolve_issue_impl(issue_key="PROJ-123")
@@ -392,7 +392,7 @@ class TestResolveIssueImpl:
         )
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _resolve_issue_impl(issue_key="PROJ-123", resolution="Won't Fix")
@@ -409,7 +409,7 @@ class TestResolveIssueImpl:
         )
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _resolve_issue_impl(
@@ -424,7 +424,7 @@ class TestResolveIssueImpl:
         self, mock_jira_client, sample_transitions
     ):
         """Test resolving when no resolve transition is available."""
-        from jira_assistant_skills_lib import ValidationError
+        from jira_as import ValidationError
 
         # sample_transitions doesn't have a "done" transition
         mock_jira_client.get_transitions.return_value = [
@@ -433,7 +433,7 @@ class TestResolveIssueImpl:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+                "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             pytest.raises(ValidationError, match="No resolution transition"),
@@ -458,7 +458,7 @@ class TestReopenIssueImpl:
         ]
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _reopen_issue_impl(issue_key="PROJ-123")
@@ -474,7 +474,7 @@ class TestReopenIssueImpl:
         ]
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _reopen_issue_impl(
@@ -487,13 +487,13 @@ class TestReopenIssueImpl:
 
     def test_reopen_no_transition_available(self, mock_jira_client):
         """Test reopening when no reopen transition is available."""
-        from jira_assistant_skills_lib import ValidationError
+        from jira_as import ValidationError
 
         mock_jira_client.get_transitions.return_value = [{"id": "31", "name": "Done"}]
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+                "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             pytest.raises(ValidationError, match="No reopen transition"),
@@ -515,7 +515,7 @@ class TestGetVersionsImpl:
         mock_jira_client.get_versions.return_value = deepcopy(sample_versions)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_versions_impl(project="PROJ")
@@ -528,7 +528,7 @@ class TestGetVersionsImpl:
         mock_jira_client.get_versions.return_value = deepcopy(sample_versions)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_versions_impl(project="PROJ", unreleased=True)
@@ -540,7 +540,7 @@ class TestGetVersionsImpl:
         mock_jira_client.get_versions.return_value = deepcopy(sample_versions)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _get_versions_impl(project="PROJ")
@@ -558,7 +558,7 @@ class TestCreateVersionImpl:
         mock_jira_client.create_version.return_value = deepcopy(sample_created_version)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _create_version_impl(project="PROJ", name="v1.0.0")
@@ -569,7 +569,7 @@ class TestCreateVersionImpl:
     def test_create_version_dry_run(self, mock_jira_client):
         """Test dry-run mode doesn't create version."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _create_version_impl(project="PROJ", name="v1.0.0", dry_run=True)
@@ -592,7 +592,7 @@ class TestGetComponentsImpl:
         mock_jira_client.get_components.return_value = deepcopy(sample_components)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _get_components_impl(project="PROJ")
@@ -607,7 +607,7 @@ class TestGetComponentsImpl:
         mock_jira_client.get_components.return_value = deepcopy(sample_components)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             _get_components_impl(project="PROJ")
@@ -627,7 +627,7 @@ class TestCreateComponentImpl:
         )
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _create_component_impl(project="PROJ", name="Backend")
@@ -638,7 +638,7 @@ class TestCreateComponentImpl:
     def test_create_component_dry_run(self, mock_jira_client):
         """Test dry-run mode doesn't create component."""
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_jira_client",
+            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _create_component_impl(
@@ -667,11 +667,11 @@ class TestTransitionCommand:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_client_from_context",
+                "jira_as.cli.commands.lifecycle_cmds.get_client_from_context",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.has_project_context",
+                "jira_as.cli.commands.lifecycle_cmds.has_project_context",
                 return_value=False,
             ),
         ):
@@ -694,7 +694,7 @@ class TestTransitionsCommand:
         mock_jira_client.get_transitions.return_value = deepcopy(sample_transitions)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_client_from_context",
+            "jira_as.cli.commands.lifecycle_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(lifecycle, ["transitions", "PROJ-123"])
@@ -709,7 +709,7 @@ class TestTransitionsCommand:
         mock_jira_client.get_transitions.return_value = deepcopy(sample_transitions)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_client_from_context",
+            "jira_as.cli.commands.lifecycle_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(
@@ -730,7 +730,7 @@ class TestAssignCommand:
         mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_client_from_context",
+            "jira_as.cli.commands.lifecycle_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(lifecycle, ["assign", "PROJ-123", "--self"])
@@ -750,7 +750,7 @@ class TestVersionCommands:
         mock_jira_client.get_versions.return_value = deepcopy(sample_versions)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_client_from_context",
+            "jira_as.cli.commands.lifecycle_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(lifecycle, ["version", "list", "PROJ"])
@@ -770,7 +770,7 @@ class TestComponentCommands:
         mock_jira_client.get_components.return_value = deepcopy(sample_components)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.lifecycle_cmds.get_client_from_context",
+            "jira_as.cli.commands.lifecycle_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(lifecycle, ["component", "list", "PROJ"])

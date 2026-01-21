@@ -1,6 +1,6 @@
-# JIRA Assistant Skills
+# JIRA AS
 
-[![PyPI version](https://badge.fury.io/py/jira-assistant-skills.svg)](https://badge.fury.io/py/jira-assistant-skills)
+[![PyPI version](https://badge.fury.io/py/jira-as.svg)](https://badge.fury.io/py/jira-as)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -9,13 +9,13 @@ A Python library and CLI for JIRA REST API automation, providing HTTP client, co
 ## Installation
 
 ```bash
-pip install jira-assistant-skills
+pip install jira-as
 ```
 
 With optional keyring support for secure credential storage:
 
 ```bash
-pip install jira-assistant-skills[keyring]
+pip install jira-as[keyring]
 ```
 
 ## Features
@@ -66,7 +66,7 @@ jira-as --help
 ### Library Usage
 
 ```python
-from jira_assistant_skills_lib import get_jira_client, handle_errors
+from jira_as import get_jira_client, handle_errors
 
 @handle_errors
 def main():
@@ -90,7 +90,7 @@ if __name__ == '__main__':
 ### JiraClient
 
 ```python
-from jira_assistant_skills_lib import JiraClient
+from jira_as import JiraClient
 
 # Direct instantiation (prefer get_jira_client() for config management)
 client = JiraClient(
@@ -109,7 +109,7 @@ with client:
 ### Error Handling
 
 ```python
-from jira_assistant_skills_lib import (
+from jira_as import (
     JiraError,
     AuthenticationError,
     PermissionError,
@@ -137,7 +137,7 @@ except JiraError as e:
 ### Validators
 
 ```python
-from jira_assistant_skills_lib import (
+from jira_as import (
     validate_issue_key,
     validate_project_key,
     validate_jql,
@@ -155,7 +155,7 @@ except ValidationError as e:
 ### ADF Helper
 
 ```python
-from jira_assistant_skills_lib import (
+from jira_as import (
     markdown_to_adf,
     text_to_adf,
     adf_to_text
@@ -174,7 +174,7 @@ text = adf_to_text(adf_document)
 ### Time Utils
 
 ```python
-from jira_assistant_skills_lib import (
+from jira_as import (
     parse_time_string,
     format_seconds,
     parse_relative_date
@@ -204,7 +204,7 @@ jira-as issue get DEMO-85  # Returns mock data
 import os
 os.environ['JIRA_MOCK_MODE'] = 'true'
 
-from jira_assistant_skills_lib import get_jira_client
+from jira_as import get_jira_client
 
 with get_jira_client() as client:  # Returns MockJiraClient
     issue = client.get_issue('DEMO-85')  # Mock data
@@ -214,8 +214,8 @@ with get_jira_client() as client:  # Returns MockJiraClient
 
 ```bash
 # Clone the repository
-git clone https://github.com/grandcamel/jira-assistant-skills-lib.git
-cd jira-assistant-skills-lib
+git clone https://github.com/grandcamel/jira-as-lib.git
+cd jira-as-lib
 
 # Install development dependencies
 pip install -e ".[dev]"

@@ -5,7 +5,7 @@ without making actual API calls. The mock client returns consistent,
 deterministic data matching the DEMO project structure.
 
 Usage:
-    from jira_assistant_skills_lib.mock import MockJiraClient, is_mock_mode
+    from jira_as.mock import MockJiraClient, is_mock_mode
 
     # Check if mock mode is enabled
     if is_mock_mode():

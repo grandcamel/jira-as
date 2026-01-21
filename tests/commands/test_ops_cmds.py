@@ -13,7 +13,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from jira_assistant_skills_lib.cli.commands.ops_cmds import (
+from jira_as.cli.commands.ops_cmds import (
     _cache_clear_impl,
     _cache_status_impl,
     _cache_warm_impl,
@@ -102,7 +102,7 @@ class TestCacheStatusImpl:
         mock_cache.max_size = 100 * 1024 * 1024
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.ops_cmds.JiraCache",
+            "jira_as.cli.commands.ops_cmds.JiraCache",
             return_value=mock_cache,
         ):
             result = _cache_status_impl()
@@ -172,7 +172,7 @@ class TestCacheClearImpl:
         mock_cache.get_stats.return_value = MockCacheStats(entry_count=100)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.ops_cmds.JiraCache",
+            "jira_as.cli.commands.ops_cmds.JiraCache",
             return_value=mock_cache,
         ):
             result = _cache_clear_impl(dry_run=True)
@@ -192,7 +192,7 @@ class TestCacheClearImpl:
         mock_cache.clear.return_value = 100
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.ops_cmds.JiraCache",
+            "jira_as.cli.commands.ops_cmds.JiraCache",
             return_value=mock_cache,
         ):
             result = _cache_clear_impl(force=True)
@@ -211,7 +211,7 @@ class TestCacheClearImpl:
         mock_cache.invalidate.return_value = 50
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.ops_cmds.JiraCache",
+            "jira_as.cli.commands.ops_cmds.JiraCache",
             return_value=mock_cache,
         ):
             result = _cache_clear_impl(category="issue", force=True)
@@ -283,11 +283,11 @@ class TestCacheWarmImpl:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.ops_cmds.get_jira_client",
+                "jira_as.cli.commands.ops_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.ops_cmds.JiraCache",
+                "jira_as.cli.commands.ops_cmds.JiraCache",
                 return_value=mock_cache,
             ),
         ):
@@ -309,11 +309,11 @@ class TestCacheWarmImpl:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.ops_cmds.get_jira_client",
+                "jira_as.cli.commands.ops_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.ops_cmds.JiraCache",
+                "jira_as.cli.commands.ops_cmds.JiraCache",
                 return_value=mock_cache,
             ),
         ):
@@ -332,11 +332,11 @@ class TestCacheWarmImpl:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.ops_cmds.get_jira_client",
+                "jira_as.cli.commands.ops_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.ops_cmds.JiraCache",
+                "jira_as.cli.commands.ops_cmds.JiraCache",
                 return_value=mock_cache,
             ),
         ):
@@ -411,7 +411,7 @@ class TestDiscoverProjectImpl:
         mock_jira_client.__exit__ = MagicMock(return_value=False)
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.ops_cmds.get_jira_client",
+            "jira_as.cli.commands.ops_cmds.get_jira_client",
             return_value=mock_jira_client,
         ):
             result = _discover_project_impl(project_key="PROJ")
@@ -471,7 +471,7 @@ class TestCacheStatusCommand:
         mock_cache.max_size = 100 * 1024 * 1024
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.ops_cmds.JiraCache",
+            "jira_as.cli.commands.ops_cmds.JiraCache",
             return_value=mock_cache,
         ):
             result = cli_runner.invoke(ops, ["cache-status"])
@@ -486,7 +486,7 @@ class TestCacheStatusCommand:
         mock_cache.max_size = 100 * 1024 * 1024
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.ops_cmds.JiraCache",
+            "jira_as.cli.commands.ops_cmds.JiraCache",
             return_value=mock_cache,
         ):
             result = cli_runner.invoke(ops, ["cache-status", "--json"])
@@ -505,7 +505,7 @@ class TestCacheClearCommand:
         mock_cache.get_stats.return_value = MockCacheStats()
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.ops_cmds.JiraCache",
+            "jira_as.cli.commands.ops_cmds.JiraCache",
             return_value=mock_cache,
         ):
             result = cli_runner.invoke(ops, ["cache-clear", "--dry-run"])
@@ -523,7 +523,7 @@ class TestCacheClearCommand:
         mock_cache.clear.return_value = 100
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.ops_cmds.JiraCache",
+            "jira_as.cli.commands.ops_cmds.JiraCache",
             return_value=mock_cache,
         ):
             result = cli_runner.invoke(ops, ["cache-clear", "--force"])
@@ -551,11 +551,11 @@ class TestCacheWarmCommand:
 
         with (
             patch(
-                "jira_assistant_skills_lib.cli.commands.ops_cmds.get_jira_client",
+                "jira_as.cli.commands.ops_cmds.get_jira_client",
                 return_value=mock_jira_client,
             ),
             patch(
-                "jira_assistant_skills_lib.cli.commands.ops_cmds.JiraCache",
+                "jira_as.cli.commands.ops_cmds.JiraCache",
                 return_value=mock_cache,
             ),
         ):
@@ -579,7 +579,7 @@ class TestDiscoverProjectCommand:
         mock_jira_client.search_issues.return_value = {"issues": []}
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.ops_cmds.get_client_from_context",
+            "jira_as.cli.commands.ops_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(ops, ["discover-project", "PROJ"])
@@ -600,7 +600,7 @@ class TestDiscoverProjectCommand:
         mock_jira_client.search_issues.return_value = {"issues": []}
 
         with patch(
-            "jira_assistant_skills_lib.cli.commands.ops_cmds.get_client_from_context",
+            "jira_as.cli.commands.ops_cmds.get_client_from_context",
             return_value=mock_jira_client,
         ):
             result = cli_runner.invoke(ops, ["discover-project", "PROJ", "-o", "json"])

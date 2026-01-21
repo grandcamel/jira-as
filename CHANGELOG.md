@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2025-01-20
+
+### Changed
+- **BREAKING**: Package renamed from `jira-assistant-skills` to `jira-as`
+- **BREAKING**: Module renamed from `jira_assistant_skills_lib` to `jira_as`
+- All imports must be updated: `from jira_as import ...`
+- Updated dependency to `assistant-skills-lib>=1.0.0`
+
+---
+
+## Previous Releases (as jira-assistant-skills)
+
 ## [1.2.0] - 2025-01-20
 
 ### Changed
@@ -14,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed `JIRA_PROFILE` environment variable support and deprecation warning
 - Updated dependency to `assistant-skills-lib>=1.0.0`
 
-## [1.1.0] - 2025-01-18
+## [1.1.0-pre] - 2025-01-18
 
 ### Added
 - Comprehensive test coverage for CLI and helper modules
@@ -45,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shared factories for mock response building
 
 ### Changed
-- **BREAKING**: Package renamed from `jira-assistant-skills-lib` to `jira-assistant-skills`
+- **BREAKING**: Package renamed from `jira-as-lib` to `jira-as`
 - **BREAKING**: Requires Python 3.10+ (dropped 3.8/3.9 support)
 - Refactored to use `assistant-skills-lib` base library
 
@@ -86,10 +98,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SQLite-based caching with TTL support
 - Credential manager with keychain support
 
-[1.2.0]: https://github.com/grandcamel/jira-assistant-skills-lib/compare/v1.1.0...v1.2.0
-[1.1.0]: https://github.com/grandcamel/jira-assistant-skills-lib/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/grandcamel/jira-assistant-skills-lib/compare/v0.2.2...v1.0.0
-[0.2.2]: https://github.com/grandcamel/jira-assistant-skills-lib/compare/v0.2.1...v0.2.2
-[0.2.1]: https://github.com/grandcamel/jira-assistant-skills-lib/compare/v0.1.5...v0.2.1
-[0.1.5]: https://github.com/grandcamel/jira-assistant-skills-lib/compare/v0.1.0...v0.1.5
-[0.1.0]: https://github.com/grandcamel/jira-assistant-skills-lib/releases/tag/v0.1.0
+[1.2.0]: https://github.com/grandcamel/jira-as-lib/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/grandcamel/jira-as-lib/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/grandcamel/jira-as-lib/compare/v0.2.2...v1.0.0
+[0.2.2]: https://github.com/grandcamel/jira-as-lib/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/grandcamel/jira-as-lib/compare/v0.1.5...v0.2.1
+[0.1.5]: https://github.com/grandcamel/jira-as-lib/compare/v0.1.0...v0.1.5
+[0.1.0]: https://github.com/grandcamel/jira-as-lib/releases/tag/v0.1.0

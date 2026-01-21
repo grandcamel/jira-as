@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the `jira-assistant-skills-lib` PyPI package - a shared Python library providing HTTP client, configuration management, error handling, and utilities for JIRA REST API automation. It is a dependency of the [JIRA Assistant Skills](https://github.com/grandcamel/Jira-Assistant-Skills) project.
+This is the `jira-as` PyPI package - a Python library providing HTTP client, configuration management, error handling, and utilities for JIRA REST API automation. It is a dependency of the [JIRA Assistant Skills](https://github.com/grandcamel/Jira-Assistant-Skills) project.
 
 **Usage context**: This library powers the `jira` CLI and skill scripts. When Claude Code invokes a JIRA skill, it loads the SKILL.md context, then uses Bash to execute `jira` CLI commands which call this library.
 
@@ -39,7 +39,7 @@ mypy src
 
 ### Module Structure
 
-The package is organized as a flat module under `src/jira_assistant_skills_lib/`:
+The package is organized as a flat module under `src/jira_as/`:
 
 - **jira_client.py**: HTTP client with retry logic (3 attempts, exponential backoff on 429/5xx), session management, and unified error handling for JIRA REST API v3
 - **config_manager.py**: Configuration from environment variables. Priority: env vars > keychain > settings.local.json > settings.json > defaults
@@ -100,7 +100,7 @@ All modules use a consistent 4-layer approach:
 
 All public APIs are exported from `__init__.py`. Consumer scripts should use:
 ```python
-from jira_assistant_skills_lib import get_jira_client, ValidationError, validate_issue_key
+from jira_as import get_jira_client, ValidationError, validate_issue_key
 ```
 
 ### JiraClient Usage Pattern
@@ -126,7 +126,7 @@ Both `JiraClient` and `MockJiraClient` implement `__enter__` and `__exit__` meth
 ## Adding New Functionality
 
 When adding new modules:
-1. Create the module in `src/jira_assistant_skills_lib/`
+1. Create the module in `src/jira_as/`
 2. Export public APIs from `__init__.py` in both the imports section and `__all__`
 3. Add corresponding tests in `tests/`
 4. Use existing error classes from error_handler.py
@@ -139,7 +139,7 @@ The library includes a mock JIRA client for testing without real API calls.
 ### Architecture
 
 ```
-src/jira_assistant_skills_lib/mock/
+src/jira_as/mock/
 ├── __init__.py      # Exports MockJiraClient, is_mock_mode
 ├── base.py          # MockJiraClientBase with core operations + is_mock_mode()
 ├── clients.py       # Composed clients (MockJiraClient = Base + all mixins)
@@ -202,7 +202,7 @@ mock_client.close.assert_called_once()
 - **Constants in constants.py**: Field IDs like `EPIC_LINK_FIELD`, `STORY_POINTS_FIELD` are defined in `constants.py`. Import them, don't duplicate.
 - **Mock API parity**: Mock methods must match `JiraClient` signatures exactly. If real client adds parameters (e.g., `next_page_token`), mock must accept them too or skills will fail with `TypeError: got unexpected keyword argument`.
 - **Version sync**: `pyproject.toml` version and `__init__.py` `__version__` must match. Use `./scripts/sync-version.sh` if available.
-- **Import from package**: Always `from jira_assistant_skills_lib import ...`, never import internal modules directly.
+- **Import from package**: Always `from jira_as import ...`, never import internal modules directly.
 - **Mixin method conflicts**: When adding mock methods, check if base class or other mixins define the same method. Use `super()` calls if extending.
 - **Test with real signatures**: When updating mock, test against actual skill scripts to catch signature mismatches early.
 
@@ -210,4 +210,4 @@ mock_client.close.assert_called_once()
 
 Version is defined in two places that must stay in sync:
 - `pyproject.toml`: `version = "1.1.0"` (source of truth for publishing)
-- `src/jira_assistant_skills_lib/__init__.py`: `__version__ = "1.1.0"` (runtime access)
+- `src/jira_as/__init__.py`: `__version__ = "1.1.0"` (runtime access)

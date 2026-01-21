@@ -20,9 +20,9 @@ from typing import TYPE_CHECKING, Any
 import click
 
 if TYPE_CHECKING:
-    from jira_assistant_skills_lib import JiraClient
+    from jira_as import JiraClient
 
-from jira_assistant_skills_lib import (
+from jira_as import (
     ValidationError,
     find_transition_by_keywords,
     find_transition_by_name,

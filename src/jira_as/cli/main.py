@@ -7,7 +7,7 @@ import click
 def get_version() -> str:
     """Get package version from metadata."""
     try:
-        return version("jira-assistant-skills")
+        return version("jira-as")
     except Exception:
         return "unknown"
 
