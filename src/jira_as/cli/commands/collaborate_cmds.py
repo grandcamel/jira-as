@@ -10,6 +10,8 @@ Commands for issue collaboration:
 - update-fields: Update custom fields
 """
 
+from __future__ import annotations
+
 import contextlib
 import json
 import os

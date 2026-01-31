@@ -22,6 +22,8 @@ Filter Group:
 - filter favourite: Toggle filter favourite
 """
 
+from __future__ import annotations
+
 import json
 from difflib import get_close_matches
 from typing import TYPE_CHECKING

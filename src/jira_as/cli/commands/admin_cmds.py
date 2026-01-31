@@ -11,6 +11,8 @@ Provides CLI commands for JIRA administration including:
 - Automation rules
 """
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 from typing import Any
 

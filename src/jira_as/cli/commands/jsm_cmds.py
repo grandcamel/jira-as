@@ -12,6 +12,8 @@ This module provides CLI commands for JSM operations including:
 - Asset/CMDB management (requires JSM Premium)
 """
 
+from __future__ import annotations
+
 import csv
 import json
 import sys
