@@ -14,13 +14,11 @@ from unittest.mock import patch
 
 import pytest
 
-from jira_as.cli.commands.issue_cmds import (
-    _create_issue_impl,
-    _delete_issue_impl,
-    _get_issue_impl,
-    _update_issue_impl,
-    issue,
-)
+from jira_as.cli.commands.issue_cmds import _create_issue_impl
+from jira_as.cli.commands.issue_cmds import _delete_issue_impl
+from jira_as.cli.commands.issue_cmds import _get_issue_impl
+from jira_as.cli.commands.issue_cmds import _update_issue_impl
+from jira_as.cli.commands.issue_cmds import issue
 
 # =============================================================================
 # Tests for _get_issue_impl

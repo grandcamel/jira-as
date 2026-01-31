@@ -46,21 +46,19 @@ Available Clients:
 from .base import is_mock_mode
 
 # Also export specialized clients for convenience
-from .clients import (
-    MockAdminClient,
-    MockAgileClient,
-    MockAgileSearchClient,
-    MockCollaborateClient,
-    MockDevClient,
-    MockFieldsClient,
-    MockFullDevClient,
-    MockJiraClient,
-    MockJSMClient,
-    MockJSMCollaborateClient,
-    MockRelationshipsClient,
-    MockSearchClient,
-    MockTimeClient,
-)
+from .clients import MockAdminClient
+from .clients import MockAgileClient
+from .clients import MockAgileSearchClient
+from .clients import MockCollaborateClient
+from .clients import MockDevClient
+from .clients import MockFieldsClient
+from .clients import MockFullDevClient
+from .clients import MockJiraClient
+from .clients import MockJSMClient
+from .clients import MockJSMCollaborateClient
+from .clients import MockRelationshipsClient
+from .clients import MockSearchClient
+from .clients import MockTimeClient
 
 __all__ = [
     "MockAdminClient",

@@ -12,26 +12,23 @@ Commands:
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
+from typing import Any
 
 import click
 
-from jira_as import (
-    JiraError,
-    ValidationError,
-    get_jira_client,
-    text_to_adf,
-    validate_issue_key,
-    validate_jql,
-    validate_project_key,
-)
+from jira_as import JiraError
+from jira_as import ValidationError
+from jira_as import get_jira_client
+from jira_as import text_to_adf
+from jira_as import validate_issue_key
+from jira_as import validate_jql
+from jira_as import validate_project_key
 
-from ..cli_utils import (
-    format_json,
-    get_client_from_context,
-    handle_jira_errors,
-    parse_comma_list,
-)
+from ..cli_utils import format_json
+from ..cli_utils import get_client_from_context
+from ..cli_utils import handle_jira_errors
+from ..cli_utils import parse_comma_list
 
 if TYPE_CHECKING:
     from jira_as import JiraClient

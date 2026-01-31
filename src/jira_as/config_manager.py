@@ -17,23 +17,24 @@ import os
 from typing import Any
 
 from assistant_skills_lib.config_manager import BaseConfigManager
-from assistant_skills_lib.error_handler import (  # Assuming error_handler is consolidated next
-    ValidationError,
+from assistant_skills_lib.error_handler import (
+    ValidationError,  # Assuming error_handler is consolidated next
 )
-from assistant_skills_lib.validators import (  # Assuming validate_url is consolidated next
-    validate_url,
+from assistant_skills_lib.validators import (
+    validate_url,  # Assuming validate_url is consolidated next
 )
 
 from .automation_client import AutomationClient
 from .constants import DEFAULT_AGILE_FIELDS
 from .jira_client import JiraClient
-from .validators import (  # Keep local validate_email for now, will consolidate generic ones
-    validate_email,
+from .validators import (
+    validate_email,  # Keep local validate_email for now, will consolidate generic ones
 )
 
 # Try to import credential_manager for keychain support
 try:
-    from .credential_manager import CredentialManager, is_keychain_available
+    from .credential_manager import CredentialManager
+    from .credential_manager import is_keychain_available
 
     CREDENTIAL_MANAGER_AVAILABLE = True
 except ImportError:
@@ -300,7 +301,8 @@ def get_jira_client() -> "JiraClient":
         ValidationError: If configuration is invalid or incomplete
     """
     # Check for mock mode first - allows testing without real JIRA credentials
-    from .mock import MockJiraClient, is_mock_mode
+    from .mock import MockJiraClient
+    from .mock import is_mock_mode
 
     if is_mock_mode():
         return MockJiraClient()  # type: ignore[return-value]

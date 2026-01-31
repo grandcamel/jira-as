@@ -9,69 +9,71 @@ Tests cover:
 """
 
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
 
-from jira_as import JiraError, ValidationError
-from jira_as.cli.commands.admin_cmds import (  # Formatting functions; Automation implementation functions; Group implementation functions; Notification scheme implementation functions; Permission scheme implementation functions; Screen implementation functions; Helper functions; Click commands
-    SYSTEM_GROUPS,
-    _add_user_to_group_impl,
-    _archive_project_impl,
-    _assign_category_impl,
-    _create_category_impl,
-    _create_group_impl,
-    _create_issue_type_impl,
-    _create_permission_scheme_impl,
-    _create_project_impl,
-    _delete_group_impl,
-    _delete_issue_type_impl,
-    _delete_project_impl,
-    _disable_automation_rule_impl,
-    _enable_automation_rule_impl,
-    _format_automation_rules,
-    _format_categories,
-    _format_groups,
-    _format_issue_types,
-    _format_permission_schemes,
-    _format_project,
-    _format_projects,
-    _format_screens,
-    _format_statuses,
-    _format_users,
-    _format_workflows,
-    _get_automation_rule_impl,
-    _get_group_members_impl,
-    _get_issue_type_impl,
-    _get_notification_scheme_impl,
-    _get_permission_scheme_impl,
-    _get_project_impl,
-    _get_screen_impl,
-    _get_user_impl,
-    _get_workflow_for_issue_impl,
-    _get_workflow_impl,
-    _is_system_group,
-    _list_automation_rules_impl,
-    _list_categories_impl,
-    _list_groups_impl,
-    _list_issue_types_impl,
-    _list_notification_schemes_impl,
-    _list_permission_schemes_impl,
-    _list_projects_impl,
-    _list_screen_tabs_impl,
-    _list_screens_impl,
-    _list_statuses_impl,
-    _list_trash_projects_impl,
-    _list_workflows_impl,
-    _parse_comma_list,
-    _remove_user_from_group_impl,
-    _restore_project_impl,
-    _search_users_impl,
-    _toggle_automation_rule_impl,
-    _update_project_impl,
-    admin,
+from jira_as import JiraError
+from jira_as import ValidationError
+from jira_as.cli.commands.admin_cmds import (
+    SYSTEM_GROUPS,  # Formatting functions; Automation implementation functions; Group implementation functions; Notification scheme implementation functions; Permission scheme implementation functions; Screen implementation functions; Helper functions; Click commands
 )
+from jira_as.cli.commands.admin_cmds import _add_user_to_group_impl
+from jira_as.cli.commands.admin_cmds import _archive_project_impl
+from jira_as.cli.commands.admin_cmds import _assign_category_impl
+from jira_as.cli.commands.admin_cmds import _create_category_impl
+from jira_as.cli.commands.admin_cmds import _create_group_impl
+from jira_as.cli.commands.admin_cmds import _create_issue_type_impl
+from jira_as.cli.commands.admin_cmds import _create_permission_scheme_impl
+from jira_as.cli.commands.admin_cmds import _create_project_impl
+from jira_as.cli.commands.admin_cmds import _delete_group_impl
+from jira_as.cli.commands.admin_cmds import _delete_issue_type_impl
+from jira_as.cli.commands.admin_cmds import _delete_project_impl
+from jira_as.cli.commands.admin_cmds import _disable_automation_rule_impl
+from jira_as.cli.commands.admin_cmds import _enable_automation_rule_impl
+from jira_as.cli.commands.admin_cmds import _format_automation_rules
+from jira_as.cli.commands.admin_cmds import _format_categories
+from jira_as.cli.commands.admin_cmds import _format_groups
+from jira_as.cli.commands.admin_cmds import _format_issue_types
+from jira_as.cli.commands.admin_cmds import _format_permission_schemes
+from jira_as.cli.commands.admin_cmds import _format_project
+from jira_as.cli.commands.admin_cmds import _format_projects
+from jira_as.cli.commands.admin_cmds import _format_screens
+from jira_as.cli.commands.admin_cmds import _format_statuses
+from jira_as.cli.commands.admin_cmds import _format_users
+from jira_as.cli.commands.admin_cmds import _format_workflows
+from jira_as.cli.commands.admin_cmds import _get_automation_rule_impl
+from jira_as.cli.commands.admin_cmds import _get_group_members_impl
+from jira_as.cli.commands.admin_cmds import _get_issue_type_impl
+from jira_as.cli.commands.admin_cmds import _get_notification_scheme_impl
+from jira_as.cli.commands.admin_cmds import _get_permission_scheme_impl
+from jira_as.cli.commands.admin_cmds import _get_project_impl
+from jira_as.cli.commands.admin_cmds import _get_screen_impl
+from jira_as.cli.commands.admin_cmds import _get_user_impl
+from jira_as.cli.commands.admin_cmds import _get_workflow_for_issue_impl
+from jira_as.cli.commands.admin_cmds import _get_workflow_impl
+from jira_as.cli.commands.admin_cmds import _is_system_group
+from jira_as.cli.commands.admin_cmds import _list_automation_rules_impl
+from jira_as.cli.commands.admin_cmds import _list_categories_impl
+from jira_as.cli.commands.admin_cmds import _list_groups_impl
+from jira_as.cli.commands.admin_cmds import _list_issue_types_impl
+from jira_as.cli.commands.admin_cmds import _list_notification_schemes_impl
+from jira_as.cli.commands.admin_cmds import _list_permission_schemes_impl
+from jira_as.cli.commands.admin_cmds import _list_projects_impl
+from jira_as.cli.commands.admin_cmds import _list_screen_tabs_impl
+from jira_as.cli.commands.admin_cmds import _list_screens_impl
+from jira_as.cli.commands.admin_cmds import _list_statuses_impl
+from jira_as.cli.commands.admin_cmds import _list_trash_projects_impl
+from jira_as.cli.commands.admin_cmds import _list_workflows_impl
+from jira_as.cli.commands.admin_cmds import _parse_comma_list
+from jira_as.cli.commands.admin_cmds import _remove_user_from_group_impl
+from jira_as.cli.commands.admin_cmds import _restore_project_impl
+from jira_as.cli.commands.admin_cmds import _search_users_impl
+from jira_as.cli.commands.admin_cmds import _toggle_automation_rule_impl
+from jira_as.cli.commands.admin_cmds import _update_project_impl
+from jira_as.cli.commands.admin_cmds import admin
 
 # =============================================================================
 # Fixtures

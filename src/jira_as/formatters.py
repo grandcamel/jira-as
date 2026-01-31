@@ -11,19 +11,18 @@ from dataclasses import dataclass
 from typing import Any
 
 # Import generic formatters from the base library (re-exported for convenience)
-from assistant_skills_lib.formatters import (
-    export_csv,
-    format_json,
-    format_table,
-    format_timestamp,
-    get_csv_string,
-    print_info,
-    print_success,
-    print_warning,
-)
+from assistant_skills_lib.formatters import export_csv
+from assistant_skills_lib.formatters import format_json
+from assistant_skills_lib.formatters import format_table
+from assistant_skills_lib.formatters import format_timestamp
+from assistant_skills_lib.formatters import get_csv_string
+from assistant_skills_lib.formatters import print_info
+from assistant_skills_lib.formatters import print_success
+from assistant_skills_lib.formatters import print_warning
 
 from .adf_helper import adf_to_text
-from .constants import EPIC_LINK_FIELD, STORY_POINTS_FIELD
+from .constants import EPIC_LINK_FIELD
+from .constants import STORY_POINTS_FIELD
 from .validators import safe_get_nested
 
 # Explicit exports (includes re-exports from base library)

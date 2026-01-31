@@ -9,22 +9,23 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
+from typing import Any
 from urllib.parse import urlparse
 
 import click
 
-from jira_as import (
-    ConfigManager,
-    ValidationError,
-    adf_to_text,
-    format_table,
-    get_jira_client,
-    validate_issue_key,
-    wiki_markup_to_adf,
-)
+from jira_as import ConfigManager
+from jira_as import ValidationError
+from jira_as import adf_to_text
+from jira_as import format_table
+from jira_as import get_jira_client
+from jira_as import validate_issue_key
+from jira_as import wiki_markup_to_adf
 
-from ..cli_utils import format_json, get_client_from_context, handle_jira_errors
+from ..cli_utils import format_json
+from ..cli_utils import get_client_from_context
+from ..cli_utils import handle_jira_errors
 
 if TYPE_CHECKING:
     from jira_as import JiraClient

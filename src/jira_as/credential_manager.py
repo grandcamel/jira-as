@@ -19,11 +19,14 @@ from __future__ import annotations
 import threading
 from typing import Any
 
-from assistant_skills_lib import BaseCredentialManager, CredentialBackend
+from assistant_skills_lib import BaseCredentialManager
+from assistant_skills_lib import CredentialBackend
 from assistant_skills_lib import CredentialNotFoundError as BaseCredentialNotFoundError
 
-from .error_handler import AuthenticationError, JiraError
-from .validators import validate_email, validate_url
+from .error_handler import AuthenticationError
+from .error_handler import JiraError
+from .validators import validate_email
+from .validators import validate_url
 
 
 class CredentialNotFoundError(JiraError):

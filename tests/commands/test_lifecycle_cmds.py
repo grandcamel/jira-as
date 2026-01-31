@@ -17,18 +17,16 @@ from unittest.mock import patch
 
 import pytest
 
-from jira_as.cli.commands.lifecycle_cmds import (
-    _assign_issue_impl,
-    _create_component_impl,
-    _create_version_impl,
-    _get_components_impl,
-    _get_transitions_impl,
-    _get_versions_impl,
-    _reopen_issue_impl,
-    _resolve_issue_impl,
-    _transition_issue_impl,
-    lifecycle,
-)
+from jira_as.cli.commands.lifecycle_cmds import _assign_issue_impl
+from jira_as.cli.commands.lifecycle_cmds import _create_component_impl
+from jira_as.cli.commands.lifecycle_cmds import _create_version_impl
+from jira_as.cli.commands.lifecycle_cmds import _get_components_impl
+from jira_as.cli.commands.lifecycle_cmds import _get_transitions_impl
+from jira_as.cli.commands.lifecycle_cmds import _get_versions_impl
+from jira_as.cli.commands.lifecycle_cmds import _reopen_issue_impl
+from jira_as.cli.commands.lifecycle_cmds import _resolve_issue_impl
+from jira_as.cli.commands.lifecycle_cmds import _transition_issue_impl
+from jira_as.cli.commands.lifecycle_cmds import lifecycle
 
 # =============================================================================
 # Tests for _get_transitions_impl

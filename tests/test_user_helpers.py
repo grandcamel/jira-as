@@ -6,12 +6,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jira_as.user_helpers import (
-    UserNotFoundError,
-    get_user_display_info,
-    resolve_user_to_account_id,
-    resolve_users_batch,
-)
+from jira_as.user_helpers import UserNotFoundError
+from jira_as.user_helpers import get_user_display_info
+from jira_as.user_helpers import resolve_user_to_account_id
+from jira_as.user_helpers import resolve_users_batch
 
 
 class TestUserNotFoundError:

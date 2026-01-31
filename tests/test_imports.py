@@ -21,21 +21,25 @@ class TestPackageImports:
 
     def test_client_imports(self):
         """Test client classes are importable."""
-        from jira_as import AutomationClient, JiraClient
+        from jira_as import AutomationClient
+        from jira_as import JiraClient
 
         assert JiraClient is not None
         assert AutomationClient is not None
 
     def test_config_imports(self):
         """Test configuration imports."""
-        from jira_as import ConfigManager, get_jira_client
+        from jira_as import ConfigManager
+        from jira_as import get_jira_client
 
         assert ConfigManager is not None
         assert get_jira_client is not None
 
     def test_error_imports(self):
         """Test error classes are importable."""
-        from jira_as import AuthenticationError, JiraError, ValidationError
+        from jira_as import AuthenticationError
+        from jira_as import JiraError
+        from jira_as import ValidationError
 
         assert JiraError is not None
         assert AuthenticationError is not None
@@ -43,28 +47,33 @@ class TestPackageImports:
 
     def test_validator_imports(self):
         """Test validator functions are importable."""
-        from jira_as import validate_issue_key, validate_jql
+        from jira_as import validate_issue_key
+        from jira_as import validate_jql
 
         assert validate_issue_key is not None
         assert validate_jql is not None
 
     def test_formatter_imports(self):
         """Test formatter functions are importable."""
-        from jira_as import format_issue, format_table
+        from jira_as import format_issue
+        from jira_as import format_table
 
         assert format_issue is not None
         assert format_table is not None
 
     def test_adf_imports(self):
         """Test ADF helper functions are importable."""
-        from jira_as import markdown_to_adf, text_to_adf
+        from jira_as import markdown_to_adf
+        from jira_as import text_to_adf
 
         assert text_to_adf is not None
         assert markdown_to_adf is not None
 
     def test_time_utils_imports(self):
         """Test time utilities are importable."""
-        from jira_as import SECONDS_PER_HOUR, format_seconds, parse_time_string
+        from jira_as import SECONDS_PER_HOUR
+        from jira_as import format_seconds
+        from jira_as import parse_time_string
 
         assert parse_time_string is not None
         assert format_seconds is not None
@@ -72,7 +81,8 @@ class TestPackageImports:
 
     def test_cache_imports(self):
         """Test cache classes are importable."""
-        from jira_as import JiraCache, get_cache
+        from jira_as import JiraCache
+        from jira_as import get_cache
 
         assert JiraCache is not None
         assert get_cache is not None
@@ -171,7 +181,8 @@ class TestAdfHelper:
 
     def test_adf_to_text(self):
         """Test extracting text from ADF."""
-        from jira_as import adf_to_text, text_to_adf
+        from jira_as import adf_to_text
+        from jira_as import text_to_adf
 
         adf = text_to_adf("Hello world")
         text = adf_to_text(adf)

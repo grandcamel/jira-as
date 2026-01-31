@@ -178,12 +178,10 @@ class AutomationClient:
                 return {}
 
         # Import error classes here to avoid circular imports
-        from error_handler import (
-            AutomationError,
-            AutomationNotFoundError,
-            AutomationPermissionError,
-            AutomationValidationError,
-        )
+        from error_handler import AutomationError
+        from error_handler import AutomationNotFoundError
+        from error_handler import AutomationPermissionError
+        from error_handler import AutomationValidationError
 
         status_code = response.status_code
 

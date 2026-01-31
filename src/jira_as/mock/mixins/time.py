@@ -3,7 +3,9 @@
 Provides mock implementations for worklogs, time estimates, and time tracking configuration.
 """
 
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import ClassVar
 
 if TYPE_CHECKING:
     from ..protocols import MockClientProtocol

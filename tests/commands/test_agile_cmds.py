@@ -1,44 +1,44 @@
 """Tests for agile_cmds.py - Agile/Scrum commands."""
 
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
 
-from jira_as import JiraError, ValidationError
-from jira_as.cli.commands.agile_cmds import (
-    FIBONACCI_SEQUENCE,
-    VALID_EPIC_COLORS,
-    _add_to_epic_impl,
-    _close_sprint_impl,
-    _convert_description_to_adf,
-    _create_epic_impl,
-    _create_sprint_impl,
-    _create_subtask_impl,
-    _estimate_issue_impl,
-    _format_epic_created,
-    _format_epic_details,
-    _format_sprint_details,
-    _format_sprint_list,
-    _format_velocity,
-    _get_active_sprint_impl,
-    _get_backlog_impl,
-    _get_board_for_project,
-    _get_board_id_for_project,
-    _get_epic_impl,
-    _get_estimates_impl,
-    _get_sprint_impl,
-    _get_velocity_impl,
-    _list_sprints_impl,
-    _move_to_backlog_impl,
-    _move_to_sprint_impl,
-    _parse_date_safe,
-    _rank_issue_impl,
-    _start_sprint_impl,
-    _update_sprint_impl,
-    agile,
-)
+from jira_as import JiraError
+from jira_as import ValidationError
+from jira_as.cli.commands.agile_cmds import FIBONACCI_SEQUENCE
+from jira_as.cli.commands.agile_cmds import VALID_EPIC_COLORS
+from jira_as.cli.commands.agile_cmds import _add_to_epic_impl
+from jira_as.cli.commands.agile_cmds import _close_sprint_impl
+from jira_as.cli.commands.agile_cmds import _convert_description_to_adf
+from jira_as.cli.commands.agile_cmds import _create_epic_impl
+from jira_as.cli.commands.agile_cmds import _create_sprint_impl
+from jira_as.cli.commands.agile_cmds import _create_subtask_impl
+from jira_as.cli.commands.agile_cmds import _estimate_issue_impl
+from jira_as.cli.commands.agile_cmds import _format_epic_created
+from jira_as.cli.commands.agile_cmds import _format_epic_details
+from jira_as.cli.commands.agile_cmds import _format_sprint_details
+from jira_as.cli.commands.agile_cmds import _format_sprint_list
+from jira_as.cli.commands.agile_cmds import _format_velocity
+from jira_as.cli.commands.agile_cmds import _get_active_sprint_impl
+from jira_as.cli.commands.agile_cmds import _get_backlog_impl
+from jira_as.cli.commands.agile_cmds import _get_board_for_project
+from jira_as.cli.commands.agile_cmds import _get_board_id_for_project
+from jira_as.cli.commands.agile_cmds import _get_epic_impl
+from jira_as.cli.commands.agile_cmds import _get_estimates_impl
+from jira_as.cli.commands.agile_cmds import _get_sprint_impl
+from jira_as.cli.commands.agile_cmds import _get_velocity_impl
+from jira_as.cli.commands.agile_cmds import _list_sprints_impl
+from jira_as.cli.commands.agile_cmds import _move_to_backlog_impl
+from jira_as.cli.commands.agile_cmds import _move_to_sprint_impl
+from jira_as.cli.commands.agile_cmds import _parse_date_safe
+from jira_as.cli.commands.agile_cmds import _rank_issue_impl
+from jira_as.cli.commands.agile_cmds import _start_sprint_impl
+from jira_as.cli.commands.agile_cmds import _update_sprint_impl
+from jira_as.cli.commands.agile_cmds import agile
 
 # =============================================================================
 # Fixtures

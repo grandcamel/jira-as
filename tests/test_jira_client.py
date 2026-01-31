@@ -9,14 +9,12 @@ import tempfile
 import pytest
 import responses
 
-from jira_as.error_handler import (
-    AuthenticationError,
-    NotFoundError,
-    PermissionError,
-    RateLimitError,
-    ServerError,
-    ValidationError,
-)
+from jira_as.error_handler import AuthenticationError
+from jira_as.error_handler import NotFoundError
+from jira_as.error_handler import PermissionError
+from jira_as.error_handler import RateLimitError
+from jira_as.error_handler import ServerError
+from jira_as.error_handler import ValidationError
 from jira_as.jira_client import JiraClient
 
 

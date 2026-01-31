@@ -4,7 +4,9 @@ Defines the interface that mixins expect from the base class,
 enabling proper type checking with mypy.
 """
 
-from typing import Any, ClassVar, Protocol
+from typing import Any
+from typing import ClassVar
+from typing import Protocol
 
 
 class MockClientProtocol(Protocol):

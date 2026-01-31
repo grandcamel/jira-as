@@ -5,7 +5,8 @@ Tests for search_helpers module.
 import pytest
 from assistant_skills_lib.error_handler import ValidationError
 
-from jira_as.search_helpers import fuzzy_find_by_name, fuzzy_find_by_name_optional
+from jira_as.search_helpers import fuzzy_find_by_name
+from jira_as.search_helpers import fuzzy_find_by_name_optional
 
 
 class TestFuzzyFindByName:

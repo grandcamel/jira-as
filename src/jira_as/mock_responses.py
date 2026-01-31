@@ -25,6 +25,7 @@ Architecture:
         └── search.py    # SearchMixin - advanced JQL parsing
 """
 
-from .mock import MockJiraClient, is_mock_mode
+from .mock import MockJiraClient
+from .mock import is_mock_mode
 
 __all__ = ["MockJiraClient", "is_mock_mode"]

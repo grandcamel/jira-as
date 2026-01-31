@@ -15,21 +15,19 @@ from unittest.mock import patch
 
 import pytest
 
-from jira_as.cli.commands.collaborate_cmds import (
-    _add_comment_impl,
-    _add_watcher_impl,
-    _delete_comment_impl,
-    _get_activity_impl,
-    _get_comments_impl,
-    _list_attachments_impl,
-    _list_watchers_impl,
-    _parse_changelog,
-    _remove_watcher_impl,
-    _send_notification_impl,
-    _update_comment_impl,
-    _update_custom_fields_impl,
-    collaborate,
-)
+from jira_as.cli.commands.collaborate_cmds import _add_comment_impl
+from jira_as.cli.commands.collaborate_cmds import _add_watcher_impl
+from jira_as.cli.commands.collaborate_cmds import _delete_comment_impl
+from jira_as.cli.commands.collaborate_cmds import _get_activity_impl
+from jira_as.cli.commands.collaborate_cmds import _get_comments_impl
+from jira_as.cli.commands.collaborate_cmds import _list_attachments_impl
+from jira_as.cli.commands.collaborate_cmds import _list_watchers_impl
+from jira_as.cli.commands.collaborate_cmds import _parse_changelog
+from jira_as.cli.commands.collaborate_cmds import _remove_watcher_impl
+from jira_as.cli.commands.collaborate_cmds import _send_notification_impl
+from jira_as.cli.commands.collaborate_cmds import _update_comment_impl
+from jira_as.cli.commands.collaborate_cmds import _update_custom_fields_impl
+from jira_as.cli.commands.collaborate_cmds import collaborate
 
 # =============================================================================
 # Comment Implementation Tests

@@ -1,41 +1,42 @@
 """Tests for JSM CLI commands."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
 
-from jira_as.cli.commands.jsm_cmds import (  # Approval impl; Asset impl; Customer impl; KB impl; Organization impl; Participant impl; Queue impl; Request impl; SLA impl; Request Type impl; Helper functions; CLI commands
-    _format_approvals,
-    _format_asset,
-    _format_assets,
-    _format_customers,
-    _format_datetime,
-    _format_kb_article,
-    _format_kb_search_results,
-    _format_organization,
-    _format_organizations,
-    _format_participants,
-    _format_pending_approvals,
-    _format_queue,
-    _format_queues,
-    _format_request,
-    _format_request_type_fields,
-    _format_request_types,
-    _format_requests,
-    _format_service_desk,
-    _format_service_desks,
-    _format_sla,
-    _format_sla_breach_check,
-    _format_sla_report_csv,
-    _format_sla_report_text,
-    _format_sla_time,
-    _format_transitions,
-    _is_sla_breached,
-    _parse_attributes,
-    _parse_comma_list,
-    jsm,
+from jira_as.cli.commands.jsm_cmds import (
+    _format_approvals,  # Approval impl; Asset impl; Customer impl; KB impl; Organization impl; Participant impl; Queue impl; Request impl; SLA impl; Request Type impl; Helper functions; CLI commands
 )
+from jira_as.cli.commands.jsm_cmds import _format_asset
+from jira_as.cli.commands.jsm_cmds import _format_assets
+from jira_as.cli.commands.jsm_cmds import _format_customers
+from jira_as.cli.commands.jsm_cmds import _format_datetime
+from jira_as.cli.commands.jsm_cmds import _format_kb_article
+from jira_as.cli.commands.jsm_cmds import _format_kb_search_results
+from jira_as.cli.commands.jsm_cmds import _format_organization
+from jira_as.cli.commands.jsm_cmds import _format_organizations
+from jira_as.cli.commands.jsm_cmds import _format_participants
+from jira_as.cli.commands.jsm_cmds import _format_pending_approvals
+from jira_as.cli.commands.jsm_cmds import _format_queue
+from jira_as.cli.commands.jsm_cmds import _format_queues
+from jira_as.cli.commands.jsm_cmds import _format_request
+from jira_as.cli.commands.jsm_cmds import _format_request_type_fields
+from jira_as.cli.commands.jsm_cmds import _format_request_types
+from jira_as.cli.commands.jsm_cmds import _format_requests
+from jira_as.cli.commands.jsm_cmds import _format_service_desk
+from jira_as.cli.commands.jsm_cmds import _format_service_desks
+from jira_as.cli.commands.jsm_cmds import _format_sla
+from jira_as.cli.commands.jsm_cmds import _format_sla_breach_check
+from jira_as.cli.commands.jsm_cmds import _format_sla_report_csv
+from jira_as.cli.commands.jsm_cmds import _format_sla_report_text
+from jira_as.cli.commands.jsm_cmds import _format_sla_time
+from jira_as.cli.commands.jsm_cmds import _format_transitions
+from jira_as.cli.commands.jsm_cmds import _is_sla_breached
+from jira_as.cli.commands.jsm_cmds import _parse_attributes
+from jira_as.cli.commands.jsm_cmds import _parse_comma_list
+from jira_as.cli.commands.jsm_cmds import jsm
 
 # =============================================================================
 # Fixtures

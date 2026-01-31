@@ -15,24 +15,22 @@ from unittest.mock import patch
 
 import pytest
 
-from jira_as.cli.commands.dev_cmds import (
-    DEFAULT_PREFIX,
-    ISSUE_KEY_PATTERN,
-    ISSUE_TYPE_PREFIXES,
-    _build_commit_url,
-    _create_branch_name_impl,
-    _create_pr_description_impl,
-    _detect_repo_type,
-    _extract_acceptance_criteria,
-    _get_commits_impl,
-    _get_prefix_for_issue_type,
-    _link_commit_impl,
-    _link_pr_impl,
-    _parse_commit_issues_impl,
-    _parse_pr_url,
-    _sanitize_for_branch,
-    dev,
-)
+from jira_as.cli.commands.dev_cmds import DEFAULT_PREFIX
+from jira_as.cli.commands.dev_cmds import ISSUE_KEY_PATTERN
+from jira_as.cli.commands.dev_cmds import ISSUE_TYPE_PREFIXES
+from jira_as.cli.commands.dev_cmds import _build_commit_url
+from jira_as.cli.commands.dev_cmds import _create_branch_name_impl
+from jira_as.cli.commands.dev_cmds import _create_pr_description_impl
+from jira_as.cli.commands.dev_cmds import _detect_repo_type
+from jira_as.cli.commands.dev_cmds import _extract_acceptance_criteria
+from jira_as.cli.commands.dev_cmds import _get_commits_impl
+from jira_as.cli.commands.dev_cmds import _get_prefix_for_issue_type
+from jira_as.cli.commands.dev_cmds import _link_commit_impl
+from jira_as.cli.commands.dev_cmds import _link_pr_impl
+from jira_as.cli.commands.dev_cmds import _parse_commit_issues_impl
+from jira_as.cli.commands.dev_cmds import _parse_pr_url
+from jira_as.cli.commands.dev_cmds import _sanitize_for_branch
+from jira_as.cli.commands.dev_cmds import dev
 
 # =============================================================================
 # Constants Tests

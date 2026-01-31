@@ -11,43 +11,45 @@ Tests cover:
 
 import json
 import os
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
 
-from jira_as import JiraError, ValidationError
-from jira_as.cli.commands.search_cmds import (  # Constants; Search implementation functions; Filter implementation functions; Formatting functions; Helper functions; Click commands
-    COMMON_FIELDS,
-    FUNCTION_EXAMPLES,
-    JQL_TEMPLATES,
-    _build_jql_impl,
-    _bulk_update_impl,
-    _create_filter_impl,
-    _delete_filter_impl,
-    _export_results_impl,
-    _favourite_filter_impl,
-    _format_fields,
-    _format_filter_detail,
-    _format_filters,
-    _format_functions,
-    _format_search_output,
-    _format_suggestions,
-    _format_validation_result,
-    _format_value_for_jql,
-    _get_fields_impl,
-    _get_filters_impl,
-    _get_functions_impl,
-    _get_return_type,
-    _get_suggestions_impl,
-    _run_filter_impl,
-    _search_issues_impl,
-    _share_filter_impl,
-    _suggest_correction,
-    _update_filter_impl,
-    _validate_jql_impl,
-    search,
+from jira_as import JiraError
+from jira_as import ValidationError
+from jira_as.cli.commands.search_cmds import (
+    COMMON_FIELDS,  # Constants; Search implementation functions; Filter implementation functions; Formatting functions; Helper functions; Click commands
 )
+from jira_as.cli.commands.search_cmds import FUNCTION_EXAMPLES
+from jira_as.cli.commands.search_cmds import JQL_TEMPLATES
+from jira_as.cli.commands.search_cmds import _build_jql_impl
+from jira_as.cli.commands.search_cmds import _bulk_update_impl
+from jira_as.cli.commands.search_cmds import _create_filter_impl
+from jira_as.cli.commands.search_cmds import _delete_filter_impl
+from jira_as.cli.commands.search_cmds import _export_results_impl
+from jira_as.cli.commands.search_cmds import _favourite_filter_impl
+from jira_as.cli.commands.search_cmds import _format_fields
+from jira_as.cli.commands.search_cmds import _format_filter_detail
+from jira_as.cli.commands.search_cmds import _format_filters
+from jira_as.cli.commands.search_cmds import _format_functions
+from jira_as.cli.commands.search_cmds import _format_search_output
+from jira_as.cli.commands.search_cmds import _format_suggestions
+from jira_as.cli.commands.search_cmds import _format_validation_result
+from jira_as.cli.commands.search_cmds import _format_value_for_jql
+from jira_as.cli.commands.search_cmds import _get_fields_impl
+from jira_as.cli.commands.search_cmds import _get_filters_impl
+from jira_as.cli.commands.search_cmds import _get_functions_impl
+from jira_as.cli.commands.search_cmds import _get_return_type
+from jira_as.cli.commands.search_cmds import _get_suggestions_impl
+from jira_as.cli.commands.search_cmds import _run_filter_impl
+from jira_as.cli.commands.search_cmds import _search_issues_impl
+from jira_as.cli.commands.search_cmds import _share_filter_impl
+from jira_as.cli.commands.search_cmds import _suggest_correction
+from jira_as.cli.commands.search_cmds import _update_filter_impl
+from jira_as.cli.commands.search_cmds import _validate_jql_impl
+from jira_as.cli.commands.search_cmds import search
 
 # =============================================================================
 # Fixtures

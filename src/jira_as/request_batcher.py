@@ -23,7 +23,8 @@ from typing import Any
 
 # Re-export base classes
 from assistant_skills_lib import BatchError as BaseBatchError
-from assistant_skills_lib import BatchResult, RequestBatcher
+from assistant_skills_lib import BatchResult
+from assistant_skills_lib import RequestBatcher
 
 from .error_handler import JiraError
 

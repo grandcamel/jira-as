@@ -9,29 +9,30 @@ from __future__ import annotations
 import json
 from importlib import resources
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
+from typing import Any
 
 import click
 
-from jira_as import (
-    JiraError,
-    NotFoundError,
-    PermissionError,
-    format_issue,
-    format_json,
-    get_agile_fields,
-    get_jira_client,
-    get_project_defaults,
-    has_project_context,
-    markdown_to_adf,
-    print_error,
-    print_success,
-    text_to_adf,
-    validate_issue_key,
-    validate_project_key,
-)
+from jira_as import JiraError
+from jira_as import NotFoundError
+from jira_as import PermissionError
+from jira_as import format_issue
+from jira_as import format_json
+from jira_as import get_agile_fields
+from jira_as import get_jira_client
+from jira_as import get_project_defaults
+from jira_as import has_project_context
+from jira_as import markdown_to_adf
+from jira_as import print_error
+from jira_as import print_success
+from jira_as import text_to_adf
+from jira_as import validate_issue_key
+from jira_as import validate_project_key
 
-from ..cli_utils import get_client_from_context, parse_comma_list, parse_json_arg
+from ..cli_utils import get_client_from_context
+from ..cli_utils import parse_comma_list
+from ..cli_utils import parse_json_arg
 
 if TYPE_CHECKING:
     from jira_as import JiraClient

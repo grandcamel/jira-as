@@ -13,23 +13,21 @@ from unittest.mock import patch
 
 import pytest
 
-from jira_as.cli.commands.fields_cmds import (
-    AGILE_FIELDS,
-    AGILE_PATTERNS,
-    FIELD_TYPES,
-    _add_field_to_screen,
-    _check_project_fields_impl,
-    _configure_agile_fields_impl,
-    _create_field_impl,
-    _find_agile_fields,
-    _find_project_screens,
-    _format_agile_config,
-    _format_created_field,
-    _format_fields_list,
-    _format_project_fields,
-    _list_fields_impl,
-    fields,
-)
+from jira_as.cli.commands.fields_cmds import AGILE_FIELDS
+from jira_as.cli.commands.fields_cmds import AGILE_PATTERNS
+from jira_as.cli.commands.fields_cmds import FIELD_TYPES
+from jira_as.cli.commands.fields_cmds import _add_field_to_screen
+from jira_as.cli.commands.fields_cmds import _check_project_fields_impl
+from jira_as.cli.commands.fields_cmds import _configure_agile_fields_impl
+from jira_as.cli.commands.fields_cmds import _create_field_impl
+from jira_as.cli.commands.fields_cmds import _find_agile_fields
+from jira_as.cli.commands.fields_cmds import _find_project_screens
+from jira_as.cli.commands.fields_cmds import _format_agile_config
+from jira_as.cli.commands.fields_cmds import _format_created_field
+from jira_as.cli.commands.fields_cmds import _format_fields_list
+from jira_as.cli.commands.fields_cmds import _format_project_fields
+from jira_as.cli.commands.fields_cmds import _list_fields_impl
+from jira_as.cli.commands.fields_cmds import fields
 
 # =============================================================================
 # Constants Tests

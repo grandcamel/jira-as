@@ -5,17 +5,15 @@ Each class provides a different set of functionality for specific testing needs.
 """
 
 from .base import MockJiraClientBase
-from .mixins import (
-    AdminMixin,
-    AgileMixin,
-    CollaborateMixin,
-    DevMixin,
-    FieldsMixin,
-    JSMMixin,
-    RelationshipsMixin,
-    SearchMixin,
-    TimeTrackingMixin,
-)
+from .mixins import AdminMixin
+from .mixins import AgileMixin
+from .mixins import CollaborateMixin
+from .mixins import DevMixin
+from .mixins import FieldsMixin
+from .mixins import JSMMixin
+from .mixins import RelationshipsMixin
+from .mixins import SearchMixin
+from .mixins import TimeTrackingMixin
 
 
 class MockJiraClient(
