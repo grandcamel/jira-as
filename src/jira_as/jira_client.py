@@ -386,6 +386,26 @@ class JiraClient:
         data: dict[str, Any] = {"fields": fields}
         return self.post("/rest/api/3/issue", data=data, operation="create issue")
 
+    def create_issues_bulk(
+        self, issue_updates: list[dict[str, Any]]
+    ) -> dict[str, Any]:
+        """
+        Create multiple issues in bulk.
+
+        Args:
+            issue_updates: List of issue field dictionaries, each containing fields for one issue
+
+        Returns:
+            Bulk creation response with created issues and any errors
+
+        Raises:
+            JiraError or subclass on failure
+        """
+        data: dict[str, Any] = {"issueUpdates": issue_updates}
+        return self.post(
+            "/rest/api/3/issue/bulk", data=data, operation="bulk create issues"
+        )
+
     def update_issue(
         self, issue_key: str, fields: dict[str, Any], notify_users: bool = True
     ) -> None:
@@ -666,7 +686,7 @@ class JiraClient:
             if key in kwargs and kwargs[key] is not None:
                 data[api_key] = kwargs[key]
 
-        return self.post(
+        return self.put(
             f"/rest/agile/1.0/sprint/{sprint_id}",
             data=data,
             operation=f"update sprint {sprint_id}",

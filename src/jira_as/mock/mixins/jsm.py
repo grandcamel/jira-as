@@ -154,6 +154,32 @@ class JSMMixin(_Base):
 
         raise JiraError(f"No service desk found for project key: {project_key}")
 
+    def create_service_desk(
+        self,
+        name: str,
+        key: str,
+        project_template_key: str = "com.atlassian.servicedesk:simplified-it-service-desk",
+    ) -> dict[str, Any]:
+        """Create a new service desk (requires JSM administrator permissions).
+
+        Args:
+            name: Service desk name.
+            key: Project key (uppercase, 2-10 chars).
+            project_template_key: JSM project template.
+
+        Returns:
+            Created service desk object.
+        """
+        new_id = str(len(self.SERVICE_DESKS) + 1)
+        project_id = str(10000 + len(self.SERVICE_DESKS) + 1)
+
+        return {
+            "id": new_id,
+            "projectId": project_id,
+            "projectName": name,
+            "projectKey": key,
+        }
+
     # =========================================================================
     # Queue Operations
     # =========================================================================
@@ -204,12 +230,18 @@ class JSMMixin(_Base):
             service_desk_id, include_count, start, limit
         )
 
-    def get_queue(self, service_desk_id: int, queue_id: int) -> dict[str, Any]:
+    def get_queue(
+        self,
+        service_desk_id: int,
+        queue_id: int,
+        include_count: bool = False,
+    ) -> dict[str, Any]:
         """Get a specific queue by ID.
 
         Args:
             service_desk_id: The ID of the service desk.
             queue_id: The ID of the queue to retrieve.
+            include_count: Whether to include issue counts in the response.
 
         Returns:
             The queue details.
@@ -220,7 +252,10 @@ class JSMMixin(_Base):
         queues = self.QUEUES.get(str(service_desk_id), [])
         for queue in queues:
             if queue["id"] == str(queue_id):
-                return queue
+                result = dict(queue)
+                if not include_count and "issueCount" in result:
+                    del result["issueCount"]
+                return result
         from ...error_handler import NotFoundError
 
         raise NotFoundError(
@@ -294,6 +329,67 @@ class JSMMixin(_Base):
         from ..factories import ResponseFactory
 
         return ResponseFactory.paginated(types, start, limit, format="jsm")
+
+    def get_request_type(
+        self, service_desk_id: str, request_type_id: str
+    ) -> dict[str, Any]:
+        """Get a specific request type.
+
+        Args:
+            service_desk_id: The ID of the service desk.
+            request_type_id: The ID of the request type.
+
+        Returns:
+            The request type details.
+
+        Raises:
+            NotFoundError: If the request type is not found.
+        """
+        types = self.REQUEST_TYPES.get(service_desk_id, [])
+        for rt in types:
+            if rt["id"] == request_type_id:
+                return rt
+
+        from ...error_handler import NotFoundError
+
+        raise NotFoundError(
+            f"Request type {request_type_id} not found in service desk {service_desk_id}"
+        )
+
+    def get_request_type_fields(
+        self, service_desk_id: str, request_type_id: str
+    ) -> dict[str, Any]:
+        """Get fields for a request type.
+
+        Args:
+            service_desk_id: The ID of the service desk.
+            request_type_id: The ID of the request type.
+
+        Returns:
+            Request type fields with 'requestTypeFields', 'canRaiseOnBehalfOf',
+            'canAddRequestParticipants'.
+        """
+        # Verify request type exists
+        self.get_request_type(service_desk_id, request_type_id)
+
+        return {
+            "requestTypeFields": [
+                {
+                    "fieldId": "summary",
+                    "name": "Summary",
+                    "required": True,
+                    "jiraSchema": {"type": "string"},
+                },
+                {
+                    "fieldId": "description",
+                    "name": "Description",
+                    "required": False,
+                    "jiraSchema": {"type": "string"},
+                },
+            ],
+            "canRaiseOnBehalfOf": True,
+            "canAddRequestParticipants": True,
+        }
 
     # =========================================================================
     # Request Operations
@@ -691,6 +787,30 @@ class JSMMixin(_Base):
 
         return ResponseFactory.paginated(customers, start, limit, format="jsm")
 
+    def create_customer(
+        self,
+        email: str,
+        display_name: str | None = None,
+        service_desk_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Create a customer account for JSM.
+
+        Args:
+            email: Customer email address.
+            display_name: Display name (defaults to email if not provided).
+            service_desk_id: Optional service desk ID to add customer to.
+
+        Returns:
+            Created customer data with accountId, emailAddress, displayName.
+        """
+        account_id = f"customer-{hash(email) % 100000}"
+        return {
+            "accountId": account_id,
+            "emailAddress": email,
+            "displayName": display_name or email,
+            "active": True,
+        }
+
     def add_customers(
         self,
         service_desk_id: str,
@@ -779,7 +899,7 @@ class JSMMixin(_Base):
             "links": {"self": f"{self.base_url}/rest/servicedeskapi/organization/3"},
         }
 
-    def get_organization(self, organization_id: str) -> dict[str, Any]:
+    def get_organization(self, organization_id: int) -> dict[str, Any]:
         """Get an organization by ID.
 
         Args:
@@ -789,14 +909,14 @@ class JSMMixin(_Base):
             The organization details.
         """
         return {
-            "id": organization_id,
+            "id": str(organization_id),
             "name": f"Organization {organization_id}",
             "links": {
                 "self": f"{self.base_url}/rest/servicedeskapi/organization/{organization_id}"
             },
         }
 
-    def delete_organization(self, organization_id: str) -> None:
+    def delete_organization(self, organization_id: int) -> None:
         """Delete an organization.
 
         Args:
@@ -807,7 +927,7 @@ class JSMMixin(_Base):
 
     def add_users_to_organization(
         self,
-        organization_id: str,
+        organization_id: int,
         account_ids: list[str],
     ) -> None:
         """Add users to an organization.
@@ -821,7 +941,7 @@ class JSMMixin(_Base):
 
     def remove_users_from_organization(
         self,
-        organization_id: str,
+        organization_id: int,
         account_ids: list[str],
     ) -> None:
         """Remove users from an organization.
@@ -832,6 +952,26 @@ class JSMMixin(_Base):
         """
         # In mock, this is a no-op
         pass
+
+    def get_organization_users(
+        self, organization_id: int, start: int = 0, limit: int = 50
+    ) -> dict[str, Any]:
+        """Get users in an organization.
+
+        Args:
+            organization_id: The organization ID.
+            start: Starting index for pagination.
+            limit: Maximum results to return.
+
+        Returns:
+            Paginated list of users.
+        """
+        # Return mock users
+        users = list(self.USERS.values())
+
+        from ..factories import ResponseFactory
+
+        return ResponseFactory.paginated(users, start, limit, format="jsm")
 
     # =========================================================================
     # Request Participant Operations

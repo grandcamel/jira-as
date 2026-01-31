@@ -688,9 +688,9 @@ class TestSprintOperations:
 
     @responses.activate
     def test_update_sprint(self, client, base_url):
-        """Test updating a sprint (uses POST, not PUT)."""
+        """Test updating a sprint (uses PUT per JIRA REST API spec)."""
         responses.add(
-            responses.POST,
+            responses.PUT,
             f"{base_url}/rest/agile/1.0/sprint/1",
             json={"id": 1, "name": "Updated Sprint"},
             status=200,

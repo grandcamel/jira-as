@@ -65,17 +65,24 @@ class ResponseFactory:
         Create a paginated response for issue search results.
 
         Uses 'issues' key instead of 'values'.
+        Includes nextPageToken for pagination when more results exist.
         """
         total = len(issues)
         end_at = min(start_at + max_results, total)
         paginated = issues[start_at:end_at]
 
-        return {
+        result: dict[str, Any] = {
             "startAt": start_at,
             "maxResults": max_results,
             "total": total,
             "issues": paginated,
         }
+
+        # Add nextPageToken when there are more results
+        if end_at < total:
+            result["nextPageToken"] = f"mock-token-{end_at}"
+
+        return result
 
 
 class URLFactory:

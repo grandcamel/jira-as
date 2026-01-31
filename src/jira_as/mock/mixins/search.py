@@ -371,41 +371,57 @@ class SearchMixin(_Base):
             "jql": jql,
         }
 
-    def parse_jql(self, jql: str) -> dict[str, Any]:
-        """Parse JQL into structured components.
+    def parse_jql(
+        self, queries: list, validation: str = "strict"
+    ) -> dict[str, Any]:
+        """Parse and validate JQL queries.
 
         Args:
-            jql: JQL query string.
+            queries: List of JQL query strings to parse.
+            validation: Validation level: 'strict', 'warn', or 'none'.
 
         Returns:
-            Parsed JQL structure.
+            Dict with queries array containing structure and errors.
         """
-        result: dict[str, Any] = {
-            "clauses": [],
-            "orderBy": None,
-            "raw": jql,
-        }
+        parsed_queries = []
 
-        # Extract ORDER BY
-        order_match = re.search(r"ORDER\s+BY\s+(.+)$", jql, re.IGNORECASE)
-        if order_match:
-            result["orderBy"] = order_match.group(1).strip()
-            jql = jql[: order_match.start()].strip()
+        for jql in queries:
+            query_result: dict[str, Any] = {
+                "query": jql,
+                "structure": {
+                    "clauses": [],
+                    "orderBy": None,
+                },
+                "errors": [],
+            }
 
-        # Parse clauses (simplified)
-        clause_pattern = (
-            r"(\w+)\s*([=!<>~]+|IN|NOT IN)\s*([^\s]+|\([^)]+\)|\"[^\"]+\"|'[^']+')"
-        )
-        for match in re.finditer(clause_pattern, jql, re.IGNORECASE):
-            result["clauses"].append(
-                {
-                    "field": match.group(1),
-                    "operator": match.group(2),
-                    "value": match.group(3).strip("'\""),
-                }
+            # Extract ORDER BY
+            order_match = re.search(r"ORDER\s+BY\s+(.+)$", jql, re.IGNORECASE)
+            if order_match:
+                query_result["structure"]["orderBy"] = order_match.group(1).strip()
+                jql = jql[: order_match.start()].strip()
+
+            # Parse clauses (simplified)
+            clause_pattern = (
+                r"(\w+)\s*([=!<>~]+|IN|NOT IN)\s*([^\s]+|\([^)]+\)|\"[^\"]+\"|'[^']+')"
             )
+            for match in re.finditer(clause_pattern, jql, re.IGNORECASE):
+                query_result["structure"]["clauses"].append(
+                    {
+                        "field": match.group(1),
+                        "operator": match.group(2),
+                        "value": match.group(3).strip("'\""),
+                    }
+                )
 
-        return result
+            # Basic validation if strict mode
+            if validation == "strict":
+                if jql.count("(") != jql.count(")"):
+                    query_result["errors"].append("Unbalanced parentheses")
+
+            parsed_queries.append(query_result)
+
+        return {"queries": parsed_queries}
 
     # =========================================================================
     # Filter Operations
@@ -647,3 +663,184 @@ class SearchMixin(_Base):
             return {"format": "csv", "data": rows}
         else:
             return {"format": "json", "data": results["issues"]}
+
+    # =========================================================================
+    # Filter Favourite/Permission Operations
+    # =========================================================================
+
+    def add_filter_favourite(self, filter_id: str) -> dict[str, Any]:
+        """Add a filter to favourites.
+
+        Args:
+            filter_id: The filter ID.
+
+        Returns:
+            The updated filter.
+        """
+        return self.set_filter_favourite(filter_id, True)
+
+    def remove_filter_favourite(self, filter_id: str) -> dict[str, Any]:
+        """Remove a filter from favourites.
+
+        Args:
+            filter_id: The filter ID.
+
+        Returns:
+            The updated filter.
+        """
+        return self.set_filter_favourite(filter_id, False)
+
+    def get_filter_permissions(self, filter_id: str) -> list[dict[str, Any]]:
+        """Get permissions for a filter.
+
+        Args:
+            filter_id: The filter ID.
+
+        Returns:
+            List of filter permissions.
+        """
+        # Verify filter exists
+        self.get_filter(filter_id)
+
+        return [
+            {
+                "id": 1,
+                "type": "user",
+                "user": {"accountId": "abc123", "displayName": "Jason Krueger"},
+            },
+            {
+                "id": 2,
+                "type": "project",
+                "project": {"id": "10000", "key": "DEMO", "name": "Demo Project"},
+            },
+        ]
+
+    def add_filter_permission(
+        self,
+        filter_id: str,
+        permission_type: str,
+        value: str | None = None,
+    ) -> dict[str, Any]:
+        """Add a permission to a filter.
+
+        Args:
+            filter_id: The filter ID.
+            permission_type: Type of permission ('user', 'group', 'project', etc.).
+            value: The value for the permission (account ID, group name, etc.).
+
+        Returns:
+            The created permission.
+        """
+        # Verify filter exists
+        self.get_filter(filter_id)
+
+        return {
+            "id": 10,
+            "type": permission_type,
+            "value": value,
+        }
+
+    def delete_filter_permission(
+        self, filter_id: str, permission_id: int
+    ) -> None:
+        """Delete a permission from a filter.
+
+        Args:
+            filter_id: The filter ID.
+            permission_id: The permission ID to delete.
+        """
+        # Verify filter exists
+        self.get_filter(filter_id)
+        # In mock, this is a no-op
+
+    # =========================================================================
+    # JQL Autocomplete Operations
+    # =========================================================================
+
+    def get_jql_autocomplete(self) -> dict[str, Any]:
+        """Get JQL autocomplete data (fields and functions).
+
+        Returns:
+            Dict with visibleFieldNames and visibleFunctionNames.
+        """
+        return {
+            "visibleFieldNames": [
+                {"value": "project", "displayName": "Project"},
+                {"value": "issuetype", "displayName": "Issue Type"},
+                {"value": "status", "displayName": "Status"},
+                {"value": "priority", "displayName": "Priority"},
+                {"value": "assignee", "displayName": "Assignee"},
+                {"value": "reporter", "displayName": "Reporter"},
+                {"value": "created", "displayName": "Created"},
+                {"value": "updated", "displayName": "Updated"},
+                {"value": "summary", "displayName": "Summary"},
+                {"value": "description", "displayName": "Description"},
+                {"value": "labels", "displayName": "Labels"},
+                {"value": "sprint", "displayName": "Sprint"},
+            ],
+            "visibleFunctionNames": [
+                {"value": "currentUser()", "displayName": "currentUser()"},
+                {"value": "now()", "displayName": "now()"},
+                {"value": "startOfDay()", "displayName": "startOfDay()"},
+                {"value": "endOfDay()", "displayName": "endOfDay()"},
+                {"value": "startOfWeek()", "displayName": "startOfWeek()"},
+                {"value": "endOfWeek()", "displayName": "endOfWeek()"},
+                {"value": "openSprints()", "displayName": "openSprints()"},
+                {"value": "closedSprints()", "displayName": "closedSprints()"},
+            ],
+        }
+
+    def get_jql_suggestions(
+        self, field_name: str, field_value: str | None = None
+    ) -> dict[str, Any]:
+        """Get JQL field value suggestions.
+
+        Args:
+            field_name: The field to get suggestions for.
+            field_value: Partial value to filter suggestions.
+
+        Returns:
+            Dict with results array of suggestion objects.
+        """
+        suggestions: dict[str, list[dict[str, str]]] = {
+            "project": [
+                {"value": "DEMO", "displayName": "Demo Project"},
+                {"value": "DEMOSD", "displayName": "Demo Service Desk"},
+            ],
+            "issuetype": [
+                {"value": "Bug", "displayName": "Bug"},
+                {"value": "Story", "displayName": "Story"},
+                {"value": "Task", "displayName": "Task"},
+                {"value": "Epic", "displayName": "Epic"},
+            ],
+            "status": [
+                {"value": "To Do", "displayName": "To Do"},
+                {"value": "In Progress", "displayName": "In Progress"},
+                {"value": "Done", "displayName": "Done"},
+            ],
+            "priority": [
+                {"value": "Highest", "displayName": "Highest"},
+                {"value": "High", "displayName": "High"},
+                {"value": "Medium", "displayName": "Medium"},
+                {"value": "Low", "displayName": "Low"},
+                {"value": "Lowest", "displayName": "Lowest"},
+            ],
+            "assignee": [
+                {"value": "abc123", "displayName": "Jason Krueger"},
+                {"value": "def456", "displayName": "Jane Manager"},
+            ],
+        }
+
+        results = suggestions.get(field_name.lower(), [])
+
+        # Filter by partial value if provided
+        if field_value:
+            field_value_lower = field_value.lower()
+            results = [
+                s
+                for s in results
+                if field_value_lower in s["value"].lower()
+                or field_value_lower in s["displayName"].lower()
+            ]
+
+        return {"results": results}

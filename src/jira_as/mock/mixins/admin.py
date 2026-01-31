@@ -263,6 +263,24 @@ class AdminMixin(_Base):
             "groups": groups[:max_results],
         }
 
+    def find_groups(
+        self,
+        query: str | None = None,
+        exclude: list[str] | None = None,
+        max_results: int = 50,
+    ) -> dict[str, Any]:
+        """Alias for get_groups() for API parity.
+
+        Args:
+            query: Filter groups by name.
+            exclude: Groups to exclude.
+            max_results: Maximum number of results.
+
+        Returns:
+            List of groups.
+        """
+        return self.get_groups(query=query, exclude=exclude, max_results=max_results)
+
     def get_group(self, group_name: str) -> dict[str, Any]:
         """Get a group by name.
 

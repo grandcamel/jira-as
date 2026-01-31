@@ -456,21 +456,21 @@ class MockJiraClientBase:
     def search_issues(
         self,
         jql: str,
-        start_at: int | None = 0,
+        fields: list | None = None,
         max_results: int = 50,
-        fields: str | None = None,
-        expand: str | None = None,
         next_page_token: str | None = None,
+        start_at: int | None = 0,
+        expand: str | None = None,
     ) -> dict[str, Any]:
         """Search issues with JQL. Supports basic project and assignee filtering.
 
         Args:
             jql: JQL query string.
-            start_at: Starting index for pagination.
+            fields: List of fields to return (for API parity).
             max_results: Maximum number of results to return.
-            fields: Comma-separated list of fields to return.
-            expand: Fields to expand.
             next_page_token: Pagination token (ignored in mock, for API compatibility).
+            start_at: Starting index for pagination (deprecated, use next_page_token).
+            expand: Fields to expand.
 
         Returns:
             Search results with pagination info and matching issues.
@@ -611,6 +611,40 @@ class MockJiraClientBase:
 
         self._issues[issue_key] = new_issue
         return {"key": issue_key, "id": issue_id, "self": new_issue["self"]}
+
+    def create_issues_bulk(
+        self, issue_updates: list[dict[str, Any]]
+    ) -> dict[str, Any]:
+        """Create multiple issues in bulk.
+
+        Args:
+            issue_updates: List of issue field dictionaries, each containing
+                          fields for one issue.
+
+        Returns:
+            Bulk creation response with created issues and any errors.
+        """
+        created_issues = []
+        errors = []
+
+        for i, update in enumerate(issue_updates):
+            try:
+                fields = update.get("fields", update)
+                result = self.create_issue(fields)
+                created_issues.append(result)
+            except Exception as e:
+                errors.append(
+                    {
+                        "status": 400,
+                        "elementErrors": {"errorMessages": [str(e)]},
+                        "failedElementNumber": i,
+                    }
+                )
+
+        return {
+            "issues": created_issues,
+            "errors": errors,
+        }
 
     def update_issue(
         self,
@@ -1034,25 +1068,84 @@ class MockJiraClientBase:
 
     def find_assignable_users(
         self,
-        project: str | None = None,
-        issue_key: str | None = None,
-        query: str | None = None,
+        query: str,
+        project_key: str,
         start_at: int = 0,
         max_results: int = 50,
     ) -> list:
-        """Find users assignable to a project or issue.
+        """Find users assignable to issues in a project.
 
         Args:
-            project: Project key to filter by.
-            issue_key: Issue key to filter by.
-            query: Search query.
+            query: Search query (name or email).
+            project_key: Project key to search within.
             start_at: Starting index for pagination.
             max_results: Maximum number of results.
 
         Returns:
-            List of assignable users.
+            List of assignable users matching the query.
         """
-        return list(self.USERS.values())
+        users = list(self.USERS.values())
+
+        # Filter by query if provided
+        if query:
+            query_lower = query.lower()
+            users = [
+                u
+                for u in users
+                if query_lower in u["displayName"].lower()
+                or query_lower in u.get("emailAddress", "").lower()
+            ]
+
+        return users[start_at : start_at + max_results]
+
+    def get_all_users(self, start_at: int = 0, max_results: int = 50) -> list:
+        """Get all users (paginated).
+
+        Note: Requires 'Browse users and groups' global permission.
+
+        Args:
+            start_at: Starting index for pagination.
+            max_results: Maximum results to return.
+
+        Returns:
+            List of user objects.
+        """
+        users = list(self.USERS.values())
+        return users[start_at : start_at + max_results]
+
+    def get_users_bulk(
+        self, account_ids: list, max_results: int = 200
+    ) -> dict[str, Any]:
+        """Get multiple users by account IDs.
+
+        Args:
+            account_ids: List of user account IDs (max 200).
+            max_results: Maximum results to return.
+
+        Returns:
+            Response with 'values' array of user objects.
+        """
+        users = [
+            self.USERS[aid] for aid in account_ids if aid in self.USERS
+        ][:max_results]
+        return {"values": users}
+
+    def get_user_groups(self, account_id: str) -> list:
+        """Get groups that a user belongs to.
+
+        Args:
+            account_id: User's account ID.
+
+        Returns:
+            List of group objects with name, groupId.
+        """
+        # Return mock groups for known users
+        if account_id in self.USERS:
+            return [
+                {"name": "jira-software-users", "groupId": "group-2"},
+                {"name": "developers", "groupId": "group-4"},
+            ]
+        return []
 
     # =========================================================================
     # Project Operations

@@ -239,20 +239,20 @@ class AgileMixin(_Base):
 
     def create_sprint(
         self,
-        name: str,
         board_id: int,
+        name: str,
+        goal: str | None = None,
         start_date: str | None = None,
         end_date: str | None = None,
-        goal: str | None = None,
     ) -> dict[str, Any]:
         """Create a new sprint.
 
         Args:
-            name: Sprint name.
             board_id: Board ID for the sprint.
+            name: Sprint name.
+            goal: Sprint goal.
             start_date: Sprint start date.
             end_date: Sprint end date.
-            goal: Sprint goal.
 
         Returns:
             The created sprint.
@@ -405,15 +405,15 @@ class AgileMixin(_Base):
     def rank_issues(
         self,
         issue_keys: list[str],
-        rank_before_issue: str | None = None,
-        rank_after_issue: str | None = None,
+        rank_before: str | None = None,
+        rank_after: str | None = None,
     ) -> None:
         """Rank issues in the backlog.
 
         Args:
             issue_keys: Issues to rank.
-            rank_before_issue: Issue to rank before.
-            rank_after_issue: Issue to rank after.
+            rank_before: Issue to rank before.
+            rank_after: Issue to rank after.
         """
         # In mock, this is a no-op
         pass
@@ -509,3 +509,88 @@ class AgileMixin(_Base):
         """
         # In mock, this is a no-op
         pass
+
+    # =========================================================================
+    # Aliases for API Parity
+    # =========================================================================
+
+    def get_all_boards(
+        self,
+        start_at: int = 0,
+        max_results: int = 50,
+        project_key_or_id: str | None = None,
+        board_type: str | None = None,
+        name: str | None = None,
+    ) -> dict[str, Any]:
+        """Alias for get_boards() for API parity.
+
+        Args:
+            start_at: Starting index for pagination.
+            max_results: Maximum number of results.
+            project_key_or_id: Filter by project.
+            board_type: Filter by board type (scrum, kanban).
+            name: Filter by board name.
+
+        Returns:
+            Paginated list of boards.
+        """
+        return self.get_boards(
+            start_at=start_at,
+            max_results=max_results,
+            project_key_or_id=project_key_or_id,
+            board_type=board_type,
+            name=name,
+        )
+
+    def get_board_sprints(
+        self,
+        board_id: int,
+        start_at: int = 0,
+        max_results: int = 50,
+        state: str | None = None,
+    ) -> dict[str, Any]:
+        """Alias for get_sprints() for API parity.
+
+        Args:
+            board_id: The board ID.
+            start_at: Starting index for pagination.
+            max_results: Maximum number of results.
+            state: Filter by sprint state (active, future, closed).
+
+        Returns:
+            Paginated list of sprints.
+        """
+        return self.get_sprints(
+            board_id=board_id,
+            start_at=start_at,
+            max_results=max_results,
+            state=state,
+        )
+
+    def get_board_backlog(
+        self,
+        board_id: int,
+        start_at: int = 0,
+        max_results: int = 50,
+        jql: str | None = None,
+        fields: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Alias for get_backlog_issues() for API parity.
+
+        Args:
+            board_id: The board ID.
+            start_at: Starting index for pagination.
+            max_results: Maximum number of results.
+            jql: Additional JQL filter.
+            fields: Fields to return.
+
+        Returns:
+            Paginated list of backlog issues.
+        """
+        return self.get_backlog_issues(
+            board_id=board_id,
+            start_at=start_at,
+            max_results=max_results,
+            jql=jql,
+            fields=fields,
+        )
