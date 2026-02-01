@@ -6779,7 +6779,9 @@ class JiraClient:
             operation=f"get permission grant {permission_id}",
         )
 
-    def delete_permission_grant(self, scheme_id: int | str, permission_id: int | str) -> None:
+    def delete_permission_grant(
+        self, scheme_id: int | str, permission_id: int | str
+    ) -> None:
         """
         Delete a permission grant from a permission scheme.
 
