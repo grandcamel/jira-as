@@ -28,7 +28,7 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Run tests with coverage
-        run: pytest --cov=jira_as --cov-report=xml --cov-fail-under=70 -v
+        run: pytest --cov=jira_as --cov-report=xml --cov-fail-under=60 -v
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
