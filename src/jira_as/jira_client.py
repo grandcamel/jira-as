@@ -131,6 +131,7 @@ class JiraClient:
         data: dict[str, Any] | None = None,
         operation: str = "create resource",
         headers: dict[str, str] | None = None,
+        params: dict[str, Any] | None = None,
     ) -> Any:
         """
         Perform POST request.
@@ -140,6 +141,7 @@ class JiraClient:
             data: Request body (dict will be JSON-encoded, string used as-is)
             operation: Description of operation for error messages
             headers: Optional additional headers
+            params: Optional query parameters
 
         Returns:
             Response JSON as dictionary
@@ -153,11 +155,11 @@ class JiraClient:
         # (e.g., for watcher API which expects just "accountId")
         if isinstance(data, str):
             response = self.session.post(
-                url, data=data, timeout=self.timeout, headers=headers
+                url, data=data, timeout=self.timeout, headers=headers, params=params
             )
         else:
             response = self.session.post(
-                url, json=data, timeout=self.timeout, headers=headers
+                url, json=data, timeout=self.timeout, headers=headers, params=params
             )
 
         handle_jira_error(response, operation)
@@ -1664,8 +1666,13 @@ class JiraClient:
         Raises:
             JiraError or subclass on failure
         """
+        params: dict[str, Any] = {}
+        if validation != "strict":
+            params["validation"] = validation
+
         return self.post(
             "/rest/api/3/jql/parse",
+            params=params if params else None,
             data={"queries": queries},
             operation="parse JQL queries",
         )
@@ -2706,7 +2713,7 @@ class JiraClient:
     def create_customer(
         self,
         email: str,
-        display_name: str | None = None,
+        display_name: str,
         service_desk_id: str | None = None,
     ) -> dict[str, Any]:
         """
@@ -2714,7 +2721,7 @@ class JiraClient:
 
         Args:
             email: Customer email address
-            display_name: Display name (defaults to email if not provided)
+            display_name: Display name for the customer (required by API)
             service_desk_id: Optional service desk ID to add customer to
 
         Returns:
@@ -2723,9 +2730,7 @@ class JiraClient:
         Raises:
             JiraError or subclass on failure
         """
-        payload = {"email": email}
-        if display_name:
-            payload["displayName"] = display_name
+        payload = {"email": email, "displayName": display_name}
 
         customer = self.post(
             "/rest/servicedeskapi/customer",
@@ -2967,6 +2972,9 @@ class JiraClient:
 
         Raises:
             JiraError or subclass on failure
+
+        Note:
+            Uses the experimental JSM API - requires X-ExperimentalApi header.
         """
         payload: dict[str, Any] = {"id": transition_id}
 
@@ -2977,6 +2985,7 @@ class JiraClient:
             f"/rest/servicedeskapi/request/{issue_key}/transition",
             data=payload,
             operation=f"transition request {issue_key}",
+            headers={"X-ExperimentalApi": "opt-in"},
         )
 
     def get_request_slas(
@@ -3363,13 +3372,12 @@ class JiraClient:
         """
         params: dict[str, Any] = {"start": start, "limit": limit}
 
-        # Handle both 'public' and 'internal' parameters
-        # 'internal' is the inverse of 'public'
-        if internal is not None and public is None:
-            public = not internal
-
+        # Handle public and internal parameters independently
+        # Both are valid API parameters that can be set separately
         if public is not None:
             params["public"] = str(public).lower()
+        if internal is not None:
+            params["internal"] = str(internal).lower()
 
         return self.get(
             f"/rest/servicedeskapi/request/{issue_key}/comment",
@@ -5136,7 +5144,7 @@ class JiraClient:
             JiraError or subclass on failure
         """
         if not group_name and not group_id:
-            from error_handler import ValidationError
+            from .error_handler import ValidationError
 
             raise ValidationError("Either group_name or group_id must be provided")
 
@@ -5190,7 +5198,7 @@ class JiraClient:
             JiraError or subclass on failure
         """
         if not group_name and not group_id:
-            from error_handler import ValidationError
+            from .error_handler import ValidationError
 
             raise ValidationError("Either group_name or group_id must be provided")
 
@@ -5235,7 +5243,7 @@ class JiraClient:
             JiraError or subclass on failure
         """
         if not group_name and not group_id:
-            from error_handler import ValidationError
+            from .error_handler import ValidationError
 
             raise ValidationError("Either group_name or group_id must be provided")
 
@@ -5281,7 +5289,7 @@ class JiraClient:
             will not cause an error.
         """
         if not group_name and not group_id:
-            from error_handler import ValidationError
+            from .error_handler import ValidationError
 
             raise ValidationError("Either group_name or group_id must be provided")
 
@@ -5324,7 +5332,7 @@ class JiraClient:
             will not cause an error.
         """
         if not group_name and not group_id:
-            from error_handler import ValidationError
+            from .error_handler import ValidationError
 
             raise ValidationError("Either group_name or group_id must be provided")
 
@@ -6566,7 +6574,7 @@ class JiraClient:
         )
 
     def get_permission_scheme(
-        self, scheme_id: int, expand: str | None = None
+        self, scheme_id: int | str, expand: str | None = None
     ) -> dict[str, Any]:
         """
         Get a specific permission scheme by ID.
@@ -6628,7 +6636,7 @@ class JiraClient:
 
     def update_permission_scheme(
         self,
-        scheme_id: int,
+        scheme_id: int | str,
         name: str | None = None,
         description: str | None = None,
     ) -> dict[str, Any]:
@@ -6662,7 +6670,7 @@ class JiraClient:
             operation=f"update permission scheme {scheme_id}",
         )
 
-    def delete_permission_scheme(self, scheme_id: int) -> None:
+    def delete_permission_scheme(self, scheme_id: int | str) -> None:
         """
         Delete a permission scheme.
 
@@ -6682,7 +6690,7 @@ class JiraClient:
         )
 
     def get_permission_scheme_grants(
-        self, scheme_id: int, expand: str | None = None
+        self, scheme_id: int | str, expand: str | None = None
     ) -> dict[str, Any]:
         """
         Get all permission grants for a permission scheme.
@@ -6709,7 +6717,7 @@ class JiraClient:
 
     def create_permission_grant(
         self,
-        scheme_id: int,
+        scheme_id: int | str,
         permission: str,
         holder_type: str,
         holder_parameter: str | None = None,
@@ -6745,7 +6753,7 @@ class JiraClient:
         )
 
     def get_permission_grant(
-        self, scheme_id: int, permission_id: int, expand: str | None = None
+        self, scheme_id: int | str, permission_id: int | str, expand: str | None = None
     ) -> dict[str, Any]:
         """
         Get a specific permission grant.
@@ -6771,7 +6779,7 @@ class JiraClient:
             operation=f"get permission grant {permission_id}",
         )
 
-    def delete_permission_grant(self, scheme_id: int, permission_id: int) -> None:
+    def delete_permission_grant(self, scheme_id: int | str, permission_id: int | str) -> None:
         """
         Delete a permission grant from a permission scheme.
 
@@ -6835,7 +6843,7 @@ class JiraClient:
         )
 
     def assign_permission_scheme_to_project(
-        self, project_key_or_id: str, scheme_id: int
+        self, project_key_or_id: str, scheme_id: int | str
     ) -> dict[str, Any]:
         """
         Assign a permission scheme to a project.

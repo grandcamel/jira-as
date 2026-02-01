@@ -792,14 +792,14 @@ class JSMMixin(_Base):
     def create_customer(
         self,
         email: str,
-        display_name: str | None = None,
+        display_name: str,
         service_desk_id: str | None = None,
     ) -> dict[str, Any]:
         """Create a customer account for JSM.
 
         Args:
             email: Customer email address.
-            display_name: Display name (defaults to email if not provided).
+            display_name: Display name for the customer (required by API).
             service_desk_id: Optional service desk ID to add customer to.
 
         Returns:
@@ -809,7 +809,7 @@ class JSMMixin(_Base):
         return {
             "accountId": account_id,
             "emailAddress": email,
-            "displayName": display_name or email,
+            "displayName": display_name,
             "active": True,
         }
 
