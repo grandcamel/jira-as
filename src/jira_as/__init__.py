@@ -174,6 +174,18 @@ from .time_utils import validate_time_format
 from .transition_helpers import find_transition_by_keywords
 from .transition_helpers import find_transition_by_name
 
+# Testing utilities
+from .testing import IssueBuilder
+from .testing import assert_issue_has_field
+from .testing import assert_search_returns_empty
+from .testing import assert_search_returns_results
+from .testing import generate_unique_name
+from .testing import get_jira_version
+from .testing import is_cloud_instance
+from .testing import skip_if_version_below
+from .testing import wait_for_assignment
+from .testing import wait_for_transition
+
 # User helpers
 from .user_helpers import UserNotFoundError
 from .user_helpers import get_user_display_info
@@ -205,6 +217,8 @@ __all__ = [
     "HOLDER_TYPES_WITHOUT_PARAMETER",
     "HOLDER_TYPES_WITH_PARAMETER",
     "HOURS_PER_DAY",
+    # Testing Utilities
+    "IssueBuilder",
     "IssueFields",
     "PROJECT_TEMPLATES",
     "SECONDS_PER_DAY",
@@ -359,5 +373,15 @@ __all__ = [
     "validate_transition",
     "validate_transition_id",
     "validate_url",
+    "wait_for_assignment",
+    "wait_for_transition",
     "wiki_markup_to_adf",
+    # Testing utilities
+    "assert_issue_has_field",
+    "assert_search_returns_empty",
+    "assert_search_returns_results",
+    "generate_unique_name",
+    "get_jira_version",
+    "is_cloud_instance",
+    "skip_if_version_below",
 ]
