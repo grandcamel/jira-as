@@ -217,6 +217,20 @@ ignore = ["E501"]  # Line too long (handled by black)
 # relationships_cmds uses 'l' for link in list comprehensions (readable in context)
 "src/jira_as/cli/commands/relationships_cmds.py" = ["E741"]
 
+[tool.coverage.run]
+source = ["src/jira_as"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+fail_under = 70
+
 [tool.bandit]
 exclude_dirs = ["tests", "venv", ".venv"]
 skips = ["B101"]  # Skip assert warnings (used in tests)
