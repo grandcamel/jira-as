@@ -3,12 +3,11 @@
 Tests the mixin functionality in isolation using the composed MockJiraClient.
 """
 
-import os
 
 import pytest
 
-from jira_as.mock import MockJiraClient, is_mock_mode
 from jira_as.error_handler import NotFoundError
+from jira_as.mock import MockJiraClient, is_mock_mode
 
 
 class TestIsMockMode:
