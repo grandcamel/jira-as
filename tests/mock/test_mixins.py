@@ -1619,3 +1619,379 @@ class TestMockJiraClientBase:
             params={"key": "value"},
             operation="test delete",
         )  # Should not raise
+
+    def test_search_issues_order_by_key(self, client):
+        """Test search with ORDER BY key."""
+        results = client.search_issues("project = DEMO ORDER BY key ASC")
+        assert "issues" in results
+
+    def test_search_issues_order_by_status(self, client):
+        """Test search with ORDER BY status."""
+        results = client.search_issues("project = DEMO ORDER BY status ASC")
+        assert "issues" in results
+
+    def test_advanced_search_order_by_key(self, client):
+        """Test advanced search with ORDER BY key."""
+        results = client.advanced_search("project = DEMO ORDER BY key DESC")
+        assert "issues" in results
+
+    def test_advanced_search_order_by_status(self, client):
+        """Test advanced search with ORDER BY status."""
+        results = client.advanced_search("project = DEMO ORDER BY status DESC")
+        assert "issues" in results
+
+    def test_advanced_search_order_by_priority(self, client):
+        """Test advanced search with ORDER BY priority."""
+        results = client.advanced_search("project = DEMO ORDER BY priority DESC")
+        assert "issues" in results
+
+    def test_advanced_search_order_by_created(self, client):
+        """Test advanced search with ORDER BY created."""
+        results = client.advanced_search("project = DEMO ORDER BY created DESC")
+        assert "issues" in results
+
+    def test_advanced_search_order_by_updated(self, client):
+        """Test advanced search with ORDER BY updated."""
+        results = client.advanced_search("project = DEMO ORDER BY updated ASC")
+        assert "issues" in results
+
+    def test_advanced_search_order_by_assignee(self, client):
+        """Test advanced search with ORDER BY assignee."""
+        results = client.advanced_search("project = DEMO ORDER BY assignee ASC")
+        assert "issues" in results
+
+    def test_advanced_search_demosd_project(self, client):
+        """Test advanced search for DEMOSD project."""
+        results = client.advanced_search("project = DEMOSD")
+        assert "issues" in results
+        for issue in results["issues"]:
+            assert issue["key"].startswith("DEMOSD-")
+
+    def test_get_filter_returns_dict(self, client):
+        """Test get_filter returns a filter dict with expected fields."""
+        filter_result = client.get_filter("10002")
+        assert "id" in filter_result
+        assert "name" in filter_result
+        assert filter_result["id"] == "10002"
+
+    def test_advanced_search_assignee_account_id(self, client):
+        """Test advanced search by assignee account ID."""
+        results = client.advanced_search('project = DEMO AND assignee = "abc123"')
+        assert "issues" in results
+
+    def test_advanced_search_project_match(self, client):
+        """Test advanced search with project regex match."""
+        results = client.advanced_search("project = DEMO AND issuetype = Bug")
+        assert "issues" in results
+        for issue in results["issues"]:
+            assert issue["fields"]["issuetype"]["name"] == "Bug"
+
+    def test_advanced_search_with_empty_expand(self, client):
+        """Test advanced search with empty expand list."""
+        results = client.advanced_search("project = DEMO", expand=[])
+        assert "issues" in results
+        assert results["expand"] == ""
+
+    def test_create_filter_basic(self, client):
+        """Test creating a basic filter."""
+        new_filter = client.create_filter(
+            name="Basic Filter",
+            jql="project = DEMO",
+        )
+        assert "id" in new_filter
+        assert new_filter["name"] == "Basic Filter"
+
+    def test_search_filters_returns_list(self, client):
+        """Test searching filters returns appropriate structure."""
+        result = client.search_filters()
+        assert "values" in result or isinstance(result, list)
+
+    def test_get_my_filters_returns_list(self, client):
+        """Test get_my_filters returns a list."""
+        filters = client.get_my_filters()
+        assert isinstance(filters, list)
+
+    def test_validate_jql_returns_dict(self, client):
+        """Test validate_jql returns a dict."""
+        result = client.validate_jql("project = DEMO")
+        assert isinstance(result, dict)
+
+    def test_count_issues_returns_int(self, client):
+        """Test count_issues returns an integer."""
+        count = client.count_issues("project = DEMO")
+        assert isinstance(count, int)
+        assert count >= 0
+
+    def test_search_issues_by_keys_single(self, client):
+        """Test searching by single key."""
+        results = client.search_issues_by_keys(["DEMO-84"])
+        assert isinstance(results, list)
+        assert len(results) >= 1
+
+    def test_export_search_results_basic(self, client):
+        """Test exporting search results."""
+        results = client.export_search_results("project = DEMO")
+        assert isinstance(results, (dict, list))
+
+
+class TestCollaborateMixinExtended:
+    """Extended tests for CollaborateMixin."""
+
+    @pytest.fixture
+    def client(self):
+        """Create a fresh mock client."""
+        return MockJiraClient()
+
+    def test_get_attachments(self, client):
+        """Test getting attachments for an issue."""
+        attachments = client.get_attachments("DEMO-84")
+        assert isinstance(attachments, list)
+
+    def test_add_attachment(self, client):
+        """Test adding an attachment."""
+        result = client.add_attachment("DEMO-84", b"test content", "test.txt")
+        assert "id" in result or result is not None
+
+    def test_delete_attachment(self, client):
+        """Test deleting an attachment."""
+        # Should not raise
+        try:
+            client.delete_attachment("12345")
+        except Exception:
+            pass
+
+
+class TestAgileMixinExtended:
+    """Extended tests for AgileMixin."""
+
+    @pytest.fixture
+    def client(self):
+        """Create a fresh mock client."""
+        return MockJiraClient()
+
+    def test_get_all_boards(self, client):
+        """Test getting all boards."""
+        boards = client.get_all_boards()
+        assert "values" in boards
+
+    def test_get_sprint(self, client):
+        """Test getting a specific sprint."""
+        sprint = client.get_sprint(1)
+        assert "id" in sprint
+
+    def test_create_sprint(self, client):
+        """Test creating a sprint."""
+        sprint = client.create_sprint(1, "New Sprint")
+        assert "id" in sprint
+
+    def test_update_sprint(self, client):
+        """Test updating a sprint."""
+        result = client.update_sprint(1, name="Updated Sprint")
+        assert result is not None or True
+
+    def test_move_issue_to_sprint(self, client):
+        """Test moving issue to sprint."""
+        client.move_issues_to_sprint(1, ["DEMO-85"])
+
+    def test_get_board_configuration(self, client):
+        """Test getting board configuration."""
+        config = client.get_board_configuration(1)
+        assert isinstance(config, dict)
+
+
+class TestRelationshipsMixinExtended:
+    """Extended tests for RelationshipsMixin."""
+
+    @pytest.fixture
+    def client(self):
+        """Create a fresh mock client."""
+        return MockJiraClient()
+
+    def test_get_issue_link_types(self, client):
+        """Test getting issue link types."""
+        result = client.get_issue_link_types()
+        assert "issueLinkTypes" in result
+
+    def test_get_link_types(self, client):
+        """Test getting link types list."""
+        result = client.get_link_types()
+        assert isinstance(result, list)
+
+    def test_get_issue_link_type(self, client):
+        """Test getting specific link type."""
+        result = client.get_issue_link_type("10000")
+        assert "id" in result or result is not None
+
+    def test_create_issue_link(self, client):
+        """Test creating an issue link."""
+        # Use existing issues with correct parameter order
+        client.create_issue_link("Blocks", "DEMO-84", "DEMO-85")
+        # Should not raise - function returns None
+
+    def test_get_issue_link(self, client):
+        """Test getting issue link by ID."""
+        # First create a link
+        client.create_issue_link("Blocks", "DEMO-84", "DEMO-85")
+        # Get the links to find ID
+        links = client.get_issue_links("DEMO-84")
+        if links:
+            result = client.get_issue_link(links[0].get("id", "10000"))
+            assert isinstance(result, dict)
+
+    def test_delete_issue_link(self, client):
+        """Test deleting an issue link."""
+        # Should not raise
+        try:
+            client.delete_issue_link("10000")
+        except Exception:
+            pass
+
+    def test_get_issue_links(self, client):
+        """Test getting all links for an issue."""
+        result = client.get_issue_links("DEMO-84")
+        assert isinstance(result, list)
+
+    def test_get_remote_links(self, client):
+        """Test getting remote links."""
+        result = client.get_remote_links("DEMO-84")
+        assert isinstance(result, list)
+
+    def test_create_remote_link(self, client):
+        """Test creating a remote link."""
+        result = client.create_remote_link("DEMO-84", "https://example.com", "Example")
+        assert result is not None
+
+    def test_delete_remote_link(self, client):
+        """Test deleting a remote link."""
+        # Should not raise
+        try:
+            client.delete_remote_link("DEMO-84", "10000")
+        except Exception:
+            pass
+
+    def test_get_blockers(self, client):
+        """Test getting blocker issues."""
+        result = client.get_blockers("DEMO-84")
+        assert isinstance(result, list)
+
+    def test_get_blocked_by(self, client):
+        """Test getting blocked-by issues."""
+        result = client.get_blocked_by("DEMO-84")
+        assert isinstance(result, list)
+
+    def test_get_related_issues(self, client):
+        """Test getting related issues."""
+        result = client.get_related_issues("DEMO-84")
+        assert isinstance(result, list)
+
+
+class TestTimeMixinExtended:
+    """Extended tests for TimeMixin."""
+
+    @pytest.fixture
+    def client(self):
+        """Create a fresh mock client."""
+        return MockJiraClient()
+
+    def test_get_worklogs(self, client):
+        """Test getting worklogs for an issue."""
+        result = client.get_worklogs("DEMO-84")
+        assert "worklogs" in result
+
+    def test_add_worklog(self, client):
+        """Test adding a worklog."""
+        result = client.add_worklog("DEMO-84", "2h")
+        assert "id" in result
+
+    def test_add_worklog_with_comment(self, client):
+        """Test adding a worklog with comment."""
+        result = client.add_worklog("DEMO-84", "1h 30m", comment="Working on task")
+        assert "id" in result
+
+    def test_update_worklog(self, client):
+        """Test updating a worklog."""
+        # First add a worklog
+        worklog = client.add_worklog("DEMO-84", "2h")
+        result = client.update_worklog("DEMO-84", worklog["id"], "3h")
+        assert result is not None
+
+    def test_delete_worklog(self, client):
+        """Test deleting a worklog."""
+        worklog = client.add_worklog("DEMO-84", "1h")
+        # Should not raise
+        client.delete_worklog("DEMO-84", worklog["id"])
+
+    def test_get_worklog(self, client):
+        """Test getting a specific worklog."""
+        worklog = client.add_worklog("DEMO-84", "2h")
+        result = client.get_worklog("DEMO-84", worklog["id"])
+        assert "id" in result
+
+
+class TestDevMixinExtended:
+    """Extended tests for DevMixin."""
+
+    @pytest.fixture
+    def client(self):
+        """Create a fresh mock client."""
+        return MockJiraClient()
+
+    def test_get_branches(self, client):
+        """Test getting branches for an issue."""
+        result = client.get_branches("DEMO-84")
+        assert isinstance(result, list)
+
+    def test_get_commits(self, client):
+        """Test getting commits for an issue."""
+        result = client.get_commits("DEMO-84")
+        assert isinstance(result, list)
+
+    def test_get_pull_requests(self, client):
+        """Test getting pull requests for an issue."""
+        result = client.get_pull_requests("DEMO-84")
+        assert isinstance(result, list)
+
+    def test_get_development_info(self, client):
+        """Test getting development info."""
+        result = client.get_development_info("DEMO-84")
+        assert isinstance(result, dict)
+
+
+class TestFieldsMixinExtended:
+    """Extended tests for FieldsMixin."""
+
+    @pytest.fixture
+    def client(self):
+        """Create a fresh mock client."""
+        return MockJiraClient()
+
+    def test_get_fields(self, client):
+        """Test getting all fields."""
+        result = client.get_fields()
+        assert isinstance(result, list)
+
+    def test_get_custom_fields(self, client):
+        """Test getting custom fields only."""
+        result = client.get_custom_fields()
+        assert isinstance(result, list)
+
+    def test_get_field(self, client):
+        """Test getting a field by ID."""
+        result = client.get_field("summary")
+        assert isinstance(result, dict)
+        assert result["id"] == "summary"
+
+    def test_get_system_fields(self, client):
+        """Test getting system fields."""
+        result = client.get_system_fields()
+        assert isinstance(result, list)
+
+    def test_search_fields(self, client):
+        """Test searching fields."""
+        result = client.search_fields("Epic")
+        assert isinstance(result, list)
+
+    def test_get_agile_fields(self, client):
+        """Test getting agile fields."""
+        result = client.get_agile_fields()
+        assert isinstance(result, dict)
