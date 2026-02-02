@@ -16,30 +16,30 @@ import contextlib
 import json
 import os
 from datetime import datetime
-from typing import TYPE_CHECKING
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import click
 
 if TYPE_CHECKING:
     from jira_as import JiraClient
 
-from jira_as import UserNotFoundError
-from jira_as import ValidationError
-from jira_as import adf_to_text
-from jira_as import format_json
-from jira_as import format_table
-from jira_as import get_jira_client
-from jira_as import markdown_to_adf
-from jira_as import print_info
-from jira_as import print_success
-from jira_as import resolve_user_to_account_id
-from jira_as import text_to_adf
-from jira_as import validate_file_path
-from jira_as import validate_issue_key
+from jira_as import (
+    UserNotFoundError,
+    ValidationError,
+    adf_to_text,
+    format_json,
+    format_table,
+    get_jira_client,
+    markdown_to_adf,
+    print_info,
+    print_success,
+    resolve_user_to_account_id,
+    text_to_adf,
+    validate_file_path,
+    validate_issue_key,
+)
 
-from ..cli_utils import get_client_from_context
-from ..cli_utils import handle_jira_errors
+from ..cli_utils import get_client_from_context, handle_jira_errors
 
 # =============================================================================
 # Comment Implementation Functions

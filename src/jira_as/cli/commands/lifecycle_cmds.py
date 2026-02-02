@@ -15,33 +15,32 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
-from typing import TYPE_CHECKING
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import click
 
 if TYPE_CHECKING:
     from jira_as import JiraClient
 
-from jira_as import ValidationError
-from jira_as import find_transition_by_keywords
-from jira_as import find_transition_by_name
-from jira_as import format_json
-from jira_as import format_table
-from jira_as import format_transitions
-from jira_as import get_jira_client
-from jira_as import get_project_context
-from jira_as import get_valid_transitions
-from jira_as import has_project_context
-from jira_as import print_info
-from jira_as import print_success
-from jira_as import text_to_adf
-from jira_as import validate_issue_key
-from jira_as import validate_transition_id
+from jira_as import (
+    ValidationError,
+    find_transition_by_keywords,
+    find_transition_by_name,
+    format_json,
+    format_table,
+    format_transitions,
+    get_jira_client,
+    get_project_context,
+    get_valid_transitions,
+    has_project_context,
+    print_info,
+    print_success,
+    text_to_adf,
+    validate_issue_key,
+    validate_transition_id,
+)
 
-from ..cli_utils import get_client_from_context
-from ..cli_utils import handle_jira_errors
-from ..cli_utils import parse_json_arg
+from ..cli_utils import get_client_from_context, handle_jira_errors, parse_json_arg
 
 # =============================================================================
 # Transition Implementation Functions

@@ -18,16 +18,18 @@ from unittest.mock import patch
 
 import pytest
 
-from jira_as.cli.commands.relationships_cmds import _bulk_link_impl
-from jira_as.cli.commands.relationships_cmds import _clone_issue_impl
-from jira_as.cli.commands.relationships_cmds import _get_blockers_impl
-from jira_as.cli.commands.relationships_cmds import _get_dependencies_impl
-from jira_as.cli.commands.relationships_cmds import _get_link_stats_impl
-from jira_as.cli.commands.relationships_cmds import _get_link_types_impl
-from jira_as.cli.commands.relationships_cmds import _get_links_impl
-from jira_as.cli.commands.relationships_cmds import _link_issue_impl
-from jira_as.cli.commands.relationships_cmds import _unlink_issue_impl
-from jira_as.cli.commands.relationships_cmds import relationships
+from jira_as.cli.commands.relationships_cmds import (
+    _bulk_link_impl,
+    _clone_issue_impl,
+    _get_blockers_impl,
+    _get_dependencies_impl,
+    _get_link_stats_impl,
+    _get_link_types_impl,
+    _get_links_impl,
+    _link_issue_impl,
+    _unlink_issue_impl,
+    relationships,
+)
 
 # =============================================================================
 # Link Implementation Tests

@@ -26,28 +26,31 @@ from __future__ import annotations
 
 import json
 from difflib import get_close_matches
-from typing import TYPE_CHECKING
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import click
 
 if TYPE_CHECKING:
     from jira_as import JiraClient
 
-from jira_as import EPIC_LINK_FIELD
-from jira_as import STORY_POINTS_FIELD
-from jira_as import ValidationError
-from jira_as import export_csv
-from jira_as import format_search_results
-from jira_as import format_table
-from jira_as import get_autocomplete_cache
-from jira_as import get_jira_client
-from jira_as import validate_jql
+from jira_as import (
+    EPIC_LINK_FIELD,
+    STORY_POINTS_FIELD,
+    ValidationError,
+    export_csv,
+    format_search_results,
+    format_table,
+    get_autocomplete_cache,
+    get_jira_client,
+    validate_jql,
+)
 
-from ..cli_utils import format_json
-from ..cli_utils import get_client_from_context
-from ..cli_utils import handle_jira_errors
-from ..cli_utils import parse_comma_list
+from ..cli_utils import (
+    format_json,
+    get_client_from_context,
+    handle_jira_errors,
+    parse_comma_list,
+)
 
 # Common JQL fields for suggestions
 COMMON_FIELDS = [

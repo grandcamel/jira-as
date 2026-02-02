@@ -13,27 +13,27 @@ Provides CLI commands for JIRA administration including:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import click
 
 if TYPE_CHECKING:
     from jira_as import JiraClient
 
-from jira_as import JiraError
-from jira_as import ValidationError
-from jira_as import format_json
-from jira_as import format_table
-from jira_as import get_automation_client
-from jira_as import get_jira_client
-from jira_as import validate_project_key
-from jira_as import validate_project_name
-from jira_as import validate_project_template
-from jira_as import validate_project_type
+from jira_as import (
+    JiraError,
+    ValidationError,
+    format_json,
+    format_table,
+    get_automation_client,
+    get_jira_client,
+    validate_project_key,
+    validate_project_name,
+    validate_project_template,
+    validate_project_type,
+)
 
-from ..cli_utils import get_client_from_context
-from ..cli_utils import handle_jira_errors
+from ..cli_utils import get_client_from_context, handle_jira_errors
 
 # =============================================================================
 # Helper Functions

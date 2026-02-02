@@ -7,8 +7,7 @@ converting JIRA wiki markup to Atlassian Document Format (ADF).
 
 import pytest
 
-from jira_as.adf_helper import _parse_wiki_inline
-from jira_as.adf_helper import wiki_markup_to_adf
+from jira_as.adf_helper import _parse_wiki_inline, wiki_markup_to_adf
 
 
 @pytest.mark.unit

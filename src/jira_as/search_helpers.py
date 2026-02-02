@@ -6,8 +6,7 @@ Provides reusable fuzzy matching functions for finding items by name.
 
 from __future__ import annotations
 
-from typing import Any
-from typing import Callable
+from typing import Any, Callable
 
 from .error_handler import ValidationError
 

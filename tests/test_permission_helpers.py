@@ -5,20 +5,22 @@ Tests for permission_helpers module.
 import pytest
 from assistant_skills_lib.error_handler import ValidationError
 
-from jira_as.permission_helpers import HOLDER_TYPES_WITH_PARAMETER
-from jira_as.permission_helpers import HOLDER_TYPES_WITHOUT_PARAMETER
-from jira_as.permission_helpers import VALID_HOLDER_TYPES
-from jira_as.permission_helpers import build_grant_payload
-from jira_as.permission_helpers import find_grant_by_spec
-from jira_as.permission_helpers import find_scheme_by_name
-from jira_as.permission_helpers import format_grant
-from jira_as.permission_helpers import format_grant_for_export
-from jira_as.permission_helpers import format_scheme_summary
-from jira_as.permission_helpers import get_holder_display
-from jira_as.permission_helpers import group_grants_by_permission
-from jira_as.permission_helpers import parse_grant_string
-from jira_as.permission_helpers import validate_holder_type
-from jira_as.permission_helpers import validate_permission
+from jira_as.permission_helpers import (
+    HOLDER_TYPES_WITH_PARAMETER,
+    HOLDER_TYPES_WITHOUT_PARAMETER,
+    VALID_HOLDER_TYPES,
+    build_grant_payload,
+    find_grant_by_spec,
+    find_scheme_by_name,
+    format_grant,
+    format_grant_for_export,
+    format_scheme_summary,
+    get_holder_display,
+    group_grants_by_permission,
+    parse_grant_string,
+    validate_holder_type,
+    validate_permission,
+)
 
 
 class TestConstants:

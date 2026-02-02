@@ -3,7 +3,6 @@
 Tests the mixin functionality in isolation using the composed MockJiraClient.
 """
 
-
 import pytest
 
 from jira_as.error_handler import NotFoundError
@@ -183,9 +182,7 @@ class TestSearchMixin:
 
     def test_advanced_search_with_validate_false(self, client):
         """Test advanced search without validation."""
-        results = client.advanced_search(
-            "project = DEMO", validate_query=False
-        )
+        results = client.advanced_search("project = DEMO", validate_query=False)
         assert "issues" in results
 
     def test_search_issues_status_not_done(self, client):
@@ -196,25 +193,19 @@ class TestSearchMixin:
 
     def test_search_issues_assignee_currentuser(self, client):
         """Test searching by currentUser() assignee."""
-        results = client.search_issues(
-            "project = DEMO AND assignee = currentUser()"
-        )
+        results = client.search_issues("project = DEMO AND assignee = currentUser()")
         assert "issues" in results
         # The search path runs through basic search which doesn't filter by currentUser
         # Just verify results are returned
 
     def test_search_issues_assignee_empty(self, client):
         """Test searching for unassigned issues."""
-        results = client.search_issues(
-            "project = DEMO AND assignee IS EMPTY"
-        )
+        results = client.search_issues("project = DEMO AND assignee IS EMPTY")
         assert "issues" in results
 
     def test_search_issues_reporter_currentuser(self, client):
         """Test searching by currentUser() reporter."""
-        results = client.search_issues(
-            "project = DEMO AND reporter = currentUser()"
-        )
+        results = client.search_issues("project = DEMO AND reporter = currentUser()")
         assert "issues" in results
 
     def test_get_filter_basic(self, client):
@@ -273,17 +264,19 @@ class TestSearchMixin:
 
     def test_advanced_search_status_not_filter(self, client):
         """Test advanced search with status != filter."""
-        results = client.advanced_search('project = DEMO AND status != Done')
+        results = client.advanced_search("project = DEMO AND status != Done")
         assert "issues" in results
 
     def test_advanced_search_assignee_null(self, client):
         """Test advanced search for null assignee."""
-        results = client.advanced_search('project = DEMO AND assignee IS NULL')
+        results = client.advanced_search("project = DEMO AND assignee IS NULL")
         assert "issues" in results
 
     def test_advanced_search_reporter_match(self, client):
         """Test advanced search with reporter match."""
-        results = client.advanced_search('project = DEMO AND reporter = "Jason Krueger"')
+        results = client.advanced_search(
+            'project = DEMO AND reporter = "Jason Krueger"'
+        )
         assert "issues" in results
 
     def test_advanced_search_issuetype_filter(self, client):
@@ -384,9 +377,7 @@ class TestSearchMixin:
 
     def test_search_issues_order_by(self, client):
         """Test search with ORDER BY."""
-        results = client.search_issues(
-            "project = DEMO ORDER BY created DESC"
-        )
+        results = client.search_issues("project = DEMO ORDER BY created DESC")
         assert "issues" in results
 
     def test_advanced_search(self, client):
@@ -1450,13 +1441,17 @@ class TestMockJiraClientBase:
 
     def test_get_create_issue_meta_pagination(self, client):
         """Test create metadata with pagination."""
-        meta = client.get_create_issue_meta_issuetypes("DEMO", start_at=0, max_results=2)
+        meta = client.get_create_issue_meta_issuetypes(
+            "DEMO", start_at=0, max_results=2
+        )
         assert "values" in meta
         assert meta["maxResults"] == 2
 
     def test_get_create_issue_meta_fields_pagination(self, client):
         """Test create field metadata with pagination."""
-        meta = client.get_create_issue_meta_fields("DEMO", "10000", start_at=0, max_results=2)
+        meta = client.get_create_issue_meta_fields(
+            "DEMO", "10000", start_at=0, max_results=2
+        )
         assert "values" in meta
 
     def test_get_project_with_expand(self, client):

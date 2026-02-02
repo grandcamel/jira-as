@@ -8,23 +8,25 @@ import tempfile
 import pytest
 from assistant_skills_lib.error_handler import ValidationError
 
-from jira_as.validators import PROJECT_TEMPLATES
-from jira_as.validators import VALID_ASSIGNEE_TYPES
-from jira_as.validators import VALID_PROJECT_TYPES
-from jira_as.validators import safe_get_nested
-from jira_as.validators import validate_assignee_type
-from jira_as.validators import validate_avatar_file
-from jira_as.validators import validate_category_name
-from jira_as.validators import validate_email
-from jira_as.validators import validate_file_path
-from jira_as.validators import validate_issue_key
-from jira_as.validators import validate_jql
-from jira_as.validators import validate_project_key
-from jira_as.validators import validate_project_name
-from jira_as.validators import validate_project_template
-from jira_as.validators import validate_project_type
-from jira_as.validators import validate_transition_id
-from jira_as.validators import validate_url
+from jira_as.validators import (
+    PROJECT_TEMPLATES,
+    VALID_ASSIGNEE_TYPES,
+    VALID_PROJECT_TYPES,
+    safe_get_nested,
+    validate_assignee_type,
+    validate_avatar_file,
+    validate_category_name,
+    validate_email,
+    validate_file_path,
+    validate_issue_key,
+    validate_jql,
+    validate_project_key,
+    validate_project_name,
+    validate_project_template,
+    validate_project_type,
+    validate_transition_id,
+    validate_url,
+)
 
 
 class TestSafeGetNested:

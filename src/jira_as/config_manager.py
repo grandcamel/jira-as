@@ -33,8 +33,7 @@ from .validators import (
 
 # Try to import credential_manager for keychain support
 try:
-    from .credential_manager import CredentialManager
-    from .credential_manager import is_keychain_available
+    from .credential_manager import CredentialManager, is_keychain_available
 
     CREDENTIAL_MANAGER_AVAILABLE = True
 except ImportError:
@@ -301,8 +300,7 @@ def get_jira_client() -> "JiraClient":
         ValidationError: If configuration is invalid or incomplete
     """
     # Check for mock mode first - allows testing without real JIRA credentials
-    from .mock import MockJiraClient
-    from .mock import is_mock_mode
+    from .mock import MockJiraClient, is_mock_mode
 
     if is_mock_mode():
         return MockJiraClient()  # type: ignore[return-value]

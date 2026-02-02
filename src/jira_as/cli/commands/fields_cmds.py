@@ -7,18 +7,13 @@ All implementation functions are inlined for direct CLI usage.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import click
 
-from jira_as import JiraError
-from jira_as import ValidationError
-from jira_as import get_jira_client
+from jira_as import JiraError, ValidationError, get_jira_client
 
-from ..cli_utils import format_json
-from ..cli_utils import get_client_from_context
-from ..cli_utils import handle_jira_errors
+from ..cli_utils import format_json, get_client_from_context, handle_jira_errors
 
 if TYPE_CHECKING:
     from jira_as import JiraClient

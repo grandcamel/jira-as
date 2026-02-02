@@ -14,24 +14,22 @@ from __future__ import annotations
 import functools
 import json
 from collections.abc import Callable
-from functools import wraps
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import TypeVar
-from typing import cast
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 import click
 
-from jira_as import AuthenticationError
-from jira_as import ConflictError
-from jira_as import JiraError
-from jira_as import NotFoundError
-from jira_as import PermissionError
-from jira_as import RateLimitError
-from jira_as import ServerError
-from jira_as import ValidationError
-from jira_as import get_jira_client
-from jira_as import print_error
+from jira_as import (
+    AuthenticationError,
+    ConflictError,
+    JiraError,
+    NotFoundError,
+    PermissionError,
+    RateLimitError,
+    ServerError,
+    ValidationError,
+    get_jira_client,
+    print_error,
+)
 
 if TYPE_CHECKING:
     from jira_as import JiraClient
@@ -268,9 +266,7 @@ def output_results(
         columns: Column names for table output
         success_msg: Optional success message for text output
     """
-    from jira_as import format_json
-    from jira_as import format_table
-    from jira_as import print_success
+    from jira_as import format_json, format_table, print_success
 
     if output_format == "json":
         click.echo(format_json(data))

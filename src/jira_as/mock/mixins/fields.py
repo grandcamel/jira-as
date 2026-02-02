@@ -3,9 +3,7 @@
 Provides mock implementations for field metadata, screens, and custom fields.
 """
 
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 if TYPE_CHECKING:
     from ..protocols import MockClientProtocol

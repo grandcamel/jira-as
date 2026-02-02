@@ -5,8 +5,7 @@ operations that other mixins build upon.
 """
 
 import os
-from typing import Any
-from typing import ClassVar
+from typing import Any, ClassVar
 
 
 def is_mock_mode() -> bool:

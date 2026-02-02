@@ -8,8 +8,7 @@ and convert between seconds and human-readable formats.
 from __future__ import annotations
 
 import re
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 # JIRA default time units (configurable in JIRA, these are common defaults)
 SECONDS_PER_MINUTE = 60

@@ -1,39 +1,39 @@
 """Tests for time tracking commands."""
 
-from datetime import datetime
-from datetime import timedelta
-from unittest.mock import MagicMock
-from unittest.mock import patch
+from datetime import datetime, timedelta
+from unittest.mock import MagicMock, patch
 
 import pytest
 from click.testing import CliRunner
 
 from jira_as import ValidationError
-from jira_as.cli.commands.time_cmds import _add_worklog_impl
-from jira_as.cli.commands.time_cmds import _bulk_log_time_impl
-from jira_as.cli.commands.time_cmds import _calculate_progress
-from jira_as.cli.commands.time_cmds import _delete_worklog_impl
-from jira_as.cli.commands.time_cmds import _export_timesheets_impl
-from jira_as.cli.commands.time_cmds import _extract_comment_text
-from jira_as.cli.commands.time_cmds import _format_bulk_log_result
-from jira_as.cli.commands.time_cmds import _format_estimate_updated
-from jira_as.cli.commands.time_cmds import _format_export_csv
-from jira_as.cli.commands.time_cmds import _format_report_csv
-from jira_as.cli.commands.time_cmds import _format_report_text
-from jira_as.cli.commands.time_cmds import _format_time_tracking
-from jira_as.cli.commands.time_cmds import _format_worklog_added
-from jira_as.cli.commands.time_cmds import _format_worklog_deleted
-from jira_as.cli.commands.time_cmds import _format_worklog_updated
-from jira_as.cli.commands.time_cmds import _format_worklogs
-from jira_as.cli.commands.time_cmds import _generate_progress_bar
-from jira_as.cli.commands.time_cmds import _generate_report_impl
-from jira_as.cli.commands.time_cmds import _get_time_tracking_impl
-from jira_as.cli.commands.time_cmds import _get_worklogs_impl
-from jira_as.cli.commands.time_cmds import _group_entries
-from jira_as.cli.commands.time_cmds import _resolve_period_dates
-from jira_as.cli.commands.time_cmds import _set_estimate_impl
-from jira_as.cli.commands.time_cmds import _update_worklog_impl
-from jira_as.cli.commands.time_cmds import time
+from jira_as.cli.commands.time_cmds import (
+    _add_worklog_impl,
+    _bulk_log_time_impl,
+    _calculate_progress,
+    _delete_worklog_impl,
+    _export_timesheets_impl,
+    _extract_comment_text,
+    _format_bulk_log_result,
+    _format_estimate_updated,
+    _format_export_csv,
+    _format_report_csv,
+    _format_report_text,
+    _format_time_tracking,
+    _format_worklog_added,
+    _format_worklog_deleted,
+    _format_worklog_updated,
+    _format_worklogs,
+    _generate_progress_bar,
+    _generate_report_impl,
+    _get_time_tracking_impl,
+    _get_worklogs_impl,
+    _group_entries,
+    _resolve_period_dates,
+    _set_estimate_impl,
+    _update_worklog_impl,
+    time,
+)
 
 # =============================================================================
 # Fixtures

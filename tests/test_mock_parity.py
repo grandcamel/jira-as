@@ -6,7 +6,6 @@ real clients.
 """
 
 import inspect
-from typing import get_type_hints
 
 import pytest
 
@@ -69,7 +68,6 @@ class TestMockParity:
 
     def test_mock_has_all_core_methods(self):
         """Verify MockJiraClient has all core JiraClient methods."""
-        real_methods = get_public_methods(JiraClient)
         mock_methods = get_public_methods(MockJiraClient)
 
         # Core methods that mock MUST have
@@ -209,12 +207,12 @@ class TestMockParity:
     )
     def test_method_exists_in_both(self, method_name):
         """Verify specific methods exist in both clients."""
-        assert hasattr(
-            JiraClient, method_name
-        ), f"JiraClient missing method: {method_name}"
-        assert hasattr(
-            MockJiraClient, method_name
-        ), f"MockJiraClient missing method: {method_name}"
+        assert hasattr(JiraClient, method_name), (
+            f"JiraClient missing method: {method_name}"
+        )
+        assert hasattr(MockJiraClient, method_name), (
+            f"MockJiraClient missing method: {method_name}"
+        )
 
 
 class TestAgileMethodParity:
@@ -287,6 +285,6 @@ class TestJSMMethodParity:
                 if "organization_id" in params:
                     annotation = params["organization_id"].annotation
                     # Should be int, not str
-                    assert annotation == int or "int" in str(
-                        annotation
-                    ), f"{method_name}: organization_id should be int"
+                    assert annotation is int or "int" in str(annotation), (
+                        f"{method_name}: organization_id should be int"
+                    )

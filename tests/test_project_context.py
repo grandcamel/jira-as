@@ -1,10 +1,7 @@
 """Tests for project_context module."""
 
-import json
 from pathlib import Path
 from unittest.mock import patch
-
-import pytest
 
 from jira_as.project_context import (
     ProjectContext,
@@ -13,7 +10,6 @@ from jira_as.project_context import (
     format_context_summary,
     get_common_labels,
     get_defaults_for_issue_type,
-    get_project_context,
     get_statuses_for_issue_type,
     get_valid_transitions,
     has_project_context,
@@ -102,7 +98,9 @@ class TestProjectContext:
         """Test get_assignable_users returns users."""
         ctx = ProjectContext(
             project_key="PROJ",
-            metadata={"assignable_users": [{"accountId": "abc", "displayName": "John"}]},
+            metadata={
+                "assignable_users": [{"accountId": "abc", "displayName": "John"}]
+            },
         )
         users = ctx.get_assignable_users()
         assert len(users) == 1
@@ -295,9 +293,7 @@ class TestGetStatusesForIssueType:
             workflows={
                 "by_issue_type": {
                     "Bug": {
-                        "statuses": [
-                            {"id": "1", "name": "Open", "category": "To Do"}
-                        ]
+                        "statuses": [{"id": "1", "name": "Open", "category": "To Do"}]
                     }
                 }
             },
@@ -321,9 +317,7 @@ class TestSuggestAssignee:
         ctx = ProjectContext(
             project_key="PROJ",
             patterns={
-                "top_assignees": [
-                    {"account_id": "abc123", "display_name": "John"}
-                ]
+                "top_assignees": [{"account_id": "abc123", "display_name": "John"}]
             },
         )
         result = suggest_assignee(ctx)
@@ -361,11 +355,7 @@ class TestGetCommonLabels:
         """Test with issue type specific labels."""
         ctx = ProjectContext(
             project_key="PROJ",
-            patterns={
-                "by_issue_type": {
-                    "Bug": {"labels": {"bug": 10, "urgent": 5}}
-                }
-            },
+            patterns={"by_issue_type": {"Bug": {"labels": {"bug": 10, "urgent": 5}}}},
         )
         result = get_common_labels(ctx, issue_type="Bug")
         assert result == ["bug", "urgent"]
@@ -375,9 +365,7 @@ class TestGetCommonLabels:
         ctx = ProjectContext(
             project_key="PROJ",
             patterns={
-                "by_issue_type": {
-                    "Bug": {"labels": {"a": 10, "b": 8, "c": 6, "d": 4}}
-                }
+                "by_issue_type": {"Bug": {"labels": {"a": 10, "b": 8, "c": 6, "d": 4}}}
             },
         )
         result = get_common_labels(ctx, issue_type="Bug", limit=2)
@@ -393,11 +381,7 @@ class TestValidateTransition:
             project_key="PROJ",
             workflows={
                 "by_issue_type": {
-                    "Bug": {
-                        "transitions": {
-                            "Open": [{"to_status": "In Progress"}]
-                        }
-                    }
+                    "Bug": {"transitions": {"Open": [{"to_status": "In Progress"}]}}
                 }
             },
         )

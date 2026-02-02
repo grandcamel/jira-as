@@ -2,12 +2,14 @@
 Tests for mock factory classes.
 """
 
-from jira_as.mock.factories import CommentFactory
-from jira_as.mock.factories import ResponseFactory
-from jira_as.mock.factories import StatusFactory
-from jira_as.mock.factories import TimestampFactory
-from jira_as.mock.factories import URLFactory
-from jira_as.mock.factories import UserFactory
+from jira_as.mock.factories import (
+    CommentFactory,
+    ResponseFactory,
+    StatusFactory,
+    TimestampFactory,
+    URLFactory,
+    UserFactory,
+)
 
 
 class TestResponseFactory:

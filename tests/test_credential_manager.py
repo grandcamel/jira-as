@@ -75,11 +75,13 @@ class TestValidateCredentials:
         mock_get.return_value = mock_response
 
         manager = CredentialManager()
-        result = manager.validate_credentials({
-            "site_url": "https://test.atlassian.net",
-            "email": "test@example.com",
-            "api_token": "test-token",
-        })
+        result = manager.validate_credentials(
+            {
+                "site_url": "https://test.atlassian.net",
+                "email": "test@example.com",
+                "api_token": "test-token",
+            }
+        )
 
         assert result["accountId"] == "abc123"
 
@@ -94,11 +96,13 @@ class TestValidateCredentials:
 
         manager = CredentialManager()
         with pytest.raises(AuthenticationError, match="Invalid credentials"):
-            manager.validate_credentials({
-                "site_url": "https://test.atlassian.net",
-                "email": "test@example.com",
-                "api_token": "bad-token",
-            })
+            manager.validate_credentials(
+                {
+                    "site_url": "https://test.atlassian.net",
+                    "email": "test@example.com",
+                    "api_token": "bad-token",
+                }
+            )
 
     @patch("requests.get")
     def test_validate_403_forbidden(self, mock_get):
@@ -111,11 +115,13 @@ class TestValidateCredentials:
 
         manager = CredentialManager()
         with pytest.raises(AuthenticationError, match="Access forbidden"):
-            manager.validate_credentials({
-                "site_url": "https://test.atlassian.net",
-                "email": "test@example.com",
-                "api_token": "test-token",
-            })
+            manager.validate_credentials(
+                {
+                    "site_url": "https://test.atlassian.net",
+                    "email": "test@example.com",
+                    "api_token": "test-token",
+                }
+            )
 
     @patch("requests.get")
     def test_validate_connection_error(self, mock_get):
@@ -128,11 +134,13 @@ class TestValidateCredentials:
 
         manager = CredentialManager()
         with pytest.raises(JiraError, match="Cannot connect"):
-            manager.validate_credentials({
-                "site_url": "https://test.atlassian.net",
-                "email": "test@example.com",
-                "api_token": "test-token",
-            })
+            manager.validate_credentials(
+                {
+                    "site_url": "https://test.atlassian.net",
+                    "email": "test@example.com",
+                    "api_token": "test-token",
+                }
+            )
 
     @patch("requests.get")
     def test_validate_timeout(self, mock_get):
@@ -145,11 +153,13 @@ class TestValidateCredentials:
 
         manager = CredentialManager()
         with pytest.raises(JiraError, match="timed out"):
-            manager.validate_credentials({
-                "site_url": "https://test.atlassian.net",
-                "email": "test@example.com",
-                "api_token": "test-token",
-            })
+            manager.validate_credentials(
+                {
+                    "site_url": "https://test.atlassian.net",
+                    "email": "test@example.com",
+                    "api_token": "test-token",
+                }
+            )
 
 
 class TestGetCredentialsTuple:

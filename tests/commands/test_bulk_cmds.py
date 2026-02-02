@@ -8,30 +8,28 @@ Tests cover:
 - CLI commands
 """
 
-from unittest.mock import MagicMock
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from click.testing import CliRunner
 
-from jira_as import JiraError
-from jira_as import ValidationError
+from jira_as import JiraError, ValidationError
 from jira_as.cli.commands.bulk_cmds import (
     CLONE_FIELDS,  # Constants; Implementation functions; Helper functions; Formatting functions; Click commands
+    STANDARD_PRIORITIES,
+    _bulk_assign_impl,
+    _bulk_clone_impl,
+    _bulk_delete_impl,
+    _bulk_set_priority_impl,
+    _bulk_transition_impl,
+    _clone_issue,
+    _find_transition,
+    _format_bulk_result,
+    _get_issues_to_process,
+    _resolve_user_id,
+    _validate_priority,
+    bulk,
 )
-from jira_as.cli.commands.bulk_cmds import STANDARD_PRIORITIES
-from jira_as.cli.commands.bulk_cmds import _bulk_assign_impl
-from jira_as.cli.commands.bulk_cmds import _bulk_clone_impl
-from jira_as.cli.commands.bulk_cmds import _bulk_delete_impl
-from jira_as.cli.commands.bulk_cmds import _bulk_set_priority_impl
-from jira_as.cli.commands.bulk_cmds import _bulk_transition_impl
-from jira_as.cli.commands.bulk_cmds import _clone_issue
-from jira_as.cli.commands.bulk_cmds import _find_transition
-from jira_as.cli.commands.bulk_cmds import _format_bulk_result
-from jira_as.cli.commands.bulk_cmds import _get_issues_to_process
-from jira_as.cli.commands.bulk_cmds import _resolve_user_id
-from jira_as.cli.commands.bulk_cmds import _validate_priority
-from jira_as.cli.commands.bulk_cmds import bulk
 
 # =============================================================================
 # Fixtures

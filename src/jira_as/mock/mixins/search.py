@@ -4,9 +4,7 @@ Provides mock implementations for advanced JQL parsing, filters, and search oper
 """
 
 import re
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 if TYPE_CHECKING:
     from ..protocols import MockClientProtocol

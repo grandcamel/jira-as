@@ -13,16 +13,17 @@ with JIRA-specific defaults and helper functions.
 
 from __future__ import annotations
 
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 # Re-export base classes
 from assistant_skills_lib import BatchConfig as BaseBatchConfig
-from assistant_skills_lib import BatchProcessor
-from assistant_skills_lib import BatchProgress
-from assistant_skills_lib import CheckpointManager
-from assistant_skills_lib import generate_operation_id
+from assistant_skills_lib import (
+    BatchProcessor,
+    BatchProgress,
+    CheckpointManager,
+    generate_operation_id,
+)
 
 # For backward compatibility, re-export all symbols
 __all__ = [

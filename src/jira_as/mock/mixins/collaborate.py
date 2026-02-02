@@ -3,8 +3,7 @@
 Provides mock implementations for watchers, changelog, attachments, and notifications.
 """
 
-from typing import TYPE_CHECKING
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from ..protocols import MockClientProtocol

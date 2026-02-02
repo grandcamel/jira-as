@@ -9,22 +9,23 @@ Tests cover:
 """
 
 from copy import deepcopy
-from unittest.mock import MagicMock
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
-from jira_as.cli.commands.ops_cmds import _cache_clear_impl
-from jira_as.cli.commands.ops_cmds import _cache_status_impl
-from jira_as.cli.commands.ops_cmds import _cache_warm_impl
-from jira_as.cli.commands.ops_cmds import _discover_project_impl
-from jira_as.cli.commands.ops_cmds import _format_bytes
-from jira_as.cli.commands.ops_cmds import _format_cache_clear
-from jira_as.cli.commands.ops_cmds import _format_cache_status
-from jira_as.cli.commands.ops_cmds import _format_cache_warm
-from jira_as.cli.commands.ops_cmds import _format_discover_project
-from jira_as.cli.commands.ops_cmds import _is_critical_error
-from jira_as.cli.commands.ops_cmds import ops
+from jira_as.cli.commands.ops_cmds import (
+    _cache_clear_impl,
+    _cache_status_impl,
+    _cache_warm_impl,
+    _discover_project_impl,
+    _format_bytes,
+    _format_cache_clear,
+    _format_cache_status,
+    _format_cache_warm,
+    _format_discover_project,
+    _is_critical_error,
+    ops,
+)
 
 # =============================================================================
 # Helper Function Tests

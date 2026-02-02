@@ -11,9 +11,8 @@ from typing import Any
 
 from assistant_skills_lib.error_handler import ValidationError
 from assistant_skills_lib.validators import validate_email as base_validate_email
-from assistant_skills_lib.validators import validate_int
+from assistant_skills_lib.validators import validate_int, validate_required
 from assistant_skills_lib.validators import validate_path as base_validate_path
-from assistant_skills_lib.validators import validate_required
 from assistant_skills_lib.validators import validate_url as base_validate_url
 
 

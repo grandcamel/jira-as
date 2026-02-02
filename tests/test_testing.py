@@ -2,8 +2,6 @@
 Tests for the testing utilities module.
 """
 
-import time
-from datetime import datetime
 from unittest.mock import MagicMock
 
 import pytest
