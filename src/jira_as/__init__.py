@@ -22,7 +22,7 @@ Example usage:
         print(issue['fields']['summary'])
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 # Error handling
 # ADF Helper
