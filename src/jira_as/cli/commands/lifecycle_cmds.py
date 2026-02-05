@@ -824,7 +824,7 @@ def _delete_component_impl(
 
         kwargs = {}
         if move_to:
-            kwargs["moveIssuesTo"] = move_to
+            kwargs["move_issues_to"] = move_to
 
         c.delete_component(component_id, **kwargs)
         return None
@@ -1393,7 +1393,7 @@ def component_delete(
             # Actually delete
             kwargs = {}
             if move_to:
-                kwargs["moveIssuesTo"] = move_to
+                kwargs["move_issues_to"] = move_to
             client.delete_component(component_id, **kwargs)
             print_success(f"Deleted component {component_id}")
         else:

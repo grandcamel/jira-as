@@ -535,64 +535,77 @@ class FieldsMixin(_Base):
         self,
         start_at: int = 0,
         max_results: int = 100,
+        scope: list | None = None,
+        query_string: str | None = None,
     ) -> dict[str, Any]:
-        """Get all screens.
+        """Get all screens with pagination.
 
         Args:
             start_at: Starting index for pagination.
-            max_results: Maximum number of results.
+            max_results: Maximum results per page (max 100).
+            scope: Filter by scope type (PROJECT, TEMPLATE, GLOBAL).
+            query_string: Filter screens by name (partial match).
 
         Returns:
             Paginated list of screens.
         """
+        screens = list(self.SCREENS)
+
+        if scope:
+            screens = [s for s in screens if s.get("scope", {}).get("type") in scope]
+
+        if query_string:
+            query_lower = query_string.lower()
+            screens = [s for s in screens if query_lower in s["name"].lower()]
+
         from ..factories import ResponseFactory
 
-        return ResponseFactory.paginated(self.SCREENS, start_at, max_results)
+        return ResponseFactory.paginated(screens, start_at, max_results)
 
-    def get_screen(self, screen_id: str) -> dict[str, Any]:
-        """Get a screen by ID.
+    def get_screen(self, screen_id: int) -> dict[str, Any]:
+        """Get a specific screen by ID.
 
         Args:
-            screen_id: The screen ID.
+            screen_id: Screen ID.
 
         Returns:
-            The screen details.
+            Screen object with id, name, description, scope.
 
         Raises:
             NotFoundError: If the screen is not found.
         """
         for screen in self.SCREENS:
-            if screen["id"] == screen_id:
+            if screen["id"] == screen_id or screen["id"] == str(screen_id):
                 return screen
 
         from ...error_handler import NotFoundError
 
         raise NotFoundError(f"Screen {screen_id} not found")
 
-    def get_screen_tabs(self, screen_id: str) -> list[dict[str, Any]]:
-        """Get tabs for a screen.
+    def get_screen_tabs(self, screen_id: int) -> list[dict[str, Any]]:
+        """Get all tabs for a screen.
 
         Args:
-            screen_id: The screen ID.
+            screen_id: Screen ID.
 
         Returns:
-            List of screen tabs.
+            List of tab objects with id, name.
         """
         return [
-            {"id": "1", "name": "Field Tab", "position": 0},
+            {"id": 1, "name": "Field Tab", "position": 0},
         ]
 
     def get_screen_tab_fields(
-        self, screen_id: str, tab_id: str
+        self, screen_id: int, tab_id: int
     ) -> list[dict[str, Any]]:
-        """Get fields in a screen tab.
+        """Get all fields for a screen tab.
 
         Args:
-            screen_id: The screen ID.
-            tab_id: The tab ID.
+            screen_id: Screen ID.
+            tab_id: Tab ID.
 
         Returns:
-            List of fields in the tab.
+            List of field objects with id, name.
         """
         return [
             {"id": "summary", "name": "Summary"},

@@ -425,21 +425,31 @@ class SearchMixin(_Base):
     # Filter Operations
     # =========================================================================
 
-    def get_filter(self, filter_id: str) -> dict[str, Any]:
-        """Get a saved filter by ID.
+    def get_filter(self, filter_id: str, expand: str | None = None) -> dict[str, Any]:
+        """Get a filter by ID.
 
         Args:
-            filter_id: The filter ID.
+            filter_id: Filter ID.
+            expand: Optional expansions (e.g., 'sharedUsers,subscriptions').
 
         Returns:
-            The filter details.
+            Filter object.
 
         Raises:
             NotFoundError: If the filter is not found.
         """
         for f in self.FILTERS:
             if f["id"] == filter_id:
-                return f
+                result = dict(f)
+                if expand:
+                    # Add expanded fields as empty placeholders
+                    for field in expand.split(","):
+                        field = field.strip()
+                        if field == "sharedUsers":
+                            result["sharedUsers"] = []
+                        elif field == "subscriptions":
+                            result["subscriptions"] = []
+                return result
 
         from ...error_handler import NotFoundError
 
@@ -498,20 +508,22 @@ class SearchMixin(_Base):
         jql: str,
         description: str | None = None,
         favourite: bool = False,
+        share_permissions: list | None = None,
     ) -> dict[str, Any]:
-        """Create a saved filter.
+        """Create a new filter.
 
         Args:
             name: Filter name.
-            jql: JQL query for the filter.
-            description: Filter description.
+            jql: JQL query string.
+            description: Optional description.
             favourite: Whether to mark as favourite.
+            share_permissions: Optional list of share permissions.
 
         Returns:
             The created filter.
         """
         filter_id = str(10000 + len(self.FILTERS))
-        return {
+        result = {
             "id": filter_id,
             "name": name,
             "jql": jql,
@@ -520,6 +532,9 @@ class SearchMixin(_Base):
             "favourite": favourite,
             "self": f"{self.base_url}/rest/api/3/filter/{filter_id}",
         }
+        if share_permissions:
+            result["sharePermissions"] = share_permissions
+        return result
 
     def update_filter(
         self,
@@ -716,34 +731,36 @@ class SearchMixin(_Base):
     def add_filter_permission(
         self,
         filter_id: str,
-        permission_type: str,
-        value: str | None = None,
+        permission: dict,
     ) -> dict[str, Any]:
-        """Add a permission to a filter.
+        """Add share permission to filter.
 
         Args:
-            filter_id: The filter ID.
-            permission_type: Type of permission ('user', 'group', 'project', etc.).
-            value: The value for the permission (account ID, group name, etc.).
+            filter_id: Filter ID.
+            permission: Permission object with type and relevant fields:
+                       - type: 'global', 'loggedin', 'project', 'project-role', 'group', 'user'
+                       - project: {id: '10000'} (for project/project-role)
+                       - role: {id: '10001'} (for project-role)
+                       - group: {name: 'developers'} or {groupId: 'abc123'}
+                       - user: {accountId: '...'} (for user)
 
         Returns:
-            The created permission.
+            Created permission object.
         """
         # Verify filter exists
         self.get_filter(filter_id)
 
         return {
             "id": 10,
-            "type": permission_type,
-            "value": value,
+            **permission,
         }
 
-    def delete_filter_permission(self, filter_id: str, permission_id: int) -> None:
-        """Delete a permission from a filter.
+    def delete_filter_permission(self, filter_id: str, permission_id: str) -> None:
+        """Delete a filter share permission.
 
         Args:
-            filter_id: The filter ID.
-            permission_id: The permission ID to delete.
+            filter_id: Filter ID.
+            permission_id: Permission ID.
         """
         # Verify filter exists
         self.get_filter(filter_id)
@@ -787,12 +804,12 @@ class SearchMixin(_Base):
         }
 
     def get_jql_suggestions(
-        self, field_name: str, field_value: str | None = None
+        self, field_name: str, field_value: str = ""
     ) -> dict[str, Any]:
-        """Get JQL field value suggestions.
+        """Get autocomplete suggestions for a JQL field value.
 
         Args:
-            field_name: The field to get suggestions for.
+            field_name: Field to get suggestions for (e.g., 'project', 'status').
             field_value: Partial value to filter suggestions.
 
         Returns:

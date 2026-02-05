@@ -411,7 +411,7 @@ def _create_request_impl(
             summary=summary,
             description=description,
             fields=fields,
-            raise_on_behalf_of=on_behalf_of,
+            on_behalf_of=on_behalf_of,
         )
 
     if client is not None:

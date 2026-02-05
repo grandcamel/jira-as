@@ -460,20 +460,38 @@ class JSMMixin(_Base):
         self,
         service_desk_id: str,
         request_type_id: str,
-        request_field_values: dict[str, Any],
-        raise_on_behalf_of: str | None = None,
+        fields: dict[str, Any] | None = None,
+        summary: str | None = None,
+        description: str | None = None,
+        priority: str | None = None,
+        participants: list | None = None,
+        on_behalf_of: str | None = None,
     ) -> dict[str, Any]:
         """Create a new JSM request.
 
         Args:
             service_desk_id: The ID of the service desk.
             request_type_id: The ID of the request type.
-            request_field_values: Field values for the request.
-            raise_on_behalf_of: Optional account ID to raise the request on behalf of.
+            fields: Dictionary of field values (summary, description, custom fields).
+            summary: Request summary (alternative to fields dict).
+            description: Request description (alternative to fields dict).
+            priority: Request priority name (alternative to fields dict).
+            participants: List of participant email addresses (optional).
+            on_behalf_of: Optional account ID to raise the request on behalf of.
 
         Returns:
             The created request details.
         """
+        # Build request_field_values from either fields dict or individual params
+        if fields is None:
+            fields = {}
+        if summary:
+            fields["summary"] = summary
+        if description:
+            fields["description"] = description
+        if priority:
+            fields["priority"] = {"name": priority}
+        request_field_values = fields
         self._next_issue_id += 1
         issue_key = f"DEMOSD-{self._next_issue_id}"
         issue_id = str(20000 + self._next_issue_id)
@@ -498,7 +516,7 @@ class JSMMixin(_Base):
                 "priority": {"name": "Medium", "id": "3"},
                 "assignee": None,
                 "reporter": self.USERS.get(
-                    raise_on_behalf_of or "abc123", self.USERS["abc123"]
+                    on_behalf_of or "abc123", self.USERS["abc123"]
                 ),
                 "project": {
                     "key": "DEMOSD",

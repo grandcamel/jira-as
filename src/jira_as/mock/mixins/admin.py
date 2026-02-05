@@ -174,21 +174,13 @@ class AdminMixin(_Base):
 
         raise NotFoundError(f"Role {role_id} not found")
 
-    def get_project_roles(self, project_key: str) -> dict[str, str]:
-        """Get roles for a project.
-
-        Args:
-            project_key: The project key.
+    def get_project_roles(self) -> list:
+        """Get all project roles.
 
         Returns:
-            Dictionary mapping role names to role URLs.
+            List of project roles.
         """
-        return {
-            role[
-                "name"
-            ]: f"{self.base_url}/rest/api/3/project/{project_key}/role/{role['id']}"
-            for role in self.ROLES
-        }
+        return list(self.ROLES)
 
     def add_actor_to_project_role(
         self,
@@ -326,18 +318,20 @@ class AdminMixin(_Base):
 
     def get_group_members(
         self,
-        group_name: str,
+        group_name: str | None = None,
+        group_id: str | None = None,
+        include_inactive: bool = False,
         start_at: int = 0,
         max_results: int = 50,
-        include_inactive: bool = False,
     ) -> dict[str, Any]:
         """Get members of a group.
 
         Args:
             group_name: The group name.
+            group_id: The group ID (preferred).
+            include_inactive: Include inactive users.
             start_at: Starting index for pagination.
             max_results: Maximum number of results.
-            include_inactive: Include inactive users.
 
         Returns:
             Paginated list of group members.
@@ -350,24 +344,37 @@ class AdminMixin(_Base):
 
         return ResponseFactory.paginated(members, start_at, max_results)
 
-    def add_user_to_group(self, group_name: str, account_id: str) -> dict[str, Any]:
+    def add_user_to_group(
+        self,
+        account_id: str,
+        group_name: str | None = None,
+        group_id: str | None = None,
+    ) -> dict[str, Any]:
         """Add a user to a group.
 
         Args:
-            group_name: The group name.
             account_id: The user's account ID.
+            group_name: The group name.
+            group_id: The group ID (preferred).
 
         Returns:
             The group with the added user.
         """
-        return self.get_group(group_name)
+        name = group_name or "jira-administrators"
+        return self.get_group(name)
 
-    def remove_user_from_group(self, group_name: str, account_id: str) -> None:
+    def remove_user_from_group(
+        self,
+        account_id: str,
+        group_name: str | None = None,
+        group_id: str | None = None,
+    ) -> None:
         """Remove a user from a group.
 
         Args:
-            group_name: The group name.
             account_id: The user's account ID.
+            group_name: The group name.
+            group_id: The group ID (preferred).
         """
         # In mock, this is a no-op
         pass
@@ -581,11 +588,12 @@ class AdminMixin(_Base):
             "self": f"{self.base_url}/rest/api/3/project/{project_id}",
         }
 
-    def delete_project(self, project_key: str) -> None:
+    def delete_project(self, project_key: str, enable_undo: bool = True) -> None:
         """Delete a project.
 
         Args:
-            project_key: The project key to delete.
+            project_key: Project key to delete.
+            enable_undo: If True, project goes to trash (recoverable for 60 days).
         """
         # In mock, this is a no-op
         pass
@@ -661,19 +669,23 @@ class AdminMixin(_Base):
 
         return ResponseFactory.paginated(workflows, start_at, max_results)
 
-    def get_workflow_scheme(self, project_key: str) -> dict[str, Any]:
-        """Get workflow scheme for a project.
+    def get_workflow_scheme(
+        self, scheme_id: int, return_draft_if_exists: bool = False
+    ) -> dict[str, Any]:
+        """Get a workflow scheme by ID.
 
         Args:
-            project_key: The project key.
+            scheme_id: Workflow scheme ID.
+            return_draft_if_exists: If True, return draft if one exists.
 
         Returns:
             The workflow scheme details.
         """
         return {
-            "id": "10000",
+            "id": str(scheme_id),
             "name": "Default Workflow Scheme",
             "description": "Default workflow scheme",
             "defaultWorkflow": "Software Simplified Workflow",
             "issueTypeMappings": {},
+            "draft": return_draft_if_exists,
         }

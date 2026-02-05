@@ -259,7 +259,7 @@ class TimeTrackingMixin(_Base):
         self,
         issue_key: str,
         worklog_id: str,
-        adjust_estimate: str | None = None,
+        adjust_estimate: str = "auto",
         new_estimate: str | None = None,
         increase_by: str | None = None,
     ) -> None:
@@ -268,9 +268,10 @@ class TimeTrackingMixin(_Base):
         Args:
             issue_key: The issue key.
             worklog_id: The worklog ID to delete.
-            adjust_estimate: How to adjust estimate after deletion.
-            new_estimate: New estimate value.
-            increase_by: Amount to increase estimate by.
+            adjust_estimate: How to adjust remaining estimate:
+                           'auto' (default), 'leave', 'new', 'manual'.
+            new_estimate: New remaining estimate (when adjust_estimate='new').
+            increase_by: Amount to increase estimate (when adjust_estimate='manual').
 
         Raises:
             NotFoundError: If the worklog is not found.

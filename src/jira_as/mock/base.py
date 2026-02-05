@@ -1069,17 +1069,17 @@ class MockJiraClientBase:
         self,
         issue_key: str,
         start_at: int = 0,
-        max_results: int = 1000,
+        max_results: int = 5000,
     ) -> dict[str, Any]:
-        """Get worklogs for an issue.
+        """Get all worklogs for an issue.
 
         Args:
-            issue_key: The issue key.
+            issue_key: Issue key (e.g., 'PROJ-123').
             start_at: Starting index for pagination.
-            max_results: Maximum number of results.
+            max_results: Maximum number of worklogs to return.
 
         Returns:
-            Paginated list of worklogs.
+            Worklogs response with 'worklogs', 'total', 'startAt', 'maxResults'.
 
         Raises:
             NotFoundError: If the issue is not found.

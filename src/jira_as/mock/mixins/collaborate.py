@@ -340,14 +340,17 @@ class CollaborateMixin(_Base):
         # In mock, this is a no-op
         pass
 
-    def get_notification_scheme(self, project_key: str) -> dict[str, Any]:
-        """Get notification scheme for a project.
+    def get_notification_scheme(
+        self, scheme_id: str, expand: str | None = None
+    ) -> dict[str, Any]:
+        """Get a specific notification scheme by ID.
 
         Args:
-            project_key: The project key.
+            scheme_id: Notification scheme ID.
+            expand: Optional expand parameter (e.g., 'all', 'notificationSchemeEvents').
 
         Returns:
-            The notification scheme details.
+            Notification scheme object with events and notifications.
         """
         return {
             "id": "10000",

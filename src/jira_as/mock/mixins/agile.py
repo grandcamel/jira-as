@@ -348,12 +348,15 @@ class AgileMixin(_Base):
 
         return ResponseFactory.paginated_issues(demo_issues, start_at, max_results)
 
-    def move_issues_to_sprint(self, sprint_id: int, issue_keys: list[str]) -> None:
+    def move_issues_to_sprint(
+        self, sprint_id: int, issue_keys: list[str], rank: str | None = None
+    ) -> None:
         """Move issues to a sprint.
 
         Args:
             sprint_id: The target sprint ID.
             issue_keys: List of issue keys to move.
+            rank: Optional rank position ('top', 'bottom', or None).
         """
         # In mock, this is a no-op since we don't track sprint assignments
         pass
