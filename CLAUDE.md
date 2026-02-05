@@ -206,6 +206,32 @@ mock_client.close.assert_called_once()
 - **Mixin method conflicts**: When adding mock methods, check if base class or other mixins define the same method. Use `super()` calls if extending.
 - **Test with real signatures**: When updating mock, test against actual skill scripts to catch signature mismatches early.
 
+### CLI ↔ JiraClient Parameter Rules
+
+- **Use snake_case for kwargs**: JiraClient uses Python naming conventions. Use `move_issues_to` not `moveIssuesTo` when passing kwargs to client methods.
+- **List parameters require lists**: Methods like `get_issue(fields=...)` and `get_project(expand=...)` expect Python lists, not comma-separated strings:
+  ```python
+  # Correct
+  client.get_issue("PROJ-123", fields=["summary", "status", "assignee"])
+  client.get_project("PROJ", expand=["description", "lead"])
+
+  # Wrong - will fail or behave unexpectedly
+  client.get_issue("PROJ-123", fields="summary,status,assignee")
+  ```
+
+### Mock Signature Alignment Checklist
+
+When adding or updating mock methods, verify these match the real `JiraClient`:
+
+1. **Parameter order**: Check positional args match exactly (e.g., `add_user_to_group(account_id, group_name)` not `(group_name, account_id)`)
+2. **Parameter names**: Must be identical for kwargs to work (e.g., `on_behalf_of` not `raise_on_behalf_of`)
+3. **Default values**: Must match exactly:
+   - `adjust_estimate='auto'` not `None`
+   - `max_results=5000` not `1000` for `get_worklogs()`
+   - `field_value=''` not `None` for `get_jql_suggestions()`
+4. **Types**: Must match (e.g., `screen_id: int` not `str`)
+5. **Optional params**: If real client has `group_id: str | None = None`, mock needs it too
+
 ## Version Management
 
 Version is defined in two places that must stay in sync:
