@@ -17,12 +17,18 @@ from click.testing import CliRunner
 from jira_as import JiraError, ValidationError
 from jira_as.cli.commands.admin_cmds import (
     SYSTEM_GROUPS,  # Formatting functions; Automation implementation functions; Group implementation functions; Notification scheme implementation functions; Permission scheme implementation functions; Screen implementation functions; Helper functions; Click commands
+    _add_notification_impl,
     _add_user_to_group_impl,
     _archive_project_impl,
     _assign_category_impl,
+    _assign_issue_type_scheme_impl,
+    _assign_permission_scheme_impl,
+    _assign_workflow_scheme_impl,
     _create_category_impl,
     _create_group_impl,
     _create_issue_type_impl,
+    _create_issue_type_scheme_impl,
+    _create_notification_scheme_impl,
     _create_permission_scheme_impl,
     _create_project_impl,
     _delete_group_impl,
@@ -44,13 +50,17 @@ from jira_as.cli.commands.admin_cmds import (
     _get_automation_rule_impl,
     _get_group_members_impl,
     _get_issue_type_impl,
+    _get_issue_type_scheme_impl,
     _get_notification_scheme_impl,
     _get_permission_scheme_impl,
+    _get_project_config_impl,
     _get_project_impl,
+    _get_project_issue_type_scheme_impl,
     _get_screen_impl,
     _get_user_impl,
     _get_workflow_for_issue_impl,
     _get_workflow_impl,
+    _get_workflow_scheme_impl,
     _is_system_group,
     _list_automation_rules_impl,
     _list_categories_impl,
@@ -65,6 +75,7 @@ from jira_as.cli.commands.admin_cmds import (
     _list_trash_projects_impl,
     _list_workflows_impl,
     _parse_comma_list,
+    _remove_notification_impl,
     _remove_user_from_group_impl,
     _restore_project_impl,
     _search_users_impl,
@@ -1048,9 +1059,11 @@ class TestWorkflowImplementation:
                 "status": {"name": "Open"},
             },
         }
-        mock_client.get_project_workflow_scheme.return_value = {
-            "defaultWorkflow": "Default Workflow",
-            "issueTypeMappings": {},
+        mock_client.get_workflow_scheme_for_project.return_value = {
+            "workflowScheme": {
+                "defaultWorkflow": "Default Workflow",
+                "issueTypeMappings": {},
+            }
         }
         mock_client.search_workflows.return_value = {"values": [sample_workflows[0]]}
 
@@ -1449,3 +1462,265 @@ class TestErrorHandling:
         result = cli_runner.invoke(admin, ["project", "get", "INVALID"])
 
         assert result.exit_code != 0
+
+
+# =============================================================================
+# Test Repaired Admin Client Calls
+# =============================================================================
+
+
+class TestAdminClientCallParity:
+    """Admin commands must call methods the real JiraClient actually defines.
+
+    Every test here uses ``spec_jira_client``, so a call to a method missing
+    from JiraClient raises AttributeError instead of silently succeeding
+    against a permissive MagicMock.
+    """
+
+    def test_get_permission_scheme_with_projects(self, spec_jira_client):
+        """--show-projects enumerates projects for the scheme."""
+        spec_jira_client.get_permission_scheme.return_value = {"id": 10000}
+        spec_jira_client.get_projects_for_permission_scheme.return_value = [
+            {"key": "PROJ"}
+        ]
+
+        result = _get_permission_scheme_impl(
+            "10000", show_projects=True, client=spec_jira_client
+        )
+
+        assert result["projects"] == [{"key": "PROJ"}]
+        spec_jira_client.get_projects_for_permission_scheme.assert_called_once_with(
+            "10000"
+        )
+
+    def test_assign_permission_scheme(self, spec_jira_client):
+        """Assignment goes through assign_permission_scheme_to_project."""
+        spec_jira_client.assign_permission_scheme_to_project.return_value = {
+            "id": 10000
+        }
+
+        result = _assign_permission_scheme_impl(
+            "PROJ", "10000", client=spec_jira_client
+        )
+
+        assert result["action"] == "assigned"
+        spec_jira_client.assign_permission_scheme_to_project.assert_called_once_with(
+            "PROJ", "10000"
+        )
+
+    def test_create_notification_scheme_sends_data_dict(self, spec_jira_client):
+        """The client takes a payload dict, not name/description kwargs."""
+        spec_jira_client.create_notification_scheme.return_value = {"id": "10100"}
+
+        _create_notification_scheme_impl(
+            "Scheme", description="Desc", client=spec_jira_client
+        )
+
+        spec_jira_client.create_notification_scheme.assert_called_once_with(
+            {"name": "Scheme", "description": "Desc"}
+        )
+
+    def test_create_notification_scheme_omits_blank_description(self, spec_jira_client):
+        """An absent description is left out of the payload entirely."""
+        spec_jira_client.create_notification_scheme.return_value = {"id": "10100"}
+
+        _create_notification_scheme_impl("Scheme", client=spec_jira_client)
+
+        spec_jira_client.create_notification_scheme.assert_called_once_with(
+            {"name": "Scheme"}
+        )
+
+    def test_add_notification_builds_event_payload(self, spec_jira_client):
+        """Event and recipient are nested the way the API expects."""
+        spec_jira_client.add_notification_to_scheme.return_value = {}
+
+        result = _add_notification_impl(
+            "10100", "1", "CurrentAssignee", client=spec_jira_client
+        )
+
+        spec_jira_client.add_notification_to_scheme.assert_called_once_with(
+            "10100",
+            {
+                "notificationSchemeEvents": [
+                    {
+                        "event": {"id": "1"},
+                        "notifications": [{"notificationType": "CurrentAssignee"}],
+                    }
+                ]
+            },
+        )
+        assert result["action"] == "added"
+
+    def test_remove_notification(self, spec_jira_client):
+        """Removal goes through delete_notification_from_scheme."""
+        result = _remove_notification_impl("10100", "5", client=spec_jira_client)
+
+        spec_jira_client.delete_notification_from_scheme.assert_called_once_with(
+            "10100", "5"
+        )
+        assert result["action"] == "removed"
+
+    def test_get_screen_coerces_id_to_int(self, spec_jira_client):
+        """Click hands the screen ID over as a string; the client needs an int."""
+        spec_jira_client.get_screen.return_value = {"id": 1}
+
+        _get_screen_impl("1", client=spec_jira_client)
+
+        spec_jira_client.get_screen.assert_called_once_with(1)
+
+    def test_get_screen_rejects_non_numeric_id(self, spec_jira_client):
+        """A non-numeric screen ID fails with a clear message, not an API error."""
+        with pytest.raises(ValidationError, match="Screen ID must be numeric"):
+            _get_screen_impl("not-a-number", client=spec_jira_client)
+
+        spec_jira_client.get_screen.assert_not_called()
+
+    def test_get_issue_type_scheme_filters_the_list(self, spec_jira_client):
+        """There is no single-scheme endpoint, so the list is filtered by ID."""
+        spec_jira_client.get_issue_type_schemes.return_value = {
+            "values": [{"id": "10000", "name": "Default"}]
+        }
+
+        result = _get_issue_type_scheme_impl("10000", client=spec_jira_client)
+
+        assert result["name"] == "Default"
+        spec_jira_client.get_issue_type_schemes.assert_called_once_with(
+            scheme_ids=["10000"]
+        )
+
+    def test_get_issue_type_scheme_missing(self, spec_jira_client):
+        """An empty result is reported as not found."""
+        spec_jira_client.get_issue_type_schemes.return_value = {"values": []}
+
+        with pytest.raises(ValidationError, match="not found"):
+            _get_issue_type_scheme_impl("99999", client=spec_jira_client)
+
+    def test_create_issue_type_scheme_passes_issue_types(self, spec_jira_client):
+        """The API requires at least one issue type ID."""
+        spec_jira_client.create_issue_type_scheme.return_value = {"id": "10001"}
+
+        _create_issue_type_scheme_impl(
+            "Scheme",
+            issue_type_ids=["10001", "10002"],
+            description="Desc",
+            default_issue_type_id="10001",
+            client=spec_jira_client,
+        )
+
+        spec_jira_client.create_issue_type_scheme.assert_called_once_with(
+            name="Scheme",
+            issue_type_ids=["10001", "10002"],
+            description="Desc",
+            default_issue_type_id="10001",
+        )
+
+    def test_create_issue_type_scheme_requires_issue_types(self, spec_jira_client):
+        """An empty issue type list is rejected before the API call."""
+        with pytest.raises(ValidationError, match="--issue-types"):
+            _create_issue_type_scheme_impl(
+                "Scheme", issue_type_ids=[], client=spec_jira_client
+            )
+
+        spec_jira_client.create_issue_type_scheme.assert_not_called()
+
+    def test_assign_issue_type_scheme_returns_a_result(self, spec_jira_client):
+        """The client returns None on 204, so the impl builds its own result."""
+        spec_jira_client.assign_issue_type_scheme.return_value = None
+
+        result = _assign_issue_type_scheme_impl(
+            "PROJ", "10000", client=spec_jira_client
+        )
+
+        # Client argument order is (scheme_id, project_id).
+        spec_jira_client.assign_issue_type_scheme.assert_called_once_with(
+            "10000", "PROJ"
+        )
+        assert result == {
+            "action": "assigned",
+            "project": "PROJ",
+            "scheme_id": "10000",
+        }
+
+    def test_get_project_issue_type_scheme_unwraps_mapping(self, spec_jira_client):
+        """The project endpoint returns scheme/project mappings."""
+        spec_jira_client.get_issue_type_scheme_for_projects.return_value = {
+            "values": [
+                {
+                    "issueTypeScheme": {"id": "10000", "name": "Default"},
+                    "projectIds": ["10100"],
+                }
+            ]
+        }
+
+        result = _get_project_issue_type_scheme_impl("10100", client=spec_jira_client)
+
+        assert result == {"id": "10000", "name": "Default"}
+        spec_jira_client.get_issue_type_scheme_for_projects.assert_called_once_with(
+            ["10100"]
+        )
+
+    def test_get_project_issue_type_scheme_missing(self, spec_jira_client):
+        """No mapping is reported rather than returning an empty dict."""
+        spec_jira_client.get_issue_type_scheme_for_projects.return_value = {
+            "values": []
+        }
+
+        with pytest.raises(ValidationError, match="No issue type scheme"):
+            _get_project_issue_type_scheme_impl("10100", client=spec_jira_client)
+
+    def test_get_workflow_scheme_coerces_id_and_lists_projects(self, spec_jira_client):
+        """The scheme ID becomes an int and projects come back as a list."""
+        spec_jira_client.get_workflow_scheme.return_value = {"id": 10000}
+        spec_jira_client.get_projects_for_workflow_scheme.return_value = [
+            {"key": "PROJ"}
+        ]
+
+        result = _get_workflow_scheme_impl(
+            "10000", show_projects=True, client=spec_jira_client
+        )
+
+        spec_jira_client.get_workflow_scheme.assert_called_once_with(10000)
+        assert result["projects"] == [{"key": "PROJ"}]
+
+    def test_assign_workflow_scheme(self, spec_jira_client):
+        """Assignment goes through assign_workflow_scheme_to_project."""
+        spec_jira_client.assign_workflow_scheme_to_project.return_value = {
+            "taskId": "1"
+        }
+
+        _assign_workflow_scheme_impl("PROJ", "10000", client=spec_jira_client)
+
+        spec_jira_client.assign_workflow_scheme_to_project.assert_called_once_with(
+            "PROJ", "10000"
+        )
+
+    def test_list_statuses(self, spec_jira_client):
+        """'status list' calls get_statuses()."""
+        spec_jira_client.get_statuses.return_value = [{"name": "Open"}]
+
+        assert _list_statuses_impl(client=spec_jira_client) == [{"name": "Open"}]
+
+    def test_project_config_reads_both_schemes(self, spec_jira_client):
+        """--show-schemes reads the permission and notification schemes."""
+        spec_jira_client.get_project.return_value = {"key": "PROJ"}
+        spec_jira_client.get_project_permission_scheme.return_value = {"id": 10000}
+        spec_jira_client.get_project_notification_scheme.return_value = {"id": 10100}
+
+        result = _get_project_config_impl(
+            "PROJ", show_schemes=True, client=spec_jira_client
+        )
+
+        assert result["schemes"]["permission"] == {"id": 10000}
+        assert result["schemes"]["notification"] == {"id": 10100}
+
+    def test_create_issue_type_uses_issue_type_kwarg(self, spec_jira_client):
+        """The client parameter is issue_type, not the reserved word 'type'."""
+        spec_jira_client.create_issue_type.return_value = {"id": "10001"}
+
+        _create_issue_type_impl(
+            "Bug", description="A bug", issue_type="standard", client=spec_jira_client
+        )
+
+        spec_jira_client.create_issue_type.assert_called_once_with(
+            name="Bug", description="A bug", issue_type="standard"
+        )

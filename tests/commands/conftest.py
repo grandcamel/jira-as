@@ -35,6 +35,23 @@ def cli_runner():
 
 
 @pytest.fixture
+def spec_jira_client():
+    """Mock JiraClient bound to the real class's attribute surface.
+
+    Unlike ``mock_jira_client``, this raises AttributeError when a command
+    calls a method the real JiraClient does not define, so renamed or
+    misspelled client calls fail in tests rather than in production.
+    """
+    from jira_as import JiraClient
+
+    client = MagicMock(spec=JiraClient)
+    client.__enter__ = MagicMock(return_value=client)
+    client.__exit__ = MagicMock(return_value=None)
+    client.base_url = "https://test.atlassian.net"
+    return client
+
+
+@pytest.fixture
 def mock_jira_client():
     """
     Mock JiraClient for testing without API calls.

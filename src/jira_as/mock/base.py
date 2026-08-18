@@ -560,7 +560,15 @@ class MockJiraClientBase:
         # Pagination
         from .factories import ResponseFactory
 
-        return ResponseFactory.paginated_issues(issues, start_at or 0, max_results)
+        offset = start_at or 0
+        if next_page_token:
+            # Mock tokens encode the offset they resume from ("mock-token-100").
+            try:
+                offset = int(str(next_page_token).rsplit("-", 1)[-1])
+            except ValueError:
+                offset = 0
+
+        return ResponseFactory.paginated_issues(issues, offset, max_results)
 
     def create_issue(self, fields: dict[str, Any]) -> dict[str, Any]:
         """Create a new issue.

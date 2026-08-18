@@ -40,6 +40,19 @@ from ..cli_utils import get_client_from_context, handle_jira_errors
 # =============================================================================
 
 
+def _as_int_id(value: Any, label: str) -> int:
+    """Coerce a CLI-supplied numeric ID to int.
+
+    Click hands these over as strings while the JiraClient screen and tab
+    endpoints take ints, so convert at the boundary and report a clear error
+    instead of letting a bad value reach the API.
+    """
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        raise ValidationError(f"{label} must be numeric, got: {value!r}") from None
+
+
 def _parse_comma_list(value: str | None) -> list[str] | None:
     """Parse comma-separated values into a list."""
     if not value:
@@ -154,16 +167,18 @@ def _create_project_impl(
     name = validate_project_name(name)
     project_type = validate_project_type(project_type)
 
-    template_key = None
+    default_templates = {
+        "software": "com.pyxis.greenhopper.jira:gh-simplified-agility-scrum",
+        "business": "com.atlassian.jira-core-project-templates:jira-core-project-management",
+        "service_desk": "com.atlassian.servicedesk:simplified-it-service-desk",
+    }
     if template:
         template_key = validate_project_template(template)
     else:
-        default_templates = {
-            "software": "com.pyxis.greenhopper.jira:gh-simplified-agility-scrum",
-            "business": "com.atlassian.jira-core-project-templates:jira-core-project-management",
-            "service_desk": "com.atlassian.servicedesk:simplified-it-service-desk",
-        }
-        template_key = default_templates.get(project_type)
+        # An unrecognised project type still needs some template for the API.
+        template_key = default_templates.get(
+            project_type, default_templates["software"]
+        )
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
         lead_account_id = None
@@ -797,7 +812,7 @@ def _assign_permission_scheme_impl(
                 "would_assign": True,
             }
 
-        result = c.assign_permission_scheme(project_key, scheme_id)
+        result = c.assign_permission_scheme_to_project(project_key, scheme_id)
         return {
             "action": "assigned",
             "project_key": project_key,
@@ -873,7 +888,10 @@ def _create_notification_scheme_impl(
     """Create a notification scheme."""
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
-        return c.create_notification_scheme(name=name, description=description)
+        data: dict[str, Any] = {"name": name}
+        if description:
+            data["description"] = description
+        return c.create_notification_scheme(data)
 
     if client is not None:
         return _do_work(client)
@@ -891,9 +909,21 @@ def _add_notification_impl(
     """Add a notification to a scheme."""
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
-        return c.add_notification(
-            scheme_id, event_type=event, notification_type=recipient
-        )
+        event_data = {
+            "notificationSchemeEvents": [
+                {
+                    "event": {"id": event},
+                    "notifications": [{"notificationType": recipient}],
+                }
+            ]
+        }
+        c.add_notification_to_scheme(scheme_id, event_data)
+        return {
+            "action": "added",
+            "scheme_id": scheme_id,
+            "event": event,
+            "recipient": recipient,
+        }
 
     if client is not None:
         return _do_work(client)
@@ -910,7 +940,7 @@ def _remove_notification_impl(
     """Remove a notification from a scheme."""
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
-        c.remove_notification(scheme_id, notification_id)
+        c.delete_notification_from_scheme(scheme_id, notification_id)
         return {
             "action": "removed",
             "scheme_id": scheme_id,
@@ -985,7 +1015,7 @@ def _get_screen_impl(
     """Get screen details."""
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
-        return c.get_screen(screen_id)
+        return c.get_screen(_as_int_id(screen_id, "Screen ID"))
 
     if client is not None:
         return _do_work(client)
@@ -1001,7 +1031,7 @@ def _list_screen_tabs_impl(
     """List screen tabs."""
 
     def _do_work(c: "JiraClient") -> list[dict[str, Any]]:
-        return c.get_screen_tabs(screen_id)
+        return c.get_screen_tabs(_as_int_id(screen_id, "Screen ID"))
 
     if client is not None:
         return _do_work(client)
@@ -1018,13 +1048,16 @@ def _get_screen_fields_impl(
     """Get fields on a screen."""
 
     def _do_work(c: "JiraClient") -> list[dict[str, Any]]:
+        screen = _as_int_id(screen_id, "Screen ID")
         if tab_id:
-            return c.get_screen_tab_fields(screen_id, tab_id)
+            return c.get_screen_tab_fields(screen, _as_int_id(tab_id, "Tab ID"))
         else:
-            tabs = c.get_screen_tabs(screen_id)
+            tabs = c.get_screen_tabs(screen)
             all_fields: list[dict[str, Any]] = []
             for tab in tabs:
-                fields = c.get_screen_tab_fields(screen_id, tab["id"])
+                fields = c.get_screen_tab_fields(
+                    screen, _as_int_id(tab["id"], "Tab ID")
+                )
                 for field in fields:
                     field["tab"] = tab["name"]
                 all_fields.extend(fields)
@@ -1047,14 +1080,15 @@ def _add_field_to_screen_impl(
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
         nonlocal tab_id
+        screen = _as_int_id(screen_id, "Screen ID")
         if not tab_id:
-            tabs = c.get_screen_tabs(screen_id)
+            tabs = c.get_screen_tabs(screen)
             if tabs:
                 tab_id = tabs[0]["id"]
             else:
                 raise ValidationError("No tabs found on screen")
 
-        return c.add_field_to_screen_tab(screen_id, tab_id, field_id)
+        return c.add_field_to_screen_tab(screen, _as_int_id(tab_id, "Tab ID"), field_id)
 
     if client is not None:
         return _do_work(client)
@@ -1073,10 +1107,13 @@ def _remove_field_from_screen_impl(
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
         nonlocal tab_id
+        screen = _as_int_id(screen_id, "Screen ID")
         if not tab_id:
-            tabs = c.get_screen_tabs(screen_id)
+            tabs = c.get_screen_tabs(screen)
             for tab in tabs:
-                fields = c.get_screen_tab_fields(screen_id, tab["id"])
+                fields = c.get_screen_tab_fields(
+                    screen, _as_int_id(tab["id"], "Tab ID")
+                )
                 if any(f["id"] == field_id for f in fields):
                     tab_id = tab["id"]
                     break
@@ -1084,7 +1121,7 @@ def _remove_field_from_screen_impl(
         if not tab_id:
             raise ValidationError(f"Field {field_id} not found on any tab")
 
-        c.remove_field_from_screen_tab(screen_id, tab_id, field_id)
+        c.remove_field_from_screen_tab(screen, _as_int_id(tab_id, "Tab ID"), field_id)
         return {"action": "removed", "screen_id": screen_id, "field_id": field_id}
 
     if client is not None:
@@ -1117,7 +1154,7 @@ def _get_screen_scheme_impl(
     """Get screen scheme details."""
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
-        return c.get_screen_scheme(scheme_id)
+        return c.get_screen_scheme(_as_int_id(scheme_id, "Screen scheme ID"))
 
     if client is not None:
         return _do_work(client)
@@ -1189,7 +1226,7 @@ def _create_issue_type_impl(
         return c.create_issue_type(
             name=name,
             description=description,
-            type=issue_type,
+            issue_type=issue_type,
         )
 
     if client is not None:
@@ -1262,7 +1299,12 @@ def _get_issue_type_scheme_impl(
     """Get issue type scheme details."""
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
-        return c.get_issue_type_scheme(scheme_id)
+        # There is no single-scheme endpoint; filter the paginated list by ID.
+        response = c.get_issue_type_schemes(scheme_ids=[scheme_id])
+        schemes = response.get("values") or []
+        if not schemes:
+            raise ValidationError(f"Issue type scheme not found: {scheme_id}")
+        return schemes[0]
 
     if client is not None:
         return _do_work(client)
@@ -1273,13 +1315,29 @@ def _get_issue_type_scheme_impl(
 
 def _create_issue_type_scheme_impl(
     name: str,
+    issue_type_ids: list[str],
     description: str | None = None,
+    default_issue_type_id: str | None = None,
     client: "JiraClient | None" = None,
 ) -> dict[str, Any]:
-    """Create an issue type scheme."""
+    """Create an issue type scheme.
+
+    The API rejects a scheme with no issue types, so at least one ID is
+    required rather than being discovered after a failed call.
+    """
+    if not issue_type_ids:
+        raise ValidationError(
+            "At least one issue type is required. "
+            "Pass --issue-types with comma-separated issue type IDs."
+        )
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
-        return c.create_issue_type_scheme(name=name, description=description)
+        return c.create_issue_type_scheme(
+            name=name,
+            issue_type_ids=issue_type_ids,
+            description=description,
+            default_issue_type_id=default_issue_type_id,
+        )
 
     if client is not None:
         return _do_work(client)
@@ -1296,7 +1354,13 @@ def _assign_issue_type_scheme_impl(
     """Assign an issue type scheme to a project."""
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
-        return c.assign_issue_type_scheme(project_key, scheme_id)
+        # The client returns None on success (204 No Content).
+        c.assign_issue_type_scheme(scheme_id, project_key)
+        return {
+            "action": "assigned",
+            "project": project_key,
+            "scheme_id": scheme_id,
+        }
 
     if client is not None:
         return _do_work(client)
@@ -1312,7 +1376,14 @@ def _get_project_issue_type_scheme_impl(
     """Get the issue type scheme for a project."""
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
-        return c.get_project_issue_type_scheme(project_id)
+        response = c.get_issue_type_scheme_for_projects([project_id])
+        mappings = response.get("values") or []
+        if not mappings:
+            raise ValidationError(
+                f"No issue type scheme found for project ID: {project_id}"
+            )
+        # Each mapping is {"issueTypeScheme": {...}, "projectIds": [...]}.
+        return mappings[0].get("issueTypeScheme", mappings[0])
 
     if client is not None:
         return _do_work(client)
@@ -1501,7 +1572,9 @@ def _get_workflow_for_issue_impl(
         project_key = issue["fields"]["project"]["key"]
         issue_type_id = issue["fields"]["issuetype"]["id"]
 
-        workflow_scheme = c.get_project_workflow_scheme(project_key)
+        # The endpoint wraps the scheme in a {"workflowScheme": {...}} envelope.
+        response = c.get_workflow_scheme_for_project(project_key)
+        workflow_scheme = response.get("workflowScheme", response)
         workflow_name = None
 
         mappings = workflow_scheme.get("issueTypeMappings", {})
@@ -1551,12 +1624,11 @@ def _get_workflow_scheme_impl(
     """Get workflow scheme details."""
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
-        scheme = c.get_workflow_scheme(scheme_id)
+        scheme = c.get_workflow_scheme(_as_int_id(scheme_id, "Workflow scheme ID"))
         result: dict[str, Any] = {"scheme": scheme}
 
         if show_projects:
-            projects = c.get_projects_for_workflow_scheme(scheme_id)
-            result["projects"] = projects.get("values", [])
+            result["projects"] = c.get_projects_for_workflow_scheme(scheme_id)
 
         return result
 
@@ -1575,7 +1647,7 @@ def _assign_workflow_scheme_impl(
     """Assign a workflow scheme to a project."""
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
-        return c.assign_workflow_scheme(project_key, scheme_id)
+        return c.assign_workflow_scheme_to_project(project_key, scheme_id)
 
     if client is not None:
         return _do_work(client)
@@ -3252,15 +3324,28 @@ def issue_type_scheme_get(ctx, scheme_id, output):
 
 @issue_type_scheme_group.command(name="create")
 @click.option("--name", "-n", required=True, help="Scheme name")
+@click.option(
+    "--issue-types",
+    "-i",
+    required=True,
+    help="Comma-separated issue type IDs (at least one is required)",
+)
+@click.option("--default-issue-type", help="Issue type ID to use as the default")
 @click.option("--description", "-d", help="Description")
 @click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
 @click.pass_context
 @handle_jira_errors
-def issue_type_scheme_create(ctx, name, description, output):
+def issue_type_scheme_create(
+    ctx, name, issue_types, default_issue_type, description, output
+):
     """Create an issue type scheme."""
     client = get_client_from_context(ctx)
     result = _create_issue_type_scheme_impl(
-        name=name, description=description, client=client
+        name=name,
+        issue_type_ids=_parse_comma_list(issue_types) or [],
+        description=description,
+        default_issue_type_id=default_issue_type,
+        client=client,
     )
     if output == "json":
         click.echo(format_json(result))

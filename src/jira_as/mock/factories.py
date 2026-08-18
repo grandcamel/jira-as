@@ -76,6 +76,7 @@ class ResponseFactory:
             "maxResults": max_results,
             "total": total,
             "issues": paginated,
+            "isLast": end_at >= total,
         }
 
         # Add nextPageToken when there are more results
