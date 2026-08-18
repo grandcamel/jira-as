@@ -765,6 +765,15 @@ class MockJiraClientBase:
                 "required": False,
                 "schema": {"type": "array", "items": "string"},
             },
+            {
+                # A custom field on the create screen, so project-scoped field
+                # listings have something to show beyond the system fields.
+                "fieldId": "customfield_10016",
+                "name": "Story Points",
+                "required": False,
+                "custom": True,
+                "schema": {"type": "number", "custom": "float"},
+            },
         ]
 
         from .factories import ResponseFactory
