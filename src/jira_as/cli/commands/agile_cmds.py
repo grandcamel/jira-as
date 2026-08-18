@@ -38,6 +38,7 @@ if TYPE_CHECKING:
 
 from jira_as import (
     JiraError,
+    NotFoundError,
     ValidationError,
     get_agile_field,
     get_agile_fields,
@@ -83,16 +84,43 @@ FIBONACCI_SEQUENCE = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 # =============================================================================
 
 
+# Page size used when walking /rest/agile/1.0/board.
+BOARD_PAGE_SIZE = 50
+
+
 def _get_board_for_project(
     project_key: str, client: "JiraClient | None" = None
 ) -> dict | None:
-    """Find the first Scrum board for a project."""
+    """Find the board to use for a project, preferring Scrum boards.
+
+    A project can have several boards. Silently picking one makes commands
+    look like they operated on the wrong data, so the choice is reported on
+    stderr whenever there was more than one candidate.
+    """
 
     def _do_work(c: "JiraClient") -> dict | None:
         result = c.get_all_boards(project_key=project_key)
         boards = result.get("values", [])
+        if not boards:
+            return None
+
         scrum_boards = [b for b in boards if b.get("type") == "scrum"]
-        return scrum_boards[0] if scrum_boards else (boards[0] if boards else None)
+        chosen = scrum_boards[0] if scrum_boards else boards[0]
+
+        if len(boards) > 1:
+            names = ", ".join(
+                f"{b.get('name', 'unnamed')} (id {b.get('id')}, {b.get('type', '?')})"
+                for b in boards
+            )
+            click.echo(
+                f"Warning: project {project_key} has {len(boards)} boards: {names}. "
+                f"Using board {chosen.get('id')} "
+                f"({chosen.get('name', 'unnamed')}). "
+                "Pass --board to choose a different one.",
+                err=True,
+            )
+
+        return chosen
 
     if client is not None:
         return _do_work(client)
@@ -113,6 +141,88 @@ def _get_board_id_for_project(
             "Ensure the project has a Scrum or Kanban board configured."
         )
     return board["id"]
+
+
+def _list_boards_impl(
+    project_key: str | None = None,
+    board_type: str | None = None,
+    max_results: int = 50,
+    client: "JiraClient | None" = None,
+) -> dict[str, Any]:
+    """List boards, optionally scoped to a project or board type.
+
+    ``/rest/agile/1.0/board`` pages with ``isLast``, so results are collected
+    across pages until the requested count is reached or the API says there
+    is nothing more.
+
+    Args:
+        project_key: Restrict to boards for this project
+        board_type: Restrict to 'scrum' or 'kanban' boards
+        max_results: Maximum boards to return
+        client: Optional JiraClient instance
+
+    Returns:
+        Dict with 'boards', 'total', and 'is_last'
+    """
+    if project_key:
+        validate_project_key(project_key)
+
+    def _do_work(c: "JiraClient") -> dict[str, Any]:
+        boards: list[dict[str, Any]] = []
+        start_at = 0
+        is_last = True
+
+        while len(boards) < max_results:
+            page = c.get_all_boards(
+                project_key=project_key,
+                board_type=board_type,
+                max_results=min(max_results - len(boards), BOARD_PAGE_SIZE),
+                start_at=start_at,
+            )
+            values = page.get("values") or []
+            boards.extend(values)
+
+            is_last = bool(page.get("isLast", True)) or not values
+            if is_last:
+                break
+            start_at += len(values)
+
+        boards = boards[:max_results]
+        return {
+            "boards": boards,
+            "total": len(boards),
+            "is_last": is_last,
+            "project": project_key,
+            "type": board_type,
+        }
+
+    if client is not None:
+        return _do_work(client)
+
+    with get_jira_client() as c:
+        return _do_work(c)
+
+
+def _format_boards(result: dict[str, Any]) -> str:
+    """Format a board listing as text."""
+    boards = result.get("boards", [])
+    if not boards:
+        return "No boards found."
+
+    lines = [f"Boards ({result.get('total', len(boards))}):", ""]
+    for board in boards:
+        location = board.get("location") or {}
+        project = location.get("projectKey") or location.get("projectName") or "-"
+        lines.append(
+            f"  [{board.get('id')}] {board.get('name', 'unnamed')} "
+            f"({board.get('type', '?')}, project {project})"
+        )
+
+    if not result.get("is_last", True):
+        lines.append("")
+        lines.append("More boards are available; raise --max-results to see them.")
+
+    return "\n".join(lines)
 
 
 def _parse_date_safe(date_str: str | None) -> str | None:
@@ -377,6 +487,7 @@ def _list_sprints_impl(
                 )
             actual_board_id = board["id"]
 
+        assert actual_board_id is not None  # guaranteed by the checks above
         result = c.get_board_sprints(
             actual_board_id, state=state, max_results=max_results
         )
@@ -561,8 +672,16 @@ def _close_sprint_impl(
         result: dict[str, Any] = {}
 
         if move_incomplete_to:
-            move_result = c.move_issues_to_sprint(sprint_id, move_incomplete_to)
-            result["moved_issues"] = move_result.get("movedIssues", 0)
+            # Move whatever is still open in this sprint, then close it.
+            incomplete = c.search_issues(
+                f"sprint = {sprint_id} AND statusCategory != Done",
+                fields=["key"],
+                max_results=1000,
+            )
+            issue_keys = [i["key"] for i in incomplete.get("issues", [])]
+            if issue_keys:
+                c.move_issues_to_sprint(move_incomplete_to, issue_keys)
+            result["moved_issues"] = len(issue_keys)
 
         update_data = {"state": "closed"}
         sprint_result = c.update_sprint(sprint_id, **update_data)
@@ -718,12 +837,24 @@ def _get_backlog_impl(
         if not actual_board_id and project_key:
             actual_board_id = _get_board_id_for_project(project_key, client=c)
 
-        agile_fields = get_agile_fields()
+        if actual_board_id is None:
+            raise ValidationError("Either board_id or project_key is required")
+
+        agile_fields = get_agile_fields(project_key=project_key)
         epic_link_field = agile_fields["epic_link"]
 
-        result = c.get_board_backlog(
-            actual_board_id, jql=jql_filter, max_results=max_results
-        )
+        try:
+            result = c.get_board_backlog(
+                actual_board_id, jql=jql_filter, max_results=max_results
+            )
+        except (NotFoundError, ValidationError):
+            # Kanban and team-managed boards may not expose a backlog
+            # endpoint at all. Fall back to the board's issues.
+            result = c.get_board_issues(
+                actual_board_id, jql=jql_filter, max_results=max_results
+            )
+            result["backlog_fallback"] = "board_issues"
+
         result["_agile_fields"] = agile_fields
 
         if group_by_epic:
@@ -960,6 +1091,9 @@ def _get_velocity_impl(
                 )
             actual_board_id = board["id"]
             board_name = board.get("name")
+
+        if actual_board_id is None:
+            raise ValidationError("Either board_id or project_key is required")
 
         result = c.get_board_sprints(
             actual_board_id, state="closed", max_results=num_sprints
@@ -1324,6 +1458,59 @@ def agile():
 
 
 # --- Epic Commands ---
+
+
+@agile.group()
+def board():
+    """Manage boards."""
+    pass
+
+
+@board.command(name="list")
+@click.option("--project", "-p", help="Project key to scope the listing to")
+@click.option(
+    "--type",
+    "-t",
+    "board_type",
+    type=click.Choice(["scrum", "kanban"]),
+    help="Filter by board type",
+)
+@click.option("--max-results", "-m", type=int, default=50, help="Maximum boards")
+@click.option(
+    "--output",
+    "-o",
+    type=click.Choice(["text", "json"]),
+    default="text",
+    help="Output format",
+)
+@click.pass_context
+@handle_jira_errors
+def board_list(ctx, project, board_type, max_results, output):
+    """List boards.
+
+    Examples:
+        jira-as agile board list --project PROJ
+        jira-as agile board list --type scrum --output json
+    """
+    if not project:
+        click.echo(
+            "Warning: listing every board on the site, which can be very large. "
+            "Pass --project to scope the results.",
+            err=True,
+        )
+
+    client = get_client_from_context(ctx)
+    result = _list_boards_impl(
+        project_key=project,
+        board_type=board_type,
+        max_results=max_results,
+        client=client,
+    )
+
+    if output == "json":
+        click.echo(format_json(result))
+    else:
+        click.echo(_format_boards(result))
 
 
 @agile.group()

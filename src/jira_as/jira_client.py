@@ -907,6 +907,64 @@ class JiraClient:
             operation=f"get backlog for board {board_id}",
         )
 
+    def get_board_issues(
+        self,
+        board_id: int,
+        jql: str | None = None,
+        fields: list | None = None,
+        max_results: int = 50,
+        start_at: int = 0,
+    ) -> dict[str, Any]:
+        """
+        Get all issues on a board.
+
+        Unlike get_board_backlog(), this endpoint works for Kanban boards and
+        for team-managed boards that do not expose a separate backlog.
+
+        Args:
+            board_id: Board ID
+            jql: Additional JQL filter
+            fields: List of fields to return
+            max_results: Maximum results per page
+            start_at: Starting index for pagination
+
+        Returns:
+            Board issues
+
+        Raises:
+            JiraError or subclass on failure
+        """
+        params: dict[str, Any] = {
+            "maxResults": max_results,
+            "startAt": start_at,
+        }
+        if jql:
+            params["jql"] = jql
+        if fields:
+            params["fields"] = ",".join(fields)
+
+        return self.get(
+            f"/rest/agile/1.0/board/{board_id}/issue",
+            params=params,
+            operation=f"get issues for board {board_id}",
+        )
+
+    def move_issues_to_backlog(self, issue_keys: list) -> None:
+        """
+        Move issues out of any sprint and back to the backlog.
+
+        Args:
+            issue_keys: List of issue keys to move
+
+        Raises:
+            JiraError or subclass on failure
+        """
+        self.post(
+            "/rest/agile/1.0/backlog/issue",
+            data={"issues": issue_keys},
+            operation="move issues to backlog",
+        )
+
     def rank_issues(
         self,
         issue_keys: list,

@@ -578,22 +578,53 @@ class AgileMixin(_Base):
     def get_board_backlog(
         self,
         board_id: int,
-        start_at: int = 0,
-        max_results: int = 50,
         jql: str | None = None,
         fields: list[str] | None = None,
+        max_results: int = 50,
+        start_at: int = 0,
     ) -> dict[str, Any]:
         """Alias for get_backlog_issues() for API parity.
 
+        The parameter order mirrors ``JiraClient.get_board_backlog`` so
+        positional calls behave the same against either client.
+
         Args:
             board_id: The board ID.
-            start_at: Starting index for pagination.
-            max_results: Maximum number of results.
             jql: Additional JQL filter.
             fields: Fields to return.
+            max_results: Maximum number of results.
+            start_at: Starting index for pagination.
 
         Returns:
             Paginated list of backlog issues.
+        """
+        return self.get_backlog_issues(
+            board_id=board_id,
+            start_at=start_at,
+            max_results=max_results,
+            jql=jql,
+            fields=fields,
+        )
+
+    def get_board_issues(
+        self,
+        board_id: int,
+        jql: str | None = None,
+        fields: list[str] | None = None,
+        max_results: int = 50,
+        start_at: int = 0,
+    ) -> dict[str, Any]:
+        """Get all issues on a board.
+
+        Args:
+            board_id: The board ID.
+            jql: Additional JQL filter.
+            fields: Fields to return.
+            max_results: Maximum number of results.
+            start_at: Starting index for pagination.
+
+        Returns:
+            Paginated list of board issues.
         """
         return self.get_backlog_issues(
             board_id=board_id,

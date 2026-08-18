@@ -24,6 +24,7 @@ Filter Group:
 
 from __future__ import annotations
 
+import csv
 import json
 from difflib import get_close_matches
 from typing import TYPE_CHECKING, Any
@@ -255,6 +256,40 @@ def _search_issues_impl(
         return _do_work(c)
 
 
+def _serialize_export_value(value: Any, for_csv: bool) -> Any:
+    """Render a field value for export.
+
+    JSON exports keep nested values as real JSON so downstream tools can read
+    them. CSV has no nesting, so objects collapse to their display name where
+    they have one and to compact JSON otherwise - never to a Python repr,
+    which is not parseable by anything.
+    """
+    if not for_csv:
+        return value
+
+    if isinstance(value, dict):
+        for key in ("displayName", "name", "value"):
+            if key in value:
+                return value[key]
+        return json.dumps(value, separators=(",", ":"))
+
+    if isinstance(value, list):
+        parts = []
+        for item in value:
+            if isinstance(item, dict):
+                for key in ("displayName", "name", "value"):
+                    if key in item:
+                        parts.append(str(item[key]))
+                        break
+                else:
+                    parts.append(json.dumps(item, separators=(",", ":")))
+            else:
+                parts.append(str(item))
+        return ", ".join(parts)
+
+    return value
+
+
 def _export_results_impl(
     jql: str,
     output_file: str,
@@ -285,47 +320,34 @@ def _export_results_impl(
         )
         issues = results.get("issues", [])
 
-        if not issues:
-            return {"exported": 0, "message": "No issues found to export"}
+        columns = ["key"] + [f for f in fields if f != "key"]  # type: ignore[union-attr]
 
         export_data = []
         for issue in issues:
-            row = {"key": issue.get("key", "")}
+            row: dict[str, Any] = {"key": issue.get("key", "")}
             issue_fields = issue.get("fields", {})
 
             for field in fields:  # type: ignore[union-attr]
                 if field == "key":
                     continue
-
-                value = issue_fields.get(field, "")
-
-                if isinstance(value, dict):
-                    if "displayName" in value:
-                        value = value["displayName"]
-                    elif "name" in value:
-                        value = value["name"]
-                    else:
-                        value = str(value)
-                elif isinstance(value, list):
-                    value = ", ".join(
-                        (
-                            item.get("name", str(item))
-                            if isinstance(item, dict)
-                            else str(item)
-                        )
-                        for item in value
-                    )
-
-                row[field] = value
+                row[field] = _serialize_export_value(
+                    issue_fields.get(field, ""), for_csv=format_type == "csv"
+                )
 
             export_data.append(row)
 
+        # An empty result set is a successful export of nothing: write a CSV
+        # with just its header row, or an empty JSON envelope. Returning early
+        # used to skip the file and omit 'output_file' from the result, which
+        # the CLI then raised a KeyError on.
         if format_type == "csv":
-            export_csv(
-                export_data,
-                output_file,
-                columns=["key"] + [f for f in fields if f != "key"],  # type: ignore[union-attr]
-            )
+            if export_data:
+                export_csv(export_data, output_file, columns=columns)
+            else:
+                # export_csv() rejects an empty list, but a header-only file is
+                # the right answer for a query that matched nothing.
+                with open(output_file, "w", newline="", encoding="utf-8") as f:
+                    csv.DictWriter(f, fieldnames=columns).writeheader()
         else:
             with open(output_file, "w") as f:
                 json.dump(
