@@ -283,9 +283,7 @@ def _format_dot(issue_key: str, dependencies: list) -> str:
         color = (
             "lightgreen"
             if status == "Done"
-            else "lightyellow"
-            if status == "In Progress"
-            else "white"
+            else "lightyellow" if status == "In Progress" else "white"
         )
         lines.append(f'    "{dep_key}" [style=filled, fillcolor={color}];')
 

@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import argparse
 import ast
-import json
 import re
 import sys
 from dataclasses import dataclass, field
@@ -471,13 +470,6 @@ def check_parameter_compliance(
         if p.get("required", False) and p.get("in") != "path"
     }
 
-    # Get optional spec parameters
-    optional_params = {
-        p["name"]: p
-        for p in spec_params
-        if not p.get("required", False) and p.get("in") != "path"
-    }
-
     # Check for missing required parameters
     impl_all_params = set(method.params + method.optional_params)
 
@@ -627,7 +619,11 @@ def find_missing_spec_endpoints(
         api_missing: list[str] = []
         for path, path_item in paths.items():
             if path not in implemented_paths:
-                methods = [m.upper() for m in path_item.keys() if m in ("get", "post", "put", "delete")]
+                methods = [
+                    m.upper()
+                    for m in path_item.keys()
+                    if m in ("get", "post", "put", "delete")
+                ]
                 if methods:
                     summary = ""
                     for m in ["get", "post", "put", "delete"]:
@@ -657,8 +653,12 @@ def generate_report(
     # Summary section
     lines.append("## Summary")
     lines.append("")
-    lines.append("| API | Spec Status | Categories | Methods | Matched | Compliant | Issues |")
-    lines.append("|-----|-------------|------------|---------|---------|-----------|--------|")
+    lines.append(
+        "| API | Spec Status | Categories | Methods | Matched | Compliant | Issues |"
+    )
+    lines.append(
+        "|-----|-------------|------------|---------|---------|-----------|--------|"
+    )
 
     api_stats: dict[str, dict[str, int]] = {}
     for api_type in ["platform", "agile", "jsm", "assets"]:
@@ -681,7 +681,9 @@ def generate_report(
     for api_type, stats in api_stats.items():
         if stats["methods"] == 0:
             continue
-        spec_status = "✅ Loaded" if specs_loaded.get(api_type, False) else "❌ Not Available"
+        spec_status = (
+            "✅ Loaded" if specs_loaded.get(api_type, False) else "❌ Not Available"
+        )
         api_name = {
             "platform": "Platform v3",
             "agile": "Agile",
@@ -698,7 +700,10 @@ def generate_report(
 
     # Critical issues section
     critical_issues = [
-        issue for cat in categories.values() for issue in cat.issues if issue.severity == "critical"
+        issue
+        for cat in categories.values()
+        for issue in cat.issues
+        if issue.severity == "critical"
     ]
 
     if critical_issues:
@@ -726,7 +731,11 @@ def generate_report(
         matched = len(category.matched_endpoints)
         compliant = category.compliant_count
 
-        status_icon = "✅" if compliant == matched and matched > 0 else "⚠️" if matched > 0 else "❓"
+        status_icon = (
+            "✅"
+            if compliant == matched and matched > 0
+            else "⚠️" if matched > 0 else "❓"
+        )
 
         lines.append(f"### {category.name} {status_icon}")
         lines.append("")
@@ -757,7 +766,9 @@ def generate_report(
             lines.append("#### Unmatched Methods (not found in spec)")
             lines.append("")
             for method in category.unmatched_methods:
-                lines.append(f"- `{method.name}()` - {method.http_method or 'N/A'} {method.endpoint or 'N/A'}")
+                lines.append(
+                    f"- `{method.name}()` - {method.http_method or 'N/A'} {method.endpoint or 'N/A'}"
+                )
             lines.append("")
 
         if category.issues:
@@ -767,7 +778,9 @@ def generate_report(
                 severity_icon = {"critical": "🔴", "warning": "🟡", "info": "🔵"}.get(
                     issue.severity, "⚪"
                 )
-                lines.append(f"- {severity_icon} **{issue.issue_type}**: {issue.description}")
+                lines.append(
+                    f"- {severity_icon} **{issue.issue_type}**: {issue.description}"
+                )
             if len(category.issues) > 10:
                 lines.append(f"- ... and {len(category.issues) - 10} more issues")
             lines.append("")
@@ -776,7 +789,9 @@ def generate_report(
     if missing_endpoints:
         lines.append("## Missing Endpoints (from spec)")
         lines.append("")
-        lines.append("These endpoints exist in the OpenAPI spec but are not implemented:")
+        lines.append(
+            "These endpoints exist in the OpenAPI spec but are not implemented:"
+        )
         lines.append("")
 
         for api_type, endpoints in missing_endpoints.items():
@@ -800,7 +815,9 @@ def generate_report(
     lines.append("### High Priority")
     lines.append("")
     if critical_issues:
-        lines.append(f"1. Fix {len(critical_issues)} critical issues (missing required parameters)")
+        lines.append(
+            f"1. Fix {len(critical_issues)} critical issues (missing required parameters)"
+        )
     lines.append("2. Review unmatched methods for potential spec updates")
     lines.append("3. Consider implementing high-value missing endpoints")
     lines.append("")
@@ -886,7 +903,7 @@ def main():
     total_compliant = sum(c.compliant_count for c in categories.values())
     total_issues = sum(len(c.issues) for c in categories.values())
 
-    print(f"\nSummary:")
+    print("\nSummary:")
     print(f"  Total methods: {total_methods}")
     print(f"  Matched to spec: {total_matched}")
     print(f"  Fully compliant: {total_compliant}")

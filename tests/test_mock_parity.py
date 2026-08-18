@@ -207,12 +207,12 @@ class TestMockParity:
     )
     def test_method_exists_in_both(self, method_name):
         """Verify specific methods exist in both clients."""
-        assert hasattr(JiraClient, method_name), (
-            f"JiraClient missing method: {method_name}"
-        )
-        assert hasattr(MockJiraClient, method_name), (
-            f"MockJiraClient missing method: {method_name}"
-        )
+        assert hasattr(
+            JiraClient, method_name
+        ), f"JiraClient missing method: {method_name}"
+        assert hasattr(
+            MockJiraClient, method_name
+        ), f"MockJiraClient missing method: {method_name}"
 
 
 class TestAgileMethodParity:
@@ -285,6 +285,6 @@ class TestJSMMethodParity:
                 if "organization_id" in params:
                     annotation = params["organization_id"].annotation
                     # Should be int, not str
-                    assert annotation is int or "int" in str(annotation), (
-                        f"{method_name}: organization_id should be int"
-                    )
+                    assert annotation is int or "int" in str(
+                        annotation
+                    ), f"{method_name}: organization_id should be int"

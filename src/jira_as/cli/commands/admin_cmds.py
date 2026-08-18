@@ -302,7 +302,9 @@ def _get_project_config_impl(
     """Get project configuration."""
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
-        project = c.get_project(project_key, expand=["description", "lead", "issueTypes"])
+        project = c.get_project(
+            project_key, expand=["description", "lead", "issueTypes"]
+        )
         config: dict[str, Any] = {"project": project}
 
         if show_schemes:

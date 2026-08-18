@@ -223,9 +223,9 @@ pip install -e ".[dev]"
 # Run tests
 pytest
 
-# Format code
+# Format code (black formats; ruff sorts imports)
 black src tests
-isort src tests
+ruff check --fix src tests
 
 # Type checking
 mypy src
