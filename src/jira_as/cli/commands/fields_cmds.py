@@ -11,7 +11,12 @@ from typing import TYPE_CHECKING, Any
 
 import click
 
-from jira_as import JiraError, ValidationError, get_jira_client
+from jira_as import (
+    JiraError,
+    ValidationError,
+    get_jira_client,
+    validate_project_key,
+)
 
 from ..cli_utils import format_json, get_client_from_context, handle_jira_errors
 
@@ -200,10 +205,60 @@ def _add_field_to_screen(
 # =============================================================================
 
 
+def _resolve_issue_type_id(
+    c: JiraClient, project: str, issue_type: str
+) -> tuple[str, str]:
+    """Resolve an issue type name or ID to (id, name) within a project."""
+    response = c.get_create_issue_meta_issuetypes(project, max_results=100)
+    issue_types = response.get("issueTypes") or response.get("values") or []
+
+    wanted = issue_type.lower()
+    for it in issue_types:
+        if str(it.get("id")) == issue_type or str(it.get("name", "")).lower() == wanted:
+            return str(it.get("id")), str(it.get("name", issue_type))
+
+    available = ", ".join(str(it.get("name", it.get("id"))) for it in issue_types)
+    raise ValidationError(
+        f"Issue type '{issue_type}' not found in project {project}. "
+        f"Available: {available or 'none'}"
+    )
+
+
+def _get_create_screen_fields(
+    c: JiraClient, project: str, issue_type: str | None
+) -> list[dict[str, Any]]:
+    """Get the fields on a project's create screen.
+
+    Scoping to a project (and optionally an issue type) answers "what can I
+    actually set here", which the full instance field catalogue does not.
+    """
+    if issue_type:
+        type_ids = [_resolve_issue_type_id(c, project, issue_type)]
+    else:
+        response = c.get_create_issue_meta_issuetypes(project, max_results=100)
+        issue_types = response.get("issueTypes") or response.get("values") or []
+        type_ids = [(str(it.get("id")), str(it.get("name", ""))) for it in issue_types]
+
+    # A field can appear on several issue types; keep one entry per field and
+    # record which issue types it belongs to.
+    by_id: dict[str, dict[str, Any]] = {}
+    for type_id, type_name in type_ids:
+        response = c.get_create_issue_meta_fields(project, type_id, max_results=100)
+        for field in response.get("fields") or response.get("values") or []:
+            field_id = str(field.get("fieldId") or field.get("key") or field.get("id"))
+            entry = by_id.setdefault(field_id, {**field, "issue_types": []})
+            if type_name and type_name not in entry["issue_types"]:
+                entry["issue_types"].append(type_name)
+
+    return list(by_id.values())
+
+
 def _list_fields_impl(
     filter_pattern: str | None = None,
     agile_only: bool = False,
     custom_only: bool = True,
+    project: str | None = None,
+    issue_type: str | None = None,
     client: JiraClient | None = None,
 ) -> list[dict[str, Any]]:
     """
@@ -213,14 +268,24 @@ def _list_fields_impl(
         filter_pattern: Filter fields by name pattern (case-insensitive)
         agile_only: If True, only show Agile-related fields
         custom_only: If True, only show custom fields (default: True)
+        project: Restrict to the fields on this project's create screen
+        issue_type: Restrict further to one issue type (requires project)
         client: Optional JiraClient instance. If None, creates one internally.
 
     Returns:
         List of field dictionaries
     """
+    if issue_type and not project:
+        raise ValidationError("--issue-type requires --project")
+
+    if project:
+        project = validate_project_key(project)
 
     def _do_list(c: JiraClient) -> list[dict[str, Any]]:
-        fields = c.get("/rest/api/3/field")
+        if project:
+            fields = _get_create_screen_fields(c, project, issue_type)
+        else:
+            fields = c.get("/rest/api/3/field")
 
         result: list[dict[str, Any]] = []
         for field in fields:
@@ -228,7 +293,7 @@ def _list_fields_impl(
                 continue
 
             name = field.get("name", "")
-            field_id = field.get("id", "")
+            field_id = field.get("id") or field.get("fieldId") or field.get("key") or ""
 
             if filter_pattern and filter_pattern.lower() not in name.lower():
                 continue
@@ -239,16 +304,19 @@ def _list_fields_impl(
                     continue
 
             schema = field.get("schema", {})
-            result.append(
-                {
-                    "id": field_id,
-                    "name": name,
-                    "type": schema.get("type", "unknown"),
-                    "custom": field.get("custom", False),
-                    "searchable": field.get("searchable", False),
-                    "navigable": field.get("navigable", False),
-                }
-            )
+            entry: dict[str, Any] = {
+                "id": field_id,
+                "name": name,
+                "type": schema.get("type", "unknown"),
+                "custom": field.get("custom", False),
+                "searchable": field.get("searchable", False),
+                "navigable": field.get("navigable", False),
+            }
+            if project:
+                entry["required"] = field.get("required", False)
+                if field.get("issue_types"):
+                    entry["issue_types"] = field["issue_types"]
+            result.append(entry)
 
         result.sort(key=lambda x: x["name"].lower())
         return result
@@ -635,18 +703,44 @@ def fields():
 @click.option(
     "--all", "show_all", is_flag=True, help="Show all fields (not just custom)"
 )
+@click.option(
+    "--project",
+    "-p",
+    help="Scope to the fields on this project's create screen "
+    "(instead of the whole instance catalogue)",
+)
+@click.option(
+    "--issue-type", "-t", help="Scope further to one issue type (requires --project)"
+)
 @click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
 @click.pass_context
 @handle_jira_errors
 def fields_list(
-    ctx: click.Context, filter_pattern: str, agile: bool, show_all: bool, output: str
+    ctx: click.Context,
+    filter_pattern: str,
+    agile: bool,
+    show_all: bool,
+    project: str,
+    issue_type: str,
+    output: str,
 ):
-    """List all available fields."""
+    """List available fields.
+
+    Without --project this lists the whole instance field catalogue. With
+    --project (and optionally --issue-type) it lists only the fields you can
+    actually set when creating an issue there.
+
+    Examples:
+        jira-as fields list --project PROJ
+        jira-as fields list --project PROJ --issue-type Bug
+    """
     client = get_client_from_context(ctx)
     result = _list_fields_impl(
         filter_pattern=filter_pattern,
         agile_only=agile,
         custom_only=not show_all,
+        project=project,
+        issue_type=issue_type,
         client=client,
     )
 

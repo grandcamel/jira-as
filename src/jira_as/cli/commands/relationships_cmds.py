@@ -18,6 +18,8 @@ if TYPE_CHECKING:
 
 from jira_as import (
     JiraError,
+    NotFoundError,
+    PermissionError,
     ValidationError,
     get_jira_client,
     text_to_adf,
@@ -449,6 +451,70 @@ def _format_d2(issue_key: str, dependencies: list) -> str:
 # =============================================================================
 
 
+def _create_remote_link_impl(
+    issue_key: str,
+    remote_url: str,
+    remote_title: str | None = None,
+    remote_relationship: str | None = None,
+    dry_run: bool = False,
+    client: JiraClient | None = None,
+) -> dict:
+    """Create a remote (web) link on an issue.
+
+    Native issue links only work between issues in the same Jira site that
+    the caller can link. A remote link points at any URL, which is the way to
+    reference cross-project or JSM targets a native link rejects.
+
+    Args:
+        issue_key: Issue to attach the link to
+        remote_url: Target URL
+        remote_title: Link title (defaults to the URL)
+        remote_relationship: Relationship text (e.g. "documented by")
+        dry_run: Preview without creating the link
+        client: Optional JiraClient instance
+
+    Returns:
+        Dict describing the created (or previewed) remote link
+    """
+    issue_key = validate_issue_key(issue_key)
+
+    if not remote_url:
+        raise ValidationError("--remote-url requires a URL")
+
+    title = remote_title or remote_url
+
+    def _do_work(c: JiraClient) -> dict:
+        if dry_run:
+            return {
+                "source": issue_key,
+                "remote_url": remote_url,
+                "title": title,
+                "relationship": remote_relationship,
+                "dry_run": True,
+                "preview": f"{issue_key} -> {remote_url} ({title})",
+            }
+
+        result = c.create_remote_link(
+            issue_key,
+            url=remote_url,
+            title=title,
+            relationship=remote_relationship,
+        )
+        return {
+            "source": issue_key,
+            "remote_url": remote_url,
+            "title": title,
+            "relationship": remote_relationship,
+            "id": result.get("id"),
+        }
+
+    if client is not None:
+        return _do_work(client)
+
+    with get_jira_client() as c:
+        return _do_work(c)
+
+
 def _link_issue_impl(
     issue_key: str,
     blocks: str | None = None,
@@ -532,7 +598,18 @@ def _link_issue_impl(
                 "preview": f"{issue_key} {direction} {resolved_target}",
             }
 
-        c.create_link(link_type_obj["name"], inward_key, outward_key, adf_comment)
+        try:
+            c.create_link(link_type_obj["name"], inward_key, outward_key, adf_comment)
+        except (NotFoundError, PermissionError) as e:
+            # Cross-project and JSM targets often reject a native link even
+            # though a remote link to the same issue works fine.
+            click.echo(
+                f"Hint: a native link to {resolved_target} was rejected. "
+                "If the target is in another project or a service desk, try "
+                f"'relationships link {issue_key} --remote-url <issue URL>'.",
+                err=True,
+            )
+            raise e
         return None
 
     if client is not None:
@@ -880,6 +957,8 @@ def _bulk_link_impl(
     """Bulk link multiple issues to a target."""
     if not target:
         raise ValidationError("target is required")
+    if not link_type:
+        raise ValidationError("link_type is required")
     target = validate_issue_key(target)
 
     def _do_work(c: JiraClient) -> dict[str, Any]:
@@ -1449,6 +1528,15 @@ def relationships():
 @click.option("--clones", help="Issue that this issue clones")
 @click.option("--type", "-t", "link_type", help="Explicit link type name")
 @click.option("--to", "target", help="Target issue (use with --type)")
+@click.option(
+    "--remote-url",
+    help="Create a remote (web) link to this URL instead of a native issue link",
+)
+@click.option("--remote-title", help="Title for the remote link (defaults to the URL)")
+@click.option(
+    "--remote-relationship",
+    help='Relationship text for the remote link (e.g. "documented by")',
+)
 @click.option("--comment", "-c", help="Add comment with the link")
 @click.option("--dry-run", "-n", is_flag=True, help="Preview without making changes")
 @click.pass_context
@@ -1463,10 +1551,50 @@ def relationships_link(
     clones: str,
     link_type: str,
     target: str,
+    remote_url: str,
+    remote_title: str,
+    remote_relationship: str,
     comment: str,
     dry_run: bool,
 ):
-    """Create a link between two issues."""
+    """Create a link between two issues, or a remote link to any URL.
+
+    Examples:
+        jira-as relationships link PROJ-1 --blocks PROJ-2
+        jira-as relationships link PROJ-1 --remote-url https://example.com/doc
+    """
+    client = get_client_from_context(ctx)
+
+    if remote_url:
+        conflicting = [blocks, is_blocked_by, relates_to, duplicates, clones, target]
+        if any(conflicting):
+            raise click.UsageError(
+                "--remote-url creates a web link and cannot be combined with "
+                "native link options"
+            )
+
+        remote_result = _create_remote_link_impl(
+            issue_key=source_issue,
+            remote_url=remote_url,
+            remote_title=remote_title,
+            remote_relationship=remote_relationship,
+            dry_run=dry_run,
+            client=client,
+        )
+
+        if dry_run:
+            click.echo(
+                f"[DRY RUN] Would create remote link: {remote_result['preview']}"
+            )
+        else:
+            click.echo(f"Linked {source_issue} to {remote_url}")
+        return
+
+    if remote_title or remote_relationship:
+        raise click.UsageError(
+            "--remote-title and --remote-relationship require --remote-url"
+        )
+
     link_opts = [blocks, is_blocked_by, relates_to, duplicates, clones]
     explicit_opts = link_type and target
     if sum(1 for opt in link_opts if opt) + (1 if explicit_opts else 0) != 1:
@@ -1474,7 +1602,6 @@ def relationships_link(
             "Specify exactly one link type: --blocks, --relates-to, --duplicates, --clones, --is-blocked-by, or --type with --to"
         )
 
-    client = get_client_from_context(ctx)
     result = _link_issue_impl(
         issue_key=source_issue,
         blocks=blocks,

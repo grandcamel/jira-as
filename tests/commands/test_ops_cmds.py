@@ -14,6 +14,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from jira_as.cli.commands.ops_cmds import (
+    _analyze_field_fill_rates,
+    _analyze_parent_hierarchy,
+    _analyze_value_distributions,
     _cache_clear_impl,
     _cache_status_impl,
     _cache_warm_impl,
@@ -607,3 +610,144 @@ class TestDiscoverProjectCommand:
 
         assert result.exit_code == 0
         assert "{" in result.output
+
+
+# =============================================================================
+# discover-project analyses
+# =============================================================================
+
+
+class TestFieldFillRates:
+    """Fill rates say how often a field actually carries a value."""
+
+    def test_counts_populated_fields(self):
+        """Only non-empty values count as filled."""
+        issues = [
+            {"fields": {"assignee": {"accountId": "a"}, "labels": ["x"]}},
+            {"fields": {"assignee": None, "labels": []}},
+        ]
+
+        result = _analyze_field_fill_rates(issues, ["assignee", "labels"])
+
+        assert result["assignee"] == {"filled": 1, "total": 2, "percentage": 50.0}
+        assert result["labels"] == {"filled": 1, "total": 2, "percentage": 50.0}
+
+    def test_field_never_present_is_zero_not_missing(self):
+        """A field absent everywhere still gets a 0% entry."""
+        result = _analyze_field_fill_rates([{"fields": {}}], ["duedate"])
+
+        assert result["duedate"]["percentage"] == 0.0
+
+    def test_empty_sample(self):
+        """No issues means no rates."""
+        assert _analyze_field_fill_rates([], ["assignee"]) == {}
+
+
+class TestValueDistributions:
+    """Distributions show the values a project actually uses."""
+
+    def test_counts_scalar_and_list_fields(self):
+        """Objects and arrays of objects are both counted by name."""
+        issues = [
+            {
+                "fields": {
+                    "status": {"name": "Open"},
+                    "priority": {"name": "High"},
+                    "components": [{"name": "api"}, {"name": "web"}],
+                }
+            },
+            {
+                "fields": {
+                    "status": {"name": "Open"},
+                    "priority": {"name": "Low"},
+                    "components": [{"name": "api"}],
+                }
+            },
+        ]
+
+        result = _analyze_value_distributions(issues)
+
+        assert result["status"]["Open"] == {"count": 2, "percentage": 100.0}
+        assert result["priority"]["High"]["count"] == 1
+        assert result["components"]["api"]["count"] == 2
+
+    def test_ranks_and_truncates(self):
+        """Only the top N values are reported, most common first."""
+        issues = [{"fields": {"status": {"name": f"S{n % 12}"}}} for n in range(120)]
+
+        result = _analyze_value_distributions(issues, top_n=3)
+
+        assert len(result["status"]) == 3
+
+    def test_absent_fields_are_omitted(self):
+        """A field with no values does not appear at all."""
+        result = _analyze_value_distributions([{"fields": {}}])
+
+        assert result == {}
+
+
+class TestParentHierarchy:
+    """Parent analysis says whether new issues need a parent."""
+
+    def test_maps_child_types_to_parent_types(self):
+        """The child-to-parent mapping is built from the sample."""
+        issues = [
+            {
+                "fields": {
+                    "issuetype": {"name": "Story"},
+                    "parent": {"fields": {"issuetype": {"name": "Epic"}}},
+                }
+            },
+            {
+                "fields": {
+                    "issuetype": {"name": "Sub-task"},
+                    "parent": {"fields": {"issuetype": {"name": "Story"}}},
+                }
+            },
+        ]
+
+        result = _analyze_parent_hierarchy(issues)
+
+        assert result["issues_with_parent"] == 2
+        assert result["percentage"] == 100.0
+        assert result["child_to_parent_types"]["Story"] == {"Epic": 1}
+        assert result["parent_issue_types"] == {"Epic": 1, "Story": 1}
+
+    def test_hint_when_parents_are_the_norm(self):
+        """A mostly-parented project tells you to pass --parent."""
+        issues = [
+            {
+                "fields": {
+                    "issuetype": {"name": "Story"},
+                    "parent": {"fields": {"issuetype": {"name": "Epic"}}},
+                }
+            }
+        ] * 9 + [{"fields": {"issuetype": {"name": "Task"}}}]
+
+        assert "set --parent" in _analyze_parent_hierarchy(issues)["hint"]
+
+    def test_hint_when_project_is_flat(self):
+        """No parents at all is reported as a flat project."""
+        result = _analyze_parent_hierarchy(
+            [{"fields": {"issuetype": {"name": "Task"}}}]
+        )
+
+        assert result["issues_with_parent"] == 0
+        assert "flat" in result["hint"]
+
+    def test_hint_when_parents_are_optional(self):
+        """A mixed project says --parent is optional."""
+        issues = [
+            {
+                "fields": {
+                    "issuetype": {"name": "Story"},
+                    "parent": {"fields": {"issuetype": {"name": "Epic"}}},
+                }
+            }
+        ] + [{"fields": {"issuetype": {"name": "Task"}}}] * 4
+
+        assert "optional" in _analyze_parent_hierarchy(issues)["hint"]
+
+    def test_empty_sample(self):
+        """No issues means no hierarchy data."""
+        assert _analyze_parent_hierarchy([]) == {}
