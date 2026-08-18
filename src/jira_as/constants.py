@@ -22,3 +22,7 @@ DEFAULT_AGILE_FIELDS = {
 #   field_id = get_agile_field("epic_link")
 EPIC_LINK_FIELD = DEFAULT_AGILE_FIELDS["epic_link"]
 STORY_POINTS_FIELD = DEFAULT_AGILE_FIELDS["story_points"]
+
+# Maximum page size accepted by /rest/api/3/search/jql. Larger requests are
+# silently truncated by the API, so the client pages transparently instead.
+SEARCH_JQL_MAX_PAGE_SIZE = 100

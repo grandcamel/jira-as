@@ -142,7 +142,7 @@ class AutomationClient:
                 data = response.json()
                 return data["cloudId"]
             else:
-                from error_handler import AutomationError
+                from .error_handler import AutomationError
 
                 raise AutomationError(
                     f"Failed to fetch cloud ID: HTTP {response.status_code}",
@@ -178,7 +178,7 @@ class AutomationClient:
                 return {}
 
         # Import error classes here to avoid circular imports
-        from error_handler import (
+        from .error_handler import (
             AutomationError,
             AutomationNotFoundError,
             AutomationPermissionError,
@@ -201,7 +201,7 @@ class AutomationClient:
                 message, status_code=status_code, response_data=error_data
             )
         elif status_code == 401:
-            from error_handler import AuthenticationError
+            from .error_handler import AuthenticationError
 
             raise AuthenticationError(
                 message, status_code=status_code, response_data=error_data
@@ -218,7 +218,7 @@ class AutomationClient:
                 response_data=error_data,
             )
         elif status_code == 429:
-            from error_handler import RateLimitError
+            from .error_handler import RateLimitError
 
             retry_after = response.headers.get("Retry-After")
             raise RateLimitError(
@@ -227,7 +227,7 @@ class AutomationClient:
                 response_data=error_data,
             )
         elif status_code >= 500:
-            from error_handler import ServerError
+            from .error_handler import ServerError
 
             raise ServerError(
                 message, status_code=status_code, response_data=error_data

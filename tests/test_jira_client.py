@@ -422,6 +422,191 @@ class TestSearchOperations:
         assert "maxResults=25" in responses.calls[0].request.url
 
 
+class TestSearchPagination:
+    """Tests for the auto-pagination behaviour of search_issues()."""
+
+    @staticmethod
+    def _issues(start, count):
+        return [{"key": f"TEST-{i}"} for i in range(start, start + count)]
+
+    @responses.activate
+    def test_single_page_when_within_cap(self, client, base_url):
+        """max_results <= 100 issues exactly one request, uncapped."""
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/search/jql",
+            json={
+                "issues": self._issues(0, 100),
+                "isLast": False,
+                "nextPageToken": "t",
+            },
+            status=200,
+        )
+
+        result = client.search_issues("project = TEST", max_results=100)
+
+        assert len(responses.calls) == 1
+        assert "maxResults=100" in responses.calls[0].request.url
+        assert len(result["issues"]) == 100
+
+    @responses.activate
+    def test_auto_paginates_beyond_cap(self, client, base_url):
+        """max_results > 100 walks nextPageToken until the total is reached."""
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/search/jql",
+            json={
+                "issues": self._issues(0, 100),
+                "nextPageToken": "token-1",
+                "isLast": False,
+            },
+            status=200,
+        )
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/search/jql",
+            json={
+                "issues": self._issues(100, 100),
+                "nextPageToken": "token-2",
+                "isLast": False,
+            },
+            status=200,
+        )
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/search/jql",
+            json={"issues": self._issues(200, 50), "isLast": True},
+            status=200,
+        )
+
+        result = client.search_issues("project = TEST", max_results=250)
+
+        assert len(responses.calls) == 3
+        assert len(result["issues"]) == 250
+        assert result["issues"][0]["key"] == "TEST-0"
+        assert result["issues"][-1]["key"] == "TEST-249"
+        assert result["isLast"] is True
+        assert "nextPageToken" not in result
+        # Each request is capped at the API page size and carries the token.
+        assert "maxResults=100" in responses.calls[0].request.url
+        assert "nextPageToken=token-1" in responses.calls[1].request.url
+        assert "nextPageToken=token-2" in responses.calls[2].request.url
+
+    @responses.activate
+    def test_auto_pagination_stops_on_is_last(self, client, base_url):
+        """A short final page ends paging even when more were requested."""
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/search/jql",
+            json={
+                "issues": self._issues(0, 100),
+                "nextPageToken": "token-1",
+                "isLast": False,
+            },
+            status=200,
+        )
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/search/jql",
+            json={"issues": self._issues(100, 20), "isLast": True},
+            status=200,
+        )
+
+        result = client.search_issues("project = TEST", max_results=1000)
+
+        assert len(responses.calls) == 2
+        assert len(result["issues"]) == 120
+        assert result["isLast"] is True
+
+    @responses.activate
+    def test_auto_pagination_stops_without_token(self, client, base_url):
+        """A missing nextPageToken ends paging even without isLast."""
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/search/jql",
+            json={"issues": self._issues(0, 100)},
+            status=200,
+        )
+
+        result = client.search_issues("project = TEST", max_results=500)
+
+        assert len(responses.calls) == 1
+        assert len(result["issues"]) == 100
+        assert result["isLast"] is True
+
+    @responses.activate
+    def test_last_page_is_trimmed_to_max_results(self, client, base_url):
+        """Never return more issues than the caller asked for."""
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/search/jql",
+            json={
+                "issues": self._issues(0, 100),
+                "nextPageToken": "token-1",
+                "isLast": False,
+            },
+            status=200,
+        )
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/search/jql",
+            json={
+                "issues": self._issues(100, 100),
+                "nextPageToken": "token-2",
+                "isLast": False,
+            },
+            status=200,
+        )
+
+        result = client.search_issues("project = TEST", max_results=150)
+
+        assert len(result["issues"]) == 150
+        # More results remain, so the caller can resume from the token.
+        assert result["isLast"] is False
+        assert result["nextPageToken"] == "token-2"
+        # The second request only asks for the 50 issues still needed.
+        assert "maxResults=50" in responses.calls[1].request.url
+
+    @responses.activate
+    def test_manual_token_paging_is_single_page(self, client, base_url):
+        """An explicit next_page_token means the caller drives pagination."""
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/search/jql",
+            json={
+                "issues": self._issues(0, 100),
+                "nextPageToken": "token-2",
+                "isLast": False,
+            },
+            status=200,
+        )
+
+        result = client.search_issues(
+            "project = TEST", max_results=500, next_page_token="token-1"
+        )
+
+        assert len(responses.calls) == 1
+        assert "nextPageToken=token-1" in responses.calls[0].request.url
+        # Still capped at the API maximum page size.
+        assert "maxResults=100" in responses.calls[0].request.url
+        assert result["nextPageToken"] == "token-2"
+
+    @responses.activate
+    def test_manual_start_at_paging_is_single_page(self, client, base_url):
+        """Legacy startAt paging also stays single-page."""
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/search/jql",
+            json={"issues": self._issues(0, 100), "nextPageToken": "t"},
+            status=200,
+        )
+
+        client.search_issues("project = TEST", max_results=500, start_at=100)
+
+        assert len(responses.calls) == 1
+        assert "startAt=100" in responses.calls[0].request.url
+
+
 class TestTransitionOperations:
     """Tests for transition operations."""
 
@@ -812,6 +997,96 @@ class TestLinkOperations:
         )
 
         client.delete_link("10001")
+        assert len(responses.calls) == 1
+
+
+class TestRemoteLinkOperations:
+    """Tests for remote (web) link operations."""
+
+    @responses.activate
+    def test_get_remote_links(self, client, base_url):
+        """A bare list response is returned as-is."""
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/issue/TEST-1/remotelink",
+            json=[
+                {"id": 10000, "object": {"url": "https://example.com", "title": "X"}}
+            ],
+            status=200,
+        )
+
+        result = client.get_remote_links("TEST-1")
+        assert len(result) == 1
+        assert result[0]["object"]["url"] == "https://example.com"
+
+    @responses.activate
+    def test_get_remote_links_unwraps_envelope(self, client, base_url):
+        """An enveloped {'values': [...]} response is unwrapped."""
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/issue/TEST-1/remotelink",
+            json={"values": [{"id": 10000}]},
+            status=200,
+        )
+
+        assert client.get_remote_links("TEST-1") == [{"id": 10000}]
+
+    @responses.activate
+    def test_create_remote_link_minimal(self, client, base_url):
+        """Only object.url and object.title are required."""
+        responses.add(
+            responses.POST,
+            f"{base_url}/rest/api/3/issue/TEST-1/remotelink",
+            json={"id": 10001},
+            status=201,
+        )
+
+        result = client.create_remote_link(
+            "TEST-1", "https://example.com/page", "Design doc"
+        )
+
+        body = json.loads(responses.calls[0].request.body)
+        assert body == {
+            "object": {"url": "https://example.com/page", "title": "Design doc"}
+        }
+        assert result["id"] == 10001
+
+    @responses.activate
+    def test_create_remote_link_full(self, client, base_url):
+        """Relationship and icon fields are nested where the API expects them."""
+        responses.add(
+            responses.POST,
+            f"{base_url}/rest/api/3/issue/TEST-1/remotelink",
+            json={"id": 10002},
+            status=201,
+        )
+
+        client.create_remote_link(
+            "TEST-1",
+            "https://example.com/page",
+            "Design doc",
+            relationship="documented by",
+            icon_url="https://example.com/icon.png",
+            icon_title="Doc",
+        )
+
+        body = json.loads(responses.calls[0].request.body)
+        assert body["relationship"] == "documented by"
+        assert body["object"]["icon"] == {
+            "url16x16": "https://example.com/icon.png",
+            "title": "Doc",
+        }
+
+    @responses.activate
+    def test_delete_remote_link(self, client, base_url):
+        """Test deleting a remote link."""
+        responses.add(
+            responses.DELETE,
+            f"{base_url}/rest/api/3/issue/TEST-1/remotelink/10001",
+            status=204,
+        )
+
+        client.delete_remote_link("TEST-1", "10001")
         assert len(responses.calls) == 1
 
 

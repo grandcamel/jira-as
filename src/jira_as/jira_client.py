@@ -7,13 +7,15 @@ including automatic retries, exponential backoff, and unified error handling.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from .error_handler import handle_jira_error
+from .constants import SEARCH_JQL_MAX_PAGE_SIZE
+from .error_handler import JiraError, handle_jira_error
 
 
 class JiraClient:
@@ -329,9 +331,17 @@ class JiraClient:
         Raises:
             JiraError or subclass on failure
         """
+        # The caller is driving pagination itself, so hand back exactly one page.
+        manual_paging = next_page_token is not None or (
+            start_at is not None and start_at > 0
+        )
+
+        if max_results > SEARCH_JQL_MAX_PAGE_SIZE and not manual_paging:
+            return self._search_issues_paginated(jql, fields, max_results)
+
         params: dict[str, Any] = {
             "jql": jql,
-            "maxResults": max_results,
+            "maxResults": min(max_results, SEARCH_JQL_MAX_PAGE_SIZE),
         }
 
         # Use nextPageToken for pagination (preferred per CHANGE-2046)
@@ -347,6 +357,62 @@ class JiraClient:
         return self.get(
             "/rest/api/3/search/jql", params=params, operation="search issues"
         )
+
+    def _search_issues_paginated(
+        self,
+        jql: str,
+        fields: list | None,
+        max_results: int,
+    ) -> dict[str, Any]:
+        """Collect up to ``max_results`` issues across several API pages.
+
+        ``/rest/api/3/search/jql`` caps a single response at
+        ``SEARCH_JQL_MAX_PAGE_SIZE`` issues, so a caller asking for more is
+        served by walking ``nextPageToken`` until the requested count is
+        reached or the API reports the last page.
+
+        Returns:
+            A merged response shaped like a single-page result. ``isLast``
+            reflects whether the underlying result set was exhausted, and
+            ``nextPageToken`` is carried over when it was not.
+        """
+        issues: list[dict[str, Any]] = []
+        token: str | None = None
+        last_page: dict[str, Any] = {}
+
+        while len(issues) < max_results:
+            params: dict[str, Any] = {
+                "jql": jql,
+                "maxResults": min(max_results - len(issues), SEARCH_JQL_MAX_PAGE_SIZE),
+            }
+            if token:
+                params["nextPageToken"] = token
+            if fields:
+                params["fields"] = ",".join(fields)
+
+            page = self.get(
+                "/rest/api/3/search/jql", params=params, operation="search issues"
+            )
+            last_page = page
+
+            page_issues = page.get("issues") or []
+            issues.extend(page_issues)
+
+            token = page.get("nextPageToken")
+            # An explicit isLast, a missing token, or an empty page all mean
+            # there is nothing further to fetch.
+            if page.get("isLast") or not token or not page_issues:
+                token = None
+                break
+
+        result = dict(last_page)
+        result["issues"] = issues[:max_results]
+        result["isLast"] = token is None
+        if token is None:
+            result.pop("nextPageToken", None)
+        else:
+            result["nextPageToken"] = token
+        return result
 
     def get_issue(self, issue_key: str, fields: list | None = None) -> dict[str, Any]:
         """
@@ -1031,6 +1097,95 @@ class JiraClient:
             operation=f"get links for {issue_key}",
         )
         return issue.get("fields", {}).get("issuelinks", [])
+
+    # ========== Remote Link API Methods (/rest/api/3/issue/{key}/remotelink) ==========
+
+    def get_remote_links(self, issue_key: str) -> list:
+        """
+        Get all remote (web) links on an issue.
+
+        Args:
+            issue_key: Issue key (e.g., PROJ-123)
+
+        Returns:
+            List of remote links
+
+        Raises:
+            JiraError or subclass on failure
+        """
+        result = self.get(
+            f"/rest/api/3/issue/{issue_key}/remotelink",
+            operation=f"get remote links for {issue_key}",
+        )
+        # The endpoint returns a bare list; tolerate an enveloped shape too.
+        if isinstance(result, dict):
+            return result.get("values", [])
+        return result
+
+    def create_remote_link(
+        self,
+        issue_key: str,
+        url: str,
+        title: str,
+        relationship: str | None = None,
+        icon_url: str | None = None,
+        icon_title: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Create a remote (web) link on an issue.
+
+        Unlike native issue links, a remote link points at an arbitrary URL, so
+        it works for targets a native link cannot reach - other Jira sites,
+        Confluence pages, or cross-project and JSM issues.
+
+        Args:
+            issue_key: Issue key (e.g., PROJ-123)
+            url: Target URL of the link
+            title: Human-readable link title
+            relationship: Relationship description (e.g., "mentioned in")
+            icon_url: URL of a 16x16 icon shown beside the link
+            icon_title: Tooltip for the icon
+
+        Returns:
+            Created remote link data (id, self)
+
+        Raises:
+            JiraError or subclass on failure
+        """
+        link_object: dict[str, Any] = {"url": url, "title": title}
+        if icon_url or icon_title:
+            icon: dict[str, Any] = {}
+            if icon_url:
+                icon["url16x16"] = icon_url
+            if icon_title:
+                icon["title"] = icon_title
+            link_object["icon"] = icon
+
+        data: dict[str, Any] = {"object": link_object}
+        if relationship:
+            data["relationship"] = relationship
+
+        return self.post(
+            f"/rest/api/3/issue/{issue_key}/remotelink",
+            data=data,
+            operation=f"create remote link on {issue_key}",
+        )
+
+    def delete_remote_link(self, issue_key: str, link_id: str) -> None:
+        """
+        Delete a remote link from an issue.
+
+        Args:
+            issue_key: Issue key (e.g., PROJ-123)
+            link_id: Remote link ID
+
+        Raises:
+            JiraError or subclass on failure
+        """
+        self.delete(
+            f"/rest/api/3/issue/{issue_key}/remotelink/{link_id}",
+            operation=f"delete remote link {link_id} from {issue_key}",
+        )
 
     # ========== Project Management API Methods (/rest/api/3/project) ==========
 
@@ -4624,6 +4779,22 @@ class JiraClient:
         """
         return self.get("/rest/api/3/status", operation="get all statuses")
 
+    def get_statuses(self) -> list:
+        """
+        Get all statuses defined on the instance.
+
+        Returns:
+            List of status objects
+
+        Raises:
+            JiraError or subclass on failure
+        """
+        result = self.get("/rest/api/3/status", operation="get statuses")
+        # The endpoint returns a bare list; tolerate an enveloped shape too.
+        if isinstance(result, dict):
+            return result.get("values", [])
+        return result
+
     def get_status(self, status_id_or_name: str) -> dict[str, Any]:
         """
         Get a specific status by ID or name.
@@ -5833,7 +6004,7 @@ class JiraClient:
             start_at += 100
 
         # Screen not found
-        from error_handler import NotFoundError
+        from .error_handler import NotFoundError
 
         raise NotFoundError(f"Screen with ID {screen_id} not found")
 
@@ -6005,7 +6176,7 @@ class JiraClient:
         if values:
             return values[0]
 
-        from error_handler import NotFoundError
+        from .error_handler import NotFoundError
 
         raise NotFoundError(f"Screen scheme with ID {scheme_id} not found")
 
@@ -6327,7 +6498,7 @@ class JiraClient:
             ValidationError: If more than 100 project IDs
             JiraError or subclass on failure
         """
-        from error_handler import ValidationError
+        from .error_handler import ValidationError
 
         if len(project_ids) > 100:
             raise ValidationError("Maximum 100 project IDs allowed")
@@ -6482,7 +6653,7 @@ class JiraClient:
         if values:
             return values[0]
 
-        from error_handler import NotFoundError
+        from .error_handler import NotFoundError
 
         raise NotFoundError(f"Issue type screen scheme with ID {scheme_id} not found")
 
@@ -6868,6 +7039,133 @@ class JiraClient:
             f"/rest/api/3/project/{project_key_or_id}/permissionscheme",
             data=data,
             operation=f"assign permission scheme to project {project_key_or_id}",
+        )
+
+    def get_project_notification_scheme(
+        self, project_key_or_id: str, expand: str | None = None
+    ) -> dict[str, Any]:
+        """
+        Get the notification scheme associated with a project.
+
+        Args:
+            project_key_or_id: Project key or ID
+            expand: Optional expansion (e.g., 'all', 'notificationSchemeEvents')
+
+        Returns:
+            Notification scheme data
+
+        Raises:
+            JiraError or subclass on failure
+
+        Note:
+            Requires 'Administer Jira' global permission or project admin permission.
+        """
+        params: dict[str, Any] = {}
+        if expand:
+            params["expand"] = expand
+
+        return self.get(
+            f"/rest/api/3/project/{project_key_or_id}/notificationscheme",
+            params=params if params else None,
+            operation=f"get notification scheme for project {project_key_or_id}",
+        )
+
+    def _enumerate_projects_by_scheme(
+        self,
+        scheme_id: int | str,
+        lookup: Callable[[str], dict[str, Any]],
+        extract_id: Callable[[dict[str, Any]], Any],
+        max_projects: int = 500,
+    ) -> list:
+        """
+        Find the projects using a given scheme.
+
+        Jira exposes project-to-scheme lookups but no scheme-to-projects
+        endpoint for permission or workflow schemes, so this walks the visible
+        projects and keeps the ones whose scheme matches.
+
+        Args:
+            scheme_id: Scheme ID to match
+            lookup: Callable taking a project key and returning its scheme
+            extract_id: Callable pulling the scheme ID out of a lookup result
+            max_projects: Safety cap on how many projects to inspect
+
+        Returns:
+            List of matching project objects
+        """
+        wanted = str(scheme_id)
+        matches: list = []
+        start_at = 0
+        inspected = 0
+
+        while inspected < max_projects:
+            page = self.search_projects(start_at=start_at, max_results=50)
+            projects = page.get("values") or []
+            if not projects:
+                break
+
+            for project in projects:
+                inspected += 1
+                if inspected > max_projects:
+                    break
+                try:
+                    found = extract_id(lookup(project["key"]))
+                except JiraError:
+                    # A project we cannot administer simply cannot match.
+                    continue
+                if found is not None and str(found) == wanted:
+                    matches.append(project)
+
+            if page.get("isLast") or len(projects) < 50:
+                break
+            start_at += len(projects)
+
+        return matches
+
+    def get_projects_for_permission_scheme(self, scheme_id: int | str) -> list:
+        """
+        Get the projects using a permission scheme.
+
+        Args:
+            scheme_id: Permission scheme ID
+
+        Returns:
+            List of project objects using the scheme
+
+        Raises:
+            JiraError or subclass on failure
+
+        Note:
+            Jira has no scheme-to-projects endpoint for permission schemes, so
+            this enumerates visible projects and filters by their scheme.
+        """
+        return self._enumerate_projects_by_scheme(
+            scheme_id,
+            self.get_project_permission_scheme,
+            lambda scheme: scheme.get("id"),
+        )
+
+    def get_projects_for_workflow_scheme(self, scheme_id: int | str) -> list:
+        """
+        Get the projects using a workflow scheme.
+
+        Args:
+            scheme_id: Workflow scheme ID
+
+        Returns:
+            List of project objects using the scheme
+
+        Raises:
+            JiraError or subclass on failure
+
+        Note:
+            Jira has no scheme-to-projects endpoint for workflow schemes, so
+            this enumerates visible projects and filters by their scheme.
+        """
+        return self._enumerate_projects_by_scheme(
+            scheme_id,
+            self.get_workflow_scheme_for_project,
+            lambda result: (result.get("workflowScheme") or {}).get("id"),
         )
 
     def get_project_roles(self) -> list:

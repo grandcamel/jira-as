@@ -462,6 +462,104 @@ class AdminMixin(_Base):
 
         raise NotFoundError(f"Permission scheme {scheme_id} not found")
 
+    def get_project_permission_scheme(
+        self, project_key_or_id: str, expand: str | None = None
+    ) -> dict[str, Any]:
+        """Get the permission scheme assigned to a project.
+
+        Args:
+            project_key_or_id: Project key or ID.
+            expand: Optional expansion (accepted for API parity).
+
+        Returns:
+            The project's permission scheme.
+        """
+        # Service desk projects use the JSM scheme; everything else the default.
+        index = 1 if str(project_key_or_id).upper().startswith("DEMOSD") else 0
+        return self.PERMISSION_SCHEMES[index]
+
+    def get_project_notification_scheme(
+        self, project_key_or_id: str, expand: str | None = None
+    ) -> dict[str, Any]:
+        """Get the notification scheme assigned to a project.
+
+        Args:
+            project_key_or_id: Project key or ID.
+            expand: Optional expansion (accepted for API parity).
+
+        Returns:
+            The project's notification scheme.
+        """
+        return {
+            "id": "10100",
+            "name": "Default Notification Scheme",
+            "description": "Default scheme for new projects",
+            "self": f"{self.base_url}/rest/api/3/notificationscheme/10100",
+        }
+
+    def get_projects_for_permission_scheme(self, scheme_id: int | str) -> list:
+        """Get the projects using a permission scheme.
+
+        Args:
+            scheme_id: Permission scheme ID.
+
+        Returns:
+            List of projects using the scheme.
+        """
+        return [
+            project
+            for project in self.PROJECTS
+            if self.get_project_permission_scheme(project["key"])["id"]
+            == str(scheme_id)
+        ]
+
+    def get_projects_for_workflow_scheme(self, scheme_id: int | str) -> list:
+        """Get the projects using a workflow scheme.
+
+        Args:
+            scheme_id: Workflow scheme ID.
+
+        Returns:
+            List of projects using the scheme.
+        """
+        # The mock exposes a single workflow scheme shared by every project.
+        return list(self.PROJECTS)
+
+    def get_workflow_scheme_for_project(self, project_key_or_id: str) -> dict[str, Any]:
+        """Get the workflow scheme assigned to a project.
+
+        Args:
+            project_key_or_id: Project key or ID.
+
+        Returns:
+            Dict with a 'workflowScheme' object, matching the real endpoint.
+        """
+        return {"workflowScheme": self.get_workflow_scheme(10000)}
+
+    def get_statuses(self) -> list:
+        """Get all statuses defined on the instance.
+
+        Returns:
+            List of status objects.
+        """
+        return [
+            {
+                "id": "10000",
+                "name": "To Do",
+                "statusCategory": {"key": "new", "name": "To Do"},
+            },
+            {
+                "id": "10001",
+                "name": "In Progress",
+                "statusCategory": {"key": "indeterminate", "name": "In Progress"},
+            },
+            {
+                "id": "10002",
+                "name": "Done",
+                "statusCategory": {"key": "done", "name": "Done"},
+            },
+        ]
+
     # =========================================================================
     # Issue Type Operations
     # =========================================================================
