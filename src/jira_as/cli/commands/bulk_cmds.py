@@ -217,7 +217,7 @@ def _bulk_transition_impl(
         if dry_run:
             preview = []
             for issue in issues:
-                key = issue.get("key")
+                key = issue["key"]
                 current_status = (
                     issue.get("fields", {}).get("status", {}).get("name", "Unknown")
                 )
@@ -246,7 +246,7 @@ def _bulk_transition_impl(
         processed: list[str] = []
 
         for i, issue in enumerate(issues, 1):
-            issue_key = issue.get("key")
+            issue_key = issue["key"]
 
             try:
                 transitions = c.get_transitions(issue_key)
@@ -342,7 +342,7 @@ def _bulk_assign_impl(
         if dry_run:
             preview = []
             for issue in issues:
-                key = issue.get("key")
+                key = issue["key"]
                 current = issue.get("fields", {}).get("assignee")
                 current_name = (
                     current.get("displayName", "Unassigned")
@@ -374,7 +374,7 @@ def _bulk_assign_impl(
         processed: list[str] = []
 
         for i, issue in enumerate(issues, 1):
-            issue_key = issue.get("key")
+            issue_key = issue["key"]
 
             try:
                 c.assign_issue(issue_key, account_id)
@@ -442,7 +442,7 @@ def _bulk_set_priority_impl(
         if dry_run:
             preview = []
             for issue in issues:
-                key = issue.get("key")
+                key = issue["key"]
                 current = issue.get("fields", {}).get("priority")
                 current_name = current.get("name", "None") if current else "None"
                 preview.append(
@@ -470,7 +470,7 @@ def _bulk_set_priority_impl(
         processed: list[str] = []
 
         for i, issue in enumerate(issues, 1):
-            issue_key = issue.get("key")
+            issue_key = issue["key"]
 
             try:
                 c.update_issue(
@@ -707,7 +707,7 @@ def _bulk_clone_impl(
         if dry_run:
             preview = []
             for issue in issues:
-                key = issue.get("key")
+                key = issue["key"]
                 summary = issue.get("fields", {}).get("summary", "")[:50]
                 subtask_count = len(issue.get("fields", {}).get("subtasks", []))
                 link_count = len(issue.get("fields", {}).get("issuelinks", []))
@@ -741,7 +741,7 @@ def _bulk_clone_impl(
         created_mapping: dict[str, str] = {}
 
         for i, issue in enumerate(issues, 1):
-            issue_key = issue.get("key")
+            issue_key = issue["key"]
 
             try:
                 result = _clone_issue(
@@ -822,7 +822,7 @@ def _bulk_delete_impl(
         if dry_run:
             preview = []
             for issue in issues:
-                key = issue.get("key")
+                key = issue["key"]
                 fields = issue.get("fields", {})
                 summary = fields.get("summary", "")[:50]
                 issue_type = fields.get("issuetype", {}).get("name", "")
@@ -856,7 +856,7 @@ def _bulk_delete_impl(
         processed: list[str] = []
 
         for i, issue in enumerate(issues, 1):
-            issue_key = issue.get("key")
+            issue_key = issue["key"]
 
             try:
                 c.delete_issue(issue_key, delete_subtasks=delete_subtasks)

@@ -277,7 +277,8 @@ def _create_issue_impl(
         result = c.create_issue(fields)
 
         # Add to sprint after creation (sprint assignment requires issue to exist)
-        issue_key = result.get("key")
+        # The create endpoint always returns a key on success.
+        issue_key = result["key"]
 
         if deferred_parent:
             c.update_issue(issue_key, {"parent": deferred_parent})

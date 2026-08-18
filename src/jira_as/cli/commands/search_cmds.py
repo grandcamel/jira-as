@@ -746,6 +746,9 @@ def _run_filter_impl(
             else:
                 raise ValidationError("Could not retrieve filters")
 
+        if not filter_id:
+            raise ValidationError("Either filter_id or filter_name is required")
+
         filter_data = c.get_filter(filter_id)
         jql = filter_data.get("jql", "")
 

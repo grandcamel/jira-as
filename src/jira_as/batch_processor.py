@@ -44,6 +44,9 @@ class BatchConfig(BaseBatchConfig):
     Extends BaseBatchConfig with JIRA-specific defaults.
     """
 
+    # Re-declared purely so the inherited attribute has a visible type.
+    checkpoint_dir: str | None = None
+
     def __post_init__(self) -> None:
         # Set JIRA-specific default checkpoint directory if not specified
         if self.checkpoint_dir is None:

@@ -285,21 +285,24 @@ class FieldsMixin(_Base):
     # Class Constants - Screens
     # =========================================================================
 
-    SCREENS: ClassVar[list[dict[str, str]]] = [
+    SCREENS: ClassVar[list[dict[str, Any]]] = [
         {
             "id": "1",
             "name": "Default Screen",
             "description": "Default screen for all issue operations",
+            "scope": {"type": "GLOBAL"},
         },
         {
             "id": "2",
             "name": "Resolve Issue Screen",
             "description": "Screen for resolving issues",
+            "scope": {"type": "GLOBAL"},
         },
         {
             "id": "3",
             "name": "Workflow Screen",
             "description": "Screen for workflow transitions",
+            "scope": {"type": "PROJECT", "project": {"id": "10000", "key": "DEMO"}},
         },
     ]
 
@@ -552,7 +555,12 @@ class FieldsMixin(_Base):
         screens = list(self.SCREENS)
 
         if scope:
-            screens = [s for s in screens if s.get("scope", {}).get("type") in scope]
+            # A screen without a scope object is global by default.
+            screens = [
+                s
+                for s in screens
+                if (s.get("scope") or {}).get("type", "GLOBAL") in scope
+            ]
 
         if query_string:
             query_lower = query_string.lower()

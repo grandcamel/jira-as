@@ -131,7 +131,7 @@ class JiraClient:
     def post(
         self,
         endpoint: str,
-        data: dict[str, Any] | None = None,
+        data: dict[str, Any] | str | None = None,
         operation: str = "create resource",
         headers: dict[str, str] | None = None,
         params: dict[str, Any] | None = None,
@@ -5205,8 +5205,10 @@ class JiraClient:
                 params["expand"] = ",".join(expand)
             return self.get("/rest/api/3/user", params=params, operation="get user")
 
-        # For email lookup, use search_users (replaces deprecated username parameter)
-        users = self.search_users(query=email)
+        # For email lookup, use search_users (replaces deprecated username
+        # parameter). email is non-None here: the guard above requires one of
+        # account_id or email, and account_id already returned.
+        users = self.search_users(query=str(email))
         if not users:
             from .error_handler import NotFoundError
 

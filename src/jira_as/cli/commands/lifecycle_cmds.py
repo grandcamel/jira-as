@@ -703,12 +703,18 @@ def _create_component_impl(
         return None
 
     def _do_work(c: JiraClient) -> dict[str, Any]:
+        # Omit assignee_type entirely when unset so the client's
+        # PROJECT_DEFAULT applies.
+        kwargs: dict[str, Any] = {}
+        if assignee_type:
+            kwargs["assignee_type"] = assignee_type
+
         return c.create_component(
             project=project,
             name=name,
             description=description,
             lead_account_id=lead_account_id,
-            assignee_type=assignee_type,
+            **kwargs,
         )
 
     if client is not None:
