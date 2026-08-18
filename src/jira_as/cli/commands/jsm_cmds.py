@@ -30,6 +30,7 @@ from jira_as import (
     JiraError,
     NotFoundError,
     PermissionError,
+    ValidationError,
     format_json,
     get_jira_client,
     print_error,
@@ -156,9 +157,9 @@ def _create_service_desk_impl(
     """Create a new service desk."""
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
-        return c.create_service_desk(
-            project_key=project_key, name=name, description=description
-        )
+        # The servicedeskapi create endpoint takes a name and project key; it
+        # has no description field, so any description is ignored here.
+        return c.create_service_desk(name=name, key=project_key)
 
     if client is not None:
         return _do_work(client)
@@ -269,7 +270,8 @@ def _get_request_type_fields_impl(
     """Get fields for a request type."""
 
     def _do_work(c: "JiraClient") -> list[dict[str, Any]]:
-        return c.get_request_type_fields(service_desk_id, request_type_id)
+        response = c.get_request_type_fields(service_desk_id, request_type_id)
+        return response.get("requestTypeFields", [])
 
     if client is not None:
         return _do_work(client)
@@ -393,24 +395,107 @@ def _list_requests_impl(
         return _do_work(c)
 
 
+def _build_request_fields(
+    summary: str | None = None,
+    description: str | None = None,
+    priority: str | None = None,
+    labels: list[str] | None = None,
+    fields: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Merge the request field options into a single requestFieldValues dict."""
+    merged: dict[str, Any] = dict(fields or {})
+
+    if summary:
+        merged["summary"] = summary
+    if description:
+        merged["description"] = description
+    if priority:
+        merged["priority"] = {"name": priority}
+    if labels:
+        merged["labels"] = labels
+
+    return merged
+
+
+def _check_request_required_fields(
+    c: "JiraClient",
+    service_desk_id: str,
+    request_type_id: str,
+    provided: dict[str, Any],
+) -> None:
+    """Fail early when a required field cannot be supplied through the API.
+
+    Some request types require fields the REST API cannot set - portal-only
+    fields and asset (CMDB) pickers among them. Creating anyway returns an
+    opaque 400, so check the request type's field metadata first and say
+    precisely which fields are the problem.
+    """
+    try:
+        response = c.get_request_type_fields(service_desk_id, request_type_id)
+    except JiraError:
+        # Metadata is best-effort; let the create call report the real error.
+        return
+
+    unsettable = []
+    missing = []
+    for field in response.get("requestTypeFields", []):
+        if not field.get("required"):
+            continue
+        field_id = field.get("fieldId")
+        if field_id in provided:
+            continue
+        name = field.get("name", field_id)
+        if field.get("visible") is False:
+            unsettable.append(f"{name} ({field_id}): portal-only, not settable via API")
+        else:
+            missing.append(f"{name} ({field_id})")
+
+    if unsettable:
+        raise ValidationError(
+            "This request type requires fields the API cannot set:\n  "
+            + "\n  ".join(unsettable)
+            + "\nRaise this request through the customer portal instead."
+        )
+    if missing:
+        raise ValidationError(
+            "Missing required fields for this request type:\n  "
+            + "\n  ".join(missing)
+            + "\nPass them with --fields '{\"fieldId\": value}'."
+        )
+
+
 def _create_request_impl(
     service_desk_id: int,
     request_type_id: int,
-    summary: str,
+    summary: str | None = None,
     description: str | None = None,
     fields: dict[str, Any] | None = None,
     on_behalf_of: str | None = None,
+    priority: str | None = None,
+    labels: list[str] | None = None,
     client: "JiraClient | None" = None,
 ) -> dict[str, Any]:
-    """Create a new service request."""
+    """Create a new service request.
+
+    ``summary`` is optional: some request types populate it from other fields,
+    and the field metadata check below reports what is actually required.
+    """
+    request_fields = _build_request_fields(
+        summary=summary,
+        description=description,
+        priority=priority,
+        labels=labels,
+        fields=fields,
+    )
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
+        _check_request_required_fields(
+            c, str(service_desk_id), str(request_type_id), request_fields
+        )
         return c.create_request(
-            service_desk_id=service_desk_id,
-            request_type_id=request_type_id,
-            summary=summary,
-            description=description,
-            fields=fields,
+            service_desk_id=str(service_desk_id),
+            request_type_id=str(request_type_id),
+            fields=request_fields,
             on_behalf_of=on_behalf_of,
         )
 
@@ -451,7 +536,31 @@ def _get_request_status_impl(
     """Get request status."""
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
-        return c.get_request_status(issue_key)
+        response = c.get_request_status(issue_key)
+
+        # The endpoint returns a paginated status *history*, so reading
+        # 'status' off the envelope always yielded N/A. Take the most recent
+        # entry, while still accepting a bare status object.
+        history = response.get("values")
+        if not history:
+            return response
+
+        def _changed_at(entry: dict[str, Any]) -> int:
+            date = entry.get("statusDate") or {}
+            try:
+                return int(date.get("epochMillis", 0))
+            except (TypeError, ValueError):
+                return 0
+
+        current = (
+            max(history, key=_changed_at)
+            if any(_changed_at(e) for e in history)
+            else history[0]
+        )
+
+        result = dict(current)
+        result["history"] = history
+        return result
 
     if client is not None:
         return _do_work(client)
@@ -518,11 +627,28 @@ def _add_request_comment_impl(
     issue_key: str,
     body: str,
     public: bool = True,
+    body_format: str = "text",
     client: "JiraClient | None" = None,
 ) -> dict[str, Any]:
-    """Add a comment to a service request."""
+    """Add a comment to a service request.
+
+    Args:
+        issue_key: Request key (e.g., REQ-123)
+        body: Comment body
+        public: True for customer-visible, False for internal
+        body_format: 'text' or 'wiki'. The servicedeskapi comment endpoint
+            takes a plain string that Jira renders as wiki markup, so the body
+            is sent verbatim either way - there is no ADF conversion here.
+            'wiki' documents that the caller is passing markup deliberately.
+        client: Optional JiraClient instance
+    """
+    if body_format not in ("text", "wiki"):
+        raise ValidationError(
+            f"Invalid comment format: {body_format}. Valid formats: text, wiki"
+        )
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
+        # Sent verbatim - converting to ADF would break this endpoint.
         return c.add_request_comment(issue_key, body, public=public)
 
     if client is not None:
@@ -541,9 +667,15 @@ def _get_request_comments_impl(
     """Get comments for a request."""
 
     def _do_work(c: "JiraClient") -> list[dict[str, Any]]:
-        return c.get_request_comments(
-            issue_key, public=public_only if public_only else None
-        )
+        # public=True returns public comments, public=False internal ones.
+        public: bool | None = None
+        if public_only:
+            public = True
+        elif internal_only:
+            public = False
+
+        response = c.get_request_comments(issue_key, public=public)
+        return response.get("values", [])
 
     if client is not None:
         return _do_work(client)
@@ -677,7 +809,8 @@ def _get_participants_impl(
     """Get participants for a request."""
 
     def _do_work(c: "JiraClient") -> list[dict[str, Any]]:
-        return c.get_request_participants(issue_key)
+        response = c.get_request_participants(issue_key)
+        return response.get("values", [])
 
     if client is not None:
         return _do_work(client)
@@ -714,7 +847,7 @@ def _remove_participant_impl(
     """Remove a participant from a request."""
 
     def _do_work(c: "JiraClient") -> None:
-        c.remove_request_participant(issue_key, account_id)
+        c.remove_request_participants(issue_key, account_ids=[account_id])
 
     if client is not None:
         _do_work(client)
@@ -780,8 +913,11 @@ def _create_customer_impl(
     """Create a new customer."""
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
+        # The API requires a display name; fall back to the email local part.
         return c.create_customer(
-            service_desk_id, email=email, display_name=display_name
+            email=email,
+            display_name=display_name or email.split("@")[0],
+            service_desk_id=service_desk_id,
         )
 
     if client is not None:
@@ -1314,7 +1450,8 @@ def _get_approvals_impl(
     """Get approvals for an issue."""
 
     def _do_work(c: "JiraClient") -> list[dict[str, Any]]:
-        return c.get_request_approvals(issue_key)
+        response = c.get_request_approvals(issue_key)
+        return response.get("values", [])
 
     if client is not None:
         return _do_work(client)
@@ -1429,7 +1566,8 @@ def _search_kb_impl(
     """Search KB articles."""
 
     def _do_work(c: "JiraClient") -> list[dict[str, Any]]:
-        return c.search_kb_articles(service_desk_id, query, max_results)
+        # The third positional parameter is 'highlight'; the cap is 'limit'.
+        return c.search_kb_articles(service_desk_id, query, limit=max_results)
 
     if client is not None:
         return _do_work(client)
@@ -1462,7 +1600,7 @@ def _suggest_kb_impl(
     """Suggest KB articles for an issue."""
 
     def _do_work(c: "JiraClient") -> list[dict[str, Any]]:
-        return c.suggest_kb_articles(issue_key, max_results)
+        return c.suggest_kb_for_request(issue_key, max_results)
 
     if client is not None:
         return _do_work(client)
@@ -1624,7 +1762,8 @@ def _find_affected_assets_impl(
 
     def _do_work(c: "JiraClient") -> list[dict[str, Any]]:
         _check_assets_license(c)
-        return c.find_affected_assets(issue_key)
+        response = c.find_affected_assets(issue_key)
+        return response.get("values", [])
 
     if client is not None:
         return _do_work(client)
@@ -1908,8 +2047,14 @@ def request_list(
 @request.command(name="create")
 @click.argument("service_desk_id", type=int)
 @click.argument("request_type_id", type=int)
-@click.option("--summary", "-s", required=True, help="Request summary")
+@click.option(
+    "--summary",
+    "-s",
+    help="Request summary (optional: some request types derive it from other fields)",
+)
 @click.option("--description", "-d", help="Request description")
+@click.option("--priority", help="Priority name (e.g., High, Medium)")
+@click.option("--labels", "-l", help="Comma-separated labels")
 @click.option("--fields", "-f", help="Additional fields as JSON")
 @click.option("--on-behalf-of", help="Create on behalf of customer (account ID)")
 @click.option("--dry-run", is_flag=True, help="Show what would be created")
@@ -1922,31 +2067,50 @@ def request_create(
     request_type_id: int,
     summary: str,
     description: str,
+    priority: str,
+    labels: str,
     fields: str,
     on_behalf_of: str,
     dry_run: bool,
     output: str,
 ):
     """Create a new service request."""
-    if dry_run:
-        click.echo("DRY RUN MODE - No changes will be made\n")
-        click.echo("Would create request:")
-        click.echo(f"  Service Desk: {service_desk_id}")
-        click.echo(f"  Request Type: {request_type_id}")
-        click.echo(f"  Summary: {summary}")
-        if description:
-            click.echo(f"  Description: {description}")
-        if on_behalf_of:
-            click.echo(f"  On behalf of: {on_behalf_of}")
-        return
-
     fields_dict = json.loads(fields) if fields else None
+    labels_list = _parse_comma_list(labels) if labels else None
+
+    if dry_run:
+        payload = {
+            "service_desk_id": service_desk_id,
+            "request_type_id": request_type_id,
+            "on_behalf_of": on_behalf_of,
+            "fields": _build_request_fields(
+                summary=summary,
+                description=description,
+                priority=priority,
+                labels=labels_list,
+                fields=fields_dict,
+            ),
+        }
+        if output == "json":
+            click.echo(format_json({"dry_run": True, **payload}))
+        else:
+            click.echo("DRY RUN MODE - No changes will be made\n")
+            click.echo("Would create request:")
+            click.echo(f"  Service Desk: {service_desk_id}")
+            click.echo(f"  Request Type: {request_type_id}")
+            if on_behalf_of:
+                click.echo(f"  On behalf of: {on_behalf_of}")
+            click.echo("  Fields:")
+            click.echo(format_json(payload["fields"]))
+        return
 
     result = _create_request_impl(
         service_desk_id=service_desk_id,
         request_type_id=request_type_id,
         summary=summary,
         description=description,
+        priority=priority,
+        labels=labels_list,
         fields=fields_dict,
         on_behalf_of=on_behalf_of,
     )
@@ -2000,8 +2164,12 @@ def request_status(ctx, issue_key: str, output: str):
     if output == "json":
         click.echo(format_json(result))
     else:
-        click.echo(f"Status: {result.get('status', 'N/A')}")
-        click.echo(f"Category: {result.get('statusCategory', 'N/A')}")
+        status = result.get("status") or "N/A"
+        category = result.get("statusCategory") or "N/A"
+        if isinstance(category, dict):
+            category = category.get("name") or category.get("key") or "N/A"
+        click.echo(f"Status: {status}")
+        click.echo(f"Category: {category}")
 
 
 @request.command(name="transition")
@@ -2070,14 +2238,51 @@ def request_transition(
 @click.argument("issue_key")
 @click.argument("body")
 @click.option("--internal", "-i", is_flag=True, help="Internal comment (agent-only)")
+@click.option(
+    "--format",
+    "-f",
+    "body_format",
+    type=click.Choice(["text", "wiki"]),
+    default="text",
+    help="Body format. Both send the body verbatim; 'wiki' declares that the "
+    "body is Jira wiki markup. JSM comments are never converted to ADF.",
+)
+@click.option("--dry-run", is_flag=True, help="Show what would be posted")
 @click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
 @click.pass_context
 @handle_jira_errors
-def request_comment(ctx, issue_key: str, body: str, internal: bool, output: str):
+def request_comment(
+    ctx,
+    issue_key: str,
+    body: str,
+    internal: bool,
+    body_format: str,
+    dry_run: bool,
+    output: str,
+):
     """Add a comment to a request."""
     is_public = not internal
 
-    result = _add_request_comment_impl(issue_key, body, public=is_public)
+    if dry_run:
+        payload = {
+            "issue_key": issue_key,
+            "body": body,
+            "public": is_public,
+            "format": body_format,
+        }
+        if output == "json":
+            click.echo(format_json({"dry_run": True, **payload}))
+        else:
+            click.echo("DRY RUN MODE - No changes will be made\n")
+            click.echo(f"Would comment on {issue_key}")
+            click.echo(f"Visibility: {'Public' if is_public else 'Internal'}")
+            click.echo(f"Format: {body_format}")
+            click.echo(f"Body: {body}")
+        return
+
+    result = _add_request_comment_impl(
+        issue_key, body, public=is_public, body_format=body_format
+    )
 
     if output == "json":
         click.echo(format_json(result))
