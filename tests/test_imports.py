@@ -15,9 +15,8 @@ class TestPackageImports:
         from jira_as import __version__
 
         # Version should be a valid semver string
-        assert re.match(
-            r"^\d+\.\d+\.\d+$", __version__
-        ), f"Invalid version: {__version__}"
+        message = f"Invalid version: {__version__}"
+        assert re.match(r"^\d+\.\d+\.\d+$", __version__), message
 
     def test_client_imports(self):
         """Test client classes are importable."""
