@@ -13,6 +13,7 @@ from unittest.mock import patch
 
 import pytest
 
+from jira_as import ValidationError
 from jira_as.cli.commands.fields_cmds import (
     AGILE_FIELDS,
     AGILE_PATTERNS,
@@ -28,6 +29,7 @@ from jira_as.cli.commands.fields_cmds import (
     _format_fields_list,
     _format_project_fields,
     _list_fields_impl,
+    _resolve_issue_type_id,
     fields,
 )
 
@@ -922,3 +924,123 @@ class TestFieldsConfigureAgileCommand:
 
         assert result.exit_code == 0
         assert "{" in result.output
+
+
+# =============================================================================
+# Project- and issue-type-scoped field listing
+# =============================================================================
+
+
+@pytest.mark.unit
+class TestListFieldsScoping:
+    """'fields list --project/--issue-type' reads the create screen."""
+
+    @staticmethod
+    def _meta_client(mock_jira_client):
+        mock_jira_client.get_create_issue_meta_issuetypes.return_value = {
+            "issueTypes": [
+                {"id": "10001", "name": "Bug"},
+                {"id": "10002", "name": "Task"},
+            ]
+        }
+        mock_jira_client.get_create_issue_meta_fields.side_effect = [
+            {
+                "fields": [
+                    {
+                        "fieldId": "customfield_10050",
+                        "name": "Root Cause",
+                        "custom": True,
+                        "required": True,
+                        "schema": {"type": "string"},
+                    }
+                ]
+            },
+            {
+                "fields": [
+                    {
+                        "fieldId": "customfield_10051",
+                        "name": "Team",
+                        "custom": True,
+                        "required": False,
+                        "schema": {"type": "option"},
+                    }
+                ]
+            },
+        ]
+        return mock_jira_client
+
+    def test_without_project_lists_the_whole_catalogue(self, mock_jira_client):
+        """No --project keeps the previous instance-wide behaviour."""
+        mock_jira_client.get.return_value = [
+            {"id": "customfield_1", "name": "A", "custom": True, "schema": {}}
+        ]
+
+        result = _list_fields_impl(client=mock_jira_client)
+
+        mock_jira_client.get.assert_called_once_with("/rest/api/3/field")
+        assert [f["id"] for f in result] == ["customfield_1"]
+
+    def test_project_scope_uses_create_meta(self, mock_jira_client):
+        """--project reads the create screen, not the field catalogue."""
+        client = self._meta_client(mock_jira_client)
+
+        result = _list_fields_impl(project="PROJ", client=client)
+
+        client.get.assert_not_called()
+        assert {f["id"] for f in result} == {
+            "customfield_10050",
+            "customfield_10051",
+        }
+
+    def test_issue_type_scope_queries_one_type(self, mock_jira_client):
+        """--issue-type narrows to a single type's fields."""
+        client = self._meta_client(mock_jira_client)
+
+        result = _list_fields_impl(project="PROJ", issue_type="Bug", client=client)
+
+        assert client.get_create_issue_meta_fields.call_count == 1
+        assert client.get_create_issue_meta_fields.call_args[0][1] == "10001"
+        assert [f["id"] for f in result] == ["customfield_10050"]
+        assert result[0]["required"] is True
+
+    def test_issue_type_requires_project(self, mock_jira_client):
+        """--issue-type on its own is rejected."""
+        with pytest.raises(ValidationError, match="requires --project"):
+            _list_fields_impl(issue_type="Bug", client=mock_jira_client)
+
+    def test_unknown_issue_type_lists_the_alternatives(self, mock_jira_client):
+        """A bad issue type names what is available."""
+        client = self._meta_client(mock_jira_client)
+
+        with pytest.raises(ValidationError, match="Available: Bug, Task"):
+            _list_fields_impl(project="PROJ", issue_type="Nope", client=client)
+
+    def test_issue_type_resolves_by_id(self, mock_jira_client):
+        """An ID works as well as a name."""
+        client = self._meta_client(mock_jira_client)
+
+        assert _resolve_issue_type_id(client, "PROJ", "10002") == ("10002", "Task")
+
+    def test_field_on_several_types_is_listed_once(self, mock_jira_client):
+        """A shared field is deduplicated and records its issue types."""
+        mock_jira_client.get_create_issue_meta_issuetypes.return_value = {
+            "issueTypes": [
+                {"id": "10001", "name": "Bug"},
+                {"id": "10002", "name": "Task"},
+            ]
+        }
+        shared = {
+            "fieldId": "customfield_10050",
+            "name": "Team",
+            "custom": True,
+            "schema": {"type": "option"},
+        }
+        mock_jira_client.get_create_issue_meta_fields.side_effect = [
+            {"fields": [shared]},
+            {"fields": [shared]},
+        ]
+
+        result = _list_fields_impl(project="PROJ", client=mock_jira_client)
+
+        assert len(result) == 1
+        assert result[0]["issue_types"] == ["Bug", "Task"]

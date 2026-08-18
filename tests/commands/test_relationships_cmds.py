@@ -18,9 +18,11 @@ from unittest.mock import patch
 
 import pytest
 
+from jira_as import NotFoundError, ValidationError
 from jira_as.cli.commands.relationships_cmds import (
     _bulk_link_impl,
     _clone_issue_impl,
+    _create_remote_link_impl,
     _get_blockers_impl,
     _get_dependencies_impl,
     _get_link_stats_impl,
@@ -715,3 +717,150 @@ class TestBulkLinkCommand:
 
         assert result.exit_code != 0
         assert "Either --jql or --issues is required" in result.output
+
+
+# =============================================================================
+# Remote (web) links
+# =============================================================================
+
+
+@pytest.mark.unit
+class TestCreateRemoteLinkImpl:
+    """Tests for _create_remote_link_impl."""
+
+    def test_creates_remote_link(self, mock_jira_client):
+        """The URL and title reach the client."""
+        mock_jira_client.create_remote_link.return_value = {"id": 10001}
+
+        result = _create_remote_link_impl(
+            issue_key="PROJ-123",
+            remote_url="https://example.com/doc",
+            remote_title="Design doc",
+            remote_relationship="documented by",
+            client=mock_jira_client,
+        )
+
+        mock_jira_client.create_remote_link.assert_called_once_with(
+            "PROJ-123",
+            url="https://example.com/doc",
+            title="Design doc",
+            relationship="documented by",
+        )
+        assert result["id"] == 10001
+
+    def test_title_defaults_to_the_url(self, mock_jira_client):
+        """A link without a title is titled by its URL."""
+        mock_jira_client.create_remote_link.return_value = {"id": 1}
+
+        _create_remote_link_impl(
+            issue_key="PROJ-123",
+            remote_url="https://example.com/doc",
+            client=mock_jira_client,
+        )
+
+        kwargs = mock_jira_client.create_remote_link.call_args.kwargs
+        assert kwargs["title"] == "https://example.com/doc"
+
+    def test_dry_run_creates_nothing(self, mock_jira_client):
+        """--dry-run previews without calling the API."""
+        result = _create_remote_link_impl(
+            issue_key="PROJ-123",
+            remote_url="https://example.com/doc",
+            dry_run=True,
+            client=mock_jira_client,
+        )
+
+        mock_jira_client.create_remote_link.assert_not_called()
+        assert result["dry_run"] is True
+        assert "https://example.com/doc" in result["preview"]
+
+    def test_blank_url_is_rejected(self, mock_jira_client):
+        """An empty URL fails before the API call."""
+        with pytest.raises(ValidationError, match="requires a URL"):
+            _create_remote_link_impl(
+                issue_key="PROJ-123", remote_url="", client=mock_jira_client
+            )
+
+
+@pytest.mark.unit
+class TestLinkCommandRemoteUrl:
+    """Tests for 'relationships link --remote-url'."""
+
+    def test_remote_url_creates_a_remote_link(self, cli_runner, mock_jira_client):
+        """--remote-url takes the remote-link path."""
+        mock_jira_client.create_remote_link.return_value = {"id": 1}
+
+        with patch(
+            "jira_as.cli.commands.relationships_cmds.get_client_from_context",
+            return_value=mock_jira_client,
+        ):
+            result = cli_runner.invoke(
+                relationships,
+                ["link", "PROJ-123", "--remote-url", "https://example.com/doc"],
+            )
+
+        assert result.exit_code == 0, result.output
+        mock_jira_client.create_remote_link.assert_called_once()
+        mock_jira_client.create_link.assert_not_called()
+
+    def test_remote_url_conflicts_with_native_options(
+        self, cli_runner, mock_jira_client
+    ):
+        """Mixing --remote-url with a native link option is a usage error."""
+        with patch(
+            "jira_as.cli.commands.relationships_cmds.get_client_from_context",
+            return_value=mock_jira_client,
+        ):
+            result = cli_runner.invoke(
+                relationships,
+                [
+                    "link",
+                    "PROJ-123",
+                    "--remote-url",
+                    "https://example.com",
+                    "--blocks",
+                    "PROJ-124",
+                ],
+            )
+
+        assert result.exit_code != 0
+        assert "cannot be combined" in result.output
+
+    def test_remote_title_requires_remote_url(self, cli_runner, mock_jira_client):
+        """--remote-title alone is a usage error."""
+        with patch(
+            "jira_as.cli.commands.relationships_cmds.get_client_from_context",
+            return_value=mock_jira_client,
+        ):
+            result = cli_runner.invoke(
+                relationships,
+                ["link", "PROJ-123", "--blocks", "PROJ-124", "--remote-title", "T"],
+            )
+
+        assert result.exit_code != 0
+        assert "require --remote-url" in result.output
+
+    def test_native_link_failure_hints_at_remote_url(
+        self, cli_runner, mock_jira_client
+    ):
+        """A rejected native link suggests the remote-link route."""
+        mock_jira_client.get_link_types.return_value = [
+            {
+                "id": "1",
+                "name": "Blocks",
+                "inward": "is blocked by",
+                "outward": "blocks",
+            }
+        ]
+        mock_jira_client.create_link.side_effect = NotFoundError("cross-project")
+
+        with patch(
+            "jira_as.cli.commands.relationships_cmds.get_client_from_context",
+            return_value=mock_jira_client,
+        ):
+            result = cli_runner.invoke(
+                relationships, ["link", "PROJ-123", "--blocks", "OTHER-1"]
+            )
+
+        assert result.exit_code != 0
+        assert "--remote-url" in result.output

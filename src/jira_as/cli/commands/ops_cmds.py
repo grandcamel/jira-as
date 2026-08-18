@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 import click
 
-from jira_as import JiraCache, get_jira_client
+from jira_as import JiraCache, get_agile_fields, get_jira_client
 
 from ..cli_utils import format_json, get_client_from_context, handle_jira_errors
 
@@ -530,6 +530,129 @@ def _discover_metadata(
     return metadata
 
 
+def _analyze_field_fill_rates(
+    issues: list[dict[str, Any]], fields: list[str]
+) -> dict[str, Any]:
+    """Measure how often each sampled field actually carries a value.
+
+    A field that is populated on 3% of issues is effectively unused, which is
+    what you want to know before treating it as required or reporting on it.
+    """
+    total = len(issues)
+    if not total:
+        return {}
+
+    filled: dict[str, int] = defaultdict(int)
+    for issue in issues:
+        fields_data = issue.get("fields", {})
+        for field in fields:
+            value = fields_data.get(field)
+            # Empty lists, empty strings and None all count as unfilled.
+            if value not in (None, "", [], {}):
+                filled[field] += 1
+
+    return {
+        field: {
+            "filled": filled.get(field, 0),
+            "total": total,
+            "percentage": round(filled.get(field, 0) / total * 100, 1),
+        }
+        for field in fields
+    }
+
+
+def _analyze_value_distributions(
+    issues: list[dict[str, Any]], top_n: int = 10
+) -> dict[str, Any]:
+    """Count the values actually in use for the low-cardinality fields.
+
+    Shows which statuses, priorities and issue types a project really uses,
+    rather than every value configured on the instance.
+    """
+    if not issues:
+        return {}
+
+    distributions: dict[str, dict[str, int]] = {
+        "issuetype": defaultdict(int),
+        "status": defaultdict(int),
+        "priority": defaultdict(int),
+        "components": defaultdict(int),
+        "fixVersions": defaultdict(int),
+    }
+
+    for issue in issues:
+        fields_data = issue.get("fields", {})
+        for field in ("issuetype", "status", "priority"):
+            value = fields_data.get(field)
+            if isinstance(value, dict):
+                distributions[field][value.get("name", "Unknown")] += 1
+
+        for field in ("components", "fixVersions"):
+            for item in fields_data.get(field) or []:
+                if isinstance(item, dict):
+                    distributions[field][item.get("name", "Unknown")] += 1
+
+    total = len(issues)
+    result: dict[str, Any] = {}
+    for field, counts in distributions.items():
+        if not counts:
+            continue
+        ranked = sorted(counts.items(), key=lambda kv: kv[1], reverse=True)[:top_n]
+        result[field] = {
+            name: {"count": count, "percentage": round(count / total * 100, 1)}
+            for name, count in ranked
+        }
+
+    return result
+
+
+def _analyze_parent_hierarchy(issues: list[dict[str, Any]]) -> dict[str, Any]:
+    """Report how this project actually uses parent links.
+
+    Tells you whether new issues are expected to carry a parent, and which
+    issue types sit above which - the two things you need before creating one.
+    """
+    total = len(issues)
+    if not total:
+        return {}
+
+    with_parent = 0
+    parent_types: dict[str, int] = defaultdict(int)
+    child_of: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+
+    for issue in issues:
+        fields_data = issue.get("fields", {})
+        parent = fields_data.get("parent")
+        if not parent:
+            continue
+
+        with_parent += 1
+        parent_type = (
+            (parent.get("fields") or {}).get("issuetype", {}).get("name", "Unknown")
+        )
+        parent_types[parent_type] += 1
+
+        child_type = fields_data.get("issuetype", {}).get("name", "Unknown")
+        child_of[child_type][parent_type] += 1
+
+    percentage = round(with_parent / total * 100, 1)
+    if percentage >= 80:
+        hint = "Most issues have a parent; set --parent when creating one."
+    elif with_parent:
+        hint = "Some issues have a parent; --parent is optional here."
+    else:
+        hint = "No sampled issue has a parent; this project appears to be flat."
+
+    return {
+        "issues_with_parent": with_parent,
+        "total_sampled": total,
+        "percentage": percentage,
+        "parent_issue_types": dict(parent_types),
+        "child_to_parent_types": {k: dict(v) for k, v in child_of.items()},
+        "hint": hint,
+    }
+
+
 def _discover_patterns(
     client,
     project_key: str,
@@ -561,6 +684,7 @@ def _discover_patterns(
         f'project = "{project_key}" AND created >= "{since_date}" ORDER BY created DESC'
     )
 
+    story_points_field = get_agile_fields(project_key=project_key)["story_points"]
     fields = [
         "issuetype",
         "assignee",
@@ -569,7 +693,11 @@ def _discover_patterns(
         "labels",
         "components",
         "status",
-        "customfield_10016",
+        "parent",
+        "fixVersions",
+        "duedate",
+        "description",
+        story_points_field,
     ]
 
     try:
@@ -639,7 +767,7 @@ def _discover_patterns(
             type_data["priorities"][priority_name] += 1
 
         # Story points
-        story_points = fields_data.get("customfield_10016")
+        story_points = fields_data.get(story_points_field)
         if story_points is not None:
             type_data["story_points"].append(story_points)
 
@@ -694,6 +822,10 @@ def _discover_patterns(
         }
         for account_id, data in sorted_assignees[:20]
     ]
+
+    patterns["field_fill_rates"] = _analyze_field_fill_rates(issues, fields)
+    patterns["value_distributions"] = _analyze_value_distributions(issues)
+    patterns["parent_hierarchy"] = _analyze_parent_hierarchy(issues)
 
     if verbose:
         click.echo(
@@ -834,6 +966,44 @@ def _format_discover_project(context: dict) -> str:
 
     if patterns.get("common_labels"):
         lines.append(f"  Common Labels: {', '.join(patterns['common_labels'][:5])}")
+
+    fill_rates = patterns.get("field_fill_rates") or {}
+    if fill_rates:
+        lines.append("")
+        lines.append("Field Fill Rates:")
+        ranked = sorted(
+            fill_rates.items(), key=lambda kv: kv[1]["percentage"], reverse=True
+        )
+        for field, stats in ranked:
+            lines.append(
+                f"  {field}: {stats['percentage']}% "
+                f"({stats['filled']}/{stats['total']})"
+            )
+
+    distributions = patterns.get("value_distributions") or {}
+    if distributions:
+        lines.append("")
+        lines.append("Value Distributions:")
+        for field, values in distributions.items():
+            summary = ", ".join(
+                f"{name} {stats['percentage']}%" for name, stats in values.items()
+            )
+            lines.append(f"  {field}: {summary}")
+
+    hierarchy = patterns.get("parent_hierarchy") or {}
+    if hierarchy:
+        lines.append("")
+        lines.append("Parent Hierarchy:")
+        lines.append(
+            f"  Issues with a parent: {hierarchy['issues_with_parent']}/"
+            f"{hierarchy['total_sampled']} ({hierarchy['percentage']}%)"
+        )
+        for child, parents in (hierarchy.get("child_to_parent_types") or {}).items():
+            parent_summary = ", ".join(
+                f"{name} ({count})" for name, count in parents.items()
+            )
+            lines.append(f"  {child} -> {parent_summary}")
+        lines.append(f"  {hierarchy['hint']}")
 
     return "\n".join(lines)
 
