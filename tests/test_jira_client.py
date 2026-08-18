@@ -422,6 +422,60 @@ class TestSearchOperations:
         assert "maxResults=25" in responses.calls[0].request.url
 
 
+class TestUpdateIssueNotifySuppression:
+    """Tests for the --no-notify 403 fallback in update_issue()."""
+
+    @responses.activate
+    def test_notify_suppression_retries_without_param(self, client, base_url):
+        """A 403 on notifyUsers=false retries without the parameter."""
+        responses.add(responses.PUT, f"{base_url}/rest/api/3/issue/TEST-1", status=403)
+        responses.add(responses.PUT, f"{base_url}/rest/api/3/issue/TEST-1", status=204)
+
+        client.update_issue("TEST-1", {"summary": "New"}, notify_users=False)
+
+        assert len(responses.calls) == 2
+        assert "notifyUsers=false" in responses.calls[0].request.url
+        # The retry omits notifyUsers entirely rather than sending true.
+        assert "notifyUsers" not in responses.calls[1].request.url
+        # The edit itself is still sent on the retry.
+        assert json.loads(responses.calls[1].request.body) == {
+            "fields": {"summary": "New"}
+        }
+
+    @responses.activate
+    def test_notify_suppression_warns_on_stderr(self, client, base_url, capsys):
+        """The caller is told the suppression did not take effect."""
+        responses.add(responses.PUT, f"{base_url}/rest/api/3/issue/TEST-1", status=403)
+        responses.add(responses.PUT, f"{base_url}/rest/api/3/issue/TEST-1", status=204)
+
+        client.update_issue("TEST-1", {"summary": "New"}, notify_users=False)
+
+        captured = capsys.readouterr()
+        assert "cannot suppress notifications" in captured.err
+        assert captured.out == ""
+
+    @responses.activate
+    def test_retry_failure_still_raises(self, client, base_url):
+        """A 403 that persists on retry is reported, not swallowed."""
+        responses.add(responses.PUT, f"{base_url}/rest/api/3/issue/TEST-1", status=403)
+        responses.add(responses.PUT, f"{base_url}/rest/api/3/issue/TEST-1", status=403)
+
+        with pytest.raises(PermissionError):
+            client.update_issue("TEST-1", {"summary": "New"}, notify_users=False)
+
+        assert len(responses.calls) == 2
+
+    @responses.activate
+    def test_no_retry_when_notifications_wanted(self, client, base_url):
+        """A 403 with notifications enabled is a plain permission error."""
+        responses.add(responses.PUT, f"{base_url}/rest/api/3/issue/TEST-1", status=403)
+
+        with pytest.raises(PermissionError):
+            client.update_issue("TEST-1", {"summary": "New"}, notify_users=True)
+
+        assert len(responses.calls) == 1
+
+
 class TestSearchPagination:
     """Tests for the auto-pagination behaviour of search_issues()."""
 

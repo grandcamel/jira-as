@@ -160,6 +160,44 @@ def load_settings_context(project_key: str) -> dict[str, Any] | None:
     return project_config
 
 
+def get_project_agile_fields(project_key: str) -> dict[str, str]:
+    """
+    Load per-project Agile field ID overrides from settings.
+
+    Instances often use different custom field IDs per project, so a global
+    story-points ID is not reliable. Looks for:
+
+    {
+      "jira": {
+        "projects": {
+          "{PROJECT_KEY}": {
+            "agile_fields": {
+              "story_points": "customfield_10016",
+              "sprint": "customfield_10020"
+            }
+          }
+        }
+      }
+    }
+
+    Args:
+        project_key: JIRA project key (e.g., 'PROJ')
+
+    Returns:
+        Dict of field name to field ID. Empty when nothing is configured.
+    """
+    if not project_key:
+        return {}
+
+    project_config = load_settings_context(project_key) or {}
+    agile_fields = project_config.get("agile_fields") or {}
+
+    if not isinstance(agile_fields, dict):
+        return {}
+
+    return {name: str(fid) for name, fid in agile_fields.items() if fid}
+
+
 def merge_contexts(
     skill_ctx: dict[str, Any] | None, settings_ctx: dict[str, Any] | None
 ) -> tuple[dict[str, Any], str]:

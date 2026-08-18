@@ -17,21 +17,27 @@ from jira_as import (
     JiraError,
     NotFoundError,
     PermissionError,
+    auto_wrap_adf_fields,
+    ensure_adf,
     format_issue,
     format_json,
+    format_transitions,
     get_agile_fields,
     get_jira_client,
     get_project_defaults,
     has_project_context,
-    markdown_to_adf,
     print_error,
     print_success,
-    text_to_adf,
     validate_issue_key,
     validate_project_key,
 )
 
-from ..cli_utils import get_client_from_context, parse_comma_list, parse_json_arg
+from ..cli_utils import (
+    get_client_from_context,
+    handle_jira_errors,
+    parse_comma_list,
+    parse_json_arg,
+)
 
 if TYPE_CHECKING:
     from jira_as import JiraClient
@@ -127,6 +133,9 @@ def _create_issue_impl(
     blocks: list[str] | None = None,
     relates_to: list[str] | None = None,
     estimate: str | None = None,
+    parent: str | None = None,
+    parent_via_update: bool = False,
+    dry_run: bool = False,
     no_defaults: bool = False,
     client: JiraClient | None = None,
 ) -> dict:
@@ -150,11 +159,18 @@ def _create_issue_impl(
         blocks: List of issue keys this issue blocks
         relates_to: List of issue keys this issue relates to
         estimate: Original time estimate (e.g., '2d', '4h')
+        parent: Parent issue key (epic or parent task) set via the modern
+            'parent' field rather than the legacy epic-link custom field
+        parent_via_update: If True, create the issue without a parent and set
+            it in a follow-up update. Some workflow validators reject a parent
+            at create time but accept it afterwards.
+        dry_run: If True, build and return the payload without calling the API
         no_defaults: If True, skip applying project context defaults
         client: Optional JiraClient instance. If None, creates one internally.
 
     Returns:
-        Created issue data
+        Created issue data. For a dry run, a dict with 'dry_run': True and the
+        'fields' payload that would have been sent.
     """
     project = validate_project_key(project)
 
@@ -190,17 +206,15 @@ def _create_issue_impl(
     fields["summary"] = summary
 
     if description:
-        if description.strip().startswith("{"):
-            fields["description"] = json.loads(description)
-        elif "\n" in description or any(
-            md in description for md in ["**", "*", "#", "`", "["]
-        ):
-            fields["description"] = markdown_to_adf(description)
-        else:
-            fields["description"] = text_to_adf(description)
+        fields["description"] = ensure_adf(description)
 
     if priority:
         fields["priority"] = {"name": priority}
+
+    if parent:
+        # The modern 'parent' field covers epics and parent tasks alike; the
+        # epic-link custom field is legacy and instance-specific.
+        fields["parent"] = {"key": validate_issue_key(parent)}
 
     def _do_create(c: JiraClient) -> dict:
         """Inner function that performs the create with a client."""
@@ -224,9 +238,10 @@ def _create_issue_impl(
         if custom_fields:
             fields.update(custom_fields)
 
-        # Agile fields - get field IDs from configuration
+        # Agile fields - field IDs commonly differ per project, so resolve
+        # them against this project rather than the global defaults.
         if epic or story_points is not None:
-            agile_fields = get_agile_fields()
+            agile_fields = get_agile_fields(project_key=project)
 
             if epic:
                 validated_epic = validate_issue_key(epic)
@@ -239,10 +254,35 @@ def _create_issue_impl(
         if estimate:
             fields["timetracking"] = {"originalEstimate": estimate}
 
+        # Rich-text custom fields must be sent as ADF, not bare strings.
+        auto_wrap_adf_fields(fields)
+
+        # A workflow validator may reject a parent at create time; creating
+        # first and setting the parent in a follow-up update works around it.
+        deferred_parent = None
+        if parent_via_update and "parent" in fields:
+            deferred_parent = fields.pop("parent")
+
+        if dry_run:
+            payload: dict[str, Any] = {
+                "dry_run": True,
+                "fields": fields,
+            }
+            if deferred_parent:
+                payload["deferred_parent"] = deferred_parent
+            if defaults_applied:
+                payload["defaults_applied"] = defaults_applied
+            return payload
+
         result = c.create_issue(fields)
 
         # Add to sprint after creation (sprint assignment requires issue to exist)
         issue_key = result.get("key")
+
+        if deferred_parent:
+            c.update_issue(issue_key, {"parent": deferred_parent})
+            result["parent_set_via_update"] = deferred_parent.get("key")
+
         if sprint:
             c.move_issues_to_sprint(sprint, [issue_key])
 
@@ -292,6 +332,7 @@ def _update_issue_impl(
     labels: list[str] | None = None,
     components: list[str] | None = None,
     custom_fields: dict | None = None,
+    parent: str | None = None,
     notify_users: bool = True,
     client: JiraClient | None = None,
 ) -> None:
@@ -307,6 +348,7 @@ def _update_issue_impl(
         labels: New labels (replaces existing)
         components: New components (replaces existing)
         custom_fields: Custom fields to update
+        parent: New parent issue key, or "none" to remove the parent
         notify_users: Send notifications to watchers
         client: Optional JiraClient instance. If None, creates one internally.
     """
@@ -318,14 +360,7 @@ def _update_issue_impl(
         fields["summary"] = summary
 
     if description is not None:
-        if description.strip().startswith("{"):
-            fields["description"] = json.loads(description)
-        elif "\n" in description or any(
-            md in description for md in ["**", "*", "#", "`", "["]
-        ):
-            fields["description"] = markdown_to_adf(description)
-        else:
-            fields["description"] = text_to_adf(description)
+        fields["description"] = ensure_adf(description)
 
     if priority is not None:
         fields["priority"] = {"name": priority}
@@ -338,6 +373,15 @@ def _update_issue_impl(
 
     if custom_fields:
         fields.update(custom_fields)
+
+    if parent is not None:
+        if parent.lower() in ("none", "unassigned", ""):
+            fields["parent"] = None
+        else:
+            fields["parent"] = {"key": validate_issue_key(parent)}
+
+    # Rich-text custom fields must be sent as ADF, not bare strings.
+    auto_wrap_adf_fields(fields)
 
     def _do_update(c: JiraClient) -> None:
         """Inner function that performs the update with a client."""
@@ -565,6 +609,18 @@ def get_issue(
 @click.option("--blocks", help="Comma-separated issue keys this issue blocks")
 @click.option("--relates-to", help="Comma-separated issue keys this issue relates to")
 @click.option("--estimate", help="Original time estimate (e.g., 2d, 4h, 1w)")
+@click.option("--parent", help="Parent issue key (epic or parent task, e.g., PROJ-100)")
+@click.option(
+    "--parent-via-update",
+    is_flag=True,
+    help="Create without the parent, then set it in a follow-up update "
+    "(for workflows that reject a parent at create time)",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Show the payload that would be sent without creating the issue",
+)
 @click.option("--no-defaults", is_flag=True, help="Disable project context defaults")
 @click.option(
     "--output",
@@ -591,6 +647,9 @@ def create_issue(
     blocks: str,
     relates_to: str,
     estimate: str,
+    parent: str,
+    parent_via_update: bool,
+    dry_run: bool,
     no_defaults: bool,
     output: str,
 ):
@@ -622,6 +681,9 @@ def create_issue(
             blocks=blocks_list,
             relates_to=relates_to_list,
             estimate=estimate,
+            parent=parent,
+            parent_via_update=parent_via_update,
+            dry_run=dry_run,
             no_defaults=no_defaults,
             client=client,
         )
@@ -634,10 +696,21 @@ def create_issue(
         )
         if output_format == "json":
             click.echo(json.dumps(result, indent=2))
+        elif dry_run:
+            click.echo("Dry run - no issue was created.")
+            click.echo(json.dumps(result["fields"], indent=2))
+            deferred = result.get("deferred_parent")
+            if deferred:
+                click.echo(
+                    f"Parent {deferred.get('key')} would be set in a follow-up update."
+                )
         else:
             print_success(f"Created issue: {issue_key}")
             base_url = result.get("self", "").split("/rest/api/")[0]
             click.echo(f"URL: {base_url}/browse/{issue_key}")
+            parent_key = result.get("parent_set_via_update")
+            if parent_key:
+                click.echo(f"Parent set via update: {parent_key}")
             defaults_applied = result.get("defaults_applied", [])
             if defaults_applied:
                 click.echo(f"Defaults applied: {', '.join(defaults_applied)}")
@@ -674,6 +747,9 @@ def create_issue(
     "--components", "-c", help="Comma-separated component names (replaces existing)"
 )
 @click.option("--custom-fields", help="Custom fields as JSON string")
+@click.option(
+    "--parent", help='New parent issue key (e.g., PROJ-100), or "none" to remove'
+)
 @click.option("--no-notify", is_flag=True, help="Do not send notifications to watchers")
 @click.pass_context
 def update_issue(
@@ -686,6 +762,7 @@ def update_issue(
     labels: str,
     components: str,
     custom_fields: str,
+    parent: str,
     no_notify: bool,
 ):
     """Update a JIRA issue."""
@@ -706,6 +783,7 @@ def update_issue(
             labels=labels_list,
             components=components_list,
             custom_fields=custom_fields_dict,
+            parent=parent,
             notify_users=not no_notify,
             client=client,
         )
@@ -769,3 +847,182 @@ def delete_issue(ctx: click.Context, issue_key: str, force: bool):
     except Exception as e:
         print_error(e, debug=True)
         ctx.exit(1)
+
+
+# =============================================================================
+# Aliases for cross-group commands
+#
+# These mirror commands that live in the lifecycle and collaborate groups.
+# Issue work usually starts from `jira-as issue ...`, so the most common
+# follow-ups are reachable there too. Each alias delegates to the same
+# implementation function as the canonical command, so behaviour cannot drift.
+# =============================================================================
+
+
+@issue.command(name="transitions")
+@click.argument("issue_key")
+@click.option(
+    "--output",
+    "-o",
+    type=click.Choice(["text", "json"]),
+    default="text",
+    help="Output format",
+)
+@click.pass_context
+@handle_jira_errors
+def issue_transitions(ctx: click.Context, issue_key: str, output: str):
+    """Get available transitions for an issue (read-only).
+
+    Alias for `jira-as lifecycle transitions`.
+    """
+    from .lifecycle_cmds import _get_transitions_impl
+
+    client = get_client_from_context(ctx)
+    transitions = _get_transitions_impl(issue_key, client=client)
+
+    if not transitions:
+        click.echo(f"No transitions available for {issue_key}")
+        return
+
+    if output == "json":
+        click.echo(format_json(transitions))
+    else:
+        click.echo(f"\nAvailable transitions for {issue_key}:\n")
+        click.echo(format_transitions(transitions))
+
+
+@issue.command(name="transition")
+@click.argument("issue_key")
+@click.option(
+    "--to",
+    "-t",
+    "status",
+    help='Target status name (e.g., "Done", "In Progress")',
+)
+@click.option("--id", "transition_id", help="Transition ID (alternative to --to)")
+@click.option("--comment", "-c", help="Add a comment with the transition")
+@click.option("--resolution", "-r", help="Resolution (for Done transitions)")
+@click.option(
+    "--sprint", "-s", type=int, help="Sprint ID to move issue to after transition"
+)
+@click.option("--fields", help="Additional fields as JSON string")
+@click.option(
+    "--dry-run", "-n", is_flag=True, help="Preview changes without making them"
+)
+@click.pass_context
+@handle_jira_errors
+def issue_transition(
+    ctx: click.Context,
+    issue_key: str,
+    status: str,
+    transition_id: str,
+    comment: str,
+    resolution: str,
+    sprint: int,
+    fields: str,
+    dry_run: bool,
+):
+    """Transition an issue to a new status.
+
+    Alias for `jira-as lifecycle transition`, with the same options.
+
+    Use either --to (status name) or --id (transition ID).
+
+    Examples:
+        jira-as issue transition PROJ-123 --to "In Progress"
+        jira-as issue transition PROJ-123 --to Done --resolution Fixed
+        jira-as issue transition PROJ-123 --id 31 --dry-run
+    """
+    from .lifecycle_cmds import _transition_issue_impl
+
+    if not status and not transition_id:
+        raise click.UsageError(
+            "Specify either --to (status name) or --id (transition ID)"
+        )
+    if status and transition_id:
+        raise click.UsageError("Specify only one of --to or --id, not both")
+
+    fields_dict = parse_json_arg(fields)
+    client = get_client_from_context(ctx)
+
+    _transition_issue_impl(
+        issue_key=issue_key,
+        transition_id=transition_id,
+        transition_name=status,
+        resolution=resolution,
+        comment=comment,
+        fields=fields_dict,
+        sprint_id=sprint,
+        dry_run=dry_run,
+        client=client,
+    )
+
+    if not dry_run:
+        target = status or f"transition {transition_id}"
+        msg = f"Transitioned {issue_key} to {target}"
+        if sprint:
+            msg += f" and moved to sprint {sprint}"
+        print_success(msg)
+
+
+@issue.command(name="comment")
+@click.argument("issue_key")
+@click.option("--body", "-b", required=True, help="Comment text")
+@click.option(
+    "--format",
+    "-f",
+    "body_format",
+    type=click.Choice(["text", "markdown", "adf"]),
+    default="text",
+    help="Comment format",
+)
+@click.option("--visibility-role", help="Restrict visibility to role")
+@click.option("--visibility-group", help="Restrict visibility to group")
+@click.pass_context
+@handle_jira_errors
+def issue_comment(
+    ctx: click.Context,
+    issue_key: str,
+    body: str,
+    body_format: str,
+    visibility_role: str,
+    visibility_group: str,
+):
+    """Add a comment to an issue.
+
+    Alias for `jira-as collaborate comment add`.
+
+    Examples:
+        jira-as issue comment PROJ-123 --body "Starting work"
+        jira-as issue comment PROJ-123 --body "**Done**" --format markdown
+    """
+    from .collaborate_cmds import _add_comment_impl
+
+    if visibility_role and visibility_group:
+        raise click.UsageError(
+            "Cannot specify both --visibility-role and --visibility-group"
+        )
+
+    visibility_type = None
+    visibility_value = None
+    if visibility_role:
+        visibility_type = "role"
+        visibility_value = visibility_role
+    elif visibility_group:
+        visibility_type = "group"
+        visibility_value = visibility_group
+
+    client = get_client_from_context(ctx)
+    result = _add_comment_impl(
+        issue_key=issue_key,
+        body=body,
+        body_format=body_format,
+        visibility_type=visibility_type,
+        visibility_value=visibility_value,
+        client=client,
+    )
+
+    print_success(f"Added comment to {issue_key}")
+    comment_id = result.get("id")
+    if comment_id:
+        click.echo(f"Comment ID: {comment_id}")

@@ -5,8 +5,117 @@ Provides functions to convert between markdown, plain text, and ADF format
 used by JIRA for rich text fields like descriptions and comments.
 """
 
+import os
 import re
 from typing import Any
+
+# System fields JIRA stores as rich text and therefore expects in ADF form.
+DEFAULT_ADF_FIELDS: frozenset[str] = frozenset({"description", "environment"})
+
+# Environment variable naming extra custom fields that hold rich text.
+ADF_CUSTOM_FIELDS_ENV = "JIRA_ADF_CUSTOM_FIELDS"
+
+
+def get_adf_field_ids() -> set[str]:
+    """
+    Get the field IDs whose values should be sent as ADF.
+
+    The built-in rich-text system fields are always included. Instances with
+    rich-text custom fields extend the set through the
+    ``JIRA_ADF_CUSTOM_FIELDS`` environment variable, a comma-separated list of
+    field IDs (e.g. ``customfield_10050,customfield_10051``).
+
+    Returns:
+        Set of field IDs to wrap in ADF
+    """
+    fields = set(DEFAULT_ADF_FIELDS)
+
+    configured = os.getenv(ADF_CUSTOM_FIELDS_ENV, "")
+    fields.update(f.strip() for f in configured.split(",") if f.strip())
+
+    return fields
+
+
+def is_adf(value: Any) -> bool:
+    """
+    Report whether a value is already an ADF document.
+
+    Args:
+        value: Candidate field value
+
+    Returns:
+        True when the value looks like an ADF doc node
+    """
+    return isinstance(value, dict) and value.get("type") == "doc"
+
+
+def ensure_adf(value: Any) -> Any:
+    """
+    Convert a plain-string field value to ADF, leaving other values alone.
+
+    Strings that look like markdown are converted with the markdown reader so
+    formatting survives; anything else becomes a plain-text document. Values
+    that are already ADF - or are not strings at all - pass through untouched.
+
+    Args:
+        value: Field value to normalise
+
+    Returns:
+        ADF document for plain strings, otherwise the original value
+    """
+    if not isinstance(value, str):
+        return value
+
+    stripped = value.strip()
+    if not stripped:
+        return text_to_adf(value)
+
+    # A JSON object here is an ADF document the caller already built.
+    if stripped.startswith("{"):
+        import json
+
+        try:
+            parsed = json.loads(stripped)
+        except (ValueError, TypeError):
+            return text_to_adf(value)
+        return parsed if isinstance(parsed, dict) else text_to_adf(value)
+
+    if "\n" in value or any(md in value for md in ["**", "*", "#", "`", "["]):
+        return markdown_to_adf(value)
+
+    return text_to_adf(value)
+
+
+def auto_wrap_adf_fields(
+    fields: dict[str, Any], extra_field_ids: set[str] | None = None
+) -> dict[str, Any]:
+    """
+    Wrap plain-string rich-text field values in ADF.
+
+    JIRA rejects a bare string for a rich-text field, so a caller passing
+    ``--custom-fields '{"customfield_10050": "some notes"}'`` would otherwise
+    get an opaque 400. Only the configured rich-text fields are touched, and
+    values that are already ADF pass through unchanged.
+
+    Args:
+        fields: Issue fields mapping, modified in place
+        extra_field_ids: Additional field IDs to treat as rich text
+
+    Returns:
+        The same mapping, for convenient chaining
+    """
+    adf_fields = get_adf_field_ids()
+    if extra_field_ids:
+        adf_fields |= extra_field_ids
+
+    for field_id in adf_fields:
+        if field_id not in fields:
+            continue
+        value = fields[field_id]
+        if isinstance(value, str):
+            fields[field_id] = ensure_adf(value)
+
+    return fields
 
 
 def text_to_adf(text: str) -> dict[str, Any]:

@@ -7,6 +7,7 @@ including automatic retries, exponential backoff, and unified error handling.
 
 from __future__ import annotations
 
+import sys
 from collections.abc import Callable
 from typing import Any
 
@@ -558,6 +559,23 @@ class JiraClient:
         endpoint = f"/rest/api/3/issue/{issue_key}"
         url = f"{self.base_url}{endpoint}"
         response = self.session.put(url, json=data, params=params, timeout=self.timeout)
+
+        # Suppressing notifications needs the 'Administer Jira' global
+        # permission. For everyone else Jira rejects the whole request with a
+        # 403, losing the edit as well as the suppression. Retry without the
+        # parameter so the update still lands, and say so on stderr.
+        if response.status_code == 403 and not notify_users:
+            retry = self.session.put(url, json=data, timeout=self.timeout)
+            if retry.ok:
+                print(
+                    f"Warning: cannot suppress notifications on {issue_key} "
+                    "(requires Jira administrator permission). "
+                    "The update was applied and watchers were notified.",
+                    file=sys.stderr,
+                )
+                return
+            response = retry
+
         handle_jira_error(response, f"update issue {issue_key}")
 
     def delete_issue(self, issue_key: str, delete_subtasks: bool = True) -> None:

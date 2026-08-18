@@ -188,11 +188,19 @@ class ConfigManager(BaseConfigManager):
         """
         return self.config.get(self.service_name, {}).get("default_project")
 
-    def get_agile_fields(self) -> dict[str, str]:
+    def get_agile_fields(self, project_key: str | None = None) -> dict[str, str]:
         """
         Get Agile field IDs.
 
-        Returns configured field IDs merged with defaults.
+        Returns configured field IDs merged with defaults. Resolution order,
+        lowest priority first: built-in defaults, environment variables, the
+        global ``jira.agile_fields`` config block, then any per-project
+        ``jira.projects.<KEY>.agile_fields`` overrides.
+
+        Args:
+            project_key: Optional project key. When given, per-project field
+                overrides take precedence over the global and env values,
+                since custom field IDs commonly differ per project.
 
         Returns:
             Dictionary of field names to field IDs:
@@ -225,14 +233,22 @@ class ConfigManager(BaseConfigManager):
             if field_id:
                 fields[field_name] = field_id
 
+        # Per-project overrides win over globals and env.
+        if project_key:
+            from .project_context import get_project_agile_fields
+
+            for field_name, field_id in get_project_agile_fields(project_key).items():
+                fields[field_name] = field_id
+
         return fields
 
-    def get_agile_field(self, field_name: str) -> str:
+    def get_agile_field(self, field_name: str, project_key: str | None = None) -> str:
         """
         Get a specific Agile field ID.
 
         Args:
             field_name: Field name (epic_link, story_points, epic_name, epic_color, sprint)
+            project_key: Optional project key for per-project field overrides
 
         Returns:
             Field ID string
@@ -253,7 +269,7 @@ class ConfigManager(BaseConfigManager):
                 f"Valid fields: {', '.join(valid_fields)}"
             )
 
-        fields = self.get_agile_fields()
+        fields = self.get_agile_fields(project_key=project_key)
         return fields[field_name]
 
     def get_automation_client(self) -> AutomationClient:
@@ -323,23 +339,27 @@ def get_automation_client() -> AutomationClient:
     return config_manager.get_automation_client()
 
 
-def get_agile_fields() -> dict[str, str]:
+def get_agile_fields(project_key: str | None = None) -> dict[str, str]:
     """
     Convenience function to get Agile field IDs.
+
+    Args:
+        project_key: Optional project key for per-project field overrides
 
     Returns:
         Dictionary of field names to field IDs
     """
     config_manager = ConfigManager.get_instance()
-    return config_manager.get_agile_fields()
+    return config_manager.get_agile_fields(project_key=project_key)
 
 
-def get_agile_field(field_name: str) -> str:
+def get_agile_field(field_name: str, project_key: str | None = None) -> str:
     """
     Convenience function to get a specific Agile field ID.
 
     Args:
         field_name: Field name (epic_link, story_points, epic_name, epic_color, sprint)
+        project_key: Optional project key for per-project field overrides
 
     Returns:
         Field ID string
@@ -348,7 +368,7 @@ def get_agile_field(field_name: str) -> str:
         ValidationError: If field_name is not a valid Agile field
     """
     config_manager = ConfigManager.get_instance()
-    return config_manager.get_agile_field(field_name)
+    return config_manager.get_agile_field(field_name, project_key=project_key)
 
 
 # Project context functions - lazy imports to avoid circular dependencies
