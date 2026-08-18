@@ -27,9 +27,9 @@ pytest tests/test_imports.py
 pytest tests/test_imports.py::TestValidators
 pytest tests/test_imports.py::TestValidators::test_validate_issue_key_valid
 
-# Format code
+# Format code (black formats; ruff sorts imports)
 black src tests
-isort src tests
+ruff check --fix src tests
 
 # Type checking
 mypy src
