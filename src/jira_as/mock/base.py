@@ -776,6 +776,7 @@ class MockJiraClientBase:
         issue_key: str,
         fields: dict[str, Any] | None = None,
         update: dict[str, Any] | None = None,
+        notify_users: bool = True,
     ) -> dict[str, Any]:
         """Update an issue.
 
@@ -783,6 +784,8 @@ class MockJiraClientBase:
             issue_key: The issue key to update.
             fields: Dictionary of field values to update.
             update: Update operations (for interface compatibility).
+            notify_users: Accepted for parity with JiraClient; the mock sends
+                no notifications either way.
 
         Returns:
             Empty dictionary on success.

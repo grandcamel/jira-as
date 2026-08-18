@@ -27,11 +27,17 @@ __version__ = "1.1.1"
 # Error handling
 # ADF Helper
 from .adf_helper import (
+    ADF_CUSTOM_FIELDS_ENV,
+    DEFAULT_ADF_FIELDS,
     _parse_wiki_inline,  # Exposed for testing
     adf_to_text,
+    auto_wrap_adf_fields,
     create_adf_code_block,
     create_adf_heading,
     create_adf_paragraph,
+    ensure_adf,
+    get_adf_field_ids,
+    is_adf,
     markdown_to_adf,
     text_to_adf,
     wiki_markup_to_adf,
@@ -151,6 +157,7 @@ from .project_context import (
     format_context_summary,
     get_common_labels,
     get_defaults_for_issue_type,
+    get_project_agile_fields,
     get_project_context,
     get_statuses_for_issue_type,
     get_valid_transitions,
@@ -289,7 +296,13 @@ __all__ = [
     # Version
     "__version__",
     "_parse_wiki_inline",  # Exposed for testing
+    "ADF_CUSTOM_FIELDS_ENV",
+    "DEFAULT_ADF_FIELDS",
     "adf_to_text",
+    "auto_wrap_adf_fields",
+    "ensure_adf",
+    "get_adf_field_ids",
+    "is_adf",
     "batch_fetch_issues",
     "build_grant_payload",
     "calculate_progress",
@@ -337,6 +350,7 @@ __all__ = [
     "get_defaults_for_issue_type",
     "get_holder_display",
     "get_jira_client",
+    "get_project_agile_fields",
     "get_project_context",
     "get_project_defaults",
     "get_recommended_batch_size",

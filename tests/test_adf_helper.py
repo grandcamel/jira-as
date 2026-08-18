@@ -7,7 +7,14 @@ converting JIRA wiki markup to Atlassian Document Format (ADF).
 
 import pytest
 
-from jira_as.adf_helper import _parse_wiki_inline, wiki_markup_to_adf
+from jira_as.adf_helper import (
+    _parse_wiki_inline,
+    auto_wrap_adf_fields,
+    ensure_adf,
+    get_adf_field_ids,
+    is_adf,
+    wiki_markup_to_adf,
+)
 
 
 @pytest.mark.unit
@@ -244,3 +251,98 @@ class TestParseWikiInline:
         assert result[1]["text"] == " "
         assert result[2]["text"] == "abc"
         assert result[2]["marks"][0]["type"] == "link"
+
+
+@pytest.mark.unit
+class TestAdfAutoWrap:
+    """Tests for ADF field detection and auto-wrapping."""
+
+    def test_default_fields_are_rich_text(self, monkeypatch):
+        """description and environment are always treated as rich text."""
+        monkeypatch.delenv("JIRA_ADF_CUSTOM_FIELDS", raising=False)
+        assert get_adf_field_ids() == {"description", "environment"}
+
+    def test_env_extends_the_built_in_set(self, monkeypatch):
+        """JIRA_ADF_CUSTOM_FIELDS adds field IDs without replacing defaults."""
+        monkeypatch.setenv(
+            "JIRA_ADF_CUSTOM_FIELDS", " customfield_10050 ,customfield_10051 , "
+        )
+
+        assert get_adf_field_ids() == {
+            "description",
+            "environment",
+            "customfield_10050",
+            "customfield_10051",
+        }
+
+    def test_is_adf_detects_doc_nodes(self):
+        """Only a dict with type 'doc' counts as ADF."""
+        assert is_adf({"type": "doc", "version": 1, "content": []})
+        assert not is_adf({"type": "paragraph"})
+        assert not is_adf("plain string")
+        assert not is_adf(None)
+
+    def test_ensure_adf_wraps_plain_text(self):
+        """A plain string becomes a single-paragraph document."""
+        result = ensure_adf("hello")
+
+        assert result["type"] == "doc"
+        assert result["content"][0]["content"][0]["text"] == "hello"
+
+    def test_ensure_adf_converts_markdown(self):
+        """Markdown formatting survives the conversion."""
+        result = ensure_adf("**bold**")
+
+        marks = result["content"][0]["content"][0]["marks"]
+        assert marks == [{"type": "strong"}]
+
+    def test_ensure_adf_passes_through_json_documents(self):
+        """A JSON string the caller already built is parsed, not re-wrapped."""
+        result = ensure_adf('{"type": "doc", "version": 1, "content": []}')
+
+        assert result == {"type": "doc", "version": 1, "content": []}
+
+    def test_ensure_adf_leaves_non_strings_alone(self):
+        """Numbers, dicts and None are returned unchanged."""
+        adf = {"type": "doc", "version": 1, "content": []}
+
+        assert ensure_adf(adf) is adf
+        assert ensure_adf(5) == 5
+        assert ensure_adf(None) is None
+
+    def test_auto_wrap_only_touches_configured_fields(self, monkeypatch):
+        """Fields outside the configured set keep their raw values."""
+        monkeypatch.setenv("JIRA_ADF_CUSTOM_FIELDS", "customfield_10050")
+        fields = {
+            "summary": "not rich text",
+            "description": "wrap me",
+            "customfield_10050": "wrap me too",
+            "customfield_10099": "leave me",
+        }
+
+        auto_wrap_adf_fields(fields)
+
+        assert fields["summary"] == "not rich text"
+        assert fields["customfield_10099"] == "leave me"
+        assert is_adf(fields["description"])
+        assert is_adf(fields["customfield_10050"])
+
+    def test_auto_wrap_accepts_extra_field_ids(self, monkeypatch):
+        """Callers can pass additional rich-text fields directly."""
+        monkeypatch.delenv("JIRA_ADF_CUSTOM_FIELDS", raising=False)
+        fields = {"customfield_10060": "wrap me"}
+
+        auto_wrap_adf_fields(fields, extra_field_ids={"customfield_10060"})
+
+        assert is_adf(fields["customfield_10060"])
+
+    def test_auto_wrap_is_idempotent(self, monkeypatch):
+        """Wrapping twice does not nest documents."""
+        monkeypatch.delenv("JIRA_ADF_CUSTOM_FIELDS", raising=False)
+        fields = {"description": "hello"}
+
+        auto_wrap_adf_fields(fields)
+        first = fields["description"]
+        auto_wrap_adf_fields(fields)
+
+        assert fields["description"] == first

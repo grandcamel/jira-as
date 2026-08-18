@@ -475,3 +475,295 @@ class TestDeleteIssueCommand:
         assert result.exit_code == 0
         assert "Deleted" in result.output
         mock_jira_client.delete_issue.assert_called_once()
+
+
+# =============================================================================
+# Tests for parent handling, ADF auto-wrap, and dry run
+# =============================================================================
+
+
+@pytest.mark.unit
+class TestCreateIssueParentAndAdf:
+    """Tests for --parent, --parent-via-update, --dry-run and ADF wrapping."""
+
+    @staticmethod
+    def _no_context():
+        return patch(
+            "jira_as.cli.commands.issue_cmds.has_project_context", return_value=False
+        )
+
+    def test_parent_uses_modern_parent_field(
+        self, mock_jira_client, sample_created_issue
+    ):
+        """A parent is set through the 'parent' field, not an epic custom field."""
+        mock_jira_client.create_issue.return_value = deepcopy(sample_created_issue)
+
+        with self._no_context():
+            _create_issue_impl(
+                project="PROJ",
+                issue_type="Task",
+                summary="Child",
+                parent="PROJ-100",
+                client=mock_jira_client,
+            )
+
+        fields = mock_jira_client.create_issue.call_args[0][0]
+        assert fields["parent"] == {"key": "PROJ-100"}
+        # No epic-link custom field smuggling.
+        assert not any(k.startswith("customfield_") for k in fields)
+
+    def test_parent_via_update_defers_the_parent(
+        self, mock_jira_client, sample_created_issue
+    ):
+        """--parent-via-update creates first, then sets the parent."""
+        mock_jira_client.create_issue.return_value = deepcopy(sample_created_issue)
+
+        with self._no_context():
+            result = _create_issue_impl(
+                project="PROJ",
+                issue_type="Task",
+                summary="Child",
+                parent="PROJ-100",
+                parent_via_update=True,
+                client=mock_jira_client,
+            )
+
+        create_fields = mock_jira_client.create_issue.call_args[0][0]
+        assert "parent" not in create_fields
+        mock_jira_client.update_issue.assert_called_once_with(
+            "PROJ-130", {"parent": {"key": "PROJ-100"}}
+        )
+        assert result["parent_set_via_update"] == "PROJ-100"
+
+    def test_dry_run_does_not_call_the_api(self, mock_jira_client):
+        """--dry-run returns the payload and creates nothing."""
+        with self._no_context():
+            result = _create_issue_impl(
+                project="PROJ",
+                issue_type="Task",
+                summary="Preview",
+                parent="PROJ-100",
+                dry_run=True,
+                client=mock_jira_client,
+            )
+
+        mock_jira_client.create_issue.assert_not_called()
+        assert result["dry_run"] is True
+        assert result["fields"]["summary"] == "Preview"
+        assert result["fields"]["parent"] == {"key": "PROJ-100"}
+
+    def test_dry_run_reports_deferred_parent(self, mock_jira_client):
+        """A dry run shows a parent that would be set in a second step."""
+        with self._no_context():
+            result = _create_issue_impl(
+                project="PROJ",
+                issue_type="Task",
+                summary="Preview",
+                parent="PROJ-100",
+                parent_via_update=True,
+                dry_run=True,
+                client=mock_jira_client,
+            )
+
+        assert "parent" not in result["fields"]
+        assert result["deferred_parent"] == {"key": "PROJ-100"}
+
+    def test_custom_field_string_is_wrapped_in_adf(
+        self, monkeypatch, mock_jira_client, sample_created_issue
+    ):
+        """A configured rich-text custom field gets an ADF document."""
+        monkeypatch.setenv("JIRA_ADF_CUSTOM_FIELDS", "customfield_10050")
+        mock_jira_client.create_issue.return_value = deepcopy(sample_created_issue)
+
+        with self._no_context():
+            _create_issue_impl(
+                project="PROJ",
+                issue_type="Task",
+                summary="Test",
+                custom_fields={
+                    "customfield_10050": "plain notes",
+                    "customfield_10099": "left alone",
+                },
+                client=mock_jira_client,
+            )
+
+        fields = mock_jira_client.create_issue.call_args[0][0]
+        assert fields["customfield_10050"]["type"] == "doc"
+        # Fields that are not configured as rich text stay untouched.
+        assert fields["customfield_10099"] == "left alone"
+
+    def test_existing_adf_value_passes_through(
+        self, monkeypatch, mock_jira_client, sample_created_issue
+    ):
+        """A value that is already ADF is not re-wrapped."""
+        monkeypatch.setenv("JIRA_ADF_CUSTOM_FIELDS", "customfield_10050")
+        mock_jira_client.create_issue.return_value = deepcopy(sample_created_issue)
+        adf = {"version": 1, "type": "doc", "content": []}
+
+        with self._no_context():
+            _create_issue_impl(
+                project="PROJ",
+                issue_type="Task",
+                summary="Test",
+                custom_fields={"customfield_10050": adf},
+                client=mock_jira_client,
+            )
+
+        fields = mock_jira_client.create_issue.call_args[0][0]
+        assert fields["customfield_10050"] == adf
+
+    def test_story_points_field_resolved_per_project(
+        self, mock_jira_client, sample_created_issue
+    ):
+        """Story points resolve the field ID against the target project."""
+        mock_jira_client.create_issue.return_value = deepcopy(sample_created_issue)
+
+        with (
+            self._no_context(),
+            patch(
+                "jira_as.cli.commands.issue_cmds.get_agile_fields",
+                return_value={
+                    "epic_link": "customfield_10014",
+                    "story_points": "customfield_12345",
+                },
+            ) as mock_agile,
+        ):
+            _create_issue_impl(
+                project="PROJ",
+                issue_type="Story",
+                summary="Test",
+                story_points=5,
+                client=mock_jira_client,
+            )
+
+        mock_agile.assert_called_once_with(project_key="PROJ")
+        fields = mock_jira_client.create_issue.call_args[0][0]
+        assert fields["customfield_12345"] == 5
+
+
+@pytest.mark.unit
+class TestUpdateIssueParentAndAdf:
+    """Tests for parent and ADF handling on update."""
+
+    def test_update_sets_parent(self, mock_jira_client):
+        """--parent sets the modern parent field."""
+        _update_issue_impl(
+            issue_key="PROJ-123", parent="PROJ-100", client=mock_jira_client
+        )
+
+        fields = mock_jira_client.update_issue.call_args[0][1]
+        assert fields["parent"] == {"key": "PROJ-100"}
+
+    def test_update_clears_parent(self, mock_jira_client):
+        """--parent none removes the parent."""
+        _update_issue_impl(issue_key="PROJ-123", parent="none", client=mock_jira_client)
+
+        fields = mock_jira_client.update_issue.call_args[0][1]
+        assert fields["parent"] is None
+
+    def test_update_wraps_custom_field_in_adf(self, monkeypatch, mock_jira_client):
+        """Rich-text custom fields are wrapped on update too."""
+        monkeypatch.setenv("JIRA_ADF_CUSTOM_FIELDS", "customfield_10050")
+
+        _update_issue_impl(
+            issue_key="PROJ-123",
+            custom_fields={"customfield_10050": "notes"},
+            client=mock_jira_client,
+        )
+
+        fields = mock_jira_client.update_issue.call_args[0][1]
+        assert fields["customfield_10050"]["type"] == "doc"
+
+
+# =============================================================================
+# Tests for issue group aliases
+# =============================================================================
+
+
+@pytest.mark.unit
+class TestIssueGroupAliases:
+    """The issue group exposes transition, transitions and comment aliases."""
+
+    def test_transitions_alias_is_read_only(self, cli_runner, mock_jira_client):
+        """'issue transitions' lists transitions without performing one."""
+        with (
+            patch(
+                "jira_as.cli.commands.issue_cmds.get_client_from_context",
+                return_value=mock_jira_client,
+            ),
+            patch(
+                "jira_as.cli.commands.lifecycle_cmds._get_transitions_impl",
+                return_value=[{"id": "31", "name": "Done", "to": {"name": "Done"}}],
+            ) as mock_impl,
+        ):
+            result = cli_runner.invoke(issue, ["transitions", "PROJ-123"])
+
+        assert result.exit_code == 0
+        mock_impl.assert_called_once()
+        mock_jira_client.transition_issue.assert_not_called()
+
+    def test_transition_alias_delegates_to_lifecycle(
+        self, cli_runner, mock_jira_client
+    ):
+        """'issue transition' reuses the lifecycle implementation."""
+        with (
+            patch(
+                "jira_as.cli.commands.issue_cmds.get_client_from_context",
+                return_value=mock_jira_client,
+            ),
+            patch(
+                "jira_as.cli.commands.lifecycle_cmds._transition_issue_impl"
+            ) as mock_impl,
+        ):
+            result = cli_runner.invoke(
+                issue,
+                [
+                    "transition",
+                    "PROJ-123",
+                    "--to",
+                    "Done",
+                    "--resolution",
+                    "Fixed",
+                    "--comment",
+                    "done",
+                ],
+            )
+
+        assert result.exit_code == 0
+        kwargs = mock_impl.call_args.kwargs
+        assert kwargs["transition_name"] == "Done"
+        assert kwargs["resolution"] == "Fixed"
+        assert kwargs["comment"] == "done"
+
+    def test_transition_alias_requires_a_target(self, cli_runner, mock_jira_client):
+        """Neither --to nor --id is a usage error, as in the lifecycle group."""
+        with patch(
+            "jira_as.cli.commands.issue_cmds.get_client_from_context",
+            return_value=mock_jira_client,
+        ):
+            result = cli_runner.invoke(issue, ["transition", "PROJ-123"])
+
+        assert result.exit_code != 0
+
+    def test_comment_alias_delegates_to_collaborate(self, cli_runner, mock_jira_client):
+        """'issue comment' reuses the collaborate implementation."""
+        with (
+            patch(
+                "jira_as.cli.commands.issue_cmds.get_client_from_context",
+                return_value=mock_jira_client,
+            ),
+            patch(
+                "jira_as.cli.commands.collaborate_cmds._add_comment_impl",
+                return_value={"id": "10500"},
+            ) as mock_impl,
+        ):
+            result = cli_runner.invoke(
+                issue,
+                ["comment", "PROJ-123", "--body", "**hi**", "--format", "markdown"],
+            )
+
+        assert result.exit_code == 0
+        kwargs = mock_impl.call_args.kwargs
+        assert kwargs["body"] == "**hi**"
+        assert kwargs["body_format"] == "markdown"
+        assert "10500" in result.output

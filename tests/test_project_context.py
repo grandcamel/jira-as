@@ -3,6 +3,9 @@
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
+from jira_as.config_manager import get_agile_field, get_agile_fields
 from jira_as.project_context import (
     ProjectContext,
     _deep_merge,
@@ -10,6 +13,7 @@ from jira_as.project_context import (
     format_context_summary,
     get_common_labels,
     get_defaults_for_issue_type,
+    get_project_agile_fields,
     get_statuses_for_issue_type,
     get_valid_transitions,
     has_project_context,
@@ -496,3 +500,75 @@ class TestHasProjectContext:
 
         result = has_project_context("PROJ")
         assert result is True
+
+
+@pytest.mark.unit
+class TestProjectAgileFields:
+    """Tests for per-project Agile field ID overrides."""
+
+    def test_returns_empty_without_settings(self):
+        """No settings file means no overrides."""
+        with patch("jira_as.project_context.load_settings_context", return_value=None):
+            assert get_project_agile_fields("PROJ") == {}
+
+    def test_returns_empty_for_blank_key(self):
+        """A missing project key short-circuits the lookup."""
+        assert get_project_agile_fields("") == {}
+
+    def test_reads_agile_fields_block(self):
+        """jira.projects.<KEY>.agile_fields is returned as a plain mapping."""
+        with patch(
+            "jira_as.project_context.load_settings_context",
+            return_value={
+                "agile_fields": {
+                    "story_points": "customfield_12345",
+                    "sprint": "customfield_12346",
+                }
+            },
+        ):
+            assert get_project_agile_fields("PROJ") == {
+                "story_points": "customfield_12345",
+                "sprint": "customfield_12346",
+            }
+
+    def test_skips_blank_field_ids(self):
+        """An empty override does not shadow the global value."""
+        with patch(
+            "jira_as.project_context.load_settings_context",
+            return_value={"agile_fields": {"story_points": "", "sprint": None}},
+        ):
+            assert get_project_agile_fields("PROJ") == {}
+
+    def test_ignores_malformed_block(self):
+        """A non-dict agile_fields value is ignored rather than raising."""
+        with patch(
+            "jira_as.project_context.load_settings_context",
+            return_value={"agile_fields": "customfield_12345"},
+        ):
+            assert get_project_agile_fields("PROJ") == {}
+
+    def test_project_override_beats_global_and_env(self, monkeypatch):
+        """Per-project IDs win over the environment variable."""
+        monkeypatch.setenv("JIRA_STORY_POINTS_FIELD", "customfield_99999")
+
+        with patch(
+            "jira_as.project_context.load_settings_context",
+            return_value={"agile_fields": {"story_points": "customfield_12345"}},
+        ):
+            scoped = get_agile_fields(project_key="PROJ")
+            unscoped = get_agile_fields()
+
+        assert scoped["story_points"] == "customfield_12345"
+        # Without a project key the env value still applies.
+        assert unscoped["story_points"] == "customfield_99999"
+
+    def test_get_agile_field_accepts_project_key(self):
+        """The single-field accessor honours per-project overrides too."""
+        with patch(
+            "jira_as.project_context.load_settings_context",
+            return_value={"agile_fields": {"story_points": "customfield_12345"}},
+        ):
+            assert (
+                get_agile_field("story_points", project_key="PROJ")
+                == "customfield_12345"
+            )
