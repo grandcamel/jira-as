@@ -234,6 +234,29 @@ class TestAgileMethodParity:
         assert real_params[0] == mock_params[0] == "board_id"
         assert real_params[1] == mock_params[1] == "name"
 
+    def test_get_all_boards_signature(self):
+        """Mock get_all_boards mirrors the real client's leading parameters."""
+        real_sig = get_method_signature(JiraClient, "get_all_boards")
+        mock_sig = get_method_signature(MockJiraClient, "get_all_boards")
+
+        real_params = [p for p in real_sig.parameters if p != "self"]
+        mock_params = [p for p in mock_sig.parameters if p != "self"]
+
+        # The real client's parameters must lead, in order, so positional and
+        # keyword calls behave identically against either client.
+        assert mock_params[: len(real_params)] == real_params
+        # The legacy alias stays available for older callers.
+        assert "project_key_or_id" in mock_params
+
+    def test_get_all_boards_project_key_filters(self):
+        """project_key filters mock boards the same way the alias does."""
+        with MockJiraClient() as client:
+            by_key = client.get_all_boards(project_key="DEMO")
+            by_alias = client.get_all_boards(project_key_or_id="DEMO")
+
+        assert by_key == by_alias
+        assert by_key["values"], "expected seeded DEMO boards"
+
     def test_rank_issues_signature(self):
         """Verify rank_issues uses rank_before/rank_after params."""
         real_sig = get_method_signature(JiraClient, "rank_issues")

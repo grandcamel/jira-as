@@ -519,19 +519,24 @@ class AgileMixin(_Base):
 
     def get_all_boards(
         self,
-        start_at: int = 0,
-        max_results: int = 50,
-        project_key_or_id: str | None = None,
+        project_key: str | None = None,
         board_type: str | None = None,
+        max_results: int = 50,
+        start_at: int = 0,
+        project_key_or_id: str | None = None,
         name: str | None = None,
     ) -> dict[str, Any]:
         """Alias for get_boards() for API parity.
 
+        The leading parameters mirror ``JiraClient.get_all_boards`` exactly, so
+        positional and keyword calls behave the same against either client.
+
         Args:
-            start_at: Starting index for pagination.
-            max_results: Maximum number of results.
-            project_key_or_id: Filter by project.
+            project_key: Filter by project.
             board_type: Filter by board type (scrum, kanban).
+            max_results: Maximum number of results.
+            start_at: Starting index for pagination.
+            project_key_or_id: Deprecated alias for ``project_key``.
             name: Filter by board name.
 
         Returns:
@@ -540,7 +545,7 @@ class AgileMixin(_Base):
         return self.get_boards(
             start_at=start_at,
             max_results=max_results,
-            project_key_or_id=project_key_or_id,
+            project_key_or_id=project_key or project_key_or_id,
             board_type=board_type,
             name=name,
         )

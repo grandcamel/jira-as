@@ -512,7 +512,7 @@ class TestGetVersionsImpl:
 
     def test_get_versions_success(self, mock_jira_client, sample_versions):
         """Test retrieving versions successfully."""
-        mock_jira_client.get_versions.return_value = deepcopy(sample_versions)
+        mock_jira_client.get_project_versions.return_value = deepcopy(sample_versions)
 
         with patch(
             "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
@@ -521,11 +521,11 @@ class TestGetVersionsImpl:
             result = _get_versions_impl(project="PROJ")
 
         assert len(result) == 3
-        mock_jira_client.get_versions.assert_called_once_with("PROJ")
+        mock_jira_client.get_project_versions.assert_called_once_with("PROJ")
 
     def test_get_versions_unreleased_filter(self, mock_jira_client, sample_versions):
         """Test filtering for unreleased versions."""
-        mock_jira_client.get_versions.return_value = deepcopy(sample_versions)
+        mock_jira_client.get_project_versions.return_value = deepcopy(sample_versions)
 
         with patch(
             "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
@@ -537,7 +537,7 @@ class TestGetVersionsImpl:
 
     def test_get_versions_uses_context_manager(self, mock_jira_client, sample_versions):
         """Test that client is used as context manager."""
-        mock_jira_client.get_versions.return_value = deepcopy(sample_versions)
+        mock_jira_client.get_project_versions.return_value = deepcopy(sample_versions)
 
         with patch(
             "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
@@ -589,7 +589,9 @@ class TestGetComponentsImpl:
 
     def test_get_components_success(self, mock_jira_client, sample_components):
         """Test retrieving components successfully."""
-        mock_jira_client.get_components.return_value = deepcopy(sample_components)
+        mock_jira_client.get_project_components.return_value = deepcopy(
+            sample_components
+        )
 
         with patch(
             "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
@@ -598,13 +600,15 @@ class TestGetComponentsImpl:
             result = _get_components_impl(project="PROJ")
 
         assert len(result) == 2
-        mock_jira_client.get_components.assert_called_once_with("PROJ")
+        mock_jira_client.get_project_components.assert_called_once_with("PROJ")
 
     def test_get_components_uses_context_manager(
         self, mock_jira_client, sample_components
     ):
         """Test that client is used as context manager."""
-        mock_jira_client.get_components.return_value = deepcopy(sample_components)
+        mock_jira_client.get_project_components.return_value = deepcopy(
+            sample_components
+        )
 
         with patch(
             "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
@@ -747,7 +751,7 @@ class TestVersionCommands:
         self, cli_runner, mock_jira_client, sample_versions
     ):
         """Test CLI version list command success."""
-        mock_jira_client.get_versions.return_value = deepcopy(sample_versions)
+        mock_jira_client.get_project_versions.return_value = deepcopy(sample_versions)
 
         with patch(
             "jira_as.cli.commands.lifecycle_cmds.get_client_from_context",
@@ -767,7 +771,9 @@ class TestComponentCommands:
         self, cli_runner, mock_jira_client, sample_components
     ):
         """Test CLI component list command success."""
-        mock_jira_client.get_components.return_value = deepcopy(sample_components)
+        mock_jira_client.get_project_components.return_value = deepcopy(
+            sample_components
+        )
 
         with patch(
             "jira_as.cli.commands.lifecycle_cmds.get_client_from_context",
