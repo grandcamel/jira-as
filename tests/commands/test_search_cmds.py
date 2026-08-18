@@ -9,6 +9,7 @@ Tests cover:
 - CLI commands
 """
 
+import csv
 import json
 import os
 from unittest.mock import MagicMock, patch
@@ -466,21 +467,138 @@ class TestSearchImplementation:
 
     @patch("jira_as.cli.commands.search_cmds.get_jira_client")
     @patch("jira_as.cli.commands.search_cmds.validate_jql")
-    def test_export_results_no_issues(
+    def test_export_no_issues_writes_csv_headers(
         self, mock_validate, mock_get_client, mock_client, tmp_path
     ):
-        """Test export with no matching issues."""
+        """An empty result set is a successful export of a header-only CSV."""
         mock_get_client.return_value = mock_client
         mock_validate.return_value = "project = EMPTY"
         mock_client.search_issues.return_value = {"issues": []}
+        output_file = str(tmp_path / "export.csv")
 
         result = _export_results_impl(
-            jql="project = EMPTY",
-            output_file=str(tmp_path / "export.csv"),
+            jql="project = EMPTY", output_file=output_file, fields=["key", "summary"]
         )
 
         assert result["exported"] == 0
-        assert "No issues found" in result["message"]
+        # 'output_file' must be present - the CLI reads it unconditionally.
+        assert result["output_file"] == output_file
+        assert result["format"] == "csv"
+
+        with open(output_file) as f:
+            assert f.read().strip() == "key,summary"
+
+    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.search_cmds.validate_jql")
+    def test_export_no_issues_writes_empty_json(
+        self, mock_validate, mock_get_client, mock_client, tmp_path
+    ):
+        """An empty JSON export is a valid, empty envelope."""
+        mock_get_client.return_value = mock_client
+        mock_validate.return_value = "project = EMPTY"
+        mock_client.search_issues.return_value = {"issues": []}
+        output_file = str(tmp_path / "export.json")
+
+        result = _export_results_impl(
+            jql="project = EMPTY", output_file=output_file, format_type="json"
+        )
+
+        assert result["exported"] == 0
+        assert result["output_file"] == output_file
+
+        with open(output_file) as f:
+            assert json.load(f) == {"issues": [], "total": 0}
+
+    def test_export_command_exits_zero_on_no_results(
+        self, cli_runner, mock_client, tmp_path
+    ):
+        """'search export' with no matches exits 0 instead of raising KeyError."""
+        mock_client.search_issues.return_value = {"issues": []}
+        output_file = str(tmp_path / "export.csv")
+
+        with patch(
+            "jira_as.cli.commands.search_cmds.get_client_from_context",
+            return_value=mock_client,
+        ):
+            result = cli_runner.invoke(
+                search, ["export", "project = EMPTY", "-o", output_file]
+            )
+
+        assert result.exit_code == 0, result.output
+        assert "Exported 0 issues" in result.output
+
+    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.search_cmds.validate_jql")
+    def test_json_export_keeps_nested_values(
+        self, mock_validate, mock_get_client, mock_client, tmp_path
+    ):
+        """Nested field values stay real JSON, not a stringified Python repr."""
+        mock_get_client.return_value = mock_client
+        mock_validate.return_value = "project = TEST"
+        mock_client.search_issues.return_value = {
+            "issues": [
+                {
+                    "key": "TEST-1",
+                    "fields": {
+                        "summary": "S",
+                        "status": {"name": "Open", "id": "1"},
+                    },
+                }
+            ]
+        }
+        output_file = str(tmp_path / "export.json")
+
+        _export_results_impl(
+            jql="project = TEST",
+            output_file=output_file,
+            format_type="json",
+            fields=["key", "summary", "status"],
+        )
+
+        with open(output_file) as f:
+            data = json.load(f)
+
+        assert data["issues"][0]["status"] == {"name": "Open", "id": "1"}
+
+    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
+    @patch("jira_as.cli.commands.search_cmds.validate_jql")
+    def test_csv_export_flattens_without_python_repr(
+        self, mock_validate, mock_get_client, mock_client, tmp_path
+    ):
+        """CSV collapses objects to a display name, or compact JSON."""
+        mock_validate.return_value = "project = TEST"
+        mock_get_client.return_value = mock_client
+        mock_client.search_issues.return_value = {
+            "issues": [
+                {
+                    "key": "TEST-1",
+                    "fields": {
+                        "status": {"name": "Open"},
+                        "assignee": {"displayName": "Jane"},
+                        # No display-name key: must not become a Python repr.
+                        "customfield_1": {"start": "2024-01-01"},
+                        "labels": ["a", {"name": "b"}],
+                    },
+                }
+            ]
+        }
+        output_file = str(tmp_path / "export.csv")
+
+        _export_results_impl(
+            jql="project = TEST",
+            output_file=output_file,
+            format_type="csv",
+            fields=["key", "status", "assignee", "customfield_1", "labels"],
+        )
+
+        with open(output_file) as f:
+            row = list(csv.DictReader(f))[0]
+
+        assert row["status"] == "Open"
+        assert row["assignee"] == "Jane"
+        assert row["labels"] == "a, b"
+        # Parseable JSON, not "{'start': '2024-01-01'}".
+        assert json.loads(row["customfield_1"]) == {"start": "2024-01-01"}
 
     @patch("jira_as.cli.commands.search_cmds.get_jira_client")
     def test_validate_jql_valid(self, mock_get_client, mock_client):

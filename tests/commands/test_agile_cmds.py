@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
-from jira_as import JiraError, ValidationError
+from jira_as import JiraError, NotFoundError, ValidationError
 from jira_as.cli.commands.agile_cmds import (
     FIBONACCI_SEQUENCE,
     VALID_EPIC_COLORS,
@@ -17,6 +17,7 @@ from jira_as.cli.commands.agile_cmds import (
     _create_sprint_impl,
     _create_subtask_impl,
     _estimate_issue_impl,
+    _format_boards,
     _format_epic_created,
     _format_epic_details,
     _format_sprint_details,
@@ -30,6 +31,7 @@ from jira_as.cli.commands.agile_cmds import (
     _get_estimates_impl,
     _get_sprint_impl,
     _get_velocity_impl,
+    _list_boards_impl,
     _list_sprints_impl,
     _move_to_backlog_impl,
     _move_to_sprint_impl,
@@ -717,9 +719,13 @@ class TestSprintImplementation:
         mock_client.update_sprint.assert_called_once()
 
     def test_close_sprint_impl_with_move(self, mock_client, sample_sprint):
-        """Test closing sprint with move incomplete."""
+        """Incomplete issues are found first, then moved to the target sprint."""
         mock_client.update_sprint.return_value = {**sample_sprint, "state": "closed"}
-        mock_client.move_issues_to_sprint.return_value = {"movedIssues": 5}
+        # move_issues_to_sprint returns None and takes a list of issue keys.
+        mock_client.move_issues_to_sprint.return_value = None
+        mock_client.search_issues.return_value = {
+            "issues": [{"key": f"PROJ-{n}"} for n in range(1, 6)]
+        }
 
         with patch(
             "jira_as.cli.commands.agile_cmds.get_jira_client",
@@ -728,7 +734,24 @@ class TestSprintImplementation:
             result = _close_sprint_impl(456, move_incomplete_to=457)
 
         assert result["moved_issues"] == 5
-        mock_client.move_issues_to_sprint.assert_called_once()
+        mock_client.move_issues_to_sprint.assert_called_once_with(
+            457, ["PROJ-1", "PROJ-2", "PROJ-3", "PROJ-4", "PROJ-5"]
+        )
+        assert result["state"] == "closed"
+
+    def test_close_sprint_impl_with_nothing_to_move(self, mock_client, sample_sprint):
+        """A sprint with no open issues closes without a move call."""
+        mock_client.update_sprint.return_value = {**sample_sprint, "state": "closed"}
+        mock_client.search_issues.return_value = {"issues": []}
+
+        with patch(
+            "jira_as.cli.commands.agile_cmds.get_jira_client",
+            return_value=mock_client,
+        ):
+            result = _close_sprint_impl(456, move_incomplete_to=457)
+
+        assert result["moved_issues"] == 0
+        mock_client.move_issues_to_sprint.assert_not_called()
 
     def test_update_sprint_impl(self, mock_client, sample_sprint):
         """Test updating sprint."""
@@ -1711,3 +1734,181 @@ class TestErrorHandling:
         )
 
         assert result.exit_code != 0
+
+
+# =============================================================================
+# Board listing, multi-board resolution and backlog fallback
+# =============================================================================
+
+
+class TestListBoards:
+    """Tests for 'agile board list'."""
+
+    def test_single_page(self, mock_client):
+        """A last page ends the walk immediately."""
+        mock_client.get_all_boards.return_value = {
+            "values": [{"id": 1, "name": "B1", "type": "scrum"}],
+            "isLast": True,
+        }
+
+        result = _list_boards_impl(client=mock_client)
+
+        assert result["total"] == 1
+        assert result["is_last"] is True
+        assert mock_client.get_all_boards.call_count == 1
+
+    def test_pages_until_is_last(self, mock_client):
+        """isLast=False keeps paging with an advancing startAt."""
+        mock_client.get_all_boards.side_effect = [
+            {
+                "values": [{"id": n, "name": f"B{n}"} for n in range(50)],
+                "isLast": False,
+            },
+            {"values": [{"id": 50, "name": "B50"}], "isLast": True},
+        ]
+
+        result = _list_boards_impl(max_results=100, client=mock_client)
+
+        assert result["total"] == 51
+        assert result["is_last"] is True
+        second_call = mock_client.get_all_boards.call_args_list[1].kwargs
+        assert second_call["start_at"] == 50
+
+    def test_respects_max_results(self, mock_client):
+        """The listing stops at the requested count and reports more remain."""
+        mock_client.get_all_boards.return_value = {
+            "values": [{"id": n} for n in range(50)],
+            "isLast": False,
+        }
+
+        result = _list_boards_impl(max_results=10, client=mock_client)
+
+        assert result["total"] == 10
+        assert result["is_last"] is False
+        assert mock_client.get_all_boards.call_args.kwargs["max_results"] == 10
+
+    def test_filters_are_passed_through(self, mock_client):
+        """--project and --type reach the client."""
+        mock_client.get_all_boards.return_value = {"values": [], "isLast": True}
+
+        _list_boards_impl(project_key="PROJ", board_type="scrum", client=mock_client)
+
+        kwargs = mock_client.get_all_boards.call_args.kwargs
+        assert kwargs["project_key"] == "PROJ"
+        assert kwargs["board_type"] == "scrum"
+
+    def test_command_warns_when_unscoped(self, cli_runner, mock_client):
+        """Listing every board on the site is called out on stderr."""
+        mock_client.get_all_boards.return_value = {"values": [], "isLast": True}
+
+        with patch(
+            "jira_as.cli.commands.agile_cmds.get_client_from_context",
+            return_value=mock_client,
+        ):
+            result = cli_runner.invoke(agile, ["board", "list"])
+
+        assert result.exit_code == 0
+        assert "can be very large" in result.output
+
+    def test_command_does_not_warn_when_scoped(self, cli_runner, mock_client):
+        """A --project listing is bounded, so no warning."""
+        mock_client.get_all_boards.return_value = {"values": [], "isLast": True}
+
+        with patch(
+            "jira_as.cli.commands.agile_cmds.get_client_from_context",
+            return_value=mock_client,
+        ):
+            result = cli_runner.invoke(agile, ["board", "list", "-p", "PROJ"])
+
+        assert result.exit_code == 0
+        assert "can be very large" not in result.output
+
+    def test_format_boards_notes_truncation(self):
+        """Text output says when more boards are available."""
+        text = _format_boards(
+            {
+                "boards": [{"id": 1, "name": "B1", "type": "scrum"}],
+                "total": 1,
+                "is_last": False,
+            }
+        )
+
+        assert "[1] B1" in text
+        assert "raise --max-results" in text
+
+    def test_format_boards_empty(self):
+        """An empty listing says so plainly."""
+        assert _format_boards({"boards": [], "total": 0, "is_last": True}) == (
+            "No boards found."
+        )
+
+
+class TestBoardResolutionWarning:
+    """A project with several boards reports which one was used."""
+
+    def test_multiple_boards_warn(self, mock_client, capsys):
+        """The chosen board is named on stderr."""
+        mock_client.get_all_boards.return_value = {
+            "values": [
+                {"id": 1, "name": "Kanban", "type": "kanban"},
+                {"id": 2, "name": "Scrum", "type": "scrum"},
+            ]
+        }
+
+        board = _get_board_for_project("PROJ", client=mock_client)
+
+        # Scrum boards are preferred over the first result.
+        assert board["id"] == 2
+        err = capsys.readouterr().err
+        assert "has 2 boards" in err
+        assert "Using board 2" in err
+
+    def test_single_board_does_not_warn(self, mock_client, capsys):
+        """One board needs no disambiguation."""
+        mock_client.get_all_boards.return_value = {
+            "values": [{"id": 1, "name": "Only", "type": "scrum"}]
+        }
+
+        board = _get_board_for_project("PROJ", client=mock_client)
+
+        assert board["id"] == 1
+        assert capsys.readouterr().err == ""
+
+    def test_no_boards_returns_none(self, mock_client):
+        """A project with no boards resolves to None."""
+        mock_client.get_all_boards.return_value = {"values": []}
+
+        assert _get_board_for_project("PROJ", client=mock_client) is None
+
+
+class TestBacklogFallback:
+    """'agile backlog' falls back to board issues when there is no backlog."""
+
+    def test_uses_backlog_endpoint_when_available(self, mock_client):
+        """The backlog endpoint is preferred."""
+        mock_client.get_board_backlog.return_value = {"issues": []}
+
+        result = _get_backlog_impl(board_id=1, client=mock_client)
+
+        assert "backlog_fallback" not in result
+        mock_client.get_board_issues.assert_not_called()
+
+    def test_falls_back_on_not_found(self, mock_client):
+        """A board with no backlog endpoint uses the board's issues."""
+        mock_client.get_board_backlog.side_effect = NotFoundError("no backlog")
+        mock_client.get_board_issues.return_value = {"issues": [{"key": "PROJ-1"}]}
+
+        result = _get_backlog_impl(board_id=1, client=mock_client)
+
+        assert result["backlog_fallback"] == "board_issues"
+        assert result["issues"] == [{"key": "PROJ-1"}]
+
+    def test_fallback_preserves_the_jql_filter(self, mock_client):
+        """The filter is carried over to the fallback query."""
+        mock_client.get_board_backlog.side_effect = NotFoundError("no backlog")
+        mock_client.get_board_issues.return_value = {"issues": []}
+
+        _get_backlog_impl(board_id=1, jql_filter="labels = x", client=mock_client)
+
+        kwargs = mock_client.get_board_issues.call_args.kwargs
+        assert kwargs["jql"] == "labels = x"
