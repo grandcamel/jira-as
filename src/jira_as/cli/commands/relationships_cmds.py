@@ -104,8 +104,35 @@ def _sanitize_key(key: str) -> str:
     return key.replace("-", "_")
 
 
-def _extract_blockers(links: list, direction: str = "inward") -> list:
-    """Extract blocker issues from links."""
+# Status names treated as completed when the API omits statusCategory.
+DONE_STATUS_NAMES = frozenset({"done", "closed", "resolved", "complete", "completed"})
+
+
+def _is_done_issue(issue: dict[str, Any]) -> bool:
+    """Report whether a linked issue sits in the completed status category.
+
+    Prefers ``statusCategory`` (the only locale-independent signal Jira gives
+    us) and falls back to well-known status names when the field is absent.
+    """
+    status = issue.get("fields", {}).get("status", {}) or {}
+    category = status.get("statusCategory") or {}
+    if isinstance(category, dict) and (category.get("key") or category.get("name")):
+        return str(category.get("key") or category.get("name")).lower() == "done"
+    return str(status.get("name", "")).lower() in DONE_STATUS_NAMES
+
+
+def _extract_blockers(
+    links: list, direction: str = "inward", include_done: bool = False
+) -> list:
+    """Extract blocker issues from links.
+
+    Args:
+        links: Raw issue links as returned by the API.
+        direction: ``inward`` for issues blocking this one, ``outward`` for
+            issues this one blocks.
+        include_done: When False (the default) completed blockers are dropped,
+            since a finished issue no longer blocks anything.
+    """
     blockers = []
     for link in links:
         if link["type"]["name"] != "Blocks":
@@ -113,28 +140,24 @@ def _extract_blockers(links: list, direction: str = "inward") -> list:
 
         if direction == "inward" and "outwardIssue" in link:
             issue = link["outwardIssue"]
-            blockers.append(
-                {
-                    "key": issue["key"],
-                    "summary": issue.get("fields", {}).get("summary", ""),
-                    "status": issue.get("fields", {})
-                    .get("status", {})
-                    .get("name", "Unknown"),
-                    "link_id": link["id"],
-                }
-            )
         elif direction == "outward" and "inwardIssue" in link:
             issue = link["inwardIssue"]
-            blockers.append(
-                {
-                    "key": issue["key"],
-                    "summary": issue.get("fields", {}).get("summary", ""),
-                    "status": issue.get("fields", {})
-                    .get("status", {})
-                    .get("name", "Unknown"),
-                    "link_id": link["id"],
-                }
-            )
+        else:
+            continue
+
+        if not include_done and _is_done_issue(issue):
+            continue
+
+        blockers.append(
+            {
+                "key": issue["key"],
+                "summary": issue.get("fields", {}).get("summary", ""),
+                "status": issue.get("fields", {})
+                .get("status", {})
+                .get("name", "Unknown"),
+                "link_id": link["id"],
+            }
+        )
 
     return blockers
 
@@ -146,6 +169,7 @@ def _get_blockers_recursive(
     visited: set[str],
     max_depth: int,
     current_depth: int,
+    include_done: bool = False,
 ) -> dict[str, Any]:
     """Recursively get blockers."""
     if issue_key in visited:
@@ -157,13 +181,19 @@ def _get_blockers_recursive(
     visited.add(issue_key)
 
     links = client.get_issue_links(issue_key)
-    direct_blockers = _extract_blockers(links, direction)
+    direct_blockers = _extract_blockers(links, direction, include_done=include_done)
 
     result: dict[str, Any] = {"key": issue_key, "blockers": []}
 
     for blocker in direct_blockers:
         blocker_info = _get_blockers_recursive(
-            client, blocker["key"], direction, visited, max_depth, current_depth + 1
+            client,
+            blocker["key"],
+            direction,
+            visited,
+            max_depth,
+            current_depth + 1,
+            include_done,
         )
         blocker_info["summary"] = blocker["summary"]
         blocker_info["status"] = blocker["status"]
@@ -616,16 +646,20 @@ def _get_blockers_impl(
     direction: str = "inward",
     recursive: bool = False,
     max_depth: int = 0,
+    include_done: bool = False,
     client: JiraClient | None = None,
 ) -> dict[str, Any]:
-    """Get blockers for an issue."""
+    """Get blockers for an issue.
+
+    Completed blockers are excluded unless ``include_done`` is set.
+    """
     issue_key = validate_issue_key(issue_key)
 
     def _do_work(c: JiraClient) -> dict[str, Any]:
         if recursive:
             visited: set[str] = set()
             tree = _get_blockers_recursive(
-                c, issue_key, direction, visited, max_depth, 0
+                c, issue_key, direction, visited, max_depth, 0, include_done
             )
 
             all_blockers: list[dict] = []
@@ -638,6 +672,7 @@ def _get_blockers_impl(
                 "issue_key": issue_key,
                 "direction": direction,
                 "recursive": True,
+                "include_done": include_done,
                 "blockers": tree.get("blockers", []),
                 "all_blockers": all_blockers,
                 "circular": has_circular,
@@ -645,12 +680,13 @@ def _get_blockers_impl(
             }
         else:
             links = c.get_issue_links(issue_key)
-            blockers = _extract_blockers(links, direction)
+            blockers = _extract_blockers(links, direction, include_done=include_done)
 
             return {
                 "issue_key": issue_key,
                 "direction": direction,
                 "recursive": False,
+                "include_done": include_done,
                 "blockers": blockers,
                 "total": len(blockers),
             }
@@ -1540,7 +1576,11 @@ def relationships_get_links(
 @relationships.command(name="get-blockers")
 @click.argument("issue_key")
 @click.option("--recursive", "-r", is_flag=True, help="Show full blocker chain")
-@click.option("--include-done", is_flag=True, help="Include completed blockers")
+@click.option(
+    "--include-done",
+    is_flag=True,
+    help="Include completed blockers (excluded by default)",
+)
 @click.option("--depth", type=int, default=0, help="Max recursion depth (0=unlimited)")
 @click.option(
     "--direction", "-d", type=click.Choice(["inward", "outward"]), default="inward"
@@ -1564,6 +1604,7 @@ def relationships_get_blockers(
         direction=direction,
         recursive=recursive,
         max_depth=depth,
+        include_done=include_done,
         client=client,
     )
 

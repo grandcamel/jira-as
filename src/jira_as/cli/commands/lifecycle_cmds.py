@@ -456,7 +456,7 @@ def _get_versions_impl(
     """
 
     def _do_work(c: JiraClient) -> list[dict[str, Any]]:
-        versions = c.get_versions(project)
+        versions = c.get_project_versions(project)
 
         # Apply filters
         filtered = versions
@@ -557,7 +557,7 @@ def _release_version_impl(
     """
 
     def _do_work(c: JiraClient) -> dict[str, Any]:
-        versions = c.get_versions(project_key)
+        versions = c.get_project_versions(project_key)
 
         # Find version by name
         version_id = None
@@ -613,7 +613,7 @@ def _archive_version_impl(
     """
 
     def _do_work(c: JiraClient) -> dict[str, Any]:
-        versions = c.get_versions(project_key)
+        versions = c.get_project_versions(project_key)
 
         # Find version by name
         version_id = None
@@ -657,7 +657,7 @@ def _get_components_impl(
     """
 
     def _do_work(c: JiraClient) -> list[dict[str, Any]]:
-        return c.get_components(project)
+        return c.get_project_components(project)
 
     if client is not None:
         return _do_work(client)

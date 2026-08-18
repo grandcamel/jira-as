@@ -230,12 +230,24 @@ class TestGetLinksImpl:
 # =============================================================================
 
 
+def _blocks_link(link_id: str, key: str, status_name: str) -> dict:
+    """Build a minimal inward "Blocks" link for blocker tests."""
+    return {
+        "id": link_id,
+        "type": {"id": "10000", "name": "Blocks", "inward": "is blocked by"},
+        "outwardIssue": {
+            "key": key,
+            "fields": {"summary": f"Summary {key}", "status": {"name": status_name}},
+        },
+    }
+
+
 @pytest.mark.unit
 class TestGetBlockersImpl:
     """Tests for the _get_blockers_impl implementation function."""
 
     def test_get_blockers_inward(self, mock_jira_client, sample_blocker_links):
-        """Test getting inward blockers."""
+        """Completed blockers are filtered out by default."""
         mock_jira_client.get_issue_links.return_value = deepcopy(sample_blocker_links)
 
         with patch(
@@ -244,9 +256,77 @@ class TestGetBlockersImpl:
         ):
             result = _get_blockers_impl(issue_key="PROJ-123", direction="inward")
 
-        assert result["total"] == 2
+        # The fixture holds one Open and one Done blocker.
+        assert result["total"] == 1
         assert result["direction"] == "inward"
-        assert len(result["blockers"]) == 2
+        assert result["include_done"] is False
+        assert [b["key"] for b in result["blockers"]] == ["PROJ-200"]
+
+    def test_get_blockers_include_done(self, mock_jira_client, sample_blocker_links):
+        """--include-done keeps completed blockers in the result."""
+        mock_jira_client.get_issue_links.return_value = deepcopy(sample_blocker_links)
+
+        with patch(
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
+            return_value=mock_jira_client,
+        ):
+            result = _get_blockers_impl(
+                issue_key="PROJ-123", direction="inward", include_done=True
+            )
+
+        assert result["total"] == 2
+        assert result["include_done"] is True
+        assert [b["key"] for b in result["blockers"]] == ["PROJ-200", "PROJ-201"]
+
+    def test_get_blockers_uses_status_category(
+        self, mock_jira_client, sample_blocker_links
+    ):
+        """statusCategory wins over the status name when both are present."""
+        links = deepcopy(sample_blocker_links)
+        # A non-English status name that is nonetheless in the done category.
+        links[0]["outwardIssue"]["fields"]["status"] = {
+            "name": "Erledigt",
+            "statusCategory": {"key": "done", "name": "Done"},
+        }
+        # A status literally named "Done" but still in progress.
+        links[1]["outwardIssue"]["fields"]["status"] = {
+            "name": "Done",
+            "statusCategory": {"key": "indeterminate", "name": "In Progress"},
+        }
+        mock_jira_client.get_issue_links.return_value = links
+
+        with patch(
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
+            return_value=mock_jira_client,
+        ):
+            result = _get_blockers_impl(issue_key="PROJ-123", direction="inward")
+
+        assert [b["key"] for b in result["blockers"]] == ["PROJ-201"]
+
+    def test_get_blockers_recursive_filters_done(self, mock_jira_client):
+        """Recursive traversal applies the same completed-blocker filter."""
+
+        def _links(issue_key):
+            if issue_key == "PROJ-123":
+                return [
+                    _blocks_link("1", "PROJ-200", "Open"),
+                    _blocks_link("2", "PROJ-201", "Done"),
+                ]
+            if issue_key == "PROJ-200":
+                return [_blocks_link("3", "PROJ-300", "Done")]
+            return []
+
+        mock_jira_client.get_issue_links.side_effect = _links
+
+        with patch(
+            "jira_as.cli.commands.relationships_cmds.get_jira_client",
+            return_value=mock_jira_client,
+        ):
+            result = _get_blockers_impl(
+                issue_key="PROJ-123", direction="inward", recursive=True
+            )
+
+        assert [b["key"] for b in result["all_blockers"]] == ["PROJ-200"]
 
     def test_get_blockers_no_results(self, mock_jira_client):
         """Test when no blockers exist."""
