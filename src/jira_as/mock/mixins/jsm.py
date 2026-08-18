@@ -1000,7 +1000,7 @@ class JSMMixin(_Base):
         issue_key: str,
         start: int = 0,
         limit: int = 50,
-    ) -> list[dict[str, Any]]:
+    ) -> dict[str, Any]:
         """Get participants for a request.
 
         Args:
@@ -1009,7 +1009,8 @@ class JSMMixin(_Base):
             limit: Maximum results per page.
 
         Returns:
-            List of participant user dicts.
+            Paginated participants envelope, matching the servicedeskapi shape
+            the real client returns.
 
         Raises:
             NotFoundError: If the request is not found.
@@ -1031,7 +1032,14 @@ class JSMMixin(_Base):
         if "def456" in self.USERS and reporter != self.USERS["def456"]:
             participants.append(self.USERS["def456"])
 
-        return participants[start : start + limit]
+        page = participants[start : start + limit]
+        return {
+            "size": len(page),
+            "start": start,
+            "limit": limit,
+            "isLastPage": start + limit >= len(participants),
+            "values": page,
+        }
 
     def add_request_participants(
         self,

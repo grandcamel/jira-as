@@ -156,20 +156,13 @@ class IssueBuilder:
                 f"[Test] {self._fields['issuetype']['name']} - {_random_suffix()}"
             )
 
-        issue = self._client.post("/rest/api/3/issue", json={"fields": self._fields})
+        issue = self._client.create_issue(self._fields)
 
         # Create link if requested
         if self._link_to:
             target_key, link_type = self._link_to
             try:
-                self._client.post(
-                    "/rest/api/3/issueLink",
-                    json={
-                        "type": {"name": link_type},
-                        "inwardIssue": {"key": issue["key"]},
-                        "outwardIssue": {"key": target_key},
-                    },
-                )
+                self._client.create_link(link_type, issue["key"], target_key)
             except Exception:
                 pass  # Link creation is best-effort
 
@@ -209,10 +202,7 @@ def assert_search_returns_results(
     last_count = 0
 
     while time.time() - start < timeout:
-        response = client.post(
-            "/rest/api/3/search",
-            json={"jql": jql, "maxResults": 100},
-        )
+        response = client.search_issues(jql, max_results=100)
         issues = response.get("issues", [])
         last_count = len(issues)
 
@@ -246,11 +236,8 @@ def assert_search_returns_empty(
     # Wait a bit for indexing, then check
     time.sleep(min(timeout, 2))
 
-    response = client.post(
-        "/rest/api/3/search",
-        json={"jql": jql, "maxResults": 1},
-    )
-    count = response.get("total", 0)
+    response = client.search_issues(jql, max_results=1)
+    count = response.get("total", len(response.get("issues", [])))
 
     if count > 0:
         raise AssertionError(f"Expected no results for '{jql}', got {count}")

@@ -523,7 +523,7 @@ class SearchMixin(_Base):
             The created filter.
         """
         filter_id = str(10000 + len(self.FILTERS))
-        result = {
+        result: dict[str, Any] = {
             "id": filter_id,
             "name": name,
             "jql": jql,

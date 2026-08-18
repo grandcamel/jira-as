@@ -26,7 +26,7 @@ class TestIssueBuilder:
     def mock_client(self):
         """Create a mock JIRA client."""
         client = MagicMock()
-        client.post.return_value = {"id": "12345", "key": "TEST-1"}
+        client.create_issue.return_value = {"id": "12345", "key": "TEST-1"}
         return client
 
     def test_basic_build(self, mock_client):
@@ -35,10 +35,8 @@ class TestIssueBuilder:
         issue = builder.with_summary("Test summary").build()
 
         assert issue["key"] == "TEST-1"
-        mock_client.post.assert_called_once()
-        call_args = mock_client.post.call_args
-        assert call_args[0][0] == "/rest/api/3/issue"
-        fields = call_args[1]["json"]["fields"]
+        mock_client.create_issue.assert_called_once()
+        fields = mock_client.create_issue.call_args[0][0]
         assert fields["summary"] == "Test summary"
         assert fields["project"]["key"] == "TEST"
         assert fields["issuetype"]["name"] == "Task"
@@ -48,8 +46,7 @@ class TestIssueBuilder:
         builder = IssueBuilder(mock_client, "TEST")
         builder.with_summary("Bug test").with_type("Bug").build()
 
-        call_args = mock_client.post.call_args
-        fields = call_args[1]["json"]["fields"]
+        fields = mock_client.create_issue.call_args[0][0]
         assert fields["issuetype"]["name"] == "Bug"
 
     def test_with_priority(self, mock_client):
@@ -57,8 +54,7 @@ class TestIssueBuilder:
         builder = IssueBuilder(mock_client, "TEST")
         builder.with_summary("High priority").with_priority("High").build()
 
-        call_args = mock_client.post.call_args
-        fields = call_args[1]["json"]["fields"]
+        fields = mock_client.create_issue.call_args[0][0]
         assert fields["priority"]["name"] == "High"
 
     def test_with_description(self, mock_client):
@@ -68,8 +64,7 @@ class TestIssueBuilder:
             "Test description"
         ).build()
 
-        call_args = mock_client.post.call_args
-        fields = call_args[1]["json"]["fields"]
+        fields = mock_client.create_issue.call_args[0][0]
         assert fields["description"]["type"] == "doc"
         assert fields["description"]["version"] == 1
 
@@ -78,8 +73,7 @@ class TestIssueBuilder:
         builder = IssueBuilder(mock_client, "TEST")
         builder.with_summary("Custom labels").with_labels(["custom", "labels"]).build()
 
-        call_args = mock_client.post.call_args
-        fields = call_args[1]["json"]["fields"]
+        fields = mock_client.create_issue.call_args[0][0]
         assert fields["labels"] == ["custom", "labels"]
 
     def test_add_labels(self, mock_client):
@@ -87,8 +81,7 @@ class TestIssueBuilder:
         builder = IssueBuilder(mock_client, "TEST")
         builder.with_summary("Add labels").add_labels(["extra"]).build()
 
-        call_args = mock_client.post.call_args
-        fields = call_args[1]["json"]["fields"]
+        fields = mock_client.create_issue.call_args[0][0]
         # Default labels are ["test", "automated"], plus "extra"
         assert "extra" in fields["labels"]
         assert "test" in fields["labels"]
@@ -98,8 +91,7 @@ class TestIssueBuilder:
         builder = IssueBuilder(mock_client, "TEST")
         builder.with_summary("Assigned").with_assignee("account123").build()
 
-        call_args = mock_client.post.call_args
-        fields = call_args[1]["json"]["fields"]
+        fields = mock_client.create_issue.call_args[0][0]
         assert fields["assignee"]["accountId"] == "account123"
 
     def test_with_field(self, mock_client):
@@ -109,8 +101,7 @@ class TestIssueBuilder:
             "customfield_10001", "value"
         ).build()
 
-        call_args = mock_client.post.call_args
-        fields = call_args[1]["json"]["fields"]
+        fields = mock_client.create_issue.call_args[0][0]
         assert fields["customfield_10001"] == "value"
 
     def test_link_to(self, mock_client):
@@ -118,18 +109,16 @@ class TestIssueBuilder:
         builder = IssueBuilder(mock_client, "TEST")
         builder.with_summary("Linked").link_to("TEST-100", "Relates").build()
 
-        # Should make 2 calls: create issue, create link
-        assert mock_client.post.call_count == 2
-        link_call = mock_client.post.call_args_list[1]
-        assert link_call[0][0] == "/rest/api/3/issueLink"
+        # The issue is created, then linked via the typed client method.
+        mock_client.create_issue.assert_called_once()
+        mock_client.create_link.assert_called_once_with("Relates", "TEST-1", "TEST-100")
 
     def test_auto_summary(self, mock_client):
         """Test auto-generated summary when not set."""
         builder = IssueBuilder(mock_client, "TEST")
         builder.build()
 
-        call_args = mock_client.post.call_args
-        fields = call_args[1]["json"]["fields"]
+        fields = mock_client.create_issue.call_args[0][0]
         assert "[Test]" in fields["summary"]
         assert "Task" in fields["summary"]
 
@@ -144,7 +133,7 @@ class TestAssertionHelpers:
 
     def test_assert_search_returns_results_success(self, mock_client):
         """Test successful search assertion."""
-        mock_client.post.return_value = {
+        mock_client.search_issues.return_value = {
             "issues": [{"key": "TEST-1"}, {"key": "TEST-2"}]
         }
 
@@ -157,7 +146,7 @@ class TestAssertionHelpers:
 
     def test_assert_search_returns_results_timeout(self, mock_client):
         """Test search assertion timeout."""
-        mock_client.post.return_value = {"issues": []}
+        mock_client.search_issues.return_value = {"issues": []}
 
         with pytest.raises(AssertionError) as exc_info:
             assert_search_returns_results(
@@ -168,14 +157,14 @@ class TestAssertionHelpers:
 
     def test_assert_search_returns_empty_success(self, mock_client):
         """Test empty search assertion success."""
-        mock_client.post.return_value = {"total": 0}
+        mock_client.search_issues.return_value = {"total": 0}
 
         # Should not raise
         assert_search_returns_empty(mock_client, "project = EMPTY", timeout=1)
 
     def test_assert_search_returns_empty_failure(self, mock_client):
         """Test empty search assertion failure."""
-        mock_client.post.return_value = {"total": 5}
+        mock_client.search_issues.return_value = {"total": 5}
 
         with pytest.raises(AssertionError) as exc_info:
             assert_search_returns_empty(mock_client, "project = TEST", timeout=1)

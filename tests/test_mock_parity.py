@@ -288,6 +288,52 @@ class TestSearchMethodParity:
         assert "queries" in mock_params
 
 
+class TestReturnShapeParity:
+    """Mock methods must return the same envelope shape as the real client."""
+
+    ENVELOPE_METHODS = [
+        "get_request_participants",
+        "get_request_comments",
+        "get_request_type_fields",
+    ]
+
+    @staticmethod
+    def _container(annotation):
+        """Reduce an annotation to its outer container name.
+
+        Modules differ on whether annotations are strings (from __future__
+        import annotations) or objects, so "dict[str, Any]" and
+        "dict[str, typing.Any]" must compare equal.
+        """
+        text = normalize_annotation(annotation) or ""
+        return text.replace("typing.", "").split("[")[0].strip().lower()
+
+    @pytest.mark.parametrize("method_name", ENVELOPE_METHODS)
+    def test_declared_return_types_match(self, method_name):
+        """A mock returning a bare list where the client returns an envelope
+        breaks every caller that unwraps 'values'."""
+        real = get_method_signature(JiraClient, method_name)
+        mock = get_method_signature(MockJiraClient, method_name)
+
+        assert self._container(real.return_annotation) == self._container(
+            mock.return_annotation
+        ), f"{method_name}: mock return type differs from JiraClient"
+
+    def test_participants_envelope_has_values(self):
+        """The mock participants response is unwrappable like the real one."""
+        with MockJiraClient() as client:
+            response = client.get_request_participants("DEMOSD-1")
+
+        assert isinstance(response, dict)
+        assert isinstance(response["values"], list)
+
+    def test_update_issue_accepts_notify_users(self):
+        """The mock takes notify_users so --no-notify works in mock mode."""
+        sig = get_method_signature(MockJiraClient, "update_issue")
+
+        assert "notify_users" in sig.parameters
+
+
 class TestJSMMethodParity:
     """Test parity of JSM-specific methods."""
 
