@@ -33,6 +33,12 @@ from ..cli_utils import format_json, get_client_from_context, handle_jira_errors
 # Constants
 # =============================================================================
 
+# Node fill colours for DOT dependency diagrams, by issue status.
+DOT_STATUS_COLORS = {
+    "Done": "lightgreen",
+    "In Progress": "lightyellow",
+}
+
 # Mapping of semantic flags to JIRA link type names
 LINK_TYPE_MAPPING = {
     "blocks": "Blocks",
@@ -312,11 +318,7 @@ def _format_dot(issue_key: str, dependencies: list) -> str:
     for dep in dependencies:
         dep_key = dep["key"]
         status = dep["status"]
-        color = (
-            "lightgreen"
-            if status == "Done"
-            else "lightyellow" if status == "In Progress" else "white"
-        )
+        color = DOT_STATUS_COLORS.get(status, "white")
         lines.append(f'    "{dep_key}" [style=filled, fillcolor={color}];')
 
         label = dep["direction_label"]
