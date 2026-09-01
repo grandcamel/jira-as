@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from jira_as import JiraClient
 
 from jira_as import (
+    JiraError,
     ValidationError,
     find_transition_by_keywords,
     find_transition_by_name,
@@ -45,6 +46,31 @@ from ..cli_utils import get_client_from_context, handle_jira_errors, parse_json_
 # =============================================================================
 # Transition Implementation Functions
 # =============================================================================
+
+_SCREEN_FIELD_REJECTION_MARKERS = (
+    "does not support update",
+    "cannot be set",
+    "not on the appropriate screen",
+)
+
+
+def _screen_rejected_option_fields(
+    error: JiraError, option_fields: set[str]
+) -> set[str]:
+    """Return option-owned fields Jira rejected because of transition screens."""
+    response_data = error.response_data if isinstance(error.response_data, dict) else {}
+    errors = response_data.get("errors", {})
+    if not isinstance(errors, dict):
+        return set()
+
+    rejected: set[str] = set()
+    for field in option_fields:
+        message = errors.get(field)
+        if isinstance(message, str) and any(
+            marker in message.lower() for marker in _SCREEN_FIELD_REJECTION_MARKERS
+        ):
+            rejected.add(field)
+    return rejected
 
 
 def _get_context_workflow_hint(
@@ -156,13 +182,16 @@ def _transition_issue_impl(
                 )
             transition = matching[0]
 
-        transition_fields = fields or {}
+        transition_fields = dict(fields or {})
+        option_fields: set[str] = set()
 
         if resolution:
             transition_fields["resolution"] = {"name": resolution}
+            option_fields.add("resolution")
 
         if comment:
             transition_fields["comment"] = text_to_adf(comment)
+            option_fields.add("comment")
 
         target_status = transition.get("to", {}).get(
             "name", transition.get("name", "Unknown")
@@ -176,6 +205,9 @@ def _transition_issue_impl(
             "target_status": target_status,
             "resolution": resolution,
             "comment": comment is not None,
+            "resolution_applied": resolution is not None,
+            "comment_applied": comment is not None,
+            "fallback_fields": [],
             "sprint_id": sprint_id,
             "dry_run": dry_run,
         }
@@ -202,11 +234,39 @@ def _transition_issue_impl(
 
             return result
 
-        c.transition_issue(
-            issue_key,
-            transition_id,
-            fields=transition_fields if transition_fields else None,
-        )
+        pending_fields = dict(transition_fields)
+        while True:
+            try:
+                c.transition_issue(
+                    issue_key,
+                    transition_id,
+                    fields=pending_fields if pending_fields else None,
+                )
+                break
+            except JiraError as error:
+                rejected = _screen_rejected_option_fields(error, option_fields)
+                if not rejected:
+                    raise
+                for field in sorted(rejected):
+                    pending_fields.pop(field, None)
+                    option_fields.remove(field)
+                    result["fallback_fields"].append(field)
+                    click.echo(
+                        f"Warning: transition screen rejected --{field}; "
+                        + (
+                            "the comment will be added separately after transition."
+                            if field == "comment"
+                            else "transitioning without setting the requested resolution."
+                        ),
+                        err=True,
+                    )
+
+        if "resolution" in result["fallback_fields"]:
+            result["resolution_applied"] = False
+
+        if "comment" in result["fallback_fields"]:
+            assert comment is not None
+            c.add_comment(issue_key, text_to_adf(comment))
 
         if sprint_id:
             c.move_issues_to_sprint(sprint_id, [issue_key])
@@ -862,8 +922,16 @@ def lifecycle():
     help='Target status name (e.g., "Done", "In Progress")',
 )
 @click.option("--id", "transition_id", help="Transition ID (alternative to --to)")
-@click.option("--comment", "-c", help="Add a comment with the transition")
-@click.option("--resolution", "-r", help="Resolution (for Done transitions)")
+@click.option(
+    "--comment",
+    "-c",
+    help="Add a comment; falls back to a separate comment if the screen rejects it",
+)
+@click.option(
+    "--resolution",
+    "-r",
+    help="Resolution for Done; warns and skips it if the screen rejects the field",
+)
 @click.option(
     "--sprint", "-s", type=int, help="Sprint ID to move issue to after transition"
 )
@@ -894,6 +962,11 @@ def lifecycle_transition(
         jira-as lifecycle transition PROJ-123 --id 31
         jira-as lifecycle transition PROJ-123 --to "In Progress" --dry-run
         jira-as lifecycle transition PROJ-123 --to "In Progress" --sprint 42
+
+    Jira workflows can reject comment or resolution when the transition screen
+    omits that field. In that case this command retries without the rejected
+    field, adds a rejected comment separately, and warns when resolution was
+    skipped.
     """
     if not status and not transition_id:
         raise click.UsageError(

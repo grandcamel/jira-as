@@ -17,6 +17,7 @@ from unittest.mock import patch
 
 import pytest
 
+from jira_as import text_to_adf
 from jira_as.cli.commands.lifecycle_cmds import (
     _assign_issue_impl,
     _create_component_impl,
@@ -177,6 +178,138 @@ class TestTransitionIssueImpl:
         assert result["resolution"] == "Fixed"
         call_args = mock_jira_client.transition_issue.call_args
         assert call_args[1]["fields"]["resolution"] == {"name": "Fixed"}
+
+    def test_transition_retries_without_screen_rejected_comment_then_adds_it(
+        self, mock_jira_client, sample_issue, sample_transitions
+    ):
+        """A screen-rejected transition comment falls back to a separate comment."""
+        from jira_as import ValidationError
+
+        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
+        mock_jira_client.get_transitions.return_value = deepcopy(sample_transitions)
+        mock_jira_client.transition_issue.side_effect = [
+            ValidationError(
+                "comment rejected",
+                response_data={
+                    "errors": {"comment": "Field does not support update 'comment'"}
+                },
+            ),
+            None,
+        ]
+
+        result = _transition_issue_impl(
+            issue_key="PROJ-123",
+            transition_name="In Progress",
+            comment="Starting work",
+            client=mock_jira_client,
+        )
+
+        assert mock_jira_client.transition_issue.call_count == 2
+        assert mock_jira_client.transition_issue.call_args.kwargs["fields"] is None
+        mock_jira_client.add_comment.assert_called_once_with(
+            "PROJ-123", text_to_adf("Starting work")
+        )
+        assert result["comment_applied"] is True
+        assert result["fallback_fields"] == ["comment"]
+
+    def test_transition_retries_without_screen_rejected_resolution(
+        self, mock_jira_client, sample_issue, sample_transitions
+    ):
+        """A screen-rejected resolution is skipped while the transition proceeds."""
+        from jira_as import ValidationError
+
+        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
+        mock_jira_client.get_transitions.return_value = deepcopy(sample_transitions)
+        mock_jira_client.transition_issue.side_effect = [
+            ValidationError(
+                "resolution rejected",
+                response_data={
+                    "errors": {
+                        "resolution": "Field 'resolution' cannot be set. It is not on the appropriate screen, or unknown"
+                    }
+                },
+            ),
+            None,
+        ]
+
+        result = _transition_issue_impl(
+            issue_key="PROJ-123",
+            transition_name="Done",
+            resolution="Done",
+            client=mock_jira_client,
+        )
+
+        assert mock_jira_client.transition_issue.call_count == 2
+        assert mock_jira_client.transition_issue.call_args.kwargs["fields"] is None
+        assert result["resolution_applied"] is False
+        assert result["fallback_fields"] == ["resolution"]
+
+    def test_transition_does_not_retry_unrelated_validation_error(
+        self, mock_jira_client, sample_issue, sample_transitions
+    ):
+        """Only transition-screen field rejections activate the fallback."""
+        from jira_as import ValidationError
+
+        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
+        mock_jira_client.get_transitions.return_value = deepcopy(sample_transitions)
+        error = ValidationError(
+            "bad request", response_data={"errors": {"summary": "Required"}}
+        )
+        mock_jira_client.transition_issue.side_effect = error
+
+        with pytest.raises(ValidationError, match="bad request"):
+            _transition_issue_impl(
+                issue_key="PROJ-123",
+                transition_name="In Progress",
+                comment="Starting work",
+                client=mock_jira_client,
+            )
+
+        mock_jira_client.transition_issue.assert_called_once()
+        mock_jira_client.add_comment.assert_not_called()
+
+    def test_transition_can_strip_both_rejected_options_across_retries(
+        self, mock_jira_client, sample_issue, sample_transitions
+    ):
+        """Resolution and comment rejections can be discovered one at a time."""
+        from jira_as import ValidationError
+
+        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
+        mock_jira_client.get_transitions.return_value = deepcopy(sample_transitions)
+        mock_jira_client.transition_issue.side_effect = [
+            ValidationError(
+                "resolution rejected",
+                response_data={
+                    "errors": {"resolution": "Field cannot be set on this screen"}
+                },
+            ),
+            ValidationError(
+                "comment rejected",
+                response_data={
+                    "errors": {"comment": "Field does not support update 'comment'"}
+                },
+            ),
+            None,
+        ]
+
+        result = _transition_issue_impl(
+            issue_key="PROJ-123",
+            transition_name="Done",
+            resolution="Done",
+            comment="Finished",
+            fields={"customfield_10000": "kept"},
+            client=mock_jira_client,
+        )
+
+        assert mock_jira_client.transition_issue.call_count == 3
+        assert mock_jira_client.transition_issue.call_args.kwargs["fields"] == {
+            "customfield_10000": "kept"
+        }
+        mock_jira_client.add_comment.assert_called_once_with(
+            "PROJ-123", text_to_adf("Finished")
+        )
+        assert result["fallback_fields"] == ["resolution", "comment"]
+        assert result["resolution_applied"] is False
 
     def test_transition_dry_run(
         self, mock_jira_client, sample_issue, sample_transitions
