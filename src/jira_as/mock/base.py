@@ -928,6 +928,7 @@ class MockJiraClientBase:
         issue_key: str,
         start_at: int = 0,
         max_results: int = 50,
+        order_by: str = "-created",
     ) -> dict[str, Any]:
         """Get comments for an issue.
 
@@ -935,6 +936,7 @@ class MockJiraClientBase:
             issue_key: The issue key.
             start_at: Starting index for pagination.
             max_results: Maximum number of results.
+            order_by: Field to sort by, prefixed with ``-`` for descending.
 
         Returns:
             Paginated list of comments.
@@ -944,6 +946,12 @@ class MockJiraClientBase:
         """
         self._verify_issue_exists(issue_key)
         comments = self._comments.get(issue_key, [])
+        sort_field = order_by.removeprefix("-")
+        comments = sorted(
+            comments,
+            key=lambda comment: comment.get(sort_field, ""),
+            reverse=order_by.startswith("-"),
+        )
 
         from .factories import ResponseFactory
 

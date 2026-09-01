@@ -61,7 +61,7 @@ def cli(ctx, output: str, verbose: bool, quiet: bool):
 from .commands.admin_cmds import admin
 from .commands.agile_cmds import agile
 from .commands.bulk_cmds import bulk
-from .commands.collaborate_cmds import collaborate
+from .commands.collaborate_cmds import collaborate, comment
 from .commands.dev_cmds import dev
 from .commands.fields_cmds import fields
 from .commands.issue_cmds import issue
@@ -69,8 +69,12 @@ from .commands.jsm_cmds import jsm
 from .commands.lifecycle_cmds import lifecycle
 from .commands.ops_cmds import ops
 from .commands.relationships_cmds import relationships
-from .commands.search_cmds import search
+from .commands.search_cmds import search, search_query
 from .commands.time_cmds import time
+
+# Accept the intuitive plural spelling while retaining the established command.
+collaborate.add_command(comment, name="comments")
+search.add_command(search_query, name="jql")
 
 cli.add_command(issue)
 cli.add_command(search)

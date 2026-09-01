@@ -19,6 +19,7 @@ from jira_as import (
     PermissionError,
     auto_wrap_adf_fields,
     ensure_adf,
+    format_comments,
     format_issue,
     format_json,
     format_transitions,
@@ -114,6 +115,36 @@ def _get_issue_impl(
 
     with get_jira_client() as client:
         return client.get_issue(issue_key, fields=fields)
+
+
+def _get_all_comments_impl(client: JiraClient, issue_key: str) -> dict[str, Any]:
+    """Fetch every comment page in chronological order."""
+    page_size = 100
+    start_at = 0
+    comments: list[dict[str, Any]] = []
+    result: dict[str, Any] = {}
+
+    while True:
+        page = client.get_comments(
+            issue_key,
+            max_results=page_size,
+            start_at=start_at,
+            order_by="created",
+        )
+        if not result:
+            result = dict(page)
+        page_comments = page.get("comments", [])
+        comments.extend(page_comments)
+        total = page.get("total", len(comments))
+        if not page_comments or len(comments) >= total:
+            break
+        start_at += len(page_comments)
+
+    result["startAt"] = 0
+    result["maxResults"] = len(comments)
+    result["comments"] = comments
+    result["total"] = result.get("total", len(comments))
+    return result
 
 
 def _create_issue_impl(
@@ -511,6 +542,11 @@ def issue():
 )
 @click.option("--show-time", "-t", is_flag=True, help="Show time tracking information")
 @click.option(
+    "--comments",
+    is_flag=True,
+    help="Include the description and comments in the issue view",
+)
+@click.option(
     "--output",
     "-o",
     type=click.Choice(["text", "json"]),
@@ -524,6 +560,7 @@ def get_issue(
     detailed: bool,
     show_links: bool,
     show_time: bool,
+    comments: bool,
     output: str,
 ):
     """Get the details of a specific issue."""
@@ -534,7 +571,9 @@ def get_issue(
         field_list = parse_comma_list(fields)
 
         # Adjust field list based on flags
-        show_detailed = detailed or show_links or show_time
+        show_detailed = detailed or show_links or show_time or comments
+        if comments and field_list is not None and "description" not in field_list:
+            field_list.append("description")
         if show_links and field_list is not None and "issuelinks" not in field_list:
             field_list.append("issuelinks")
         if show_time and field_list is not None and "timetracking" not in field_list:
@@ -542,6 +581,10 @@ def get_issue(
 
         # Get issue
         issue = _get_issue_impl(issue_key=issue_key, fields=field_list, client=client)
+        comments_data = None
+        if comments:
+            comments_data = _get_all_comments_impl(client, issue.get("key", issue_key))
+            issue.setdefault("fields", {})["comment"] = comments_data
 
         # Output formatting
         output_format = (
@@ -551,6 +594,13 @@ def get_issue(
             click.echo(format_json(issue))
         else:
             click.echo(format_issue(issue, detailed=show_detailed))
+
+            if comments and comments_data is not None:
+                issue_comments = comments_data.get("comments", [])
+                click.echo(
+                    f"\nComments ({comments_data.get('total', len(issue_comments))}):"
+                )
+                click.echo(format_comments(issue_comments))
 
             # Show time tracking if requested
             if show_time:
