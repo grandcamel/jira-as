@@ -1018,7 +1018,17 @@ def issue_transition(
 
 @issue.command(name="comment")
 @click.argument("issue_key")
-@click.option("--body", "-b", required=True, help="Comment text")
+@click.option("--body", "-b", help="Comment text")
+@click.option(
+    "--body-file",
+    type=click.Path(exists=True, dir_okay=False),
+    help="Read the comment body from a UTF-8 file",
+)
+@click.option(
+    "--body-stdin",
+    is_flag=True,
+    help="Read the comment body as UTF-8 from standard input",
+)
 @click.option(
     "--format",
     "-f",
@@ -1034,7 +1044,9 @@ def issue_transition(
 def issue_comment(
     ctx: click.Context,
     issue_key: str,
-    body: str,
+    body: str | None,
+    body_file: str | None,
+    body_stdin: bool,
     body_format: str,
     visibility_role: str,
     visibility_group: str,
@@ -1047,12 +1059,14 @@ def issue_comment(
         jira-as issue comment PROJ-123 --body "Starting work"
         jira-as issue comment PROJ-123 --body "**Done**" --format markdown
     """
-    from .collaborate_cmds import _add_comment_impl
+    from .collaborate_cmds import _add_comment_impl, _resolve_comment_body
 
     if visibility_role and visibility_group:
         raise click.UsageError(
             "Cannot specify both --visibility-role and --visibility-group"
         )
+
+    body = _resolve_comment_body(body, body_file, body_stdin, body_format)
 
     visibility_type = None
     visibility_value = None

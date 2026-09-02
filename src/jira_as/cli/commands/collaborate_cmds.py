@@ -16,6 +16,7 @@ import contextlib
 import json
 import os
 from datetime import datetime
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import click
@@ -44,6 +45,53 @@ from ..cli_utils import get_client_from_context, handle_jira_errors
 # =============================================================================
 # Comment Implementation Functions
 # =============================================================================
+
+
+def _resolve_comment_body(
+    body: str | None,
+    body_file: str | None,
+    body_stdin: bool,
+    body_format: str,
+) -> str:
+    """Read exactly one comment body source as UTF-8 without rewriting it."""
+    sources = (body is not None, body_file is not None, body_stdin)
+    if sum(sources) != 1:
+        raise click.BadParameter(
+            "specify exactly one of --body, --body-file, or --body-stdin",
+            param_hint="comment body",
+        )
+
+    if body_file is not None:
+        try:
+            resolved_body = Path(body_file).read_bytes().decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise click.BadParameter(
+                "must contain valid UTF-8", param_hint="--body-file"
+            ) from exc
+    elif body_stdin:
+        try:
+            resolved_body = click.get_binary_stream("stdin").read().decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise click.BadParameter(
+                "must contain valid UTF-8", param_hint="--body-stdin"
+            ) from exc
+    else:
+        resolved_body = body or ""
+
+    if (
+        body is not None
+        and body_format == "markdown"
+        and "\\n" in resolved_body
+        and "\n" not in resolved_body
+        and "\r" not in resolved_body
+    ):
+        raise click.BadParameter(
+            "contains literal \\n sequences but no actual newline; use --body-file "
+            "or --body-stdin for multiline comments",
+            param_hint="Markdown --body",
+        )
+
+    return resolved_body
 
 
 def _add_comment_impl(
@@ -812,7 +860,17 @@ def comment():
 
 @comment.command(name="add")
 @click.argument("issue_key")
-@click.option("--body", "-b", required=True, help="Comment text")
+@click.option("--body", "-b", help="Comment text")
+@click.option(
+    "--body-file",
+    type=click.Path(exists=True, dir_okay=False),
+    help="Read the comment body from a UTF-8 file",
+)
+@click.option(
+    "--body-stdin",
+    is_flag=True,
+    help="Read the comment body as UTF-8 from standard input",
+)
 @click.option(
     "--format",
     "-f",
@@ -828,7 +886,9 @@ def comment():
 def comment_add(
     ctx,
     issue_key: str,
-    body: str,
+    body: str | None,
+    body_file: str | None,
+    body_stdin: bool,
     body_format: str,
     visibility_role: str,
     visibility_group: str,
@@ -843,6 +903,8 @@ def comment_add(
         raise click.UsageError(
             "Cannot specify both --visibility-role and --visibility-group"
         )
+
+    body = _resolve_comment_body(body, body_file, body_stdin, body_format)
 
     visibility_type = None
     visibility_value = None
@@ -957,7 +1019,17 @@ def comment_list(
 @comment.command(name="update")
 @click.argument("issue_key")
 @click.option("--id", "-i", "comment_id", required=True, help="Comment ID to update")
-@click.option("--body", "-b", required=True, help="New comment body")
+@click.option("--body", "-b", help="New comment body")
+@click.option(
+    "--body-file",
+    type=click.Path(exists=True, dir_okay=False),
+    help="Read the new comment body from a UTF-8 file",
+)
+@click.option(
+    "--body-stdin",
+    is_flag=True,
+    help="Read the new comment body as UTF-8 from standard input",
+)
 @click.option(
     "--format",
     "-f",
@@ -968,8 +1040,17 @@ def comment_list(
 )
 @click.pass_context
 @handle_jira_errors
-def comment_update(ctx, issue_key: str, comment_id: str, body: str, body_format: str):
+def comment_update(
+    ctx,
+    issue_key: str,
+    comment_id: str,
+    body: str | None,
+    body_file: str | None,
+    body_stdin: bool,
+    body_format: str,
+):
     """Update a comment."""
+    body = _resolve_comment_body(body, body_file, body_stdin, body_format)
     client = get_client_from_context(ctx)
     result = _update_comment_impl(
         issue_key=issue_key,

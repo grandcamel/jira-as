@@ -10,6 +10,7 @@ Tests cover:
 - update-fields: Update custom fields
 """
 
+import json
 from copy import deepcopy
 from unittest.mock import patch
 
@@ -377,6 +378,343 @@ class TestUpdateCustomFieldsImpl:
 class TestCommentCommands:
     """Tests for comment CLI commands."""
 
+    @pytest.mark.parametrize(
+        "body_args",
+        [
+            [],
+            ["--body", "inline", "--body-stdin"],
+            ["--body-file", "{body_file}", "--body-stdin"],
+            ["--body", "inline", "--body-file", "{body_file}"],
+            [
+                "--body",
+                "inline",
+                "--body-file",
+                "{body_file}",
+                "--body-stdin",
+            ],
+        ],
+    )
+    @pytest.mark.parametrize(
+        "command_args",
+        [
+            ["comment", "add", "PROJ-123"],
+            ["comment", "update", "PROJ-123", "--id", "10001"],
+        ],
+    )
+    def test_comment_writes_require_exactly_one_body_source(
+        self, cli_runner, mock_jira_client, tmp_path, body_args, command_args
+    ):
+        """Add and update reject no source and every multiple-source combination."""
+        body_file = tmp_path / "comment.txt"
+        body_file.write_text("from file", encoding="utf-8")
+        args = [str(body_file) if arg == "{body_file}" else arg for arg in body_args]
+
+        with patch(
+            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
+            return_value=mock_jira_client,
+        ):
+            result = cli_runner.invoke(
+                collaborate,
+                [*command_args, *args],
+                input="from stdin",
+            )
+
+        assert result.exit_code == 2
+        assert "exactly one of --body, --body-file, or --body-stdin" in result.output
+        mock_jira_client.add_comment.assert_not_called()
+        mock_jira_client.update_comment.assert_not_called()
+
+    @pytest.mark.parametrize(
+        "command_args",
+        [
+            ["comment", "add", "PROJ-123"],
+            ["comment", "update", "PROJ-123", "--id", "10001"],
+        ],
+    )
+    def test_comment_writes_reject_literal_newlines_in_markdown_body(
+        self, cli_runner, mock_jira_client, command_args
+    ):
+        """Add and update reject escaped-newline Markdown before the write."""
+        with patch(
+            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
+            return_value=mock_jira_client,
+        ):
+            result = cli_runner.invoke(
+                collaborate,
+                [
+                    *command_args,
+                    "--format",
+                    "markdown",
+                    "--body",
+                    r"## Resolution\n\nBody",
+                ],
+            )
+
+        assert result.exit_code == 2
+        assert "literal \\n sequences but no actual newline" in result.output
+        assert "--body-file or --body-stdin" in result.output
+        mock_jira_client.add_comment.assert_not_called()
+        mock_jira_client.update_comment.assert_not_called()
+
+    @pytest.mark.parametrize("command", ["add", "update"])
+    @pytest.mark.parametrize("body_format", ["text", "adf"])
+    @pytest.mark.parametrize("source", ["file", "stdin"])
+    def test_comment_writes_preserve_text_and_adf_safe_source_semantics(
+        self,
+        cli_runner,
+        mock_jira_client,
+        sample_comment,
+        tmp_path,
+        command,
+        body_format,
+        source,
+    ):
+        """Add and update preserve text/ADF semantics from files and stdin."""
+        adf = {
+            "version": 1,
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [{"type": "text", "text": "Already ADF"}],
+                }
+            ],
+        }
+        if body_format == "adf":
+            raw_body = json.dumps(adf)
+            expected_body = adf
+        else:
+            raw_body = "**literal**\\n stays literal\nsecond line"
+            expected_body = {
+                "version": 1,
+                "type": "doc",
+                "content": [
+                    {
+                        "type": "paragraph",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "**literal**\\n stays literal",
+                            }
+                        ],
+                    },
+                    {
+                        "type": "paragraph",
+                        "content": [{"type": "text", "text": "second line"}],
+                    },
+                ],
+            }
+
+        if command == "add":
+            command_args = ["comment", "add", "PROJ-123"]
+            mock_method = mock_jira_client.add_comment
+            body_arg_index = 1
+        else:
+            command_args = ["comment", "update", "PROJ-123", "--id", "10001"]
+            mock_method = mock_jira_client.update_comment
+            body_arg_index = 2
+        mock_method.return_value = deepcopy(sample_comment)
+
+        input_text = None
+        if source == "file":
+            body_file = tmp_path / f"comment.{body_format}"
+            body_file.write_bytes(raw_body.encode("utf-8"))
+            source_args = ["--body-file", str(body_file)]
+        else:
+            source_args = ["--body-stdin"]
+            input_text = raw_body
+
+        with patch(
+            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
+            return_value=mock_jira_client,
+        ):
+            result = cli_runner.invoke(
+                collaborate,
+                [
+                    *command_args,
+                    "--format",
+                    body_format,
+                    *source_args,
+                ],
+                input=input_text,
+            )
+
+        assert result.exit_code == 0, result.output
+        assert mock_method.call_args.args[body_arg_index] == expected_body
+
+    def test_comment_add_plain_text_file_keeps_literal_markdown_and_newlines(
+        self, cli_runner, mock_jira_client, sample_comment, tmp_path
+    ):
+        """Plain-text file input retains text conversion semantics."""
+        body_file = tmp_path / "comment.txt"
+        body_file.write_bytes(b"**literal**\\n stays literal\r\nsecond line")
+        mock_jira_client.add_comment.return_value = deepcopy(sample_comment)
+
+        with patch(
+            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
+            return_value=mock_jira_client,
+        ):
+            result = cli_runner.invoke(
+                collaborate,
+                ["comment", "add", "PROJ-123", "--body-file", str(body_file)],
+            )
+
+        assert result.exit_code == 0, result.output
+        assert mock_jira_client.add_comment.call_args.args[1] == {
+            "version": 1,
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "**literal**\\n stays literal\r",
+                        }
+                    ],
+                },
+                {
+                    "type": "paragraph",
+                    "content": [{"type": "text", "text": "second line"}],
+                },
+            ],
+        }
+
+    def test_comment_add_raw_adf_stdin_is_not_reinterpreted(
+        self, cli_runner, mock_jira_client, sample_comment
+    ):
+        """Raw ADF from stdin reaches the Jira client unchanged."""
+        adf = {
+            "version": 1,
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [{"type": "text", "text": "Already ADF"}],
+                }
+            ],
+        }
+        mock_jira_client.add_comment.return_value = deepcopy(sample_comment)
+
+        with patch(
+            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
+            return_value=mock_jira_client,
+        ):
+            result = cli_runner.invoke(
+                collaborate,
+                [
+                    "comment",
+                    "add",
+                    "PROJ-123",
+                    "--format",
+                    "adf",
+                    "--body-stdin",
+                ],
+                input=json.dumps(adf),
+            )
+
+        assert result.exit_code == 0, result.output
+        assert mock_jira_client.add_comment.call_args.args[1] == adf
+
+    def test_comment_add_reads_multiline_markdown_from_file(
+        self, cli_runner, mock_jira_client, sample_comment, tmp_path
+    ):
+        """A Markdown file is converted into the intended ADF structure."""
+        body_file = tmp_path / "comment.md"
+        body_file.write_text(
+            "## Resolution\n\n"
+            "The incident is resolved.\n\n"
+            "1. Restarted the **worker**\n"
+            "2. Checked the [dashboard](https://example.com/dashboard)\n",
+            encoding="utf-8",
+        )
+        mock_jira_client.add_comment.return_value = deepcopy(sample_comment)
+
+        with patch(
+            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
+            return_value=mock_jira_client,
+        ):
+            result = cli_runner.invoke(
+                collaborate,
+                [
+                    "comment",
+                    "add",
+                    "PROJ-123",
+                    "--format",
+                    "markdown",
+                    "--body-file",
+                    str(body_file),
+                ],
+            )
+
+        assert result.exit_code == 0, result.output
+        adf = mock_jira_client.add_comment.call_args.args[1]
+        assert [node["type"] for node in adf["content"]] == [
+            "heading",
+            "paragraph",
+            "orderedList",
+        ]
+        first_list_item = adf["content"][2]["content"][0]["content"][0]
+        assert {mark["type"] for mark in first_list_item["content"][1]["marks"]} == {
+            "strong"
+        }
+        second_list_item = adf["content"][2]["content"][1]["content"][0]
+        assert second_list_item["content"][1] == {
+            "type": "text",
+            "text": "dashboard",
+            "marks": [
+                {
+                    "type": "link",
+                    "attrs": {"href": "https://example.com/dashboard"},
+                }
+            ],
+        }
+
+    def test_comment_add_stdin_matches_identical_markdown_file(
+        self, cli_runner, mock_jira_client, sample_comment, tmp_path
+    ):
+        """Stdin and file sources produce identical ADF."""
+        markdown = "## Resolution\n\nDone with **care**.\n"
+        body_file = tmp_path / "comment.md"
+        body_file.write_bytes(markdown.encode("utf-8"))
+        mock_jira_client.add_comment.return_value = deepcopy(sample_comment)
+
+        with patch(
+            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
+            return_value=mock_jira_client,
+        ):
+            file_result = cli_runner.invoke(
+                collaborate,
+                [
+                    "comment",
+                    "add",
+                    "PROJ-123",
+                    "--format",
+                    "markdown",
+                    "--body-file",
+                    str(body_file),
+                ],
+            )
+            file_adf = deepcopy(mock_jira_client.add_comment.call_args.args[1])
+            mock_jira_client.add_comment.reset_mock()
+
+            stdin_result = cli_runner.invoke(
+                collaborate,
+                [
+                    "comment",
+                    "add",
+                    "PROJ-123",
+                    "--format",
+                    "markdown",
+                    "--body-stdin",
+                ],
+                input=markdown,
+            )
+
+        assert file_result.exit_code == 0, file_result.output
+        assert stdin_result.exit_code == 0, stdin_result.output
+        assert mock_jira_client.add_comment.call_args.args[1] == file_adf
+
     def test_comment_add_cli(self, cli_runner, mock_jira_client, sample_comment):
         """Test CLI comment add command."""
         mock_jira_client.add_comment.return_value = deepcopy(sample_comment)
@@ -392,6 +730,40 @@ class TestCommentCommands:
 
         assert result.exit_code == 0
         assert "Added comment" in result.output
+
+    def test_comment_update_reads_multiline_markdown_from_stdin(
+        self, cli_runner, mock_jira_client, sample_comment
+    ):
+        """Update accepts multiline Markdown from standard input."""
+        mock_jira_client.update_comment.return_value = deepcopy(sample_comment)
+
+        with patch(
+            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
+            return_value=mock_jira_client,
+        ):
+            result = cli_runner.invoke(
+                collaborate,
+                [
+                    "comment",
+                    "update",
+                    "PROJ-123",
+                    "--id",
+                    "10001",
+                    "--format",
+                    "markdown",
+                    "--body-stdin",
+                ],
+                input="## Updated\n\n1. Kept **formatting**\n",
+            )
+
+        assert result.exit_code == 0, result.output
+        adf = mock_jira_client.update_comment.call_args.args[2]
+        assert [node["type"] for node in adf["content"]] == [
+            "heading",
+            "orderedList",
+        ]
+        formatted_text = adf["content"][1]["content"][0]["content"][0]["content"]
+        assert formatted_text[1]["marks"] == [{"type": "strong"}]
 
     def test_comment_list_cli(
         self, cli_runner, mock_jira_client, sample_comments_response

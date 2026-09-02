@@ -767,3 +767,37 @@ class TestIssueGroupAliases:
         assert kwargs["body"] == "**hi**"
         assert kwargs["body_format"] == "markdown"
         assert "10500" in result.output
+
+    def test_comment_alias_reads_body_file_before_delegating(
+        self, cli_runner, mock_jira_client, tmp_path
+    ):
+        """The issue alias supports the collaboration command's file source."""
+        body_file = tmp_path / "comment.md"
+        body_file.write_bytes(b"## Result\n\nEverything passed.\n")
+
+        with (
+            patch(
+                "jira_as.cli.commands.issue_cmds.get_client_from_context",
+                return_value=mock_jira_client,
+            ),
+            patch(
+                "jira_as.cli.commands.collaborate_cmds._add_comment_impl",
+                return_value={"id": "10500"},
+            ) as mock_impl,
+        ):
+            result = cli_runner.invoke(
+                issue,
+                [
+                    "comment",
+                    "PROJ-123",
+                    "--format",
+                    "markdown",
+                    "--body-file",
+                    str(body_file),
+                ],
+            )
+
+        assert result.exit_code == 0, result.output
+        assert mock_impl.call_args.kwargs["body"] == (
+            "## Result\n\nEverything passed.\n"
+        )
