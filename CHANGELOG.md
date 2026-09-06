@@ -13,6 +13,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stamp for directory installs. Missing build metadata is reported explicitly.
 - `scripts/check_release_tag.py v<version>` refuses a release tag unless it
   matches the package, runtime version, and top changelog release.
+- JAS-1: `admin project create --style classic|team-managed`. The `scrum`,
+  `kanban` and `basic` shorthands still map to the team-managed (simplified)
+  templates by default and map to the company-managed templates with
+  `--style classic`; a full key or fixed alias that contradicts an explicit
+  style is refused before creation; the create output (text and JSON) reports
+  the project's actual style read back from Jira. Reference:
+  `docs/project-templates.md`, including the trashed key/name reservation.
+- JAS-4: optional `jira.allowed_projects` setting and `JIRA_ALLOWED_PROJECTS`
+  override refuse outside-project issue keys, explicit project values and
+  literal JQL project operands before the shared CLI client is created,
+  mock mode included. Documented in `docs/allowed-projects.md` as defence in
+  depth with its coverage limits; the organization's boundary remains its
+  wrappers.
 
 ### Changed
 - Every landing consumed by a Promotion must bump the package version and add
