@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-09-06
+
+### Added
+- JAS-2: `jira-as --version` identifies the imported package with its version
+  and checkout commit (marked dirty when modified), or a source-content build
+  stamp for directory installs. Missing build metadata is reported explicitly.
+- `scripts/check_release_tag.py v<version>` refuses a release tag unless it
+  matches the package, runtime version, and top changelog release.
+
+### Changed
+- Every landing consumed by a Promotion must bump the package version and add
+  a changelog entry; its release tag must be `v<version>`. This wave targets
+  1.2.0, with later wave entries appended here before release.
+- The CLI reads the package's own version, so editable installs report version
+  changes immediately without reinstalling stale distribution metadata.
+
 ## [1.1.3] - 2026-08-18
 
 ### Added

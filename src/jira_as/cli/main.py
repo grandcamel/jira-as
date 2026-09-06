@@ -1,20 +1,19 @@
 import os
-from importlib.metadata import version
 
 import click
 
+from jira_as import __version__
+from jira_as._build import get_build_identifier
+
 
 def get_version() -> str:
-    """Get package version from metadata."""
-    try:
-        return version("jira-as")
-    except Exception:
-        return "unknown"
+    """Identify the imported build, including edits after an editable install."""
+    return f"{__version__} ({get_build_identifier()})"
 
 
 # --- Global Options Design ---
 @click.group(invoke_without_command=True)
-@click.version_option(version=get_version())
+@click.version_option(version=get_version(), prog_name="jira-as")
 @click.option(
     "--output",
     "-o",
