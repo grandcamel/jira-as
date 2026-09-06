@@ -14,6 +14,7 @@ Supports configurable Agile field IDs with automatic discovery fallback.
 from __future__ import annotations
 
 import os
+import re
 from typing import Any
 
 from assistant_skills_lib.config_manager import BaseConfigManager
@@ -187,6 +188,34 @@ class ConfigManager(BaseConfigManager):
             Default project key or None
         """
         return self.config.get(self.service_name, {}).get("default_project")
+
+    def get_allowed_projects(self) -> list[str] | None:
+        """Return the optional project allowlist, with an environment override.
+
+        Missing means unrestricted; an explicitly empty list allows no named
+        projects. Reading this setting never retrieves credentials.
+        """
+        from .error_handler import ValidationError as JiraValidationError
+
+        override = os.getenv("JIRA_ALLOWED_PROJECTS")
+        settings = self.config.get(self.service_name, {})
+        if override is not None:
+            projects = override.split(",") if override.strip() else []
+        elif "allowed_projects" in settings:
+            projects = settings["allowed_projects"]
+        else:
+            return None
+
+        if not isinstance(projects, list) or any(
+            not isinstance(project, str)
+            or re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", project.strip()) is None
+            for project in projects
+        ):
+            raise JiraValidationError(
+                "jira.allowed_projects must be a list of project keys; "
+                "JIRA_ALLOWED_PROJECTS must be comma-separated project keys"
+            )
+        return list(dict.fromkeys(project.strip().upper() for project in projects))
 
     def get_agile_fields(self, project_key: str | None = None) -> dict[str, str]:
         """
