@@ -1951,3 +1951,51 @@ class TestProjectCreateStyles:
             another = first.create_project("NEXT", "Next project")
             assert another["id"] != created["id"]
         assert all(p["key"] not in ("NEW", "NEXT") for p in MockJiraClient.PROJECTS)
+
+
+class TestPermissionCheckCLI:
+    @pytest.mark.parametrize("output", ["text", "json"])
+    def test_mock_mode(self, cli_runner, monkeypatch, output):
+        from jira_as.cli.main import cli
+
+        monkeypatch.setenv("JIRA_MOCK_MODE", "true")
+        result = cli_runner.invoke(
+            cli, ["admin", "permission", "check", "-p", "DEMO", "-o", output]
+        )
+        assert result.exit_code == 0, result.output
+        if output == "json":
+            data = json.loads(result.output)
+            assert set(data) == {"permissions"}
+            assert (
+                data["permissions"]["MANAGE_SPRINTS_PERMISSION"]["havePermission"]
+                is True
+            )
+            assert data["permissions"]["BROWSE_PROJECTS"]["key"] == "BROWSE_PROJECTS"
+        else:
+            assert "Your permissions on project DEMO:" in result.output
+            assert "✓ Browse Projects" in result.output
+            assert "✓ Manage Sprints Permission" in result.output
+
+    @pytest.mark.parametrize("output", ["text", "json"])
+    def test_project_forwarding_and_denial(self, cli_runner, spec_jira_client, output):
+        payload = {
+            "permissions": {
+                "DELETE_ISSUES": {"name": "Delete Issues", "havePermission": False},
+                "BROWSE_PROJECTS": {"name": "Browse Projects", "havePermission": True},
+            }
+        }
+        spec_jira_client.get_my_permissions.return_value = payload
+        with patch(
+            "jira_as.cli.commands.admin_cmds.get_client_from_context",
+            return_value=spec_jira_client,
+        ):
+            result = cli_runner.invoke(
+                admin, ["permission", "check", "-p", "DEMO", "-o", output]
+            )
+        assert result.exit_code == 0, result.output
+        spec_jira_client.get_my_permissions.assert_called_once_with(project_key="DEMO")
+        if output == "json":
+            assert json.loads(result.output) == payload
+        else:
+            assert "✗ Delete Issues" in result.output
+            assert "✓ Browse Projects" in result.output

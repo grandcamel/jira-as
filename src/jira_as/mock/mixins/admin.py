@@ -386,15 +386,14 @@ class AdminMixin(_Base):
     def get_my_permissions(
         self,
         project_key: str | None = None,
-        issue_key: str | None = None,
         permissions: list[str] | None = None,
     ) -> dict[str, Any]:
         """Get current user's permissions.
 
         Args:
             project_key: Optional project to check permissions for.
-            issue_key: Optional issue to check permissions for.
-            permissions: Optional list of specific permissions to check.
+            permissions: Optional permission keys. None or an empty list uses
+                the same default project permissions as JiraClient.
 
         Returns:
             Dictionary of permissions and whether they are granted.
@@ -413,6 +412,7 @@ class AdminMixin(_Base):
             "WORK_ON_ISSUES",
             "SCHEDULE_ISSUES",
             "ADMINISTER_PROJECTS",
+            "MANAGE_SPRINTS_PERMISSION",
         ]
 
         if permissions:

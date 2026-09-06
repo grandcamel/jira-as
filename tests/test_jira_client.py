@@ -1302,3 +1302,69 @@ class TestTimeTracking:
         client.set_time_tracking("TEST-1", original_estimate="4h")
         body = json.loads(responses.calls[0].request.body)
         assert body["fields"]["timetracking"]["originalEstimate"] == "4h"
+
+
+class TestMyPermissions:
+    """Permission checks send a nonempty filter and preserve the API envelope."""
+
+    @responses.activate
+    def test_explicit_permissions(self, client, base_url):
+        payload = {
+            "permissions": {
+                "DELETE_ISSUES": {"name": "Delete Issues", "havePermission": False}
+            }
+        }
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/mypermissions",
+            match=[
+                responses.matchers.query_param_matcher(
+                    {
+                        "projectKey": "TEST",
+                        "permissions": "BROWSE_PROJECTS,DELETE_ISSUES",
+                    }
+                )
+            ],
+            json=payload,
+        )
+        assert (
+            client.get_my_permissions(
+                project_key="TEST", permissions=["BROWSE_PROJECTS", "DELETE_ISSUES"]
+            )
+            == payload
+        )
+        assert len(responses.calls) == 1
+
+    @pytest.mark.parametrize("permissions", [None, []])
+    @pytest.mark.parametrize("project_key", [None, "TEST"])
+    @responses.activate
+    def test_default_permissions(self, client, base_url, permissions, project_key):
+        from urllib.parse import parse_qs, urlsplit
+
+        from jira_as.mock import MockJiraClient
+
+        responses.add(
+            responses.GET,
+            f"{base_url}/rest/api/3/mypermissions",
+            json={"permissions": {}},
+        )
+        client.get_my_permissions(project_key=project_key, permissions=permissions)
+        query = parse_qs(urlsplit(responses.calls[0].request.url).query)
+        requested = set(query.pop("permissions")[0].split(","))
+        assert {
+            "BROWSE_PROJECTS",
+            "CREATE_ISSUES",
+            "EDIT_ISSUES",
+            "DELETE_ISSUES",
+            "ASSIGN_ISSUES",
+            "TRANSITION_ISSUES",
+            "ADD_COMMENTS",
+            "ADMINISTER_PROJECTS",
+            "MANAGE_SPRINTS_PERMISSION",
+        } <= requested
+        assert query == ({"projectKey": [project_key]} if project_key else {})
+        with MockJiraClient() as mock:
+            assert (
+                set(mock.get_my_permissions(permissions=permissions)["permissions"])
+                == requested
+            )

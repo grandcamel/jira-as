@@ -66,6 +66,128 @@ class TestMockParity:
         "search_issues",  # Mock may have different defaults
     }
 
+    def test_real_has_all_public_mock_methods(self):
+        """Mock-only APIs must not silently conceal missing real methods."""
+        # Existing mock-only APIs found during JAS-5, outside its repair scope.
+        # Keep exceptions explicit; new gaps (including get_my_permissions)
+        # must fail this check. Remove names as their real methods are added.
+        known_mock_only = {
+            "add_actor_to_project_role",
+            "add_attachment",
+            "add_customers",
+            "add_vote",
+            "add_watcher",
+            "adjust_remaining_estimate",
+            "advanced_search",
+            "count_issues",
+            "create_field_option",
+            "create_issue_link",
+            "delete_field_option",
+            "delete_issue_link",
+            "export_search_results",
+            "generate_branch_name",
+            "generate_commit_message",
+            "generate_pr_description",
+            "get_agile_fields",
+            "get_all_project_roles",
+            "get_all_projects",
+            "get_attachment",
+            "get_backlog_issues",
+            "get_blocked_by",
+            "get_blockers",
+            "get_board_configuration",
+            "get_boards",
+            "get_branches",
+            "get_builds",
+            "get_commits",
+            "get_create_meta",
+            "get_custom_fields",
+            "get_customers",
+            "get_deployments",
+            "get_development_info",
+            "get_development_status",
+            "get_edit_meta",
+            "get_epic_issues",
+            "get_epic_link_field",
+            "get_epics",
+            "get_field",
+            "get_field_configuration_items",
+            "get_field_configurations",
+            "get_field_options",
+            "get_fields",
+            "get_groups",
+            "get_issue_activity",
+            "get_issue_link",
+            "get_issue_link_type",
+            "get_issue_link_types",
+            "get_issue_types_for_project",
+            "get_issue_with_changelog",
+            "get_priorities",
+            "get_priority",
+            "get_project_fields",
+            "get_project_role",
+            "get_project_worklogs",
+            "get_pull_requests",
+            "get_related_issues",
+            "get_sprint_field",
+            "get_sprints",
+            "get_story_points_field",
+            "get_system_fields",
+            "get_time_report",
+            "get_time_tracking_configuration",
+            "get_user_mentions",
+            "get_user_worklogs",
+            "get_votes",
+            "get_watchers",
+            "get_worklog_ids_modified_since",
+            "link_repository",
+            "move_issues_to_epic",
+            "notify_users",
+            "parse_commit_message",
+            "remove_actor_from_project_role",
+            "remove_customers",
+            "remove_issues_from_epic",
+            "remove_vote",
+            "remove_watcher",
+            "search_fields",
+            "search_issues_by_keys",
+            "set_estimate",
+            "set_filter_favourite",
+            "set_time_tracking_configuration",
+            "update_field_option",
+            "validate_jql",
+        }
+        missing = (
+            set(get_public_methods(MockJiraClient))
+            - set(get_public_methods(JiraClient))
+            - known_mock_only
+        )
+        assert not missing, f"JiraClient missing mock methods: {sorted(missing)}"
+
+    def test_get_my_permissions_signature(self):
+        real = get_method_signature(JiraClient, "get_my_permissions")
+        mock = get_method_signature(MockJiraClient, "get_my_permissions")
+        assert real is not None
+        assert list(real.parameters) == list(mock.parameters)
+        for name, param in real.parameters.items():
+            assert param.default == mock.parameters[name].default
+            assert param.kind == mock.parameters[name].kind
+            assert normalize_annotation(param.annotation) == normalize_annotation(
+                mock.parameters[name].annotation
+            )
+
+    def test_get_my_permissions_explicit_mock_filter(self):
+        with MockJiraClient() as mock:
+            result = mock.get_my_permissions(
+                "DEMO", ["MANAGE_SPRINTS_PERMISSION", "BROWSE_PROJECTS"]
+            )
+        assert set(result) == {"permissions"}
+        assert set(result["permissions"]) == {
+            "MANAGE_SPRINTS_PERMISSION",
+            "BROWSE_PROJECTS",
+        }
+        assert all(p["havePermission"] is True for p in result["permissions"].values())
+
     def test_mock_has_all_core_methods(self):
         """Verify MockJiraClient has all core JiraClient methods."""
         mock_methods = get_public_methods(MockJiraClient)

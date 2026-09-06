@@ -7064,6 +7064,54 @@ class JiraClient:
         """
         return self.get("/rest/api/3/permissions", operation="get all permissions")
 
+    def get_my_permissions(
+        self,
+        project_key: str | None = None,
+        permissions: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Get the current user's permissions, optionally scoped to a project.
+
+        Args:
+            project_key: Optional project key to check permissions for.
+            permissions: Permission keys to check. None or an empty list uses
+                the default project permissions below, covering browsing,
+                issue creation/editing/deletion/assignment/transitions,
+                watchers, comments, work logs, scheduling, project
+                administration and sprint management. Jira Cloud requires
+                a nonempty permissions query parameter.
+
+        Returns:
+            Dict containing a 'permissions' mapping with permission details
+            and a 'havePermission' boolean for each permission.
+
+        Raises:
+            JiraError or subclass on failure.
+        """
+        requested = permissions or [
+            "BROWSE_PROJECTS",
+            "CREATE_ISSUES",
+            "EDIT_ISSUES",
+            "DELETE_ISSUES",
+            "ASSIGN_ISSUES",
+            "TRANSITION_ISSUES",
+            "MANAGE_WATCHERS",
+            "ADD_COMMENTS",
+            "DELETE_OWN_COMMENTS",
+            "DELETE_ALL_COMMENTS",
+            "WORK_ON_ISSUES",
+            "SCHEDULE_ISSUES",
+            "ADMINISTER_PROJECTS",
+            "MANAGE_SPRINTS_PERMISSION",
+        ]
+        params = {"permissions": ",".join(requested)}
+        if project_key:
+            params["projectKey"] = project_key
+        return self.get(
+            "/rest/api/3/mypermissions",
+            params=params,
+            operation="get my permissions",
+        )
+
     def get_project_permission_scheme(
         self, project_key_or_id: str, expand: str | None = None
     ) -> dict[str, Any]:
