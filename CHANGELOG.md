@@ -27,6 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   depth with its coverage limits; the organization's boundary remains its
   wrappers.
 
+### Fixed
+- JAS-5: `admin permission check` no longer crashes; `JiraClient.get_my_permissions`
+  calls `/rest/api/3/mypermissions` with a non-empty default permission set
+  (Jira Cloud requires one), the mock matches the real signature, and the
+  mock-parity test now also flags mock-only methods (84 legacy ones are
+  listed as named exceptions).
+
 ### Changed
 - Every landing consumed by a Promotion must bump the package version and add
   a changelog entry; its release tag must be `v<version>`. This wave targets
