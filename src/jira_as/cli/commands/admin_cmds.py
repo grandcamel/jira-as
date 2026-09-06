@@ -161,6 +161,7 @@ def _create_project_impl(
     description: str | None = None,
     category_id: int | None = None,
     client: "JiraClient | None" = None,
+    style: str | None = None,
 ) -> dict[str, Any]:
     """Create a new JIRA project."""
     key = validate_project_key(key)
@@ -172,13 +173,13 @@ def _create_project_impl(
         "business": "com.atlassian.jira-core-project-templates:jira-core-project-management",
         "service_desk": "com.atlassian.servicedesk:simplified-it-service-desk",
     }
-    if template:
-        template_key = validate_project_template(template)
-    else:
-        # An unrecognised project type still needs some template for the API.
-        template_key = default_templates.get(
-            project_type, default_templates["software"]
+    if style is not None and project_type != "software":
+        raise ValidationError("--style is supported only for software projects.")
+    if not template:
+        template = (
+            "scrum" if project_type == "software" else default_templates[project_type]
         )
+    template_key = validate_project_template(template, style=style)
 
     def _do_work(c: "JiraClient") -> dict[str, Any]:
         lead_account_id = None
@@ -207,7 +208,20 @@ def _create_project_impl(
             except JiraError:
                 pass
 
-        return result
+        try:
+            created_project = c.get_project(key)
+        except JiraError as exc:
+            raise JiraError(
+                f"Project {key} was created, but its style could not be read. "
+                f"Inspect it with 'admin project get {key}' before retrying. {exc}"
+            ) from exc
+        actual_style = created_project.get("style")
+        if not isinstance(actual_style, str) or not actual_style:
+            raise JiraError(
+                f"Project {key} was created, but the project read returned no style. "
+                f"Inspect it with 'admin project get {key}' before retrying."
+            )
+        return {**result, "style": actual_style}
 
     if client is not None:
         return _do_work(client)
@@ -2160,7 +2174,26 @@ def project_get(ctx, project_key, expand, output):
     type=click.Choice(["software", "business", "service_desk"]),
     help="Project type",
 )
-@click.option("--template", help="Template (scrum, kanban, basic) or full template key")
+@click.option(
+    "--template",
+    help=(
+        "Shortcut or full template key. scrum/kanban/basic default to team-managed "
+        "(next-gen), respectively: gh-simplified-agility-scrum, "
+        "gh-simplified-agility-kanban, gh-simplified-basic. "
+        "With --style classic (company-managed), respectively: "
+        "gh-scrum-template, gh-kanban-template, basic-software-development-template. "
+        "All these keys use the com.pyxis.greenhopper.jira: prefix."
+    ),
+)
+@click.option(
+    "--style",
+    type=click.Choice(["classic", "team-managed"]),
+    help=(
+        "Software project style; omitted preserves the template mapping "
+        "(default software template: scrum, team-managed). "
+        "Must agree with full keys and fixed classic-/simplified- aliases."
+    ),
+)
 @click.option("--lead", "-l", help="Project lead (email or account ID)")
 @click.option("--description", "-d", help="Project description")
 @click.option("--category", type=int, help="Category ID to assign")
@@ -2168,7 +2201,7 @@ def project_get(ctx, project_key, expand, output):
 @click.pass_context
 @handle_jira_errors
 def project_create(
-    ctx, key, name, project_type, template, lead, description, category, output
+    ctx, key, name, project_type, template, lead, description, category, output, style
 ):
     """Create a new JIRA project."""
     client = get_client_from_context(ctx)
@@ -2177,6 +2210,7 @@ def project_create(
         name=name,
         project_type=project_type,
         template=template,
+        style=style,
         lead=lead,
         description=description,
         category_id=category,
@@ -2189,6 +2223,10 @@ def project_create(
         click.echo(f"  Key:  {result.get('key')}")
         click.echo(f"  ID:   {result.get('id')}")
         click.echo(f"  Name: {result.get('name', 'N/A')}")
+        style_label = {"classic": "company-managed", "next-gen": "team-managed"}.get(
+            result["style"], "unrecognized"
+        )
+        click.echo(f"  Style: {result['style']} ({style_label})")
 
 
 @project_group.command(name="update")

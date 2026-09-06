@@ -662,6 +662,7 @@ class AdminMixin(_Base):
         key: str,
         name: str,
         project_type_key: str = "software",
+        template_key: str = "com.pyxis.greenhopper.jira:gh-simplified-agility-scrum",
         lead_account_id: str | None = None,
         description: str | None = None,
     ) -> dict[str, Any]:
@@ -671,20 +672,49 @@ class AdminMixin(_Base):
             key: Project key.
             name: Project name.
             project_type_key: Type of project.
+            template_key: Template determining the project style.
             lead_account_id: Project lead's account ID.
             description: Project description.
 
         Returns:
             The created project.
         """
+        from ... import PROJECT_TEMPLATES
+
+        team_templates = {PROJECT_TEMPLATES[t] for t in ("scrum", "kanban", "basic")}
+        classic_templates = {
+            PROJECT_TEMPLATES["classic-scrum"],
+            PROJECT_TEMPLATES["classic-kanban"],
+            "com.pyxis.greenhopper.jira:basic-software-development-template",
+            *(
+                PROJECT_TEMPLATES[t]
+                for t in (
+                    "project-management",
+                    "task-management",
+                    "it-service-desk",
+                    "general-service-desk",
+                )
+            ),
+        }
+        style = (
+            "next-gen"
+            if template_key in team_templates
+            else "classic"
+            if template_key in classic_templates
+            else None
+        )
         project_id = str(10000 + len(self.PROJECTS))
-        return {
+        project = {
             "id": project_id,
-            "key": key,
+            "key": key.upper(),
             "name": name,
             "projectTypeKey": project_type_key,
             "self": f"{self.base_url}/rest/api/3/project/{project_id}",
         }
+        self.PROJECTS.append(
+            {**project, "style": style, "simplified": style == "next-gen"}
+        )
+        return project
 
     def delete_project(self, project_key: str, enable_undo: bool = True) -> None:
         """Delete a project.

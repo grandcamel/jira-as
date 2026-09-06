@@ -453,6 +453,7 @@ class TestProjectImplementation:
             "com.pyxis.greenhopper.jira:gh-scrum-template"
         )
         mock_client.create_project.return_value = sample_project
+        mock_client.get_project.return_value = {**sample_project, "style": "classic"}
         mock_client.search_users.return_value = [{"accountId": "user123"}]
 
         result = _create_project_impl(
@@ -463,7 +464,8 @@ class TestProjectImplementation:
             lead="john",
         )
 
-        assert result == sample_project
+        assert result == {**sample_project, "style": "classic"}
+        mock_client.get_project.assert_called_once_with("TEST")
         mock_client.create_project.assert_called_once()
 
     @patch("jira_as.cli.commands.admin_cmds.get_jira_client")
@@ -1724,3 +1726,228 @@ class TestAdminClientCallParity:
         spec_jira_client.create_issue_type.assert_called_once_with(
             name="Bug", description="A bug", issue_type="standard"
         )
+
+
+class TestProjectCreateStyles:
+    """Exercise creation through the real mock and a POST-shaped client."""
+
+    @pytest.mark.parametrize("template", ["scrum", "kanban", "basic"])
+    @pytest.mark.parametrize(
+        "style,expected",
+        [(None, "next-gen"), ("team-managed", "next-gen"), ("classic", "classic")],
+    )
+    @pytest.mark.parametrize("output", ["text", "json"])
+    def test_create_cli_styles(self, template, style, expected, output, cli_runner):
+        from jira_as.mock import MockJiraClient
+
+        client = MockJiraClient()
+        args = [
+            "project",
+            "create",
+            "-k",
+            "NEW",
+            "-n",
+            "New project",
+            "-t",
+            "software",
+            "--template",
+            template,
+            "-o",
+            output,
+        ]
+        if style:
+            args += ["--style", style]
+        with patch(
+            "jira_as.cli.commands.admin_cmds.get_client_from_context",
+            return_value=client,
+        ):
+            result = cli_runner.invoke(admin, args)
+        assert result.exit_code == 0, result.output
+        if output == "json":
+            data = json.loads(result.output)
+            assert data["style"] == expected
+            assert data["key"] == "NEW"
+            assert {
+                "id",
+                "key",
+                "name",
+                "projectTypeKey",
+                "self",
+                "style",
+            } == data.keys()
+        else:
+            assert f"Style: {expected}" in result.output
+            assert (
+                "team-managed" if expected == "next-gen" else "company-managed"
+            ) in result.output
+        project = client.get_project("NEW")
+        assert project["style"] == expected
+        assert project["simplified"] is (expected == "next-gen")
+
+    @pytest.mark.parametrize(
+        "style,expected",
+        [(None, "next-gen"), ("classic", "classic"), ("team-managed", "next-gen")],
+    )
+    def test_omitted_software_template(self, style, expected):
+        from jira_as.mock import MockJiraClient
+
+        with MockJiraClient() as client:
+            result = _create_project_impl(
+                "NEW", "New project", "software", client=client, style=style
+            )
+        assert result["style"] == expected
+
+    @pytest.mark.parametrize(
+        "project_type,template_key",
+        [
+            (
+                "business",
+                "com.atlassian.jira-core-project-templates:jira-core-project-management",
+            ),
+            ("service_desk", "com.atlassian.servicedesk:simplified-it-service-desk"),
+        ],
+    )
+    def test_nonsoftware_defaults_unchanged(
+        self, project_type, template_key, spec_jira_client
+    ):
+        spec_jira_client.create_project.return_value = {"key": "NEW"}
+        spec_jira_client.get_project.return_value = {"style": "classic"}
+        result = _create_project_impl(
+            "NEW", "New project", project_type, client=spec_jira_client
+        )
+        assert (
+            spec_jira_client.create_project.call_args.kwargs["template_key"]
+            == template_key
+        )
+        assert result["style"] == "classic"
+
+    @pytest.mark.parametrize("project_type", ["business", "service_desk"])
+    def test_nonsoftware_style_rejected_before_create(
+        self, project_type, spec_jira_client
+    ):
+        with pytest.raises(ValidationError, match="only for software"):
+            _create_project_impl(
+                "NEW",
+                "New project",
+                project_type,
+                style="classic",
+                client=spec_jira_client,
+            )
+        spec_jira_client.create_project.assert_not_called()
+
+    @pytest.mark.parametrize(
+        "template,style",
+        [
+            ("com.pyxis.greenhopper.jira:gh-kanban-template", "team-managed"),
+            ("com.pyxis.greenhopper.jira:gh-simplified-agility-kanban", "classic"),
+        ],
+    )
+    def test_conflict_cli_never_creates(
+        self, template, style, cli_runner, spec_jira_client
+    ):
+        with patch(
+            "jira_as.cli.commands.admin_cmds.get_client_from_context",
+            return_value=spec_jira_client,
+        ):
+            result = cli_runner.invoke(
+                admin,
+                [
+                    "project",
+                    "create",
+                    "-k",
+                    "NEW",
+                    "-n",
+                    "New project",
+                    "-t",
+                    "software",
+                    "--template",
+                    template,
+                    "--style",
+                    style,
+                ],
+            )
+        assert result.exit_code != 0
+        assert "conflicts" in result.output
+        spec_jira_client.create_project.assert_not_called()
+
+    def test_help_names_mappings(self, cli_runner):
+        result = cli_runner.invoke(admin, ["project", "create", "--help"])
+        assert result.exit_code == 0
+        # Click may wrap template keys at hyphens in narrow terminals.
+        help_text = "".join(result.output.split())
+        for text in [
+            "--style [classic|team-managed]",
+            "team-managed",
+            "company-managed",
+            "gh-simplified-agility-scrum",
+            "gh-simplified-agility-kanban",
+            "gh-simplified-basic",
+            "gh-scrum-template",
+            "gh-kanban-template",
+            "basic-software-development-template",
+            "com.pyxis.greenhopper.jira:",
+        ]:
+            assert "".join(text.split()) in help_text
+
+    @pytest.mark.parametrize("actual_style", ["classic", "next-gen"])
+    def test_style_is_read_and_post_keys_preserved(
+        self, actual_style, spec_jira_client
+    ):
+        post_result = {
+            "id": "10123",
+            "key": "NEW",
+            "self": "https://example.test/project/10123",
+            "extra": "preserved",
+        }
+        spec_jira_client.create_project.return_value = post_result
+        spec_jira_client.get_project.return_value = {
+            "style": actual_style,
+            "name": "Server project",
+        }
+        result = _create_project_impl(
+            "NEW", "New project", "software", template="kanban", client=spec_jira_client
+        )
+        assert result == {**post_result, "style": actual_style}
+        assert "style" not in post_result
+        spec_jira_client.get_project.assert_called_once_with("NEW")
+
+    @pytest.mark.parametrize("read_result", [{}, {"style": None}, {"style": ""}])
+    def test_missing_style_explains_creation(self, read_result, spec_jira_client):
+        spec_jira_client.create_project.return_value = {"key": "NEW"}
+        spec_jira_client.get_project.return_value = read_result
+        with pytest.raises(JiraError, match="Project NEW was created.*no style"):
+            _create_project_impl(
+                "NEW", "New project", "software", client=spec_jira_client
+            )
+        spec_jira_client.create_project.assert_called_once()
+
+    def test_read_failure_explains_creation(self, spec_jira_client):
+        spec_jira_client.create_project.return_value = {"key": "NEW"}
+        spec_jira_client.get_project.side_effect = JiraError("Read denied")
+        with pytest.raises(JiraError, match="Project NEW was created.*before retrying"):
+            _create_project_impl(
+                "NEW", "New project", "software", client=spec_jira_client
+            )
+        spec_jira_client.create_project.assert_called_once()
+
+    def test_mock_create_signature_and_isolation(self):
+        import inspect
+
+        from jira_as import JiraClient, NotFoundError
+        from jira_as.mock import MockJiraClient
+
+        real = inspect.signature(JiraClient.create_project).parameters
+        mock = inspect.signature(MockJiraClient.create_project).parameters
+        assert list(real) == list(mock)
+        assert {k: v.default for k, v in real.items()} == {
+            k: v.default for k, v in mock.items()
+        }
+        with MockJiraClient() as first, MockJiraClient() as second:
+            created = first.create_project("NEW", "New project")
+            assert "style" not in created  # POST does not supply style.
+            assert first.get_project("NEW")["style"] == "next-gen"
+            with pytest.raises(NotFoundError):
+                second.get_project("NEW")
+            another = first.create_project("NEXT", "Next project")
+            assert another["id"] != created["id"]
+        assert all(p["key"] not in ("NEW", "NEXT") for p in MockJiraClient.PROJECTS)

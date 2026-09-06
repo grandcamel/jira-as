@@ -277,6 +277,13 @@ PROJECT_TEMPLATES = {
 }
 
 
+_CLASSIC_SOFTWARE_TEMPLATES = {
+    "scrum": "com.pyxis.greenhopper.jira:gh-scrum-template",
+    "kanban": "com.pyxis.greenhopper.jira:gh-kanban-template",
+    "basic": "com.pyxis.greenhopper.jira:basic-software-development-template",
+}
+
+
 def _validate_enum(
     value: str, field_name: str, valid_values: list[str], normalize: str = "lower"
 ) -> str:
@@ -341,39 +348,57 @@ def validate_assignee_type(assignee_type: str) -> str:
     return _validate_enum(assignee_type, "assignee_type", VALID_ASSIGNEE_TYPES, "upper")
 
 
-def validate_project_template(template: str) -> str:
+def validate_project_template(template: str, style: str | None = None) -> str:
+    """Expand a template, optionally selecting a software project style.
+
+    Omitted style preserves every existing shorthand. Explicit style selects
+    generic scrum/kanban/basic mappings and must agree with fixed aliases or
+    full keys. Unknown full keys remain accepted only without a style assertion.
     """
-    Validate and expand project template.
+    template = validate_required(template, "project_template").lower()
+    if style is not None:
+        style = _validate_enum(style, "project_style", ["classic", "team-managed"])
+        if template in _CLASSIC_SOFTWARE_TEMPLATES:
+            return (
+                _CLASSIC_SOFTWARE_TEMPLATES[template]
+                if style == "classic"
+                else PROJECT_TEMPLATES[template]
+            )
 
-    Args:
-        template: Template shortcut or full template key
-
-    Returns:
-        Full template key
-
-    Raises:
-        ValidationError: If template is unknown shortcut
-    """
-    template = validate_required(template, "project_template")
-    template = template.lower()
-
-    # If it's a shortcut, expand it
     if template in PROJECT_TEMPLATES:
-        return PROJECT_TEMPLATES[template]
+        template_key = PROJECT_TEMPLATES[template]
+    elif "." in template or ":" in template:
+        template_key = template
+    else:
+        shortcuts = ", ".join(PROJECT_TEMPLATES.keys())
+        raise ValidationError(
+            f"Unknown template shortcut: '{template}'. "
+            f"Valid shortcuts: {shortcuts}\n"
+            "Or provide a full template key "
+            "(e.g., com.pyxis.greenhopper.jira:gh-scrum-template)",
+            operation="validation",
+            details={"field": "project_template", "value": template},
+        )
 
-    # If it looks like a full template key, return it
-    if "." in template or ":" in template:
-        return template
-
-    # Unknown shortcut
-    shortcuts = ", ".join(PROJECT_TEMPLATES.keys())
-    raise ValidationError(
-        f"Unknown template shortcut: '{template}'. "
-        f"Valid shortcuts: {shortcuts}\n"
-        "Or provide a full template key (e.g., com.pyxis.greenhopper.jira:gh-scrum-template)",
-        operation="validation",
-        details={"field": "project_template", "value": template},
-    )
+    if style is not None:
+        known_style = None
+        if template_key in _CLASSIC_SOFTWARE_TEMPLATES.values():
+            known_style = "classic"
+        elif template_key in (
+            PROJECT_TEMPLATES[t] for t in ("scrum", "kanban", "basic")
+        ):
+            known_style = "team-managed"
+        if known_style is None:
+            raise ValidationError(
+                f"Cannot verify style for template '{template_key}'. "
+                "Use --style with a supported software template, or omit --style."
+            )
+        if style != known_style:
+            raise ValidationError(
+                f"Template '{template_key}' has style '{known_style}', "
+                f"which conflicts with requested style '{style}'."
+            )
+    return template_key
 
 
 def _validate_string_length(

@@ -411,6 +411,62 @@ class TestValidateProjectTemplate:
         for shortcut, full_key in PROJECT_TEMPLATES.items():
             assert validate_project_template(shortcut) == full_key
 
+    @pytest.mark.parametrize(
+        "template,suffix",
+        [
+            ("scrum", "gh-scrum-template"),
+            ("kanban", "gh-kanban-template"),
+            ("basic", "basic-software-development-template"),
+        ],
+    )
+    def test_explicit_styles(self, template, suffix):
+        assert validate_project_template(template, "classic") == (
+            "com.pyxis.greenhopper.jira:" + suffix
+        )
+        assert (
+            validate_project_template(template, "team-managed")
+            == PROJECT_TEMPLATES[template]
+        )
+        assert validate_project_template(template.upper(), "CLASSIC").endswith(suffix)
+
+    @pytest.mark.parametrize(
+        "template,style",
+        [
+            ("classic-kanban", "classic"),
+            ("classic-scrum", "classic"),
+            ("simplified-kanban", "team-managed"),
+            ("simplified-scrum", "team-managed"),
+        ],
+    )
+    def test_fixed_alias_and_full_key_styles(self, template, style):
+        full_key = PROJECT_TEMPLATES[template]
+        assert validate_project_template(template, style) == full_key
+        assert validate_project_template(full_key, style) == full_key
+        opposite = "classic" if style == "team-managed" else "team-managed"
+        for value in (template, full_key):
+            with pytest.raises(ValidationError, match="conflicts"):
+                validate_project_template(value, opposite)
+
+    def test_basic_full_key_styles(self):
+        full_key = "com.pyxis.greenhopper.jira:basic-software-development-template"
+        assert validate_project_template(full_key, "classic") == full_key
+        with pytest.raises(ValidationError, match="conflicts"):
+            validate_project_template(full_key, "team-managed")
+        with pytest.raises(ValidationError, match="conflicts"):
+            validate_project_template(PROJECT_TEMPLATES["basic"], "classic")
+
+    @pytest.mark.parametrize("style", ["next-gen", "invalid", ""])
+    def test_invalid_style(self, style):
+        with pytest.raises(ValidationError):
+            validate_project_template("kanban", style)
+
+    @pytest.mark.parametrize(
+        "template", ["com.example:custom", "it-service-desk", "project-management"]
+    )
+    def test_unclassified_template_with_style(self, template):
+        with pytest.raises(ValidationError, match="Cannot verify style"):
+            validate_project_template(template, "classic")
+
 
 class TestValidateProjectName:
     """Tests for validate_project_name function."""

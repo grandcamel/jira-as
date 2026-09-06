@@ -110,7 +110,8 @@ class MockJiraClientBase:
         self.max_retries = max_retries
         self.retry_backoff = retry_backoff
 
-        # Initialize mutable state
+        # Initialize mutable state without sharing projects between clients.
+        self.PROJECTS = [dict(project) for project in type(self).PROJECTS]
         self._next_issue_id = 100
         self._issues = self._init_issues()
         self._comments: dict[str, list[dict]] = {}
