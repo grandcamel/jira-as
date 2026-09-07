@@ -76,7 +76,7 @@ def _call_help(operation: Any) -> str:
     """Describe enrichment flags that are available for this operation."""
     lines = [
         "Call options: --body @file|-; --field path=value (repeatable); "
-        "--validate-body; --format json|table|markdown.",
+        "--project KEY; --validate-body; --format json|table|markdown.",
         "Arrays: repeat the flag or use a JSON array; booleans: true|false.",
     ]
     tags = operation.extensions
@@ -199,16 +199,19 @@ def _preview(
 @api.command(
     "call", context_settings={"ignore_unknown_options": True}, add_help_option=False
 )
+@click.option("--project", "scope_project", metavar="KEY", default=None)
 @click.argument("arguments", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
-def call(ctx: click.Context, arguments: tuple[str, ...]) -> None:
+def call(
+    ctx: click.Context, arguments: tuple[str, ...], scope_project: str | None
+) -> None:
     """Call OPERATION with its spec-derived flags; --help after OPERATION lists them."""
     if not arguments:
         raise SurfaceError(None, ["Missing operationId"], code=2)
     if arguments == ("--help",):
         click.echo(
             "api call OPERATION [--parameter value] [--body @file|-] [--field path=value] "
-            "[--validate-body] [--confirm] [--format json|table|markdown]\n"
+            "[--project KEY] [--validate-body] [--confirm] [--format json|table|markdown]\n"
             "[--representation NAME] [--raw]\n"
             "Use api call OPERATION --help for parameter flags."
         )
@@ -255,6 +258,7 @@ def call(ctx: click.Context, arguments: tuple[str, ...]) -> None:
             name,
             parameters,
             body,
+            scope_argv_identity=scope_project,
             validate_body=options["validate_body"],
             all_pages=options["all_pages"],
             limit=options["limit"],

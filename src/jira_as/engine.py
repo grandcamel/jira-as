@@ -6,16 +6,66 @@ import base64
 import json
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
+from as_engine.errors import SurfaceError
 from as_engine.index import OperationIndex, ProductIndexes
 from as_engine.responder import Responder
 from as_engine.surface import Surface
-from as_engine.transport import HTTPTransport, Transport
+from as_engine.transport import HTTPTransport, Response, Transport
 
 if TYPE_CHECKING:
     from as_engine.cassette import Recorder
     from as_engine.simulation import SimulationStore
+
+
+class _ConfiguredSurface(Surface):
+    """Load project policy once, before the first guard or transport send."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._scope_loaded = False
+        self._scope_overrides: set[str] = set()
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name in {"scope_allowlist", "scope_allow_site"}:
+            overrides = self.__dict__.get("_scope_overrides")
+            if overrides is not None:
+                overrides.add(name)
+        super().__setattr__(name, value)
+
+    def call(self, *args: Any, **kwargs: Any) -> Response:
+        if not self._scope_loaded:
+            from jira_as.config_manager import ConfigManager
+            from jira_as.error_handler import ValidationError
+
+            try:
+                config = ConfigManager.get_instance()
+                allowed = config.get_allowed_projects()
+                scope = {
+                    "scope_allowlist": None if allowed is None else tuple(allowed),
+                    "scope_allow_site": config.get_allow_site_operations(),
+                }
+            except (ValueError, ValidationError) as exc:
+                raise SurfaceError(None, [str(exc)], code=2) from exc
+            for name, value in scope.items():
+                if name not in self._scope_overrides:
+                    setattr(self, name, value)
+            self._scope_loaded = True
+        try:
+            return super().call(*args, **kwargs)
+        except SurfaceError as exc:
+            if exc.code == 4 and any(
+                "explicit command identity" in message for message in exc.messages
+            ):
+                raise SurfaceError(
+                    exc.status,
+                    [*exc.messages, "Body-only project scope requires --project KEY."],
+                    exc.operation,
+                    exc.note,
+                    code=exc.code,
+                ) from exc
+            raise
 
 
 def create_surface(
@@ -118,5 +168,4 @@ def create_surface(
             recorder.transport = live
         return recorder
 
-    # JAS-46 plugs the Jira scope policy into this Surface.
-    return Surface(indexes, factory)
+    return _ConfiguredSurface(indexes, factory)

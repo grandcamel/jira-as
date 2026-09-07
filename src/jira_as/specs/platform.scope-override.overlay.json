@@ -1,0 +1,851 @@
+{
+  "actions": [
+    {
+      "description": "Hand-reviewed site project scope for updateMultipleCustomFieldValues.",
+      "target": "$.paths[\"/rest/api/3/app/field/value\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "Bulk nested issue updates require bounded array extraction, deferred by decision 18 to JAS-48/49; site-level until every element can be proved.",
+      "x-as-test": "scope_hand_platform_updateMultipleCustomFieldValues"
+    },
+    {
+      "description": "Hand-reviewed site project scope for updateCustomFieldValue.",
+      "target": "$.paths[\"/rest/api/3/app/field/{fieldIdOrKey}/value\"].put",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "Bulk nested issue updates require bounded array extraction, deferred by decision 18 to JAS-48/49; site-level until every element can be proved.",
+      "x-as-test": "scope_hand_platform_updateCustomFieldValue"
+    },
+    {
+      "description": "Hand-reviewed body project scope for getBulkChangelogs.",
+      "target": "$.paths[\"/rest/api/3/changelog/bulkfetch\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "body",
+          "path": "/issueIdsOrKeys",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "Direct issueIdsOrKeys body array; derive every project from a well-formed issue key and require matching --project. Numeric-only IDs cannot establish a project.",
+      "x-as-test": "scope_hand_platform_getBulkChangelogs"
+    },
+    {
+      "description": "Hand-reviewed site project scope for evaluateJiraExpression.",
+      "target": "$.paths[\"/rest/api/3/expression/eval\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /context/project",
+      "x-as-test": "scope_hand_platform_evaluateJiraExpression"
+    },
+    {
+      "description": "Hand-reviewed site project scope for evaluateJSISJiraExpression.",
+      "target": "$.paths[\"/rest/api/3/expression/evaluate\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /context/project",
+      "x-as-test": "scope_hand_platform_evaluateJSISJiraExpression"
+    },
+    {
+      "description": "Hand-reviewed body project scope for createCustomFieldContext.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "body",
+          "path": "/projectIds"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "The schema declares a direct projectIds array. Every member must equal the explicit argv identity; numeric IDs cannot prove key-only allowlist membership.",
+      "x-as-test": "scope_hand_platform_createCustomFieldContext"
+    },
+    {
+      "description": "Hand-reviewed site project scope for getCustomFieldContextsForProjectsAndIssueTypes.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/mapping\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /mappings",
+      "x-as-test": "scope_hand_platform_getCustomFieldContextsForProjectsAndIssueTypes"
+    },
+    {
+      "description": "Hand-reviewed body project scope for assignProjectsToCustomFieldContext.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/{contextId}/project\"].put",
+      "update": {
+        "x-as-scope": {
+          "in": "body",
+          "path": "/projectIds"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "The schema declares a direct projectIds array. Every member must equal the explicit argv identity; numeric IDs cannot prove key-only allowlist membership.",
+      "x-as-test": "scope_hand_platform_assignProjectsToCustomFieldContext"
+    },
+    {
+      "description": "Hand-reviewed body project scope for removeCustomFieldContextFromProjects.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/{contextId}/project/remove\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "body",
+          "path": "/projectIds"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "The schema declares a direct projectIds array. Every member must equal the explicit argv identity; numeric IDs cannot prove key-only allowlist membership.",
+      "x-as-test": "scope_hand_platform_removeCustomFieldContextFromProjects"
+    },
+    {
+      "description": "Hand-reviewed site project scope for createIssueFieldOption.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldKey}/option\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /config/scope/projects, /config/scope/projects2",
+      "x-as-test": "scope_hand_platform_createIssueFieldOption"
+    },
+    {
+      "description": "Hand-reviewed site project scope for updateIssueFieldOption.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldKey}/option/{optionId}\"].put",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /config/scope/projects, /config/scope/projects2",
+      "x-as-test": "scope_hand_platform_updateIssueFieldOption"
+    },
+    {
+      "description": "Hand-reviewed site project scope for addSharePermission.",
+      "target": "$.paths[\"/rest/api/3/filter/{id}/permission\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /projectRoleId",
+      "x-as-test": "scope_hand_platform_addSharePermission"
+    },
+    {
+      "description": "Hand-reviewed site project scope for bulkPinUnpinProjectsAsync.",
+      "target": "$.paths[\"/rest/api/3/forge/panel/action/bulk/async\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /projectList",
+      "x-as-test": "scope_hand_platform_bulkPinUnpinProjectsAsync"
+    },
+    {
+      "description": "Hand-reviewed body project scope for createIssue.",
+      "target": "$.paths[\"/rest/api/3/issue\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "body",
+          "paths": [
+            "/fields/project/key",
+            "/fields/project/id"
+          ]
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "Issue fields are a free map; project key or id is in fields.project. Require explicit matching --project and agreement of every present alternative.",
+      "x-as-test": "scope_hand_platform_createIssue"
+    },
+    {
+      "description": "Hand-reviewed body project scope for archiveIssues.",
+      "target": "$.paths[\"/rest/api/3/issue/archive\"].put",
+      "update": {
+        "x-as-scope": {
+          "in": "body",
+          "path": "/issueIdsOrKeys",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "Direct issueIdsOrKeys body array; derive every project from a well-formed issue key and require matching --project. Numeric-only IDs cannot establish a project.",
+      "x-as-test": "scope_hand_platform_archiveIssues"
+    },
+    {
+      "description": "Hand-reviewed site project scope for createIssues.",
+      "target": "$.paths[\"/rest/api/3/issue/bulk\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "Bulk nested issue updates require bounded array extraction, deferred by decision 18 to JAS-48/49; site-level until every element can be proved.",
+      "x-as-test": "scope_hand_platform_createIssues"
+    },
+    {
+      "description": "Hand-reviewed body project scope for bulkFetchIssues.",
+      "target": "$.paths[\"/rest/api/3/issue/bulkfetch\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "body",
+          "path": "/issueIdsOrKeys",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "Direct issueIdsOrKeys body array; derive every project from a well-formed issue key and require matching --project. Numeric-only IDs cannot establish a project.",
+      "x-as-test": "scope_hand_platform_bulkFetchIssues"
+    },
+    {
+      "description": "Hand-reviewed site project scope for getCreateIssueMeta.",
+      "target": "$.paths[\"/rest/api/3/issue/createmeta\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "Several optional project/issue selectors can disagree or be absent; the current tag cannot prove all alternatives. Explicit site policy is required; no arbitrary selector takes precedence.",
+      "x-as-test": "scope_hand_platform_getCreateIssueMeta"
+    },
+    {
+      "description": "Hand-reviewed body project scope for unarchiveIssues.",
+      "target": "$.paths[\"/rest/api/3/issue/unarchive\"].put",
+      "update": {
+        "x-as-scope": {
+          "in": "body",
+          "path": "/issueIdsOrKeys",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "Direct issueIdsOrKeys body array; derive every project from a well-formed issue key and require matching --project. Numeric-only IDs cannot establish a project.",
+      "x-as-test": "scope_hand_platform_unarchiveIssues"
+    },
+    {
+      "description": "Hand-reviewed site project scope for getIsWatchingIssueBulk.",
+      "target": "$.paths[\"/rest/api/3/issue/watching\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /issueIds",
+      "x-as-test": "scope_hand_platform_getIsWatchingIssueBulk"
+    },
+    {
+      "description": "Hand-reviewed key project scope for editIssue.",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}\"].put",
+      "update": {
+        "x-as-scope": {
+          "checks": [
+            {
+              "in": "body",
+              "optional": true,
+              "paths": [
+                "/fields/project/key",
+                "/fields/project/id"
+              ]
+            }
+          ],
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "Issue key establishes the primary project; an optional project change in free-map fields must agree, including bodies read from files.",
+      "x-as-test": "scope_hand_platform_editIssue"
+    },
+    {
+      "description": "Hand-reviewed key project scope for doTransition.",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/transitions\"].post",
+      "update": {
+        "x-as-scope": {
+          "checks": [
+            {
+              "in": "body",
+              "optional": true,
+              "paths": [
+                "/fields/project/key",
+                "/fields/project/id"
+              ]
+            }
+          ],
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "Issue key establishes the primary project; an optional project change in free-map fields must agree, including bodies read from files.",
+      "x-as-test": "scope_hand_platform_doTransition"
+    },
+    {
+      "description": "Hand-reviewed site project scope for linkIssues.",
+      "target": "$.paths[\"/rest/api/3/issueLink\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /inwardIssue/fields/issueType/scope/project, /inwardIssue/fields/issueType/scope/project/projectCategory, /inwardIssue/fields/issueType/scope/project/projectTypeKey, /inwardIssue/fields/issuetype/scope/project, /inwardIssue/fields/issuetype/scope/project/projectCategory, /inwardIssue/fields/issuetype/scope/project/projectTypeKey, /inwardIssue/fields/status/scope/project, /inwardIssue/fields/status/scope/project/projectCategory, /inwardIssue/fields/status/scope/project/projectTypeKey, /outwardIssue/fields/issueType/scope/project, /outwardIssue/fields/issueType/scope/project/projectCategory, /outwardIssue/fields/issueType/scope/project/projectTypeKey, /outwardIssue/fields/issuetype/scope/project, /outwardIssue/fields/issuetype/scope/project/projectCategory, /outwardIssue/fields/issuetype/scope/project/projectTypeKey, /outwardIssue/fields/status/scope/project, /outwardIssue/fields/status/scope/project/projectCategory, /outwardIssue/fields/status/scope/project/projectTypeKey",
+      "x-as-test": "scope_hand_platform_linkIssues"
+    },
+    {
+      "description": "Hand-reviewed site project scope for exportArchivedIssues.",
+      "target": "$.paths[\"/rest/api/3/issues/archive/export\"].put",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /projects",
+      "x-as-test": "scope_hand_platform_exportArchivedIssues"
+    },
+    {
+      "description": "Hand-reviewed body project scope for getAutoCompletePost.",
+      "target": "$.paths[\"/rest/api/3/jql/autocompletedata\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "body",
+          "path": "/projectIds"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "The schema declares a direct projectIds array. Every member must equal the explicit argv identity; numeric IDs cannot prove key-only allowlist membership.",
+      "x-as-test": "scope_hand_platform_getAutoCompletePost"
+    },
+    {
+      "description": "Hand-reviewed site project scope for matchIssues.",
+      "target": "$.paths[\"/rest/api/3/jql/match\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /issueIds",
+      "x-as-test": "scope_hand_platform_matchIssues"
+    },
+    {
+      "description": "Hand-reviewed site project scope for getMyPermissions.",
+      "target": "$.paths[\"/rest/api/3/mypermissions\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "Several optional project/issue selectors can disagree or be absent; the current tag cannot prove all alternatives. Explicit site policy is required; no arbitrary selector takes precedence.",
+      "x-as-test": "scope_hand_platform_getMyPermissions"
+    },
+    {
+      "description": "Hand-reviewed site project scope for getBulkPermissions.",
+      "target": "$.paths[\"/rest/api/3/permissions/check\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /projectPermissions",
+      "x-as-test": "scope_hand_platform_getBulkPermissions"
+    },
+    {
+      "description": "Hand-reviewed site project scope for createPermissionScheme.",
+      "target": "$.paths[\"/rest/api/3/permissionscheme\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /scope/project, /scope/project/projectCategory, /scope/project/projectTypeKey",
+      "x-as-test": "scope_hand_platform_createPermissionScheme"
+    },
+    {
+      "description": "Hand-reviewed site project scope for updatePermissionScheme.",
+      "target": "$.paths[\"/rest/api/3/permissionscheme/{schemeId}\"].put",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /scope/project, /scope/project/projectCategory, /scope/project/projectTypeKey",
+      "x-as-test": "scope_hand_platform_updatePermissionScheme"
+    },
+    {
+      "description": "Hand-reviewed site project scope for createPlan.",
+      "target": "$.paths[\"/rest/api/3/plans/plan\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /exclusionRules/issueIds",
+      "x-as-test": "scope_hand_platform_createPlan"
+    },
+    {
+      "description": "Hand-reviewed body project scope for createPriorityScheme.",
+      "target": "$.paths[\"/rest/api/3/priorityscheme\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "body",
+          "path": "/projectIds"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "The schema declares a direct projectIds array. Every member must equal the explicit argv identity; numeric IDs cannot prove key-only allowlist membership.",
+      "x-as-test": "scope_hand_platform_createPriorityScheme"
+    },
+    {
+      "description": "Hand-reviewed site project scope for suggestedPrioritiesForMappings.",
+      "target": "$.paths[\"/rest/api/3/priorityscheme/mappings\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /projects",
+      "x-as-test": "scope_hand_platform_suggestedPrioritiesForMappings"
+    },
+    {
+      "description": "Hand-reviewed site project scope for updatePriorityScheme.",
+      "target": "$.paths[\"/rest/api/3/priorityscheme/{schemeId}\"].put",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /projects",
+      "x-as-test": "scope_hand_platform_updatePriorityScheme"
+    },
+    {
+      "description": "Hand-reviewed site project scope for createProject.",
+      "target": "$.paths[\"/rest/api/3/project\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /projectTemplateKey, /projectTypeKey",
+      "x-as-test": "scope_hand_platform_createProject"
+    },
+    {
+      "description": "Hand-reviewed site project scope for createProjectWithCustomTemplate.",
+      "target": "$.paths[\"/rest/api/3/project-template\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /template/permissionScheme/grants, /template/project, /template/project/projectTypeKey",
+      "x-as-test": "scope_hand_platform_createProjectWithCustomTemplate"
+    },
+    {
+      "description": "Hand-reviewed site project scope for createStatuses.",
+      "target": "$.paths[\"/rest/api/3/statuses\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /scope/project",
+      "x-as-test": "scope_hand_platform_createStatuses"
+    },
+    {
+      "description": "Hand-reviewed site project scope for createUiModification.",
+      "target": "$.paths[\"/rest/api/3/uiModifications\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /contexts",
+      "x-as-test": "scope_hand_platform_createUiModification"
+    },
+    {
+      "description": "Hand-reviewed site project scope for updateUiModification.",
+      "target": "$.paths[\"/rest/api/3/uiModifications/{uiModificationId}\"].put",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /contexts",
+      "x-as-test": "scope_hand_platform_updateUiModification"
+    },
+    {
+      "description": "Hand-reviewed site project scope for findUsersWithAllPermissions.",
+      "target": "$.paths[\"/rest/api/3/user/permission/search\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "Several optional project/issue selectors can disagree or be absent; the current tag cannot prove all alternatives. Explicit site policy is required; no arbitrary selector takes precedence.",
+      "x-as-test": "scope_hand_platform_findUsersWithAllPermissions"
+    },
+    {
+      "description": "Hand-reviewed site project scope for findUsersWithBrowsePermission.",
+      "target": "$.paths[\"/rest/api/3/user/viewissue/search\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "Several optional project/issue selectors can disagree or be absent; the current tag cannot prove all alternatives. Explicit site policy is required; no arbitrary selector takes precedence.",
+      "x-as-test": "scope_hand_platform_findUsersWithBrowsePermission"
+    },
+    {
+      "description": "Hand-reviewed site project scope for updateRelatedWork.",
+      "target": "$.paths[\"/rest/api/3/version/{id}/relatedwork\"].put",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /issueId",
+      "x-as-test": "scope_hand_platform_updateRelatedWork"
+    },
+    {
+      "description": "Hand-reviewed site project scope for createRelatedWork.",
+      "target": "$.paths[\"/rest/api/3/version/{id}/relatedwork\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /issueId",
+      "x-as-test": "scope_hand_platform_createRelatedWork"
+    },
+    {
+      "description": "Hand-reviewed site project scope for readWorkflows.",
+      "target": "$.paths[\"/rest/api/3/workflows\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /projectAndIssueTypes",
+      "x-as-test": "scope_hand_platform_readWorkflows"
+    },
+    {
+      "description": "Hand-reviewed site project scope for createWorkflows.",
+      "target": "$.paths[\"/rest/api/3/workflows/create\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /scope/project",
+      "x-as-test": "scope_hand_platform_createWorkflows"
+    },
+    {
+      "description": "Hand-reviewed site project scope for validateCreateWorkflows.",
+      "target": "$.paths[\"/rest/api/3/workflows/create/validation\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /payload/scope/project",
+      "x-as-test": "scope_hand_platform_validateCreateWorkflows"
+    },
+    {
+      "description": "Hand-reviewed site project scope for updateWorkflows.",
+      "target": "$.paths[\"/rest/api/3/workflows/update\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /workflows",
+      "x-as-test": "scope_hand_platform_updateWorkflows"
+    },
+    {
+      "description": "Hand-reviewed site project scope for validateUpdateWorkflows.",
+      "target": "$.paths[\"/rest/api/3/workflows/update/validation\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /payload/workflows",
+      "x-as-test": "scope_hand_platform_validateUpdateWorkflows"
+    },
+    {
+      "description": "Hand-reviewed body project scope for readWorkflowSchemes.",
+      "target": "$.paths[\"/rest/api/3/workflowscheme/read\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "body",
+          "path": "/projectIds"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "The schema declares a direct projectIds array. Every member must equal the explicit argv identity; numeric IDs cannot prove key-only allowlist membership.",
+      "x-as-test": "scope_hand_platform_readWorkflowSchemes"
+    },
+    {
+      "description": "Hand-reviewed site project scope for getWorklogsByIssueIdAndWorklogId.",
+      "target": "$.paths[\"/rest/internal/api/latest/worklog/bulk\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /requests",
+      "x-as-test": "scope_hand_platform_getWorklogsByIssueIdAndWorklogId"
+    }
+  ],
+  "info": {
+    "title": "Jira platform hand-reviewed project scope",
+    "version": "1.0.0"
+  },
+  "overlay": "1.0.0"
+}

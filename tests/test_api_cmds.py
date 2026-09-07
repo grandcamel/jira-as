@@ -20,6 +20,8 @@ ORIGINAL_SEND = requests.Session.send
 @pytest.fixture(autouse=True)
 def offline(monkeypatch):
     monkeypatch.setenv("JIRA_AS_TRANSPORT", "responder")
+    monkeypatch.setenv("JIRA_ALLOWED_PROJECTS", "SBX")
+    monkeypatch.setenv("JIRA_ALLOW_SITE_OPERATIONS", "false")
     for name in ("JIRA_AS_CASSETTE", "JIRA_AS_RECORD", "JIRA_AS_SIMULATION_SEED"):
         monkeypatch.delenv(name, raising=False)
 
@@ -95,13 +97,21 @@ def test_array_boolean_types_and_body_inputs(monkeypatch, tmp_path):
     source.write_text(json.dumps(body))
     for flag, stdin in (("@" + str(source), None), ("-", json.dumps(body))):
         result = invoke(
-            "call", "searchAndReconsileIssuesUsingJqlPost", "--body", flag, input=stdin
+            "call",
+            "searchAndReconsileIssuesUsingJqlPost",
+            "--project",
+            "SBX",
+            "--body",
+            flag,
+            input=stdin,
         )
         assert result.exit_code == 0, result.output
         assert calls[-1][2] == body
     result = invoke(
         "call",
         "searchAndReconsileIssuesUsingJqlPost",
+        "--project",
+        "SBX",
         "--field",
         "jql=project = SBX",
         "--field",
@@ -113,10 +123,12 @@ def test_array_boolean_types_and_body_inputs(monkeypatch, tmp_path):
     result = invoke(
         "call",
         "searchAndReconsileIssuesUsingJqlPost",
+        "--project",
+        "SBX",
         "--body",
         "-",
         "--validate-body",
-        input='{"maxResults":"bad"}',
+        input='{"jql":"project = SBX","maxResults":"bad"}',
     )
     assert result.exit_code == 2
 
@@ -190,7 +202,7 @@ def test_deprecation_warning_and_opt_in_search():
         "searchForIssuesUsingJql"
         in invoke("search", "searchForIssuesUsingJql", "--include-deprecated").stdout
     )
-    result = invoke("call", "searchForIssuesUsingJql")
+    result = invoke("call", "searchForIssuesUsingJql", "--jql", "project = SBX")
     assert result.exit_code == 0 and "deprecated" in result.stderr
 
 
@@ -206,6 +218,8 @@ def test_http_factory_uses_existing_tuple_config_and_correct_base_for_each_docum
         "test-only",
     )
     config.get_api_config.return_value = {"timeout": 9, "max_retries": 0}
+    config.get_allowed_projects.return_value = ["SBX"]
+    config.get_allow_site_operations.return_value = True
     monkeypatch.setattr(ConfigManager, "get_instance", lambda: config)
     surface = create_surface(transport="http")
     surface.search(["sprint"])

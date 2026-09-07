@@ -13,6 +13,8 @@
         "platform.identity.overlay.json",
         "platform.paging.overlay.json",
         "platform.paging-override.overlay.json",
+        "platform.scope.overlay.json",
+        "platform.scope-override.overlay.json",
         "platform.overlay.json",
         "platform.help.overlay.json"
       ],
@@ -32,6 +34,8 @@
         "software.identity.overlay.json",
         "software.paging.overlay.json",
         "software.paging-override.overlay.json",
+        "software.scope.overlay.json",
+        "software.scope-override.overlay.json",
         "software.overlay.json",
         "software.help.overlay.json"
       ],
@@ -51,6 +55,8 @@
         "servicedesk.identity.overlay.json",
         "servicedesk.paging.overlay.json",
         "servicedesk.paging-override.overlay.json",
+        "servicedesk.scope.overlay.json",
+        "servicedesk.scope-override.overlay.json",
         "servicedesk.overlay.json",
         "servicedesk.help.overlay.json"
       ],

@@ -129,3 +129,53 @@ Mock mode follows the same shared-helper check and the same bypasses.
 This setting is an additional check against accidental references; its
 presence does not make direct clients or unguarded commands safe to use
 outside the organization's wrappers.
+
+## Generic Surface project scope (2.0)
+
+Every operation in the platform, Software and Service Management indexes has an
+`x-as-scope` tag, shown by `api describe`. The Generic Surface checks it before
+any transport send. It reuses `jira.allowed_projects` and
+`JIRA_ALLOWED_PROJECTS`, loading policy once at the first call. Discovery and
+help do not read settings or credentials. The legacy checks described above
+remain in place for legacy verbs.
+
+An absent allowlist removes project-membership restrictions; an explicit empty
+list allows no scoped operation. Identity structure and body/argv agreement
+still apply in unrestricted mode. Site-level operations independently require
+`jira.allow_site_operations: true` (a boolean, default false), overridden by
+`JIRA_ALLOW_SITE_OPERATIONS=true|false`. Invalid site-policy values are usage
+errors. These settings do not retrieve credentials.
+
+```sh
+JIRA_ALLOWED_PROJECTS=SBX jira-as api --transport responder call getIssue --issueIdOrKey SBX-1
+JIRA_ALLOWED_PROJECTS=SBX jira-as api --transport responder call createIssue --project SBX --field fields.project.key=SBX --field fields.summary=x --field fields.issuetype.name=Task
+```
+
+Body-only identity requires `--project KEY`, including `--body @file` and JQL
+bodies. It must match the body's key or id; multiple present key/id alternatives
+must agree. The flag is also accepted on keyed/path/query calls and must agree
+with their identity. All members of project or issue-key arrays are checked.
+Numeric-only issue IDs cannot establish a project; numeric project IDs cannot
+prove membership in this key-only allowlist, and there is no implicit resolver.
+Key/id spellings compare exactly; configured project keys are uppercased.
+
+JQL calls require a complete `project = SBX` or `project IN (SBX)` restriction.
+They accept additional literal AND predicates, for example
+`project = SBX AND status = Open`. OR, NOT, saved filters, functions, ORDER BY,
+boolean grouping, malformed syntax, and missing project restrictions refuse.
+This is deliberately a small grammar rather than general JQL parsing. JQL
+bodies additionally require the matching `--project` flag.
+
+Numeric board, sprint, desk and organization routes are site-level until a
+project resolver is designed. Site metadata and ambiguous nested/bulk bodies
+also require explicit site permission; `--project SBX` alone does not prove a
+board's or desk's project membership. Bulk nested issueUpdates extraction is
+deferred. For keyed editIssue/doTransition calls, an optional body project must
+agree with the issue key, preventing a file body from silently changing scope.
+
+Local scope refusals exit 4 and emit the Generic Surface JSON error object on
+stderr: `status` is null, `messages` explain the identity/allowlist refusal,
+`operation` identifies the call and `note` preserves its enrichment note.
+No requested operation is sent on refusal. The development host wrapper still
+owns the external boundary and can refuse shapes outside its own argv grammar.
+The replayable forty-shape fixture records explicit site opt-ins separately.

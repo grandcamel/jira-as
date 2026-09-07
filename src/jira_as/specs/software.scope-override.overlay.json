@@ -1,0 +1,89 @@
+{
+  "actions": [
+    {
+      "description": "Hand-reviewed site project scope for createBoard.",
+      "target": "$.paths[\"/rest/agile/1.0/board\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "A board is a site resource; optional location.projectKeyOrId locates it but does not prove the membership of the saved filter defining its contents.",
+      "x-as-test": "scope_hand_software_createBoard"
+    },
+    {
+      "description": "Hand-reviewed site project scope for submitBuilds.",
+      "target": "$.paths[\"/rest/builds/0.1/bulk\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /builds",
+      "x-as-test": "scope_hand_software_submitBuilds"
+    },
+    {
+      "description": "Hand-reviewed site project scope for submitDeployments.",
+      "target": "$.paths[\"/rest/deployments/0.1/bulk\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /deployments",
+      "x-as-test": "scope_hand_software_submitDeployments"
+    },
+    {
+      "description": "Hand-reviewed site project scope for storeDevelopmentInformation.",
+      "target": "$.paths[\"/rest/devinfo/0.10/bulk\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /repositories",
+      "x-as-test": "scope_hand_software_storeDevelopmentInformation"
+    },
+    {
+      "description": "Hand-reviewed site project scope for submitFeatureFlags.",
+      "target": "$.paths[\"/rest/featureflags/0.1/bulk\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; decision 18 and secondary-check addendum",
+      "x-as-reason": "No single project identity is proved by this nested, alternative, numeric-only or site-resource schema; no resolver or nested-array extraction is authorized for JAS-46. unrecognized body project identity alias(es): /flags",
+      "x-as-test": "scope_hand_software_submitFeatureFlags"
+    }
+  ],
+  "info": {
+    "title": "Jira software hand-reviewed project scope",
+    "version": "1.0.0"
+  },
+  "overlay": "1.0.0"
+}

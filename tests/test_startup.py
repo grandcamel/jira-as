@@ -78,3 +78,60 @@ def test_all_legacy_export_names_resolve_and_cache_without_changing_exports():
         assert getattr(jira_as, name) is value
     with pytest.raises(AttributeError):
         getattr(jira_as, "not_a_public_export")
+
+
+def test_first_scope_call_refuses_before_transport_and_preserves_discovery(monkeypatch):
+    program = """
+import sys
+from jira_as.engine import create_surface
+from as_engine.errors import SurfaceError
+surface=create_surface(transport='responder')
+assert 'jira_as.config_manager' not in sys.modules
+surface.describe('createIssue')
+surface.search(['sprint'])
+assert 'jira_as.config_manager' not in sys.modules
+def forbidden(*args, **kwargs):
+    raise AssertionError('scope refusal must precede transport construction')
+surface.transport_factory=forbidden
+try:
+    surface.call('createIssue', {}, {'fields': {'project': {'key': 'SBX'}}})
+except SurfaceError as exc:
+    assert exc.code == 4, exc
+    assert '--project' in str(exc), exc
+else:
+    raise AssertionError('missing --project was accepted')
+assert surface.scope_allowlist == ('SBX',)
+assert surface.scope_allow_site is False
+"""
+    monkeypatch.setenv("JIRA_ALLOWED_PROJECTS", "SBX")
+    monkeypatch.setenv("JIRA_ALLOW_SITE_OPERATIONS", "false")
+    result = subprocess.run(
+        [sys.executable, "-c", program], capture_output=True, text=True, timeout=10
+    )
+    assert result.returncode == 0, result.stderr
+
+
+def test_scope_config_loads_once_and_keeps_consumer_overrides(monkeypatch):
+    from as_engine.errors import SurfaceError
+
+    from jira_as.config_manager import ConfigManager
+    from jira_as.engine import create_surface
+
+    calls = []
+
+    def allowed(self):
+        calls.append(True)
+        return ["SBX"]
+
+    monkeypatch.setattr(ConfigManager, "get_allowed_projects", allowed)
+    monkeypatch.setattr(ConfigManager, "get_allow_site_operations", lambda _: False)
+    surface = create_surface(transport="responder")
+    surface.scope_allowlist = None
+    surface.scope_allow_site = True
+    assert calls == []
+    for _ in range(2):
+        with pytest.raises(SurfaceError):
+            surface.call("missing-operation", {})
+    assert calls == [True]
+    assert surface.scope_allowlist is None
+    assert surface.scope_allow_site is True

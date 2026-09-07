@@ -1,0 +1,1255 @@
+{
+  "actions": [
+    {
+      "description": "Declare site project scope for getAssetsWorkspaces.",
+      "target": "$.paths[\"/rest/servicedeskapi/assets/workspace\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getAssetsWorkspaces"
+    },
+    {
+      "description": "Declare site project scope for createCustomer.",
+      "target": "$.paths[\"/rest/servicedeskapi/customer\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_createCustomer"
+    },
+    {
+      "description": "Declare site project scope for createCustomerWithoutPermissionCheck.",
+      "target": "$.paths[\"/rest/servicedeskapi/customer/skip-permission-check\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_createCustomerWithoutPermissionCheck"
+    },
+    {
+      "description": "Declare site project scope for revokePortalOnlyAccessForUser.",
+      "target": "$.paths[\"/rest/servicedeskapi/customer/user/{accountId}/revoke-portal-only-access\"].put",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_revokePortalOnlyAccessForUser"
+    },
+    {
+      "description": "Declare site project scope for getInfo.",
+      "target": "$.paths[\"/rest/servicedeskapi/info\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getInfo"
+    },
+    {
+      "description": "Declare site project scope for getInsightWorkspaces.",
+      "target": "$.paths[\"/rest/servicedeskapi/insight/workspace\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getInsightWorkspaces"
+    },
+    {
+      "description": "Declare site project scope for getArticles.",
+      "target": "$.paths[\"/rest/servicedeskapi/knowledgebase/article\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getArticles"
+    },
+    {
+      "description": "Declare site project scope for viewArticle.",
+      "target": "$.paths[\"/rest/servicedeskapi/knowledgebase/article/view/{pageId}\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_viewArticle"
+    },
+    {
+      "description": "Declare site project scope for getOrganizations.",
+      "target": "$.paths[\"/rest/servicedeskapi/organization\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getOrganizations"
+    },
+    {
+      "description": "Declare site project scope for createOrganization.",
+      "target": "$.paths[\"/rest/servicedeskapi/organization\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_createOrganization"
+    },
+    {
+      "description": "Declare site project scope for getOrganization.",
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getOrganization"
+    },
+    {
+      "description": "Declare site project scope for deleteOrganization.",
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}\"].delete",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_deleteOrganization"
+    },
+    {
+      "description": "Declare site project scope for getOrganizationPropertyKeys.",
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/property\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getOrganizationPropertyKeys"
+    },
+    {
+      "description": "Declare site project scope for getOrganizationProperty.",
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/property/{propertyKey}\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getOrganizationProperty"
+    },
+    {
+      "description": "Declare site project scope for setOrganizationProperty.",
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/property/{propertyKey}\"].put",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_setOrganizationProperty"
+    },
+    {
+      "description": "Declare site project scope for deleteOrganizationProperty.",
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/property/{propertyKey}\"].delete",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_deleteOrganizationProperty"
+    },
+    {
+      "description": "Declare site project scope for getUsersInOrganization.",
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/user\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getUsersInOrganization"
+    },
+    {
+      "description": "Declare site project scope for addUsersToOrganization.",
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/user\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_addUsersToOrganization"
+    },
+    {
+      "description": "Declare site project scope for removeUsersFromOrganization.",
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/user\"].delete",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_removeUsersFromOrganization"
+    },
+    {
+      "description": "Declare site project scope for getCustomerRequests.",
+      "target": "$.paths[\"/rest/servicedeskapi/request\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getCustomerRequests"
+    },
+    {
+      "description": "Declare site project scope for createCustomerRequest.",
+      "target": "$.paths[\"/rest/servicedeskapi/request\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_createCustomerRequest"
+    },
+    {
+      "description": "Declare site project scope for validateCustomerRequest.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/validate\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_validateCustomerRequest"
+    },
+    {
+      "description": "Declare key project scope for getCustomerRequestByIdOrKey.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getCustomerRequestByIdOrKey"
+    },
+    {
+      "description": "Declare key project scope for getApprovals.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/approval\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getApprovals"
+    },
+    {
+      "description": "Declare key project scope for getApprovalById.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/approval/{approvalId}\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getApprovalById"
+    },
+    {
+      "description": "Declare key project scope for answerApproval.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/approval/{approvalId}\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_answerApproval"
+    },
+    {
+      "description": "Declare key project scope for getAttachmentsForRequest.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/attachment\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getAttachmentsForRequest"
+    },
+    {
+      "description": "Declare key project scope for createCommentWithAttachment.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/attachment\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_createCommentWithAttachment"
+    },
+    {
+      "description": "Declare key project scope for getRequestAttachmentContent.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/attachment/{attachmentId}\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getRequestAttachmentContent"
+    },
+    {
+      "description": "Declare key project scope for getRequestAttachmentThumbnail.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/attachment/{attachmentId}/thumbnail\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getRequestAttachmentThumbnail"
+    },
+    {
+      "description": "Declare key project scope for getRequestComments.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/comment\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getRequestComments"
+    },
+    {
+      "description": "Declare key project scope for createRequestComment.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/comment\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_createRequestComment"
+    },
+    {
+      "description": "Declare key project scope for getRequestCommentById.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/comment/{commentId}\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getRequestCommentById"
+    },
+    {
+      "description": "Declare key project scope for getCommentAttachments.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/comment/{commentId}/attachment\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getCommentAttachments"
+    },
+    {
+      "description": "Declare key project scope for getSubscriptionStatus.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/notification\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getSubscriptionStatus"
+    },
+    {
+      "description": "Declare key project scope for subscribe.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/notification\"].put",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_subscribe"
+    },
+    {
+      "description": "Declare key project scope for unsubscribe.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/notification\"].delete",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_unsubscribe"
+    },
+    {
+      "description": "Declare key project scope for getRequestParticipants.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/participant\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getRequestParticipants"
+    },
+    {
+      "description": "Declare key project scope for addRequestParticipants.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/participant\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_addRequestParticipants"
+    },
+    {
+      "description": "Declare key project scope for removeRequestParticipants.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/participant\"].delete",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_removeRequestParticipants"
+    },
+    {
+      "description": "Declare key project scope for getSlaInformation.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/sla\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getSlaInformation"
+    },
+    {
+      "description": "Declare key project scope for getSlaInformationById.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/sla/{slaMetricId}\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getSlaInformationById"
+    },
+    {
+      "description": "Declare key project scope for getCustomerRequestStatus.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/status\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getCustomerRequestStatus"
+    },
+    {
+      "description": "Declare key project scope for getCustomerTransitions.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/transition\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getCustomerTransitions"
+    },
+    {
+      "description": "Declare key project scope for performCustomerTransition.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/transition\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "key",
+          "name": "issueIdOrKey",
+          "separator": "-"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_performCustomerTransition"
+    },
+    {
+      "description": "Declare site project scope for getFeedback.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{requestIdOrKey}/feedback\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getFeedback"
+    },
+    {
+      "description": "Declare site project scope for postFeedback.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{requestIdOrKey}/feedback\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_postFeedback"
+    },
+    {
+      "description": "Declare site project scope for deleteFeedback.",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{requestIdOrKey}/feedback\"].delete",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_deleteFeedback"
+    },
+    {
+      "description": "Declare site project scope for getAllRequestTypes.",
+      "target": "$.paths[\"/rest/servicedeskapi/requesttype\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getAllRequestTypes"
+    },
+    {
+      "description": "Declare site project scope for getServiceDesks.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getServiceDesks"
+    },
+    {
+      "description": "Declare site project scope for getServiceDeskById.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getServiceDeskById"
+    },
+    {
+      "description": "Declare site project scope for attachTemporaryFile.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/attachTemporaryFile\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_attachTemporaryFile"
+    },
+    {
+      "description": "Declare site project scope for getCustomers.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/customer\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getCustomers"
+    },
+    {
+      "description": "Declare site project scope for addCustomers.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/customer\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_addCustomers"
+    },
+    {
+      "description": "Declare site project scope for removeCustomers.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/customer\"].delete",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_removeCustomers"
+    },
+    {
+      "description": "Declare site project scope for inviteCustomer.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/customer/invite\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_inviteCustomer"
+    },
+    {
+      "description": "Declare site project scope for addCustomersWithoutPermissionCheck.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/customer/skip-permission-check\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_addCustomersWithoutPermissionCheck"
+    },
+    {
+      "description": "Declare site project scope for getServiceDeskArticles.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/knowledgebase/article\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getServiceDeskArticles"
+    },
+    {
+      "description": "Declare site project scope for getServiceDeskOrganizations.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/organization\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getServiceDeskOrganizations"
+    },
+    {
+      "description": "Declare site project scope for addOrganization.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/organization\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_addOrganization"
+    },
+    {
+      "description": "Declare site project scope for removeOrganization.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/organization\"].delete",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_removeOrganization"
+    },
+    {
+      "description": "Declare site project scope for getQueues.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/queue\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getQueues"
+    },
+    {
+      "description": "Declare site project scope for getQueue.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/queue/{queueId}\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getQueue"
+    },
+    {
+      "description": "Declare site project scope for getIssuesInQueue.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/queue/{queueId}/issue\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getIssuesInQueue"
+    },
+    {
+      "description": "Declare site project scope for getRequestTypes.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getRequestTypes"
+    },
+    {
+      "description": "Declare site project scope for createRequestType.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_createRequestType"
+    },
+    {
+      "description": "Declare site project scope for checkRequestTypePermissions.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/permissions/check\"].post",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_checkRequestTypePermissions"
+    },
+    {
+      "description": "Declare site project scope for getRequestTypeById.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getRequestTypeById"
+    },
+    {
+      "description": "Declare site project scope for deleteRequestType.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}\"].delete",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_deleteRequestType"
+    },
+    {
+      "description": "Declare site project scope for getRequestTypeFields.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/field\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getRequestTypeFields"
+    },
+    {
+      "description": "Declare site project scope for getRequestTypePropertyKeys.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getRequestTypePropertyKeys"
+    },
+    {
+      "description": "Declare site project scope for getRequestTypeProperty.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey}\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getRequestTypeProperty"
+    },
+    {
+      "description": "Declare site project scope for setRequestTypeProperty.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey}\"].put",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_setRequestTypeProperty"
+    },
+    {
+      "description": "Declare site project scope for deleteRequestTypeProperty.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey}\"].delete",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_deleteRequestTypeProperty"
+    },
+    {
+      "description": "Declare site project scope for getRequestTypeGroups.",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttypegroup\"].get",
+      "update": {
+        "x-as-scope": {
+          "in": "site"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json"
+      },
+      "x-as-origin": "JAS-46; pinned Jira Base Documents",
+      "x-as-reason": "Pinned Base Document identity classification; hand decisions layer separately.",
+      "x-as-test": "scope_servicedesk_getRequestTypeGroups"
+    }
+  ],
+  "info": {
+    "title": "Jira servicedesk generated scope (do not edit)",
+    "version": "1.0.0"
+  },
+  "overlay": "1.0.0"
+}

@@ -283,6 +283,18 @@ routes for search. Platform IDs are unchanged. Other examples include
 `getSoftwareIssue`, `getBoardConfiguration`, `getServiceDeskArticles`, and
 `getRequestAttachmentContent`. These explicit corrections preserve every route.
 
+### Project scope
+
+The Generic Surface checks generated scope tags against `JIRA_ALLOWED_PROJECTS`
+before sending. An absent allowlist is unrestricted; an empty value denies scoped
+calls. Body-only identity requires matching `--project KEY`, including bodies
+read from files. Keyed updates also check any project change hidden in the body.
+JQL requires a complete project restriction and supports literal AND predicates.
+Site-level calls (including numeric board, sprint and service-desk routes) require
+`JIRA_ALLOW_SITE_OPERATIONS=true`; the default is false. Discovery and help stay
+settings-free. See [project scope details](docs/allowed-projects.md#generic-surface-project-scope-20).
+
+
 ## Build
 
 The product vendors pristine Base Documents and manifest pins in

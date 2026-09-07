@@ -21,7 +21,12 @@ class OriginResponder(Responder):
 def wire(monkeypatch):
     indexes = ProductIndexes(Path(__file__).parents[1] / "src/jira_as/_generated")
     responders = {name: OriginResponder(index) for name, index in indexes.primary()}
-    surface = Surface(indexes, lambda name, _: responders[name])
+    surface = Surface(
+        indexes,
+        lambda name, _: responders[name],
+        scope_allowlist=("SBX",),
+        scope_allow_site=True,
+    )
     monkeypatch.setattr(
         "jira_as.cli.commands.api_cmds.create_surface", lambda **_: surface
     )
@@ -46,14 +51,14 @@ TOKEN_CASES = [
     (
         "platform",
         "searchAndReconsileIssuesUsingJqlPost",
-        ["--field", "jql=project = SBX"],
+        ["--project", "SBX", "--field", "jql=project = SBX"],
         "issues",
         True,
     ),
     (
         "platform",
         "getBulkChangelogs",
-        ["--field", 'issueIdsOrKeys=["SBX-1"]'],
+        ["--project", "SBX", "--field", 'issueIdsOrKeys=["SBX-1"]'],
         "issueChangeLogs",
         True,
     ),
@@ -80,7 +85,13 @@ TOKEN_CASES = [
         "issues",
         False,
     ),
-    ("software", "getIssuesWithoutEpicJSIS", [], "issues", False),
+    (
+        "software",
+        "getIssuesWithoutEpicJSIS",
+        ["--jql", "project = SBX"],
+        "issues",
+        False,
+    ),
     ("software", "getIssuesForEpicJSIS", ["--epicIdOrKey", "SBX-1"], "issues", False),
     ("software", "getIssuesForSprintJSIS", ["--sprintId", "1"], "issues", False),
 ]
@@ -118,7 +129,13 @@ def test_default_preserves_one_page_wrapper(wire):
     responder = wire[1]["platform"]
     page = {"issues": [1], "nextPageToken": "unused", "isLast": False}
     responder.seed("searchAndReconsileIssuesUsingJql", [page])
-    result = invoke("searchAndReconsileIssuesUsingJql", "--maxResults", "20")
+    result = invoke(
+        "searchAndReconsileIssuesUsingJql",
+        "--jql",
+        "project = SBX",
+        "--maxResults",
+        "20",
+    )
     assert result.exit_code == 0 and json.loads(result.stdout) == page, result.output
     assert len(responder.requests) == 1 and result.stderr == ""
 
@@ -194,12 +211,16 @@ def test_jsm_continues_short_nonfinal_page(wire):
 
 
 def test_string_typed_offset_preserves_declared_wire_type(wire):
+    # Numeric project fixture uses the explicit unrestricted policy.
+    wire[0].scope_allowlist = None
     responder = wire[1]["platform"]
     responder.seed(
         "getNotificationSchemes",
         [{"values": [1], "total": 2}, {"values": [2], "total": 2}],
     )
-    result = invoke("getNotificationSchemes", "--all", "--maxResults", "20")
+    result = invoke(
+        "getNotificationSchemes", "--projectId", "10000", "--all", "--maxResults", "20"
+    )
     assert result.exit_code == 0, result.output
     assert [r[1]["startAt"] for r in responder.requests] == ["0", "1"]
 
@@ -207,7 +228,10 @@ def test_string_typed_offset_preserves_declared_wire_type(wire):
 @pytest.mark.parametrize(
     "operation,flags",
     [
-        ("searchForIssuesUsingJqlPost", ["--field", "jql=project = SBX"]),
+        (
+            "searchForIssuesUsingJqlPost",
+            ["--project", "SBX", "--field", "jql=project = SBX"],
+        ),
         ("suggestedPrioritiesForMappings", []),
     ],
 )

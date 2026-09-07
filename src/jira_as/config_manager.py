@@ -217,6 +217,21 @@ class ConfigManager(BaseConfigManager):
             )
         return list(dict.fromkeys(project.strip().upper() for project in projects))
 
+    def get_allow_site_operations(self) -> bool:
+        """Read Generic Surface site policy without retrieving credentials."""
+        override = os.getenv("JIRA_ALLOW_SITE_OPERATIONS")
+        if override is not None:
+            normalized = override.strip().lower()
+            if normalized not in {"true", "false"}:
+                raise ValueError("JIRA_ALLOW_SITE_OPERATIONS must be true or false")
+            return normalized == "true"
+        value = self.config.get(self.service_name, {}).get(
+            "allow_site_operations", False
+        )
+        if type(value) is not bool:
+            raise ValueError("jira.allow_site_operations must be a boolean")
+        return value
+
     def get_agile_fields(self, project_key: str | None = None) -> dict[str, str]:
         """
         Get Agile field IDs.
