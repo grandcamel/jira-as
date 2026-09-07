@@ -39,6 +39,11 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
   corrected four invalid enum defaults and two search examples, named the
   removed-search replacements, and seeded source-backed help notes and topics.
   Custom-field resolution remains deferred to JAS-49 (JAS-47). (JAS-47)
+- Recorded the fourteen-operation jira-host Compatibility Contract and
+  migrated its legacy commands to the generic Surface while preserving output
+  and legacy exit codes; added responder compatibility coverage, normalized
+  spaced and unspaced worklog durations, explicit description input formats,
+  and bounded project-safe search ordering and link support (JAS-48). (JAS-48)
 
 ### Removed verbs
 
