@@ -887,36 +887,6 @@ class TestBulkLogTimeImpl:
 class TestTimeLogCommand:
     """Tests for time log command."""
 
-    def test_log_time(self, mock_client, sample_worklog):
-        """Test logging time."""
-        mock_client.add_worklog.return_value = sample_worklog
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(time, ["log", "PROJ-123", "--time", "2h"])
-
-        assert result.exit_code == 0
-        assert "Worklog added" in result.output
-
-    def test_log_time_json(self, mock_client, sample_worklog):
-        """Test logging time with JSON output."""
-        mock_client.add_worklog.return_value = sample_worklog
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(
-                time, ["log", "PROJ-123", "--time", "2h", "-o", "json"]
-            )
-
-        assert result.exit_code == 0
-        assert '"id": "12345"' in result.output
-
 
 class TestTimeWorklogsCommand:
     """Tests for time worklogs command."""

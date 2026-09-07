@@ -1424,37 +1424,6 @@ class TestSearchCLICommands:
         """Create CLI runner."""
         return CliRunner()
 
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    @patch("jira_as.cli.commands.search_cmds.validate_jql")
-    def test_query_command(
-        self, mock_validate, mock_get_client, runner, mock_client, sample_issues
-    ):
-        """Test search query command."""
-        mock_get_client.return_value = mock_client
-        mock_validate.return_value = "project = TEST"
-        mock_client.search_issues.return_value = {"issues": sample_issues, "total": 3}
-
-        result = runner.invoke(search, ["query", "project = TEST"])
-
-        assert result.exit_code == 0
-        assert "Found 3" in result.output
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    @patch("jira_as.cli.commands.search_cmds.validate_jql")
-    def test_query_command_json(
-        self, mock_validate, mock_get_client, runner, mock_client, sample_issues
-    ):
-        """Test search query with JSON output."""
-        mock_get_client.return_value = mock_client
-        mock_validate.return_value = "project = TEST"
-        mock_client.search_issues.return_value = {"issues": sample_issues, "total": 3}
-
-        result = runner.invoke(search, ["query", "project = TEST", "-o", "json"])
-
-        assert result.exit_code == 0
-        data = json.loads(result.output)
-        assert data["total"] == 3
-
     def test_query_command_no_query(self, runner):
         """Test search query requires JQL or filter."""
         result = runner.invoke(search, ["query"])

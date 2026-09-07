@@ -70,10 +70,17 @@ def test_critical_scope_forms_and_numeric_routes(generated_indexes):
         "name": "jql",
         "clause": "project",
         "conjunction": True,
+        "order_by": ["key", "created", "updated"],
     }
     assert platform["searchAndReconsileIssuesUsingJqlPost"]["extensions"][
         "x-as-scope"
-    ] == {"in": "body", "path": "/jql", "clause": "project", "conjunction": True}
+    ] == {
+        "in": "body",
+        "path": "/jql",
+        "clause": "project",
+        "conjunction": True,
+        "order_by": ["key", "created", "updated"],
+    }
     assert platform["createFilter"]["extensions"]["x-as-scope"] == {"in": "site"}
     assert software["getBoard"]["extensions"]["x-as-scope"] == {"in": "site"}
     assert software["getSprint"]["extensions"]["x-as-scope"] == {"in": "site"}

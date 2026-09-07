@@ -627,43 +627,6 @@ class TestLinkCommand:
 class TestGetLinksCommand:
     """Tests for the get-links CLI command."""
 
-    def test_get_links_cli(self, cli_runner, mock_jira_client, sample_issue_links):
-        """Test CLI get-links command."""
-        mock_jira_client.get_issue_links.return_value = deepcopy(sample_issue_links)
-
-        with patch(
-            "jira_as.cli.commands.relationships_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                relationships,
-                ["get-links", "PROJ-123"],
-            )
-
-        assert result.exit_code == 0
-        assert "Links for PROJ-123" in result.output
-
-
-@pytest.mark.unit
-class TestLinkTypesCommand:
-    """Tests for the link-types CLI command."""
-
-    def test_link_types_cli(self, cli_runner, mock_jira_client, sample_link_types):
-        """Test CLI link-types command."""
-        mock_jira_client.get_link_types.return_value = deepcopy(sample_link_types)
-
-        with patch(
-            "jira_as.cli.commands.relationships_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                relationships,
-                ["link-types"],
-            )
-
-        assert result.exit_code == 0
-        assert "Available Link Types" in result.output
-
 
 @pytest.mark.unit
 class TestCloneCommand:

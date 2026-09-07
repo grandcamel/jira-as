@@ -2046,7 +2046,10 @@ def agile_rank(ctx, issue_key, before, after, top, bottom, board, output):
 @handle_jira_errors
 def agile_estimate(ctx, issue_key, points, output):
     """Set story points for an issue."""
-    client = get_client_from_context(ctx)
+    from jira_as.compat.client import get_client
+    from jira_as.compat.implementations import _estimate_issue_impl
+
+    client = get_client(ctx)
     result = _estimate_issue_impl(issue_keys=[issue_key], points=points, client=client)
 
     if output == "json":

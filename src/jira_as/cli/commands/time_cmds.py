@@ -1235,7 +1235,10 @@ def time_log(
         jira-as time log PROJ-123 --time 2h
         jira-as time log PROJ-123 --time "1d 4h" --comment "Code review"
     """
-    client = get_client_from_context(ctx)
+    from jira_as.compat.client import get_client
+    from jira_as.compat.implementations import _add_worklog_impl
+
+    client = get_client(ctx)
     result = _add_worklog_impl(
         issue_key,
         time_spent,

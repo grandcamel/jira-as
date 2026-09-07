@@ -1,0 +1,993 @@
+{
+  "schema_version": 1,
+  "provenance": {
+    "authority": "evidence/jas-48-capture/README.md",
+    "pinned_reads": "jira-as 1.1.3 through scripts/jira-host",
+    "full_shapes": "jira-as 1.2.1 through scripts/jira-dev-host in SBX",
+    "note": "No 1.2.0 binary was captured. This records the pinned 1.2.x compatibility line; the pinned 1.1.3 read text shapes are comparison evidence. jira-host enrich has aggregate advisory exit 3, distinct from each child CLI exit; host duration flooring is also wrapper-only, while the CLI accepts and normalizes both spaced and unspaced durations."
+  },
+  "exit_codes": {
+    "success": 0,
+    "jira_error": 1,
+    "usage_or_refusal": 2,
+    "scope_refusal": 1,
+    "host_wrapper_usage_refusal": 2
+  },
+  "operations": [
+    {
+      "host_op": "read",
+      "argv_template": [
+        "issue",
+        "get",
+        "K",
+        "[--detailed]",
+        "[--output json]"
+      ],
+      "value_options": [
+        "-f",
+        "--fields",
+        "-o",
+        "--output"
+      ],
+      "boolean_options": [
+        "-d",
+        "--detailed",
+        "-l",
+        "--show-links",
+        "-t",
+        "--show-time"
+      ],
+      "variants": [
+        {
+          "argv": [
+            "issue",
+            "get",
+            "SBX-1"
+          ],
+          "capture": "read",
+          "operation_ids": [
+            "getIssue"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Key:\\s+[A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ],
+            "table_headers": [
+              "Type",
+              "Status",
+              "Summary"
+            ]
+          }
+        },
+        {
+          "argv": [
+            "issue",
+            "get",
+            "SBX-1",
+            "--detailed"
+          ],
+          "capture": "read-detailed",
+          "operation_ids": [
+            "getIssue"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Key:\\s+[A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$",
+              "^Reporter:.*$"
+            ],
+            "table_headers": [
+              "Created",
+              "Updated"
+            ]
+          }
+        },
+        {
+          "argv": [
+            "issue",
+            "get",
+            "SBX-1",
+            "--output",
+            "json"
+          ],
+          "capture": "read-json",
+          "operation_ids": [
+            "getIssue"
+          ],
+          "output": {
+            "kind": "json",
+            "required": {
+              "expand": "string",
+              "id": "string",
+              "self": "string",
+              "key": "string",
+              "fields": {
+                "type": "object",
+                "required": {
+                  "labels": "array"
+                }
+              }
+            }
+          }
+        },
+        {
+          "argv": [
+            "issue",
+            "get",
+            "SBX-1",
+            "--fields",
+            "labels",
+            "--output",
+            "json"
+          ],
+          "capture": "read-labels-json",
+          "operation_ids": [
+            "getIssue"
+          ],
+          "output": {
+            "kind": "json",
+            "required": {
+              "expand": "string",
+              "id": "string",
+              "self": "string",
+              "key": "string",
+              "fields": {
+                "type": "object",
+                "required": {
+                  "labels": "array"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "host_op": "comments",
+      "argv_template": [
+        "collaborate",
+        "comment",
+        "list",
+        "K"
+      ],
+      "value_options": [
+        "--id",
+        "-l",
+        "--limit",
+        "--offset",
+        "--order",
+        "-o",
+        "--output"
+      ],
+      "boolean_options": [],
+      "variants": [
+        {
+          "argv": [
+            "collaborate",
+            "comment",
+            "list",
+            "SBX-1"
+          ],
+          "capture": "comments",
+          "operation_ids": [
+            "getComments"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Comments on [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* \\(0 total\\):$",
+              "^No comments found\\.$"
+            ]
+          }
+        },
+        {
+          "argv": [
+            "collaborate",
+            "comment",
+            "list",
+            "SBX-17"
+          ],
+          "capture": "comments-after",
+          "operation_ids": [
+            "getComments"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Comments on [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* \\([1-9][0-9]* total\\):$"
+            ],
+            "table_headers": [
+              "ID",
+              "Author",
+              "Date",
+              "Body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "host_op": "comment",
+      "argv_template": [
+        "collaborate",
+        "comment",
+        "add",
+        "K",
+        "--body B|--body-file F",
+        "--format markdown"
+      ],
+      "value_options": [
+        "-b",
+        "--body",
+        "--body-file",
+        "-f",
+        "--format",
+        "--visibility-role",
+        "--visibility-group"
+      ],
+      "boolean_options": [],
+      "variants": [
+        {
+          "argv": [
+            "collaborate",
+            "comment",
+            "add",
+            "SBX-17",
+            "--body",
+            "A markdown comment: **bold** and a list",
+            "--format",
+            "markdown"
+          ],
+          "capture": "comment-add",
+          "operation_ids": [
+            "addComment"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^✓ Added comment to [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* \\(ID: [0-9]+\\)$"
+            ]
+          }
+        },
+        {
+          "argv": [
+            "collaborate",
+            "comment",
+            "add",
+            "SBX-17",
+            "--body-file",
+            "@comment.md",
+            "--format",
+            "markdown"
+          ],
+          "capture": "comment-add-file",
+          "operation_ids": [
+            "addComment"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^✓ Added comment to [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* \\(ID: [0-9]+\\)$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "host_op": "create",
+      "argv_template": [
+        "issue",
+        "create",
+        "--project",
+        "P",
+        "--type",
+        "T",
+        "--summary",
+        "S",
+        "--description",
+        "D"
+      ],
+      "value_options": [
+        "-p",
+        "--project",
+        "-t",
+        "--type",
+        "-s",
+        "--summary",
+        "-d",
+        "--description",
+        "--priority",
+        "-a",
+        "--assignee",
+        "-l",
+        "--labels",
+        "-c",
+        "--components",
+        "--template",
+        "--story-points",
+        "--estimate",
+        "-o",
+        "--output"
+      ],
+      "boolean_options": [
+        "--dry-run",
+        "--no-defaults"
+      ],
+      "variants": [
+        {
+          "argv": [
+            "issue",
+            "create",
+            "--project",
+            "SBX",
+            "--type",
+            "Task",
+            "--summary",
+            "Compatibility Contract capture probe (disposable)",
+            "--description",
+            "Created by the JAS supervisor seat to capture the pinned-line invocation shapes for the Compatibility Contract ticket. Disposable."
+          ],
+          "capture": "create",
+          "operation_ids": [
+            "createIssue"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^✓ Created issue: [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$",
+              "^URL: https?://.+/browse/[A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "host_op": "update",
+      "argv_template": [
+        "issue",
+        "update",
+        "K",
+        "--summary S|--description D"
+      ],
+      "value_options": [
+        "-s",
+        "--summary",
+        "-d",
+        "--description"
+      ],
+      "boolean_options": [],
+      "variants": [
+        {
+          "argv": [
+            "issue",
+            "update",
+            "SBX-17",
+            "--summary",
+            "Compatibility Contract capture probe (disposable, updated)"
+          ],
+          "capture": "update-summary",
+          "operation_ids": [
+            "editIssue"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^✓ Updated issue: [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ]
+          }
+        },
+        {
+          "argv": [
+            "issue",
+            "update",
+            "SBX-17",
+            "--description",
+            "Updated description with **markdown** auto-detection."
+          ],
+          "capture": "update-description",
+          "operation_ids": [
+            "editIssue"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^✓ Updated issue: [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "host_op": "transitions",
+      "argv_template": [
+        "lifecycle",
+        "transitions",
+        "K"
+      ],
+      "value_options": [
+        "-o",
+        "--output"
+      ],
+      "boolean_options": [],
+      "variants": [
+        {
+          "argv": [
+            "lifecycle",
+            "transitions",
+            "SBX-1"
+          ],
+          "capture": "transitions",
+          "operation_ids": [
+            "getTransitions"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Available transitions for [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*:$"
+            ],
+            "table_headers": [
+              "ID",
+              "Name",
+              "To Status"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "host_op": "transition",
+      "argv_template": [
+        "lifecycle",
+        "transition",
+        "K",
+        "--to",
+        "NAME"
+      ],
+      "value_options": [
+        "-t",
+        "--to",
+        "--id",
+        "-c",
+        "--comment",
+        "-r",
+        "--resolution"
+      ],
+      "boolean_options": [
+        "-n",
+        "--dry-run"
+      ],
+      "variants": [
+        {
+          "argv": [
+            "lifecycle",
+            "transition",
+            "SBX-17",
+            "--to",
+            "In Progress"
+          ],
+          "capture": "transition",
+          "operation_ids": [
+            "getIssue",
+            "getTransitions",
+            "doTransition"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^✓ Transitioned [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* to In Progress$"
+            ]
+          }
+        },
+        {
+          "argv": [
+            "lifecycle",
+            "transition",
+            "SBX-17",
+            "--to",
+            "Done"
+          ],
+          "capture": "transition-done",
+          "operation_ids": [
+            "getIssue",
+            "getTransitions",
+            "doTransition"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^✓ Transitioned [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* to Done$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "host_op": "link",
+      "argv_template": [
+        "relationships",
+        "link",
+        "A",
+        "--type",
+        "T",
+        "--to",
+        "B"
+      ],
+      "value_options": [
+        "-t",
+        "--type"
+      ],
+      "boolean_options": [],
+      "variants": [
+        {
+          "argv": [
+            "relationships",
+            "link",
+            "SBX-17",
+            "--type",
+            "Blocks",
+            "--to",
+            "SBX-1"
+          ],
+          "capture": "link",
+          "operation_ids": [
+            "getIssueLinkTypes",
+            "linkIssues"
+          ],
+          "preflight": {
+            "argv": [
+              "relationships",
+              "link-types",
+              "--output",
+              "json"
+            ],
+            "operation_ids": [
+              "getIssueLinkTypes"
+            ],
+            "capture": "link-types-json; scripts/jira-host:548-555",
+            "output": {
+              "kind": "json",
+              "root": "array",
+              "items": {
+                "type": "object",
+                "required": {
+                  "id": "string",
+                  "name": "string",
+                  "inward": "string",
+                  "outward": "string",
+                  "self": "string"
+                }
+              }
+            }
+          },
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Linked [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* to [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "host_op": "unlink",
+      "argv_template": [
+        "relationships",
+        "unlink",
+        "A",
+        "B",
+        "[--type T]"
+      ],
+      "value_options": [
+        "-t",
+        "--type"
+      ],
+      "boolean_options": [],
+      "variants": [
+        {
+          "argv": [
+            "relationships",
+            "unlink",
+            "SBX-17",
+            "SBX-1"
+          ],
+          "capture": "unlink",
+          "operation_ids": [
+            "getIssue",
+            "deleteIssueLink"
+          ],
+          "preflight": {
+            "argv": [
+              "relationships",
+              "link-types",
+              "--output",
+              "json"
+            ],
+            "operation_ids": [
+              "getIssueLinkTypes"
+            ],
+            "capture": "only when --type is supplied; link-types-json; scripts/jira-host:548-555",
+            "output": {
+              "kind": "json",
+              "root": "array",
+              "items": {
+                "type": "object",
+                "required": {
+                  "id": "string",
+                  "name": "string",
+                  "inward": "string",
+                  "outward": "string",
+                  "self": "string"
+                }
+              }
+            }
+          },
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Removed link between [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* and [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "host_op": "get-links",
+      "argv_template": [
+        "relationships",
+        "get-links",
+        "K"
+      ],
+      "value_options": [],
+      "boolean_options": [],
+      "variants": [
+        {
+          "argv": [
+            "relationships",
+            "get-links",
+            "SBX-1"
+          ],
+          "capture": "get-links",
+          "operation_ids": [
+            "getIssue"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^No links found for [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ]
+          }
+        },
+        {
+          "argv": [
+            "relationships",
+            "get-links",
+            "SBX-17"
+          ],
+          "capture": "get-links-after",
+          "operation_ids": [
+            "getIssue"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Links for [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*:$",
+              "^Total: [1-9][0-9]* link\\(s\\)$"
+            ],
+            "table_headers": [
+              "Outward"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "host_op": "link-types",
+      "argv_template": [
+        "relationships",
+        "link-types"
+      ],
+      "value_options": [],
+      "boolean_options": [],
+      "variants": [
+        {
+          "argv": [
+            "relationships",
+            "link-types"
+          ],
+          "capture": "link-types",
+          "operation_ids": [
+            "getIssueLinkTypes"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Available Link Types:$",
+              "^Total: [0-9]+ link type\\(s\\)$"
+            ],
+            "table_headers": [
+              "Name",
+              "Outward",
+              "Inward"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "host_op": "labels",
+      "argv_template": [
+        "issue",
+        "get",
+        "K",
+        "--fields",
+        "labels",
+        "--output",
+        "json",
+        "then",
+        "issue",
+        "update",
+        "K",
+        "--labels",
+        "MERGED"
+      ],
+      "ordered_steps": [
+        [
+          "issue",
+          "get",
+          "K",
+          "--fields",
+          "labels",
+          "--output",
+          "json"
+        ],
+        [
+          "issue",
+          "update",
+          "K",
+          "--labels",
+          "MERGED"
+        ]
+      ],
+      "value_options": [
+        "--add",
+        "--remove"
+      ],
+      "boolean_options": [],
+      "variants": [
+        {
+          "argv": [
+            "issue",
+            "get",
+            "SBX-17",
+            "--fields",
+            "labels",
+            "--output",
+            "json",
+            "=>",
+            "issue",
+            "update",
+            "SBX-17",
+            "--labels",
+            "compat-capture,disposable"
+          ],
+          "capture": "labels-read/read-labels-json, labels-update",
+          "operation_ids": [
+            "getIssue",
+            "editIssue"
+          ],
+          "output": {
+            "kind": "pair",
+            "first": {
+              "kind": "json",
+              "required": {
+                "expand": "string",
+                "id": "string",
+                "self": "string",
+                "key": "string",
+                "fields": {
+                  "type": "object",
+                  "required": {
+                    "labels": "array"
+                  }
+                }
+              }
+            },
+            "second": {
+              "kind": "text",
+              "lines": [
+                "^✓ Updated issue: [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "host_op": "search",
+      "argv_template": [
+        "search",
+        "query",
+        "project = P AND statusCategory != Done ORDER BY key ASC"
+      ],
+      "value_options": [],
+      "boolean_options": [],
+      "variants": [
+        {
+          "argv": [
+            "search",
+            "query",
+            "project = SBX AND statusCategory != Done ORDER BY key ASC"
+          ],
+          "capture": "search",
+          "operation_ids": [
+            "searchAndReconsileIssuesUsingJql"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Found [0-9]+ issue\\(s\\)$"
+            ],
+            "table_headers": [
+              "Key",
+              "Type",
+              "Status",
+              "Priority",
+              "Assignee",
+              "Reporter",
+              "Summary"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "host_op": "enrich",
+      "argv_template": [
+        "agile",
+        "estimate",
+        "K",
+        "--points",
+        "N"
+      ],
+      "value_options": [
+        "--story-points",
+        "--worklog",
+        "--started",
+        "--comment-file"
+      ],
+      "boolean_options": [],
+      "variants": [
+        {
+          "argv": [
+            "agile",
+            "estimate",
+            "SBX-17",
+            "--points",
+            "5"
+          ],
+          "capture": "estimate",
+          "operation_ids": [
+            "editIssue"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Updated 1 issue\\(s\\)$",
+              "^Story points: set to 5\\.0$"
+            ]
+          },
+          "optional_metadata_operations": [
+            "getFields"
+          ]
+        },
+        {
+          "argv": [
+            "time",
+            "log",
+            "SBX-17",
+            "--time",
+            "2h30m",
+            "--comment",
+            "capture probe worklog"
+          ],
+          "capture": "timelog-unspaced (captured 1.2.1 failure; 2.0 additive success requirement)",
+          "operation_ids": [
+            "addWorklog"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Worklog added to [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*:$",
+              "^\\s*Worklog ID: [0-9]+$",
+              "^\\s*Time logged: 2h 30m \\(9000 seconds\\)$",
+              "^\\s*Started: .+$",
+              "^\\s*Comment: .+$"
+            ]
+          }
+        },
+        {
+          "argv": [
+            "time",
+            "log",
+            "SBX-17",
+            "--time",
+            "2h 30m",
+            "--comment",
+            "capture probe worklog"
+          ],
+          "capture": "timelog-spaced",
+          "operation_ids": [
+            "addWorklog"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Worklog added to [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*:$",
+              "^\\s*Worklog ID: [0-9]+$",
+              "^\\s*Time logged: 2h 30m \\(9000 seconds\\)$",
+              "^\\s*Started: .+$",
+              "^\\s*Comment: .+$"
+            ]
+          }
+        },
+        {
+          "argv": [
+            "collaborate",
+            "comment",
+            "add",
+            "SBX-17",
+            "--body-file",
+            "@comment.md",
+            "--format",
+            "markdown"
+          ],
+          "capture": "comment-add-file",
+          "operation_ids": [
+            "addComment"
+          ],
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^✓ Added comment to [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* \\(ID: [0-9]+\\)$"
+            ]
+          }
+        }
+      ],
+      "ordered_steps": [
+        [
+          "agile",
+          "estimate",
+          "K",
+          "--points",
+          "N"
+        ],
+        [
+          "time",
+          "log",
+          "K",
+          "--time",
+          "D",
+          "--comment",
+          "GC-123 lifecycle: wall time dispatch-to-landed",
+          "[--started S]"
+        ],
+        [
+          "collaborate",
+          "comment",
+          "add",
+          "K",
+          "--body-file",
+          "F",
+          "--format",
+          "markdown"
+        ]
+      ],
+      "step_conditions": [
+        "--story-points supplied",
+        "--worklog supplied and host normalized duration at least one minute",
+        "--comment-file supplied"
+      ]
+    }
+  ]
+}

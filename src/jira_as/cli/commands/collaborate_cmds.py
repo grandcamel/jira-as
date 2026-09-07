@@ -899,6 +899,9 @@ def comment_add(
         jira-as collaborate comment add PROJ-123 --body "Starting work"
         jira-as collaborate comment add PROJ-123 --body "Internal" --visibility-role Developers
     """
+    from jira_as.compat.client import get_client
+    from jira_as.compat.implementations import _add_comment_impl
+
     if visibility_role and visibility_group:
         raise click.UsageError(
             "Cannot specify both --visibility-role and --visibility-group"
@@ -915,7 +918,7 @@ def comment_add(
         visibility_type = "group"
         visibility_value = visibility_group
 
-    client = get_client_from_context(ctx)
+    client = get_client(ctx)
     result = _add_comment_impl(
         issue_key=issue_key,
         body=body,
@@ -965,7 +968,9 @@ def comment_list(
     output: str,
 ):
     """List comments on an issue."""
-    client = get_client_from_context(ctx)
+    from jira_as.compat.client import get_client
+
+    client = get_client(ctx)
     result = _get_comments_impl(
         issue_key=issue_key,
         comment_id=comment_id,

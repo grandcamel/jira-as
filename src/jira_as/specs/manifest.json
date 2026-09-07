@@ -17,6 +17,7 @@
         "platform.scope-override.overlay.json",
         "platform.richtext.overlay.json",
         "platform.overlay.json",
+        "platform.compat.overlay.json",
         "platform.help.overlay.json"
       ],
       "strip_extensions": [

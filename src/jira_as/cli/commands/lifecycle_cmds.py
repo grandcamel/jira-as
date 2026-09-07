@@ -968,6 +968,9 @@ def lifecycle_transition(
     field, adds a rejected comment separately, and warns when resolution was
     skipped.
     """
+    from jira_as.compat.client import get_client
+    from jira_as.compat.implementations import _transition_issue_impl
+
     if not status and not transition_id:
         raise click.UsageError(
             "Specify either --to (status name) or --id (transition ID)"
@@ -976,7 +979,7 @@ def lifecycle_transition(
         raise click.UsageError("Specify only one of --to or --id, not both")
 
     fields_dict = parse_json_arg(fields)
-    client = get_client_from_context(ctx)
+    client = get_client(ctx)
 
     _transition_issue_impl(
         issue_key=issue_key,
@@ -1011,7 +1014,9 @@ def lifecycle_transition(
 @handle_jira_errors
 def lifecycle_get_transitions(ctx, issue_key: str, output: str):
     """Get available transitions for an issue."""
-    client = get_client_from_context(ctx)
+    from jira_as.compat.client import get_client
+
+    client = get_client(ctx)
     transitions = _get_transitions_impl(issue_key, client=client)
 
     if not transitions:

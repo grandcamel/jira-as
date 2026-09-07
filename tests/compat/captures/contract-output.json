@@ -1,0 +1,39 @@
+{
+  "provenance": {
+    "source": "JAS-48 v1.2.1 jira-dev-host SBX capture, normalized for repository-local CI",
+    "pin": "v1.2.1",
+    "normalization": "URLs, account details, timestamps, issue summaries, and IDs are scrubbed; required JSON types and user-visible grammar are retained.",
+    "source_sha256": {
+      "read-json.stdout": "880a079f9d4585b8a8663b4c907ea301499991c72fd684c9560d224f73d64be6",
+      "link-types-json.stdout": "d56d5827396f8d7b6fff0fccefdd1d3f88f83d44019f36555f72070af22ab222",
+      "timelog-spaced.stdout": "b04e0a7b83588fdeea8b739103661af97cc9ab54ec56e8f18f5206c80cc94caf"
+    }
+  },
+  "outputs": {
+    "read": "Key:      SBX-1\nType:     Task\nSummary:  Fixture\nStatus:   Backlog\nPriority: Medium\nAssignee: Fixture User\n",
+    "read-detailed": "Key:      SBX-1\nType:     Task\nSummary:  Fixture\nStatus:   Backlog\nPriority: Medium\nAssignee: Fixture User\nReporter: Fixture User\nCreated:  2026-01-01T00:00:00Z\nUpdated:  2026-01-01T00:00:00Z\n",
+    "read-json": "{\"expand\":\"names\",\"id\":\"1\",\"self\":\"https://example.test/issue/1\",\"key\":\"SBX-1\",\"fields\":{\"labels\":[\"compat\"]}}",
+    "read-labels-json": "{\"expand\":\"names\",\"id\":\"1\",\"self\":\"https://example.test/issue/1\",\"key\":\"SBX-1\",\"fields\":{\"labels\":[\"compat\"]}}",
+    "comments": "Comments on SBX-1 (0 total):\n\nNo comments found.\n",
+    "comments-after": "Comments on SBX-17 (1 total):\n\nID  Author  Date  Body\n123  Fixture User  2026-01-01  Fixture comment\n",
+    "comment-add": "✓ Added comment to SBX-17 (ID: 123)\n",
+    "comment-add-file": "✓ Added comment to SBX-17 (ID: 123)\n",
+    "create": "✓ Created issue: SBX-17\nURL: https://example.test/browse/SBX-17\n",
+    "update-summary": "✓ Updated issue: SBX-17\n",
+    "update-description": "✓ Updated issue: SBX-17\n",
+    "transitions": "Available transitions for SBX-1:\n\n  ID  Name  To Status\n  41  Done  Done\n",
+    "transition": "✓ Transitioned SBX-17 to In Progress\n",
+    "transition-done": "✓ Transitioned SBX-17 to Done\n",
+    "link": "Linked SBX-17 to SBX-1\n",
+    "unlink": "Removed link between SBX-17 and SBX-1\n",
+    "get-links": "No links found for SBX-1\n",
+    "get-links-after": "Links for SBX-17:\n\nOutward (this issue...):\n  blocks -> SBX-1 [Fixture]\n\nTotal: 1 link(s)\n",
+    "link-types": "Available Link Types:\n\nName  Outward  Inward\nBlocks  blocks  is blocked by\nTotal: 1 link type(s)\n",
+    "link-types-json": "[{\"id\":\"10000\",\"name\":\"Blocks\",\"inward\":\"is blocked by\",\"outward\":\"blocks\",\"self\":\"https://example.test/link-type/10000\"}]",
+    "search": "Found 1 issue(s)\n\nKey  Type  Status  Priority  Assignee  Reporter  Summary\nSBX-1  Task  Backlog  Medium  Fixture User  Fixture User  Fixture\n",
+    "estimate": "Updated 1 issue(s)\nStory points: set to 5.0\n",
+    "timelog-spaced": "Worklog added to SBX-17:\n  Worklog ID: 123\n  Time logged: 2h 30m (9000 seconds)\n  Started: 2026-01-01T00:00:00Z\n  Comment: Fixture worklog\n",
+    "labels-read": "{\"expand\":\"names\",\"id\":\"17\",\"self\":\"https://example.test/issue/17\",\"key\":\"SBX-17\",\"fields\":{\"labels\":[\"compat\"]}}",
+    "labels-update": "✓ Updated issue: SBX-17\n"
+  }
+}

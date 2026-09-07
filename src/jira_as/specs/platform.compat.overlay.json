@@ -1,0 +1,132 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira compatibility contract scope extensions",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "target": "$.paths['/rest/api/3/search/jql'].get",
+      "update": {
+        "x-as-scope": {
+          "order_by": [
+            "key",
+            "created",
+            "updated"
+          ]
+        }
+      },
+      "description": "Allow bounded trailing ordering for searchAndReconsileIssuesUsingJql compatibility queries.",
+      "x-as-reason": "jira-host emits a project-bounded backlog JQL ending ORDER BY key ASC; single-field created/updated ordering is also retained.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/",
+        "date": "2026-09-07",
+        "capture": "evidence/jas-48-capture/README.md:28",
+        "source": "grand-camel-platform/scripts/jira-host:24"
+      },
+      "x-as-origin": "JAS-48",
+      "x-as-test": "test_compat_search_ordering_get"
+    },
+    {
+      "target": "$.paths['/rest/api/3/search/jql'].post",
+      "update": {
+        "x-as-scope": {
+          "order_by": [
+            "key",
+            "created",
+            "updated"
+          ]
+        }
+      },
+      "description": "Allow bounded trailing ordering for searchAndReconsileIssuesUsingJqlPost compatibility queries.",
+      "x-as-reason": "jira-host emits a project-bounded backlog JQL ending ORDER BY key ASC; single-field created/updated ordering is also retained.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/",
+        "date": "2026-09-07",
+        "capture": "evidence/jas-48-capture/README.md:28",
+        "source": "grand-camel-platform/scripts/jira-host:24"
+      },
+      "x-as-origin": "JAS-48",
+      "x-as-test": "test_compat_search_ordering_post"
+    },
+    {
+      "target": "$.paths['/rest/api/3/issueLink'].post",
+      "update": {
+        "x-as-scope": {
+          "in": "body",
+          "key_paths": [
+            "/inwardIssue/key",
+            "/outwardIssue/key"
+          ],
+          "separator": "-"
+        }
+      },
+      "description": "Prove membership of both linked issue keys, including cross-project links.",
+      "x-as-reason": "The compatibility link invocation carries two explicit keys; each must be allowed.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-links/",
+        "date": "2026-09-07",
+        "source": "grand-camel-platform/scripts/jira-host:268-275",
+        "capture": "evidence/jas-48-capture/README.md"
+      },
+      "x-as-origin": "JAS-48",
+      "x-as-test": "test_compat_cross_project_link_scope"
+    },
+    {
+      "target": "$.paths['/rest/api/3/issue/{issueIdOrKey}/transitions'].post",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "request": {
+              "path": "/fields/comment",
+              "shape": "value"
+            }
+          }
+        ]
+      },
+      "description": "Convert compatibility comment Markdown through the shared engine.",
+      "x-as-reason": "Legacy contract comment options need a rich-text descriptor on free-map transition/link bodies.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/",
+        "date": "2026-09-07",
+        "source": "grand-camel-platform/scripts/jira-host:298-307"
+      },
+      "x-as-origin": "JAS-48",
+      "x-as-test": "test_compat_transition_comment_conversion"
+    },
+    {
+      "target": "$.paths['/rest/api/3/issueLink'].post",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "request": {
+              "path": "/comment/body",
+              "shape": "value"
+            }
+          }
+        ]
+      },
+      "description": "Convert compatibility comment Markdown through the shared engine.",
+      "x-as-reason": "Legacy contract comment options need a rich-text descriptor on free-map transition/link bodies.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/",
+        "date": "2026-09-07",
+        "source": "grand-camel-platform/scripts/jira-host:298-307"
+      },
+      "x-as-origin": "JAS-48",
+      "x-as-test": "test_compat_link_comment_conversion"
+    }
+  ]
+}

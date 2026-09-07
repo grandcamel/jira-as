@@ -346,3 +346,12 @@ precedes hand paging overrides in the manifest. Refresh deliberately with
 changelog beside each refreshed source and updates manifest pins last. Set
 `OASDIFF` to choose the executable. Without `--from-file` it explicitly fetches
 the manifest URLs; offline workflows must supply local files.
+
+### Compatibility Contract
+
+The fourteen `jira-host` operations keep their recorded 1.x invocation and output
+shapes on the generic engine path. The machine-readable contract, capture
+provenance, scope rules and responder suite are described in
+[Compatibility Contract](docs/compatibility-contract.md). Duration input accepts
+both `2h30m` and `2h 30m`; `issue update --format markdown|text|adf` supplements
+existing description auto-detection.

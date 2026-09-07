@@ -1565,7 +1565,14 @@ def relationships_link(
         jira-as relationships link PROJ-1 --blocks PROJ-2
         jira-as relationships link PROJ-1 --remote-url https://example.com/doc
     """
-    client = get_client_from_context(ctx)
+    from jira_as.compat.client import get_client
+    from jira_as.compat.implementations import _link_issue_impl as compat_link
+
+    client: Any = (
+        get_client(ctx)
+        if link_type and target and not remote_url
+        else get_client_from_context(ctx)
+    )
 
     if remote_url:
         conflicting = [blocks, is_blocked_by, relates_to, duplicates, clones, target]
@@ -1604,7 +1611,8 @@ def relationships_link(
             "Specify exactly one link type: --blocks, --relates-to, --duplicates, --clones, --is-blocked-by, or --type with --to"
         )
 
-    result = _link_issue_impl(
+    implementation = compat_link if link_type and target else _link_issue_impl
+    result = implementation(
         issue_key=source_issue,
         blocks=blocks,
         duplicates=duplicates,
@@ -1646,12 +1654,14 @@ def relationships_unlink(
     dry_run: bool,
 ):
     """Remove a link between two issues."""
+    from jira_as.compat.client import get_client
+
     if not target_issue and not (link_type and remove_all):
         raise click.UsageError(
             "Specify TARGET_ISSUE or use --type TYPE with --all to remove all links of a type"
         )
 
-    client = get_client_from_context(ctx)
+    client = get_client(ctx) if target_issue else get_client_from_context(ctx)
     result = _unlink_issue_impl(
         issue_key=source_issue,
         from_issue=target_issue,
@@ -1690,8 +1700,10 @@ def relationships_get_links(
     ctx: click.Context, issue_key: str, link_type: str, direction: str, output: str
 ):
     """Get all links for an issue."""
+    from jira_as.compat.client import get_client
+
     dir_filter = None if direction == "both" else direction
-    client = get_client_from_context(ctx)
+    client = get_client(ctx)
     links = _get_links_impl(
         issue_key, direction=dir_filter, link_type=link_type, client=client
     )
@@ -1779,7 +1791,9 @@ def relationships_get_dependencies(
 @handle_jira_errors
 def relationships_link_types(ctx: click.Context, filter_pattern: str, output: str):
     """List available link types."""
-    client = get_client_from_context(ctx)
+    from jira_as.compat.client import get_client
+
+    client = get_client(ctx)
     link_types = _get_link_types_impl(filter_pattern=filter_pattern, client=client)
 
     if output == "json":

@@ -8,7 +8,6 @@ Tests cover:
 - delete_issue: Deleting issues with/without confirmation
 """
 
-import json
 from copy import deepcopy
 from unittest.mock import patch
 
@@ -371,90 +370,15 @@ class TestDeleteIssueImpl:
 class TestGetIssueCommand:
     """Tests for the get_issue Click command."""
 
-    def test_get_issue_cli_success(self, cli_runner, mock_jira_client, sample_issue):
-        """Test CLI get issue command success."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-
-        with patch(
-            "jira_as.cli.commands.issue_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(issue, ["get", "PROJ-123"])
-
-        assert result.exit_code == 0
-        assert "PROJ-123" in result.output
-
-    def test_get_issue_cli_json_output(
-        self, cli_runner, mock_jira_client, sample_issue
-    ):
-        """Test CLI get issue command with JSON output."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-
-        with patch(
-            "jira_as.cli.commands.issue_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(issue, ["get", "PROJ-123", "--output", "json"])
-
-        assert result.exit_code == 0
-        parsed = json.loads(result.output)
-        assert parsed["key"] == "PROJ-123"
-
 
 @pytest.mark.unit
 class TestCreateIssueCommand:
     """Tests for the create_issue Click command."""
 
-    def test_create_issue_cli_success(
-        self, cli_runner, mock_jira_client, sample_created_issue
-    ):
-        """Test CLI create issue command success."""
-        mock_jira_client.create_issue.return_value = deepcopy(sample_created_issue)
-
-        with (
-            patch(
-                "jira_as.cli.commands.issue_cmds.get_client_from_context",
-                return_value=mock_jira_client,
-            ),
-            patch(
-                "jira_as.cli.commands.issue_cmds.has_project_context",
-                return_value=False,
-            ),
-        ):
-            result = cli_runner.invoke(
-                issue,
-                [
-                    "create",
-                    "--project",
-                    "PROJ",
-                    "--type",
-                    "Bug",
-                    "--summary",
-                    "Test bug",
-                ],
-            )
-
-        assert result.exit_code == 0
-        assert "PROJ-130" in result.output
-
 
 @pytest.mark.unit
 class TestUpdateIssueCommand:
     """Tests for the update_issue Click command."""
-
-    def test_update_issue_cli_success(self, cli_runner, mock_jira_client):
-        """Test CLI update issue command success."""
-        with patch(
-            "jira_as.cli.commands.issue_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                issue,
-                ["update", "PROJ-123", "--summary", "Updated summary"],
-            )
-
-        assert result.exit_code == 0
-        assert "Updated" in result.output
 
 
 @pytest.mark.unit

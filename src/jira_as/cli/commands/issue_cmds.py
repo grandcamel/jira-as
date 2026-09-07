@@ -564,8 +564,10 @@ def get_issue(
     output: str,
 ):
     """Get the details of a specific issue."""
+    from jira_as.compat.client import get_client
+
     try:
-        client = get_client_from_context(ctx)
+        client = get_client_from_context(ctx) if comments else get_client(ctx)
 
         # Parse fields
         field_list = parse_comma_list(fields)
@@ -705,8 +707,11 @@ def create_issue(
     output: str,
 ):
     """Create a new JIRA issue."""
+    from jira_as.compat.client import get_client
+    from jira_as.compat.implementations import _create_issue_impl
+
     try:
-        client = get_client_from_context(ctx)
+        client = get_client(ctx)
 
         # Parse comma-separated and JSON arguments
         labels_list = parse_comma_list(labels)
@@ -786,6 +791,12 @@ def create_issue(
 
 
 @issue.command(name="update")
+@click.option(
+    "--format",
+    "description_format",
+    type=click.Choice(["markdown", "text", "adf"]),
+    help="Description input format (default: auto-detect).",
+)
 @click.argument("issue_key")
 @click.option("--summary", "-s", help="New summary (title)")
 @click.option("--description", "-d", help="New description (supports markdown)")
@@ -815,10 +826,14 @@ def update_issue(
     custom_fields: str,
     parent: str,
     no_notify: bool,
+    description_format: str | None = None,
 ):
     """Update a JIRA issue."""
+    from jira_as.compat.client import get_client
+    from jira_as.compat.implementations import _update_issue_impl
+
     try:
-        client = get_client_from_context(ctx)
+        client = get_client(ctx)
 
         # Parse comma-separated and JSON arguments
         labels_list = parse_comma_list(labels)
@@ -829,6 +844,7 @@ def update_issue(
             issue_key=issue_key,
             summary=summary,
             description=description,
+            description_format=description_format,
             priority=priority,
             assignee=assignee,
             labels=labels_list,

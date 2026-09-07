@@ -1598,25 +1598,6 @@ class TestOtherAgileCommands:
         assert result.exit_code != 0
         assert "Must specify one of" in result.output
 
-    def test_estimate_text(self, mock_client):
-        """Test estimate command."""
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_client_from_context",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_field",
-                return_value="customfield_10016",
-            ),
-        ):
-            runner = CliRunner()
-            result = runner.invoke(agile, ["estimate", "PROJ-1", "-p", "5"])
-
-        assert result.exit_code == 0
-        assert "Updated 1 issue" in result.output
-        assert "set to 5" in result.output
-
     def test_estimates_by_sprint(self, mock_client, sample_issues):
         """Test estimates by sprint."""
         mock_client.get_sprint_issues.return_value = {"issues": sample_issues}

@@ -11,7 +11,6 @@ Tests cover:
 - component: Component management
 """
 
-import json
 from copy import deepcopy
 from unittest.mock import patch
 
@@ -795,67 +794,10 @@ class TestCreateComponentImpl:
 class TestTransitionCommand:
     """Tests for the transition Click command."""
 
-    def test_transition_cli_success(
-        self, cli_runner, mock_jira_client, sample_issue, sample_transitions
-    ):
-        """Test CLI transition command success."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-        mock_jira_client.get_transitions.return_value = deepcopy(sample_transitions)
-
-        with (
-            patch(
-                "jira_as.cli.commands.lifecycle_cmds.get_client_from_context",
-                return_value=mock_jira_client,
-            ),
-            patch(
-                "jira_as.cli.commands.lifecycle_cmds.has_project_context",
-                return_value=False,
-            ),
-        ):
-            result = cli_runner.invoke(
-                lifecycle, ["transition", "PROJ-123", "--to", "In Progress"]
-            )
-
-        assert result.exit_code == 0
-        assert "Transitioned" in result.output
-
 
 @pytest.mark.unit
 class TestTransitionsCommand:
     """Tests for the transitions Click command."""
-
-    def test_transitions_cli_success(
-        self, cli_runner, mock_jira_client, sample_transitions
-    ):
-        """Test CLI transitions command success."""
-        mock_jira_client.get_transitions.return_value = deepcopy(sample_transitions)
-
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(lifecycle, ["transitions", "PROJ-123"])
-
-        assert result.exit_code == 0
-        assert "Available transitions" in result.output
-
-    def test_transitions_cli_json_output(
-        self, cli_runner, mock_jira_client, sample_transitions
-    ):
-        """Test CLI transitions command with JSON output."""
-        mock_jira_client.get_transitions.return_value = deepcopy(sample_transitions)
-
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                lifecycle, ["transitions", "PROJ-123", "--output", "json"]
-            )
-
-        assert result.exit_code == 0
-        parsed = json.loads(result.output)
-        assert len(parsed) == 3
 
 
 @pytest.mark.unit

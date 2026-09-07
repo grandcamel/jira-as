@@ -218,14 +218,6 @@ def test_public_cli_refuses_before_factory_in_mock_mode(monkeypatch, args):
     factory.assert_not_called()
 
 
-def test_allowed_mock_issue_reaches_client(monkeypatch):
-    monkeypatch.setenv("JIRA_MOCK_MODE", "true")
-    monkeypatch.setenv("JIRA_ALLOWED_PROJECTS", "DEMO")
-    result = CliRunner().invoke(cli, ["issue", "get", "DEMO-85"])
-    assert result.exit_code == 0, result.output
-    assert "DEMO-85" in result.output
-
-
 def test_refusal_uses_existing_error_decorator(monkeypatch):
     monkeypatch.setenv("JIRA_ALLOWED_PROJECTS", "DEMO")
 

@@ -1234,11 +1234,13 @@ def search_query(
     output,
 ):
     """Search for issues using JQL query."""
+    from jira_as.compat.client import get_client
+
     if not jql and not filter_id:
         raise click.UsageError("Either JQL query or --filter is required")
 
     field_list = parse_comma_list(fields)
-    client = get_client_from_context(ctx)
+    client = get_client(ctx)
 
     result = _search_issues_impl(
         jql=jql,
