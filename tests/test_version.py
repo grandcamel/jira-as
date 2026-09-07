@@ -41,11 +41,30 @@ def test_version_uses_package_even_with_stale_distribution(monkeypatch):
 
 
 def test_real_worktree_identity_does_not_follow_cwd(tmp_path, monkeypatch):
-    commit = subprocess.check_output(
-        ["git", "-C", str(ROOT), "rev-parse", "--short=12", "HEAD"], text=True
-    ).strip()
+    try:
+        commit = subprocess.check_output(
+            ["git", "-C", str(ROOT), "rev-parse", "--short=12", "HEAD"], text=True
+        ).strip()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        pytest.skip(
+            "not a git checkout (e.g. a git archive export); "
+            "worktree identity is asserted only in a real worktree"
+        )
     monkeypatch.chdir(tmp_path)
     assert _build.checkout_identifier().startswith(f"git {commit}")
+
+
+def test_real_worktree_identity_skips_without_git(tmp_path, monkeypatch):
+    def fail(*args, **kwargs):
+        raise subprocess.CalledProcessError(128, "git")
+
+    monkeypatch.setattr(subprocess, "check_output", fail)
+    with pytest.raises(pytest.skip.Exception) as skipped:
+        test_real_worktree_identity_does_not_follow_cwd(tmp_path, monkeypatch)
+    assert str(skipped.value) == (
+        "not a git checkout (e.g. a git archive export); "
+        "worktree identity is asserted only in a real worktree"
+    )
 
 
 @pytest.mark.parametrize("dirty", ["", " M src/jira_as/__init__.py"])
