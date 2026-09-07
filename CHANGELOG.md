@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.x line land on branch `1.x`.
 
+### Added
+- JAS-45: jira-as runs on as-engine. The Jira platform v3, Jira Software and
+  Jira Service Management Base Documents are vendored under
+  `src/jira_as/specs` with a manifest (version, sha256, fetch date) and
+  compiled by the build hook into `src/jira_as/_generated` (catalog +
+  `platform`/`software`/`servicedesk` indexes, in the wheel, never committed).
+  New `api` group (`call`, `search`, `describe`, `topics`; `--transport
+  responder` and `JIRA_AS_TRANSPORT`), `help` levels with a Level 0 template,
+  `engine.py` over the existing configuration chain, lazy package exports and
+  lazy legacy-group registration so discovery loads no client code. Identity
+  overlays disambiguate 20 duplicate operationIds (Software `getIssue` →
+  `getSoftwareIssue`, `getConfiguration` → `getBoardConfiguration`, the
+  sprint/organization/request-type property quartets, the Service Management
+  skip-permission-check and service-desk variants). Generated paging tags with
+  hand overrides (`getAuditRecords`, `getFailedWebhooks`; four user listings
+  page until an empty page; four post-slice user searches refuse `--all`;
+  `getAllUsers` maxResults capped at 1000). Ported
+  `scripts/generate_paging_tags.py` and `scripts/refresh_base_documents.py`.
+  Legacy verbs, the client and the mock are untouched (JAS-49 applies the
+  wrapper rule).
+
 ### Removed verbs
 
 - (filled by the Wrapper Verb ticket: every single-call verb dropped in favour of the Generic Surface, except the Compatibility Contract set)
