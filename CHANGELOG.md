@@ -17,6 +17,9 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
 
 - (filled by the Wrapper Verb ticket: old verb -> `api call <operationId>`)
 
+### Fixed
+- JAS-62: `test_real_worktree_identity_does_not_follow_cwd` skips outside a git checkout (a `git archive` export, as the Promotion dry run builds); cherry-picked from 1.2.1.
+
 ## [1.2.0] - 2026-09-06
 
 ### Added
