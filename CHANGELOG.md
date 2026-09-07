@@ -29,6 +29,11 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
   `scripts/generate_paging_tags.py` and `scripts/refresh_base_documents.py`.
   Legacy verbs, the client and the mock are untouched (JAS-49 applies the
   wrapper rule).
+- Added generated project-scope metadata for all three Jira API documents,
+  first-call project allowlist enforcement, matching --project for body
+  identities, conservative bounded JQL, and explicit site-operation opt-in on
+  the Generic Surface; keyed updates also validate hidden body project changes
+  (JAS-46). (JAS-46)
 
 ### Removed verbs
 
