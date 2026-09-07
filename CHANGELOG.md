@@ -34,6 +34,11 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
   identities, conservative bounded JQL, and explicit site-operation opt-in on
   the Generic Surface; keyed updates also validate hidden body project changes
   (JAS-46). (JAS-46)
+- Added Jira v3 ADF schema references and Markdown conversion for issue,
+  comment and worklog fields, including bulk issue input and raw reads;
+  corrected four invalid enum defaults and two search examples, named the
+  removed-search replacements, and seeded source-backed help notes and topics.
+  Custom-field resolution remains deferred to JAS-49 (JAS-47). (JAS-47)
 
 ### Removed verbs
 
