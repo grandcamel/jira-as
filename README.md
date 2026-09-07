@@ -234,3 +234,75 @@ mypy src
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
+
+## Generic Surface
+
+The `api` group exposes the pinned Jira Cloud platform v3, Jira Software and
+Jira Service Management documents through as-engine. All three indexes are
+primary. Start with `jira-as help`, `jira-as api search sprint`, or
+`jira-as api describe getIssue`. Use `help paging`, `help search`, and
+`help agile` for tagged operations; `--tier platform|software|servicedesk`
+selects one document's help. `--full` expands descriptions, `--examples` shows
+enrichment examples, and long help lists continue with `--offset`.
+
+```sh
+jira-as api --transport responder call getIssue --issueIdOrKey SBX-1
+jira-as api call getIssue --issue-id-or-key PROJ-1
+jira-as api call searchAndReconsileIssuesUsingJql --jql 'project = PROJ' --all --limit 100
+jira-as api call searchAndReconsileIssuesUsingJqlPost --body @search.json --all
+```
+
+Parameters accept their exact published names and kebab aliases. Bodies come
+from `--body @file`, `--body -` (stdin), or repeated `--field path=value`.
+One page is returned by default. `--all` merges the tagged collection; its
+`--limit` caps the total, while `--maxResults` or the body `maxResults` field
+sets the request page size. For APIs with a `limit` parameter use
+`--parameter-limit` alongside `--all`. JSON is the default call output;
+`--format table|markdown` renders it. Errors are JSON on stderr with status,
+messages, operation and note; exits distinguish usage (2), authentication (3),
+permission (4), not found (5), server/transport (6), and conflict (7).
+
+Automatic paging is unsupported for findBulkAssignableUsers, findAssignableUsers, findUsersWithAllPermissions, and findUsersWithBrowsePermission: they filter after slicing, so an empty page does not prove exhaustion. Use getAllUsers plus caller-side filtering.
+For getAllUsers/getAllUsersDefault, maxResults above 1000 refuses before sending.
+The supported bare-array endpoints advance by the sent page size and probe until
+an empty page; a short nonempty page continues.
+
+Discovery and responder mode need no credentials. HTTP calls use the existing
+`JIRA_SITE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` and configuration chain only
+when a call is sent. `JIRA_AS_TRANSPORT` selects `http`, `responder`, `cassette`
+(with `JIRA_AS_CASSETTE`), or `simulation` (optional `JIRA_AS_SIMULATION_SEED`).
+`JIRA_AS_RECORD` records HTTP responses through the shared scrubber. Cassette
+and simulation content will follow in the Jira migration. The existing legacy
+groups and `JIRA_MOCK_MODE` remain available. Project guard enrichment is the
+next migration step (JAS-46); rich-text tags follow in JAS-47. Risk-tagged
+operations preview without sending until `--confirm` is supplied.
+
+Published operation IDs that collide are corrected in each document's
+`identity.overlay.json`; descriptions/notes preserve their original names and
+routes for search. Platform IDs are unchanged. Other examples include
+`getSoftwareIssue`, `getBoardConfiguration`, `getServiceDeskArticles`, and
+`getRequestAttachmentContent`. These explicit corrections preserve every route.
+
+## Build
+
+The product vendors pristine Base Documents and manifest pins in
+`src/jira_as/specs`. The wheel hook keeps the source stamp and compiles all
+three documents through as-engine into `_generated/catalog.json` and three
+indexes. Editable builds persist the same indexes; sdists contain source
+inputs and the hook, excluding compiled indexes. Nothing is fetched during
+compilation or runtime. The dependency range is `as-engine>=0.1.0a0,<0.2`.
+
+To rebuild local indexes after changing an overlay:
+
+```sh
+python -c "from as_engine.build import compile_product; compile_product('src/jira_as/specs', 'src/jira_as/_generated')"
+python scripts/generate_paging_tags.py
+```
+
+Run the generator before compilation when paging changes. Generated paging
+precedes hand paging overrides in the manifest. Refresh deliberately with
+`python scripts/refresh_base_documents.py --from-file platform=/path/to/document.json`
+(and similarly `software` or `servicedesk`). The script records an oasdiff
+changelog beside each refreshed source and updates manifest pins last. Set
+`OASDIFF` to choose the executable. Without `--from-file` it explicitly fetches
+the manifest URLs; offline workflows must supply local files.

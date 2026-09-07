@@ -1,0 +1,276 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira platform hand paging decisions",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "target": "$.paths[\"/rest/api/3/auditing/record\"].get",
+      "update": {
+        "x-as-paging": {
+          "style": "offset/limit",
+          "request": {
+            "offset": {
+              "in": "query",
+              "name": "offset"
+            },
+            "limit": {
+              "in": "query",
+              "name": "limit"
+            }
+          },
+          "itemsPath": "/records",
+          "response": {
+            "totalPath": "/total"
+          }
+        },
+        "x-as-note": "Audit records use offset/limit and total, with the collection in records."
+      },
+      "description": "Audit records use offset/limit and total, with the collection in records.",
+      "x-as-reason": "The bespoke Jira paging vocabulary requires an explicit hand decision.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45; JAS-9 paging research",
+      "x-as-test": "paging_override_platform_getAuditRecords"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/webhook/failed\"].get",
+      "update": {
+        "x-as-paging": {
+          "style": "cursor",
+          "request": {
+            "token": {
+              "in": "query",
+              "name": "after"
+            },
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            }
+          },
+          "itemsPath": "/values",
+          "next": {
+            "kind": "link",
+            "path": "/next"
+          }
+        },
+        "x-as-note": "Failed webhooks page by the after timestamp in next; follow only the declared token on the original operation."
+      },
+      "description": "Failed webhooks page by the after timestamp in next; follow only the declared token on the original operation.",
+      "x-as-reason": "The bespoke Jira paging vocabulary requires an explicit hand decision.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45; JAS-9 paging research",
+      "x-as-test": "paging_override_platform_getFailedWebhooks"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/user/assignable/multiProjectSearch\"].get",
+      "update": {
+        "x-as-note": "Automatic paging is unsupported: this operation filters after slicing, so an empty page does not prove exhaustion. Use getAllUsers and caller-side filtering. The endpoint considers at most the first 1000 users."
+      },
+      "description": "Leave findBulkAssignableUsers deliberately without automatic paging after source review.",
+      "x-as-reason": "Published operation description: This operation takes the users in the range defined by `startAt` and `maxResults`, up to the thousandth user, and then returns only the users from that range that can be assigned issues in the projects. This means the operation usually returns fewer users than specified in `maxResults`. To get all the users who can be assigned issues in the projects, use [Get all users](#api-rest-api-3-users-search-get) and filter the records in your code. Amended decision 17 leaves --all unsupported because an empty middle range cannot prove exhaustion.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-user-assignable-multiProjectSearch-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45 decision 17",
+      "x-as-test": "paging_override_platform_findBulkAssignableUsers"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/user/assignable/search\"].get",
+      "update": {
+        "x-as-note": "Automatic paging is unsupported: this operation filters after slicing, so an empty page does not prove exhaustion. Use getAllUsers and caller-side filtering. The endpoint considers at most the first 1000 users."
+      },
+      "description": "Leave findAssignableUsers deliberately without automatic paging after source review.",
+      "x-as-reason": "Published operation description: This operation takes the users in the range defined by `startAt` and `maxResults`, up to the thousandth user, and then returns only the users from that range that can be assigned the issue. This means the operation usually returns fewer users than specified in `maxResults`. To get all the users who can be assigned the issue, use [Get all users](#api-rest-api-3-users-search-get) and filter the records in your code. Amended decision 17 leaves --all unsupported because an empty middle range cannot prove exhaustion.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-user-assignable-search-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45 decision 17",
+      "x-as-test": "paging_override_platform_findAssignableUsers"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/user/bulk/migration\"].get",
+      "update": {
+        "x-as-paging": {
+          "style": "offset/limit",
+          "request": {
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            },
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            }
+          },
+          "itemsPath": "",
+          "termination": "emptyPage",
+          "advance": "requested"
+        },
+        "x-as-note": "Automatic paging stops at the first empty response and advances by the requested maxResults, including short nonempty pages. Supply a page size the server accepts. Automatic paging is unsupported for findBulkAssignableUsers, findAssignableUsers, findUsersWithAllPermissions, and findUsersWithBrowsePermission: they filter after slicing, so an empty page does not prove exhaustion. Use getAllUsers plus caller-side filtering."
+      },
+      "description": "Explicit bare-array paging decision for GET /rest/api/3/user/bulk/migration (bulkGetUsersMigration).",
+      "x-as-reason": "Published operation description: Returns the account IDs for the users specified in the `key` or `username` parameters. Note that multiple `key` or `username` parameters can be specified. Decision 17 uses an explicit empty-page/requested-size pair; no short-page termination is inferred.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-user-bulk-migration-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45 decision 17",
+      "x-as-test": "paging_override_platform_bulkGetUsersMigration"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/user/permission/search\"].get",
+      "update": {
+        "x-as-note": "Automatic paging is unsupported: this operation filters after slicing, so an empty page does not prove exhaustion. Use getAllUsers and caller-side filtering. The endpoint considers at most the first 1000 users."
+      },
+      "description": "Leave findUsersWithAllPermissions deliberately without automatic paging after source review.",
+      "x-as-reason": "Published operation description: This operation takes the users in the range defined by `startAt` and `maxResults`, up to the thousandth user, and then returns only the users from that range that match the search string and have permission for the project or issue. This means the operation usually returns fewer users than specified in `maxResults`. To get all the users who match the search string and have permission for the project or issue, use [Get all users](#api-rest-api-3-users-search-get) and filter the records in your code. Amended decision 17 leaves --all unsupported because an empty middle range cannot prove exhaustion.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-user-permission-search-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45 decision 17",
+      "x-as-test": "paging_override_platform_findUsersWithAllPermissions"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/user/search\"].get",
+      "update": {
+        "x-as-paging": {
+          "style": "offset/limit",
+          "request": {
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            },
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            }
+          },
+          "itemsPath": "",
+          "termination": "emptyPage",
+          "advance": "requested"
+        },
+        "x-as-note": "Automatic paging stops at the first empty response and advances by the requested maxResults, including short nonempty pages. Supply a page size the server accepts. The endpoint searches at most the first 1000 users; --all does not remove that limit."
+      },
+      "description": "Explicit bare-array paging decision for GET /rest/api/3/user/search (findUsers).",
+      "x-as-reason": "Published operation description: This operation first applies a filter to match the search string and property, and then takes the filtered users in the range defined by `startAt` and `maxResults`, up to the thousandth user. To get all the users who match the search string and property, use [Get all users](#api-rest-api-3-users-search-get) and filter the records in your code. Decision 17 uses an explicit empty-page/requested-size pair; no short-page termination is inferred.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-user-search-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45 decision 17",
+      "x-as-test": "paging_override_platform_findUsers"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/user/viewissue/search\"].get",
+      "update": {
+        "x-as-note": "Automatic paging is unsupported: this operation filters after slicing, so an empty page does not prove exhaustion. Use getAllUsers and caller-side filtering. The endpoint considers at most the first 1000 users."
+      },
+      "description": "Leave findUsersWithBrowsePermission deliberately without automatic paging after source review.",
+      "x-as-reason": "Published operation description: This operation takes the users in the range defined by `startAt` and `maxResults`, up to the thousandth user, and then returns only the users from that range that match the search string and have permission to browse issues. This means the operation usually returns fewer users than specified in `maxResults`. To get all the users who match the search string and have permission to browse issues, use [Get all users](#api-rest-api-3-users-search-get) and filter the records in your code. Amended decision 17 leaves --all unsupported because an empty middle range cannot prove exhaustion.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-user-viewissue-search-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45 decision 17",
+      "x-as-test": "paging_override_platform_findUsersWithBrowsePermission"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/users\"].get",
+      "update": {
+        "x-as-paging": {
+          "style": "offset/limit",
+          "request": {
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            },
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            }
+          },
+          "itemsPath": "",
+          "termination": "emptyPage",
+          "advance": "requested"
+        },
+        "x-as-note": "Automatic paging stops at the first empty response and advances by the requested maxResults, including short nonempty pages. Supply a page size the server accepts. Keep maxResults at or below the documented 1000-item server cap."
+      },
+      "description": "Explicit bare-array paging decision for GET /rest/api/3/users (getAllUsersDefault).",
+      "x-as-reason": "Published operation description: Returns a list of all users, including active users, inactive users and previously deleted users that have an Atlassian account. Decision 17 uses an explicit empty-page/requested-size pair; no short-page termination is inferred.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-users-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45 decision 17",
+      "x-as-test": "paging_override_platform_getAllUsersDefault"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/users/search\"].get",
+      "update": {
+        "x-as-paging": {
+          "style": "offset/limit",
+          "request": {
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            },
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            }
+          },
+          "itemsPath": "",
+          "termination": "emptyPage",
+          "advance": "requested"
+        },
+        "x-as-note": "Automatic paging stops at the first empty response and advances by the requested maxResults, including short nonempty pages. Supply a page size the server accepts. Keep maxResults at or below the documented 1000-item server cap."
+      },
+      "description": "Explicit bare-array paging decision for GET /rest/api/3/users/search (getAllUsers).",
+      "x-as-reason": "Published operation description: Returns a list of all users, including active users, inactive users and previously deleted users that have an Atlassian account. Decision 17 uses an explicit empty-page/requested-size pair; no short-page termination is inferred.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-users-search-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45 decision 17",
+      "x-as-test": "paging_override_platform_getAllUsers"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/users\"].get.parameters[1].schema",
+      "update": {
+        "maximum": 1000
+      },
+      "description": "Enforce the documented maxResults server cap for getAllUsersDefault.",
+      "x-as-reason": "Published parameter description: The maximum number of items to return (limited to 1000). Requested-size advancement must not exceed the server page size.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-users-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45 decision 17 amended",
+      "x-as-test": "paging_cap_getAllUsersDefault"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/users/search\"].get.parameters[1].schema",
+      "update": {
+        "maximum": 1000
+      },
+      "description": "Enforce the documented maxResults server cap for getAllUsers.",
+      "x-as-reason": "Published parameter description: The maximum number of items to return (limited to 1000). Requested-size advancement must not exceed the server page size.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-users-search-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45 decision 17 amended",
+      "x-as-test": "paging_cap_getAllUsers"
+    }
+  ]
+}

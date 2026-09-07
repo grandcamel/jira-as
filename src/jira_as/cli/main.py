@@ -1,9 +1,12 @@
 import os
+from importlib import import_module
 
 import click
+from as_engine.help import render_help
 
 from jira_as import __version__
 from jira_as._build import get_build_identifier
+from jira_as.cli.commands.help_cmds import HelpGroup, surface_map
 
 
 def get_version() -> str:
@@ -11,8 +14,48 @@ def get_version() -> str:
     return f"{__version__} ({get_build_identifier()})"
 
 
+class LazyGroups(HelpGroup):
+    """Load a legacy command family only when it is selected."""
+
+    modules = {
+        "admin": ("admin_cmds", "admin"),
+        "agile": ("agile_cmds", "agile"),
+        "bulk": ("bulk_cmds", "bulk"),
+        "collaborate": ("collaborate_cmds", "collaborate"),
+        "dev": ("dev_cmds", "dev"),
+        "fields": ("fields_cmds", "fields"),
+        "issue": ("issue_cmds", "issue"),
+        "jsm": ("jsm_cmds", "jsm"),
+        "lifecycle": ("lifecycle_cmds", "lifecycle"),
+        "ops": ("ops_cmds", "ops"),
+        "relationships": ("relationships_cmds", "relationships"),
+        "search": ("search_cmds", "search"),
+        "time": ("time_cmds", "time"),
+        "api": ("api_cmds", "api"),
+        "help": ("help_cmds", "help_command"),
+    }
+
+    def list_commands(self, ctx):
+        return sorted(set(self.modules) | set(self.commands))
+
+    def get_command(self, ctx, name):
+        if name in self.commands:
+            return self.commands[name]
+        if name not in self.modules:
+            return None
+        module_name, symbol = self.modules[name]
+        module = import_module("jira_as.cli.commands." + module_name)
+        command = getattr(module, symbol)
+        if name == "collaborate":
+            command.add_command(module.comment, name="comments")
+        elif name == "search":
+            command.add_command(module.search_query, name="jql")
+        self.add_command(command, name)
+        return command
+
+
 # --- Global Options Design ---
-@click.group(invoke_without_command=True)
+@click.group(cls=LazyGroups, invoke_without_command=True)
 @click.version_option(version=get_version(), prog_name="jira-as")
 @click.option(
     "--output",
@@ -53,38 +96,4 @@ def cli(ctx, output: str, verbose: bool, quiet: bool):
     ctx.call_on_close(cleanup)
 
     if ctx.invoked_subcommand is None:
-        click.echo(ctx.get_help())
-
-
-# --- Explicitly import command groups ---
-from .commands.admin_cmds import admin
-from .commands.agile_cmds import agile
-from .commands.bulk_cmds import bulk
-from .commands.collaborate_cmds import collaborate, comment
-from .commands.dev_cmds import dev
-from .commands.fields_cmds import fields
-from .commands.issue_cmds import issue
-from .commands.jsm_cmds import jsm
-from .commands.lifecycle_cmds import lifecycle
-from .commands.ops_cmds import ops
-from .commands.relationships_cmds import relationships
-from .commands.search_cmds import search, search_query
-from .commands.time_cmds import time
-
-# Accept the intuitive plural spelling while retaining the established command.
-collaborate.add_command(comment, name="comments")
-search.add_command(search_query, name="jql")
-
-cli.add_command(issue)
-cli.add_command(search)
-cli.add_command(lifecycle)
-cli.add_command(fields)
-cli.add_command(ops)
-cli.add_command(bulk)
-cli.add_command(dev)
-cli.add_command(relationships)
-cli.add_command(time)
-cli.add_command(collaborate)
-cli.add_command(agile)
-cli.add_command(jsm)
-cli.add_command(admin)
+        click.echo(render_help(surface_map()))

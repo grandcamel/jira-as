@@ -1,239 +1,364 @@
-"""
-JIRA AS
-
-A Python library for interacting with the JIRA REST API, providing:
-    - jira_client: HTTP client with retry logic and error handling
-    - config_manager: Multi-source configuration management
-    - error_handler: Exception hierarchy and error handling
-    - validators: Input validation for JIRA-specific formats
-    - formatters: Output formatting utilities (tables, JSON, CSV)
-    - adf_helper: Atlassian Document Format conversion
-    - time_utils: JIRA time format parsing and formatting
-    - cache: SQLite-based caching with TTL support
-    - credential_manager: Secure credential storage
-
-Example usage:
-    from jira_as import get_jira_client, handle_errors
-
-    @handle_errors
-    def main():
-        client = get_jira_client()
-        issue = client.get_issue('PROJ-123')
-        print(issue['fields']['summary'])
-"""
+"""Jira library exports, loaded on first access for fast offline discovery."""
 
 __version__ = "2.0.0"
 
-# Error handling
-# ADF Helper
-from .adf_helper import (
-    ADF_CUSTOM_FIELDS_ENV,
-    DEFAULT_ADF_FIELDS,
-    _parse_wiki_inline,  # Exposed for testing
-    adf_to_text,
-    auto_wrap_adf_fields,
-    create_adf_code_block,
-    create_adf_heading,
-    create_adf_paragraph,
-    ensure_adf,
-    get_adf_field_ids,
-    is_adf,
-    markdown_to_adf,
-    text_to_adf,
-    wiki_markup_to_adf,
-)
+from importlib import import_module
+from typing import TYPE_CHECKING, Any
 
-# Autocomplete cache
-from .autocomplete_cache import AutocompleteCache, get_autocomplete_cache
+if TYPE_CHECKING:
+    from .adf_helper import (
+        ADF_CUSTOM_FIELDS_ENV,
+        DEFAULT_ADF_FIELDS,
+        _parse_wiki_inline,  # Exposed for testing
+        adf_to_text,
+        auto_wrap_adf_fields,
+        create_adf_code_block,
+        create_adf_heading,
+        create_adf_paragraph,
+        ensure_adf,
+        get_adf_field_ids,
+        is_adf,
+        markdown_to_adf,
+        text_to_adf,
+        wiki_markup_to_adf,
+    )
+    from .autocomplete_cache import AutocompleteCache, get_autocomplete_cache
+    from .automation_client import AutomationClient
+    from .batch_processor import (
+        BatchConfig,
+        BatchProcessor,
+        BatchProgress,
+        CheckpointManager,
+        generate_operation_id,
+        get_recommended_batch_size,
+        list_pending_checkpoints,
+    )
+    from .cache import CacheStats, JiraCache, get_cache
+    from .config_manager import (
+        ConfigManager,
+        get_agile_field,
+        get_agile_fields,
+        get_automation_client,
+        get_jira_client,
+        get_project_defaults,
+    )
+    from .credential_manager import (
+        CredentialBackend,
+        CredentialManager,
+        CredentialNotFoundError,
+        get_credentials,
+        is_keychain_available,
+        store_credentials,
+        validate_credentials,
+    )
+    from .error_handler import (
+        AuthenticationError,
+        AutomationError,
+        AutomationNotFoundError,
+        AutomationPermissionError,
+        AutomationValidationError,
+        ConflictError,
+        JiraError,
+        NotFoundError,
+        PermissionError,
+        RateLimitError,
+        ServerError,
+        ValidationError,
+        handle_errors,
+        handle_jira_error,
+        print_error,
+        sanitize_error_message,
+    )
+    from .formatters import (
+        EPIC_LINK_FIELD,
+        STORY_POINTS_FIELD,
+        IssueFields,
+        calculate_sla_percentage,
+        export_csv,
+        extract_issue_fields,
+        format_comments,
+        format_duration,  # backwards-compatible alias
+        format_issue,
+        format_json,
+        format_search_results,
+        format_sla_duration,
+        format_sla_time,
+        format_table,
+        format_transitions,
+        get_csv_string,
+        get_sla_status_emoji,
+        get_sla_status_text,
+        is_sla_at_risk,
+        print_info,
+        print_success,
+        print_warning,
+    )
+    from .jira_client import JiraClient
+    from .permission_helpers import (
+        HOLDER_TYPES_WITH_PARAMETER,
+        HOLDER_TYPES_WITHOUT_PARAMETER,
+        VALID_HOLDER_TYPES,
+        build_grant_payload,
+        find_grant_by_spec,
+        find_scheme_by_name,
+        format_grant,
+        format_grant_for_export,
+        format_scheme_summary,
+        get_holder_display,
+        group_grants_by_permission,
+        parse_grant_string,
+        validate_holder_type,
+        validate_permission,
+    )
+    from .project_context import (
+        ProjectContext,
+        clear_context_cache,
+        format_context_summary,
+        get_common_labels,
+        get_defaults_for_issue_type,
+        get_project_agile_fields,
+        get_project_context,
+        get_statuses_for_issue_type,
+        get_valid_transitions,
+        has_project_context,
+        suggest_assignee,
+        validate_transition,
+    )
+    from .request_batcher import (
+        BatchError,
+        BatchResult,
+        RequestBatcher,
+        batch_fetch_issues,
+    )
+    from .testing import (
+        IssueBuilder,
+        assert_issue_has_field,
+        assert_search_returns_empty,
+        assert_search_returns_results,
+        generate_unique_name,
+        get_jira_version,
+        is_cloud_instance,
+        skip_if_version_below,
+        wait_for_assignment,
+        wait_for_transition,
+    )
+    from .time_utils import (
+        DAYS_PER_WEEK,
+        HOURS_PER_DAY,
+        SECONDS_PER_DAY,
+        SECONDS_PER_HOUR,
+        SECONDS_PER_MINUTE,
+        SECONDS_PER_WEEK,
+        calculate_progress,
+        convert_to_jira_datetime_string,
+        format_datetime_for_jira,
+        format_progress_bar,
+        format_seconds,
+        format_seconds_long,
+        parse_date_to_iso,
+        parse_relative_date,
+        parse_time_string,
+        validate_time_format,
+    )
+    from .transition_helpers import find_transition_by_keywords, find_transition_by_name
+    from .user_helpers import (
+        UserNotFoundError,
+        get_user_display_info,
+        resolve_user_to_account_id,
+        resolve_users_batch,
+    )
+    from .validators import (
+        PROJECT_TEMPLATES,
+        VALID_ASSIGNEE_TYPES,
+        VALID_PROJECT_TYPES,
+        safe_get_nested,
+        validate_assignee_type,
+        validate_avatar_file,
+        validate_category_name,
+        validate_email,
+        validate_file_path,
+        validate_issue_key,
+        validate_jql,
+        validate_project_key,
+        validate_project_name,
+        validate_project_template,
+        validate_project_type,
+        validate_transition_id,
+        validate_url,
+    )
 
-# Automation client
-from .automation_client import AutomationClient
-
-# Batch processing
-from .batch_processor import (
-    BatchConfig,
-    BatchProcessor,
-    BatchProgress,
-    CheckpointManager,
-    generate_operation_id,
-    get_recommended_batch_size,
-    list_pending_checkpoints,
-)
-
-# Cache
-from .cache import CacheStats, JiraCache, get_cache
-
-# Configuration
-from .config_manager import (
-    ConfigManager,
-    get_agile_field,
-    get_agile_fields,
-    get_automation_client,
-    get_jira_client,
-    get_project_defaults,
-)
-
-# Credential management
-from .credential_manager import (
-    CredentialBackend,
-    CredentialManager,
-    CredentialNotFoundError,
-    get_credentials,
-    is_keychain_available,
-    store_credentials,
-    validate_credentials,
-)
-from .error_handler import (
-    AuthenticationError,
-    AutomationError,
-    AutomationNotFoundError,
-    AutomationPermissionError,
-    AutomationValidationError,
-    ConflictError,
-    JiraError,
-    NotFoundError,
-    PermissionError,
-    RateLimitError,
-    ServerError,
-    ValidationError,
-    handle_errors,
-    handle_jira_error,
-    print_error,
-    sanitize_error_message,
-)
-
-# JSM / SLA utilities (now in formatters)
-# Formatters
-from .formatters import (
-    EPIC_LINK_FIELD,
-    STORY_POINTS_FIELD,
-    IssueFields,
-    calculate_sla_percentage,
-    export_csv,
-    extract_issue_fields,
-    format_comments,
-    format_duration,  # backwards-compatible alias
-    format_issue,
-    format_json,
-    format_search_results,
-    format_sla_duration,
-    format_sla_time,
-    format_table,
-    format_transitions,
-    get_csv_string,
-    get_sla_status_emoji,
-    get_sla_status_text,
-    is_sla_at_risk,
-    print_info,
-    print_success,
-    print_warning,
-)
-
-# JIRA Client
-from .jira_client import JiraClient
-
-# Permission helpers
-from .permission_helpers import (
-    HOLDER_TYPES_WITH_PARAMETER,
-    HOLDER_TYPES_WITHOUT_PARAMETER,
-    VALID_HOLDER_TYPES,
-    build_grant_payload,
-    find_grant_by_spec,
-    find_scheme_by_name,
-    format_grant,
-    format_grant_for_export,
-    format_scheme_summary,
-    get_holder_display,
-    group_grants_by_permission,
-    parse_grant_string,
-    validate_holder_type,
-    validate_permission,
-)
-
-# Project context
-from .project_context import (
-    ProjectContext,
-    clear_context_cache,
-    format_context_summary,
-    get_common_labels,
-    get_defaults_for_issue_type,
-    get_project_agile_fields,
-    get_project_context,
-    get_statuses_for_issue_type,
-    get_valid_transitions,
-    has_project_context,
-    suggest_assignee,
-    validate_transition,
-)
-
-# Request batching
-from .request_batcher import BatchError, BatchResult, RequestBatcher, batch_fetch_issues
-
-# Testing utilities
-from .testing import (
-    IssueBuilder,
-    assert_issue_has_field,
-    assert_search_returns_empty,
-    assert_search_returns_results,
-    generate_unique_name,
-    get_jira_version,
-    is_cloud_instance,
-    skip_if_version_below,
-    wait_for_assignment,
-    wait_for_transition,
-)
-
-# Time utilities
-from .time_utils import (
-    DAYS_PER_WEEK,
-    HOURS_PER_DAY,
-    SECONDS_PER_DAY,
-    SECONDS_PER_HOUR,
-    SECONDS_PER_MINUTE,
-    SECONDS_PER_WEEK,
-    calculate_progress,
-    convert_to_jira_datetime_string,
-    format_datetime_for_jira,
-    format_progress_bar,
-    format_seconds,
-    format_seconds_long,
-    parse_date_to_iso,
-    parse_relative_date,
-    parse_time_string,
-    validate_time_format,
-)
-
-# Transition helpers
-from .transition_helpers import find_transition_by_keywords, find_transition_by_name
-
-# User helpers
-from .user_helpers import (
-    UserNotFoundError,
-    get_user_display_info,
-    resolve_user_to_account_id,
-    resolve_users_batch,
-)
-
-# Validators
-from .validators import (
-    PROJECT_TEMPLATES,
-    VALID_ASSIGNEE_TYPES,
-    VALID_PROJECT_TYPES,
-    safe_get_nested,
-    validate_assignee_type,
-    validate_avatar_file,
-    validate_category_name,
-    validate_email,
-    validate_file_path,
-    validate_issue_key,
-    validate_jql,
-    validate_project_key,
-    validate_project_name,
-    validate_project_template,
-    validate_project_type,
-    validate_transition_id,
-    validate_url,
-)
+_EXPORTS = {
+    "ADF_CUSTOM_FIELDS_ENV": ("adf_helper", "ADF_CUSTOM_FIELDS_ENV"),
+    "DEFAULT_ADF_FIELDS": ("adf_helper", "DEFAULT_ADF_FIELDS"),
+    "_parse_wiki_inline": ("adf_helper", "_parse_wiki_inline"),
+    "adf_to_text": ("adf_helper", "adf_to_text"),
+    "auto_wrap_adf_fields": ("adf_helper", "auto_wrap_adf_fields"),
+    "create_adf_code_block": ("adf_helper", "create_adf_code_block"),
+    "create_adf_heading": ("adf_helper", "create_adf_heading"),
+    "create_adf_paragraph": ("adf_helper", "create_adf_paragraph"),
+    "ensure_adf": ("adf_helper", "ensure_adf"),
+    "get_adf_field_ids": ("adf_helper", "get_adf_field_ids"),
+    "is_adf": ("adf_helper", "is_adf"),
+    "markdown_to_adf": ("adf_helper", "markdown_to_adf"),
+    "text_to_adf": ("adf_helper", "text_to_adf"),
+    "wiki_markup_to_adf": ("adf_helper", "wiki_markup_to_adf"),
+    "AutocompleteCache": ("autocomplete_cache", "AutocompleteCache"),
+    "get_autocomplete_cache": ("autocomplete_cache", "get_autocomplete_cache"),
+    "AutomationClient": ("automation_client", "AutomationClient"),
+    "BatchConfig": ("batch_processor", "BatchConfig"),
+    "BatchProcessor": ("batch_processor", "BatchProcessor"),
+    "BatchProgress": ("batch_processor", "BatchProgress"),
+    "CheckpointManager": ("batch_processor", "CheckpointManager"),
+    "generate_operation_id": ("batch_processor", "generate_operation_id"),
+    "get_recommended_batch_size": ("batch_processor", "get_recommended_batch_size"),
+    "list_pending_checkpoints": ("batch_processor", "list_pending_checkpoints"),
+    "CacheStats": ("cache", "CacheStats"),
+    "JiraCache": ("cache", "JiraCache"),
+    "get_cache": ("cache", "get_cache"),
+    "ConfigManager": ("config_manager", "ConfigManager"),
+    "get_agile_field": ("config_manager", "get_agile_field"),
+    "get_agile_fields": ("config_manager", "get_agile_fields"),
+    "get_automation_client": ("config_manager", "get_automation_client"),
+    "get_jira_client": ("config_manager", "get_jira_client"),
+    "get_project_defaults": ("config_manager", "get_project_defaults"),
+    "CredentialBackend": ("credential_manager", "CredentialBackend"),
+    "CredentialManager": ("credential_manager", "CredentialManager"),
+    "CredentialNotFoundError": ("credential_manager", "CredentialNotFoundError"),
+    "get_credentials": ("credential_manager", "get_credentials"),
+    "is_keychain_available": ("credential_manager", "is_keychain_available"),
+    "store_credentials": ("credential_manager", "store_credentials"),
+    "validate_credentials": ("credential_manager", "validate_credentials"),
+    "AuthenticationError": ("error_handler", "AuthenticationError"),
+    "AutomationError": ("error_handler", "AutomationError"),
+    "AutomationNotFoundError": ("error_handler", "AutomationNotFoundError"),
+    "AutomationPermissionError": ("error_handler", "AutomationPermissionError"),
+    "AutomationValidationError": ("error_handler", "AutomationValidationError"),
+    "ConflictError": ("error_handler", "ConflictError"),
+    "JiraError": ("error_handler", "JiraError"),
+    "NotFoundError": ("error_handler", "NotFoundError"),
+    "PermissionError": ("error_handler", "PermissionError"),
+    "RateLimitError": ("error_handler", "RateLimitError"),
+    "ServerError": ("error_handler", "ServerError"),
+    "ValidationError": ("error_handler", "ValidationError"),
+    "handle_errors": ("error_handler", "handle_errors"),
+    "handle_jira_error": ("error_handler", "handle_jira_error"),
+    "print_error": ("error_handler", "print_error"),
+    "sanitize_error_message": ("error_handler", "sanitize_error_message"),
+    "EPIC_LINK_FIELD": ("formatters", "EPIC_LINK_FIELD"),
+    "STORY_POINTS_FIELD": ("formatters", "STORY_POINTS_FIELD"),
+    "IssueFields": ("formatters", "IssueFields"),
+    "calculate_sla_percentage": ("formatters", "calculate_sla_percentage"),
+    "export_csv": ("formatters", "export_csv"),
+    "extract_issue_fields": ("formatters", "extract_issue_fields"),
+    "format_comments": ("formatters", "format_comments"),
+    "format_duration": ("formatters", "format_duration"),
+    "format_issue": ("formatters", "format_issue"),
+    "format_json": ("formatters", "format_json"),
+    "format_search_results": ("formatters", "format_search_results"),
+    "format_sla_duration": ("formatters", "format_sla_duration"),
+    "format_sla_time": ("formatters", "format_sla_time"),
+    "format_table": ("formatters", "format_table"),
+    "format_transitions": ("formatters", "format_transitions"),
+    "get_csv_string": ("formatters", "get_csv_string"),
+    "get_sla_status_emoji": ("formatters", "get_sla_status_emoji"),
+    "get_sla_status_text": ("formatters", "get_sla_status_text"),
+    "is_sla_at_risk": ("formatters", "is_sla_at_risk"),
+    "print_info": ("formatters", "print_info"),
+    "print_success": ("formatters", "print_success"),
+    "print_warning": ("formatters", "print_warning"),
+    "JiraClient": ("jira_client", "JiraClient"),
+    "HOLDER_TYPES_WITH_PARAMETER": (
+        "permission_helpers",
+        "HOLDER_TYPES_WITH_PARAMETER",
+    ),
+    "HOLDER_TYPES_WITHOUT_PARAMETER": (
+        "permission_helpers",
+        "HOLDER_TYPES_WITHOUT_PARAMETER",
+    ),
+    "VALID_HOLDER_TYPES": ("permission_helpers", "VALID_HOLDER_TYPES"),
+    "build_grant_payload": ("permission_helpers", "build_grant_payload"),
+    "find_grant_by_spec": ("permission_helpers", "find_grant_by_spec"),
+    "find_scheme_by_name": ("permission_helpers", "find_scheme_by_name"),
+    "format_grant": ("permission_helpers", "format_grant"),
+    "format_grant_for_export": ("permission_helpers", "format_grant_for_export"),
+    "format_scheme_summary": ("permission_helpers", "format_scheme_summary"),
+    "get_holder_display": ("permission_helpers", "get_holder_display"),
+    "group_grants_by_permission": ("permission_helpers", "group_grants_by_permission"),
+    "parse_grant_string": ("permission_helpers", "parse_grant_string"),
+    "validate_holder_type": ("permission_helpers", "validate_holder_type"),
+    "validate_permission": ("permission_helpers", "validate_permission"),
+    "ProjectContext": ("project_context", "ProjectContext"),
+    "clear_context_cache": ("project_context", "clear_context_cache"),
+    "format_context_summary": ("project_context", "format_context_summary"),
+    "get_common_labels": ("project_context", "get_common_labels"),
+    "get_defaults_for_issue_type": ("project_context", "get_defaults_for_issue_type"),
+    "get_project_agile_fields": ("project_context", "get_project_agile_fields"),
+    "get_project_context": ("project_context", "get_project_context"),
+    "get_statuses_for_issue_type": ("project_context", "get_statuses_for_issue_type"),
+    "get_valid_transitions": ("project_context", "get_valid_transitions"),
+    "has_project_context": ("project_context", "has_project_context"),
+    "suggest_assignee": ("project_context", "suggest_assignee"),
+    "validate_transition": ("project_context", "validate_transition"),
+    "BatchError": ("request_batcher", "BatchError"),
+    "BatchResult": ("request_batcher", "BatchResult"),
+    "RequestBatcher": ("request_batcher", "RequestBatcher"),
+    "batch_fetch_issues": ("request_batcher", "batch_fetch_issues"),
+    "IssueBuilder": ("testing", "IssueBuilder"),
+    "assert_issue_has_field": ("testing", "assert_issue_has_field"),
+    "assert_search_returns_empty": ("testing", "assert_search_returns_empty"),
+    "assert_search_returns_results": ("testing", "assert_search_returns_results"),
+    "generate_unique_name": ("testing", "generate_unique_name"),
+    "get_jira_version": ("testing", "get_jira_version"),
+    "is_cloud_instance": ("testing", "is_cloud_instance"),
+    "skip_if_version_below": ("testing", "skip_if_version_below"),
+    "wait_for_assignment": ("testing", "wait_for_assignment"),
+    "wait_for_transition": ("testing", "wait_for_transition"),
+    "DAYS_PER_WEEK": ("time_utils", "DAYS_PER_WEEK"),
+    "HOURS_PER_DAY": ("time_utils", "HOURS_PER_DAY"),
+    "SECONDS_PER_DAY": ("time_utils", "SECONDS_PER_DAY"),
+    "SECONDS_PER_HOUR": ("time_utils", "SECONDS_PER_HOUR"),
+    "SECONDS_PER_MINUTE": ("time_utils", "SECONDS_PER_MINUTE"),
+    "SECONDS_PER_WEEK": ("time_utils", "SECONDS_PER_WEEK"),
+    "calculate_progress": ("time_utils", "calculate_progress"),
+    "convert_to_jira_datetime_string": (
+        "time_utils",
+        "convert_to_jira_datetime_string",
+    ),
+    "format_datetime_for_jira": ("time_utils", "format_datetime_for_jira"),
+    "format_progress_bar": ("time_utils", "format_progress_bar"),
+    "format_seconds": ("time_utils", "format_seconds"),
+    "format_seconds_long": ("time_utils", "format_seconds_long"),
+    "parse_date_to_iso": ("time_utils", "parse_date_to_iso"),
+    "parse_relative_date": ("time_utils", "parse_relative_date"),
+    "parse_time_string": ("time_utils", "parse_time_string"),
+    "validate_time_format": ("time_utils", "validate_time_format"),
+    "find_transition_by_keywords": (
+        "transition_helpers",
+        "find_transition_by_keywords",
+    ),
+    "find_transition_by_name": ("transition_helpers", "find_transition_by_name"),
+    "UserNotFoundError": ("user_helpers", "UserNotFoundError"),
+    "get_user_display_info": ("user_helpers", "get_user_display_info"),
+    "resolve_user_to_account_id": ("user_helpers", "resolve_user_to_account_id"),
+    "resolve_users_batch": ("user_helpers", "resolve_users_batch"),
+    "PROJECT_TEMPLATES": ("validators", "PROJECT_TEMPLATES"),
+    "VALID_ASSIGNEE_TYPES": ("validators", "VALID_ASSIGNEE_TYPES"),
+    "VALID_PROJECT_TYPES": ("validators", "VALID_PROJECT_TYPES"),
+    "safe_get_nested": ("validators", "safe_get_nested"),
+    "validate_assignee_type": ("validators", "validate_assignee_type"),
+    "validate_avatar_file": ("validators", "validate_avatar_file"),
+    "validate_category_name": ("validators", "validate_category_name"),
+    "validate_email": ("validators", "validate_email"),
+    "validate_file_path": ("validators", "validate_file_path"),
+    "validate_issue_key": ("validators", "validate_issue_key"),
+    "validate_jql": ("validators", "validate_jql"),
+    "validate_project_key": ("validators", "validate_project_key"),
+    "validate_project_name": ("validators", "validate_project_name"),
+    "validate_project_template": ("validators", "validate_project_template"),
+    "validate_project_type": ("validators", "validate_project_type"),
+    "validate_transition_id": ("validators", "validate_transition_id"),
+    "validate_url": ("validators", "validate_url"),
+}
 
 __all__ = [
     "DAYS_PER_WEEK",
@@ -416,3 +541,16 @@ __all__ = [
     "is_cloud_instance",
     "skip_if_version_below",
 ]
+
+
+def __getattr__(name: str) -> Any:
+    if name not in _EXPORTS:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    module, symbol = _EXPORTS[name]
+    value = getattr(import_module("." + module, __name__), symbol)
+    globals()[name] = value
+    return value
+
+
+def __dir__() -> list[str]:
+    return sorted(set(globals()) | set(__all__))

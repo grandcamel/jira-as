@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "as-engine>=0.1.0a0,<0.2"]
 build-backend = "hatchling.build"
 
 [project]
@@ -36,6 +36,7 @@ classifiers = [
     "Topic :: Office/Business :: Groupware",
 ]
 dependencies = [
+    "as-engine>=0.1.0a0,<0.2",
     "requests>=2.28.0",
     "tabulate>=0.9.0",
     "colorama>=0.4.6",
@@ -54,6 +55,8 @@ keyring = [
     "keyring>=24.0.0",
 ]
 dev = [
+    "oas-patch>=0.6.0,<0.7",  # Independent Overlay applier cross-check (tests only)
+    "jsonschema>=4.18",  # Enrichment example validation (tests only)
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "responses>=0.24.0",
@@ -70,6 +73,7 @@ Issues = "https://github.com/grandcamel/jira-as/issues"
 Changelog = "https://github.com/grandcamel/jira-as/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.sdist]
+exclude = ["/src/jira_as/_generated"]
 include = [
     "/src",
     "/hatch_build.py",
@@ -81,6 +85,8 @@ include = [
 path = "hatch_build.py"
 
 [tool.hatch.build.targets.wheel]
+dev-mode-dirs = ["src"]
+exclude = ["/src/jira_as/_generated"]
 packages = ["src/jira_as"]
 
 [tool.pytest.ini_options]

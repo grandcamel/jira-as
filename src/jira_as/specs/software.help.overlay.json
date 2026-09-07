@@ -1,0 +1,914 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira software help enrichment",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board: discovery help for getAllBoards.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getAllBoards"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board\"].post",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "POST /rest/agile/1.0/board: discovery help for createBoard.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_createBoard"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/filter/{filterId}\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/filter/{filterId}: discovery help for getBoardByFilterId.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getBoardByFilterId"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}\"].delete",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "DELETE /rest/agile/1.0/board/{boardId}: discovery help for deleteBoard.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_deleteBoard"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}: discovery help for getBoard.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getBoard"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/backlog\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/backlog: discovery help for getIssuesForBacklog.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getIssuesForBacklog"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/configuration\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/configuration: discovery help for getBoardConfiguration.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getBoardConfiguration"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/epic\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/epic: discovery help for getEpics.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getEpics"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/epic/none/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/epic/none/issue: discovery help for getIssuesWithoutEpicForBoard.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getIssuesWithoutEpicForBoard"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/epic/{epicId}/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/epic/{epicId}/issue: discovery help for getBoardIssuesForEpic.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getBoardIssuesForEpic"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/features\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/features: discovery help for getFeaturesForBoard.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getFeaturesForBoard"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/features\"].put",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "PUT /rest/agile/1.0/board/{boardId}/features: discovery help for toggleFeatures.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_toggleFeatures"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/issue: discovery help for getIssuesForBoard.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getIssuesForBoard"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/issue\"].post",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "POST /rest/agile/1.0/board/{boardId}/issue: discovery help for moveIssuesToBoard.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_moveIssuesToBoard"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/project\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/project: discovery help for getProjects.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getProjects"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/project/full\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/project/full: discovery help for getProjectsFull.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getProjectsFull"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/properties\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/properties: discovery help for getBoardPropertyKeys.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getBoardPropertyKeys"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/properties/{propertyKey}\"].delete",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "DELETE /rest/agile/1.0/board/{boardId}/properties/{propertyKey}: discovery help for deleteBoardProperty.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_deleteBoardProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/properties/{propertyKey}\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/properties/{propertyKey}: discovery help for getBoardProperty.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getBoardProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/properties/{propertyKey}\"].put",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "PUT /rest/agile/1.0/board/{boardId}/properties/{propertyKey}: discovery help for setBoardProperty.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_setBoardProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/quickfilter\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/quickfilter: discovery help for getAllQuickFilters.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getAllQuickFilters"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/quickfilter/{quickFilterId}\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/quickfilter/{quickFilterId}: discovery help for getQuickFilter.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getQuickFilter"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/reports\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/reports: discovery help for getReportsForBoard.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getReportsForBoard"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/sprint\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ],
+        "x-as-examples": [
+          {
+            "kind": "invocation",
+            "value": "jira-as api call getAllSprints --boardId 1 --all --limit 50"
+          }
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/sprint: discovery help for getAllSprints.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getAllSprints",
+      "x-as-examples": [
+        {
+          "kind": "invocation",
+          "value": "jira-as api call getAllSprints --boardId 1 --all --limit 50"
+        }
+      ]
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/sprint/{sprintId}/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/sprint/{sprintId}/issue: discovery help for getBoardIssuesForSprint.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getBoardIssuesForSprint"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/version\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/board/{boardId}/version: discovery help for getAllVersions.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getAllVersions"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/epic/none/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/epic/none/issue: discovery help for getIssuesWithoutEpic.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getIssuesWithoutEpic"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/epic/none/issue\"].post",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "POST /rest/agile/1.0/epic/none/issue: discovery help for removeIssuesFromEpic.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_removeIssuesFromEpic"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/epic/{epicIdOrKey}\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/epic/{epicIdOrKey}: discovery help for getEpic.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getEpic"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/epic/{epicIdOrKey}\"].post",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "POST /rest/agile/1.0/epic/{epicIdOrKey}: discovery help for partiallyUpdateEpic.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_partiallyUpdateEpic"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/epic/{epicIdOrKey}/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/epic/{epicIdOrKey}/issue: discovery help for getIssuesForEpic.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getIssuesForEpic"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/epic/{epicIdOrKey}/issue\"].post",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "POST /rest/agile/1.0/epic/{epicIdOrKey}/issue: discovery help for moveIssuesToEpic.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_moveIssuesToEpic"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/epic/{epicIdOrKey}/rank\"].put",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "PUT /rest/agile/1.0/epic/{epicIdOrKey}/rank: discovery help for rankEpics.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_rankEpics"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint\"].post",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "POST /rest/agile/1.0/sprint: discovery help for createSprint.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_createSprint"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}\"].delete",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "DELETE /rest/agile/1.0/sprint/{sprintId}: discovery help for deleteSprint.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_deleteSprint"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/sprint/{sprintId}: discovery help for getSprint.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getSprint"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}\"].post",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "POST /rest/agile/1.0/sprint/{sprintId}: discovery help for partiallyUpdateSprint.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_partiallyUpdateSprint"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}\"].put",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "PUT /rest/agile/1.0/sprint/{sprintId}: discovery help for updateSprint.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_updateSprint"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/sprint/{sprintId}/issue: discovery help for getIssuesForSprint.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getIssuesForSprint"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/issue\"].post",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "POST /rest/agile/1.0/sprint/{sprintId}/issue: discovery help for moveIssuesToSprintAndRank.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_moveIssuesToSprintAndRank"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/properties\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/sprint/{sprintId}/properties: discovery help for getSprintPropertyKeys.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getSprintPropertyKeys"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey}\"].delete",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "DELETE /rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey}: discovery help for deleteSprintProperty.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_deleteSprintProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey}\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey}: discovery help for getSprintProperty.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getSprintProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey}\"].put",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "PUT /rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey}: discovery help for setSprintProperty.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_setSprintProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/swap\"].post",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "POST /rest/agile/1.0/sprint/{sprintId}/swap: discovery help for swapSprint.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_swapSprint"
+    },
+    {
+      "target": "$.paths[\"/rest/software/1.0/board/{boardId}/backlog\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "agile"
+        ]
+      },
+      "description": "GET /rest/software/1.0/board/{boardId}/backlog: discovery help for getIssuesForBacklogJSIS.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getIssuesForBacklogJSIS"
+    },
+    {
+      "target": "$.paths[\"/rest/software/1.0/board/{boardId}/backlog/approximate-count\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/software/1.0/board/{boardId}/backlog/approximate-count: discovery help for getApproximateIssueCountForBacklog.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getApproximateIssueCountForBacklog"
+    },
+    {
+      "target": "$.paths[\"/rest/software/1.0/board/{boardId}/epic/none/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "agile"
+        ]
+      },
+      "description": "GET /rest/software/1.0/board/{boardId}/epic/none/issue: discovery help for getIssuesWithoutEpicForBoardJSIS.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getIssuesWithoutEpicForBoardJSIS"
+    },
+    {
+      "target": "$.paths[\"/rest/software/1.0/board/{boardId}/epic/{epicId}/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "agile"
+        ]
+      },
+      "description": "GET /rest/software/1.0/board/{boardId}/epic/{epicId}/issue: discovery help for getBoardIssuesForEpicJSIS.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getBoardIssuesForEpicJSIS"
+    },
+    {
+      "target": "$.paths[\"/rest/software/1.0/board/{boardId}/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "agile"
+        ]
+      },
+      "description": "GET /rest/software/1.0/board/{boardId}/issue: discovery help for getIssuesForBoardJSIS.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getIssuesForBoardJSIS"
+    },
+    {
+      "target": "$.paths[\"/rest/software/1.0/board/{boardId}/issue/approximate-count\"].get",
+      "update": {
+        "x-as-topic": [
+          "agile"
+        ]
+      },
+      "description": "GET /rest/software/1.0/board/{boardId}/issue/approximate-count: discovery help for getApproximateIssueCountForBoard.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getApproximateIssueCountForBoard"
+    },
+    {
+      "target": "$.paths[\"/rest/software/1.0/board/{boardId}/sprint/{sprintId}/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "agile"
+        ]
+      },
+      "description": "GET /rest/software/1.0/board/{boardId}/sprint/{sprintId}/issue: discovery help for getBoardIssuesForSprintJSIS.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getBoardIssuesForSprintJSIS"
+    },
+    {
+      "target": "$.paths[\"/rest/software/1.0/epic/none/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "agile"
+        ]
+      },
+      "description": "GET /rest/software/1.0/epic/none/issue: discovery help for getIssuesWithoutEpicJSIS.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getIssuesWithoutEpicJSIS"
+    },
+    {
+      "target": "$.paths[\"/rest/software/1.0/epic/{epicIdOrKey}/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "agile"
+        ]
+      },
+      "description": "GET /rest/software/1.0/epic/{epicIdOrKey}/issue: discovery help for getIssuesForEpicJSIS.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getIssuesForEpicJSIS"
+    },
+    {
+      "target": "$.paths[\"/rest/software/1.0/sprint/{sprintId}/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "agile"
+        ]
+      },
+      "description": "GET /rest/software/1.0/sprint/{sprintId}/issue: discovery help for getIssuesForSprintJSIS.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_software_getIssuesForSprintJSIS"
+    }
+  ]
+}

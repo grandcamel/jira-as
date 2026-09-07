@@ -23,5 +23,16 @@ class CustomBuildHook(BuildHookInterface):
             destination = "src/" + destination
         build_data.setdefault("force_include", {})[str(stamp_file)] = destination
 
+        if self.target_name == "wheel":
+            from as_engine.build import compile_product
+
+            package = root / "src" / "jira_as"
+            generated = package / "_generated"
+            catalog = compile_product(package / "specs", generated)
+            names = ["catalog.json", *(entry["file"] for entry in catalog["documents"])]
+            for name in sorted(names):
+                path = generated / name
+                build_data["force_include"][str(path)] = f"jira_as/_generated/{name}"
+
     def finalize(self, version, build_data, artifact_path):
         self._stamp_dir.cleanup()

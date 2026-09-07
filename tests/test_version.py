@@ -141,13 +141,48 @@ def test_hook_transports_stamp_without_modifying_source(
     interface = types.ModuleType("hatchling.builders.hooks.plugin.interface")
     interface.BuildHookInterface = object
     monkeypatch.setitem(sys.modules, interface.__name__, interface)
+    engine_build = types.ModuleType("as_engine.build")
+    compiled_calls = []
+
+    def compile_product(specs, generated):
+        compiled_calls.append((specs, generated))
+        generated.mkdir(parents=True, exist_ok=True)
+        documents = [
+            {"id": name, "tier": "primary", "file": f"{name}.index.json"}
+            for name in ("platform", "software", "servicedesk")
+        ]
+        for name in ["catalog.json", *(entry["file"] for entry in documents)]:
+            (generated / name).write_text("{}\n")
+        return {"format_version": 1, "documents": documents}
+
+    engine_build.compile_product = compile_product
+    monkeypatch.setitem(sys.modules, engine_build.__name__, engine_build)
     hook_class = runpy.run_path(str(ROOT / "hatch_build.py"))["CustomBuildHook"]
     hook = hook_class()
     hook.root = str(source_tree)
     hook.target_name = target
     data = {}
     hook.initialize("standard", data)
-    [(filename, destination)] = data["force_include"].items()
+    [(filename, destination)] = [
+        item
+        for item in data["force_include"].items()
+        if item[1].endswith("/_build_stamp.py")
+    ]
+    generated_names = {
+        f"jira_as/_generated/{name}"
+        for name in (
+            "catalog.json",
+            "platform.index.json",
+            "software.index.json",
+            "servicedesk.index.json",
+        )
+    }
+    assert set(data["force_include"].values()) == (
+        generated_names | {"jira_as/_build_stamp.py"}
+        if target == "wheel"
+        else {"src/jira_as/_build_stamp.py"}
+    )
+    assert len(compiled_calls) == (1 if target == "wheel" else 0)
     prefix = "src/" if target == "sdist" else ""
     assert destination == prefix + "jira_as/_build_stamp.py"
     stamp = runpy.run_path(filename)["BUILD_STAMP"]

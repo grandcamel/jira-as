@@ -1,0 +1,377 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira servicedesk help enrichment",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/assets/workspace\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/assets/workspace: discovery help for getAssetsWorkspaces.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getAssetsWorkspaces"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/insight/workspace\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/insight/workspace: discovery help for getInsightWorkspaces.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getInsightWorkspaces"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/knowledgebase/article\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/knowledgebase/article: discovery help for getArticles.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getArticles"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/organization\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/organization: discovery help for getOrganizations.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getOrganizations"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/user\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/organization/{organizationId}/user: discovery help for getUsersInOrganization.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getUsersInOrganization"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/request: discovery help for getCustomerRequests.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getCustomerRequests"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/approval\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/request/{issueIdOrKey}/approval: discovery help for getApprovals.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getApprovals"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/attachment\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/request/{issueIdOrKey}/attachment: discovery help for getAttachmentsForRequest.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getAttachmentsForRequest"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/comment\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/request/{issueIdOrKey}/comment: discovery help for getRequestComments.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getRequestComments"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/comment/{commentId}/attachment\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/request/{issueIdOrKey}/comment/{commentId}/attachment: discovery help for getCommentAttachments.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getCommentAttachments"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/participant\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/request/{issueIdOrKey}/participant: discovery help for getRequestParticipants.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getRequestParticipants"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/sla\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/request/{issueIdOrKey}/sla: discovery help for getSlaInformation.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getSlaInformation"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/status\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/request/{issueIdOrKey}/status: discovery help for getCustomerRequestStatus.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getCustomerRequestStatus"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/transition\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/request/{issueIdOrKey}/transition: discovery help for getCustomerTransitions.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getCustomerTransitions"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/requesttype\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/requesttype: discovery help for getAllRequestTypes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getAllRequestTypes"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/servicedesk: discovery help for getServiceDesks.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getServiceDesks"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/customer\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/customer: discovery help for getCustomers.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getCustomers"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/knowledgebase/article\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/knowledgebase/article: discovery help for getServiceDeskArticles.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getServiceDeskArticles"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/organization\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/organization: discovery help for getServiceDeskOrganizations.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getServiceDeskOrganizations"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/queue\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/queue: discovery help for getQueues.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getQueues"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/queue/{queueId}/issue\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/queue/{queueId}/issue: discovery help for getIssuesInQueue.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getIssuesInQueue"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype: discovery help for getRequestTypes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getRequestTypes"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttypegroup\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttypegroup: discovery help for getRequestTypeGroups.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_servicedesk_getRequestTypeGroups"
+    }
+  ]
+}

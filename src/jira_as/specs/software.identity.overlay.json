@@ -1,0 +1,99 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira software unique operation identities",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/configuration\"].get",
+      "update": {
+        "operationId": "getBoardConfiguration",
+        "x-as-note": "Atlassian operationId getConfiguration at GET /rest/agile/1.0/board/{boardId}/configuration is exposed as getBoardConfiguration to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId getConfiguration at GET /rest/agile/1.0/board/{boardId}/configuration is exposed as getBoardConfiguration to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_software_getBoardConfiguration"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/issue/{issueIdOrKey}\"].get",
+      "update": {
+        "operationId": "getSoftwareIssue",
+        "x-as-note": "Atlassian operationId getIssue at GET /rest/agile/1.0/issue/{issueIdOrKey} is exposed as getSoftwareIssue to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId getIssue at GET /rest/agile/1.0/issue/{issueIdOrKey} is exposed as getSoftwareIssue to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_software_getSoftwareIssue"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/properties\"].get",
+      "update": {
+        "operationId": "getSprintPropertyKeys",
+        "x-as-note": "Atlassian operationId getPropertiesKeys at GET /rest/agile/1.0/sprint/{sprintId}/properties is exposed as getSprintPropertyKeys to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId getPropertiesKeys at GET /rest/agile/1.0/sprint/{sprintId}/properties is exposed as getSprintPropertyKeys to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_software_getSprintPropertyKeys"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey}\"].delete",
+      "update": {
+        "operationId": "deleteSprintProperty",
+        "x-as-note": "Atlassian operationId deleteProperty at DELETE /rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey} is exposed as deleteSprintProperty to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId deleteProperty at DELETE /rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey} is exposed as deleteSprintProperty to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_software_deleteSprintProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey}\"].get",
+      "update": {
+        "operationId": "getSprintProperty",
+        "x-as-note": "Atlassian operationId getProperty at GET /rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey} is exposed as getSprintProperty to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId getProperty at GET /rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey} is exposed as getSprintProperty to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_software_getSprintProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey}\"].put",
+      "update": {
+        "operationId": "setSprintProperty",
+        "x-as-note": "Atlassian operationId setProperty at PUT /rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey} is exposed as setSprintProperty to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId setProperty at PUT /rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey} is exposed as setSprintProperty to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_software_setSprintProperty"
+    }
+  ]
+}

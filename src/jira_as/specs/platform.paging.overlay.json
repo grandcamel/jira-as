@@ -1,0 +1,4238 @@
+{
+  "actions": [
+    {
+      "description": "Declare offset/limit paging for getCustomFieldsConfigurations.",
+      "target": "$.paths[\"/rest/api/3/app/field/context/configuration/list\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getCustomFieldsConfigurations"
+    },
+    {
+      "description": "Declare offset/limit paging for getCustomFieldConfiguration.",
+      "target": "$.paths[\"/rest/api/3/app/field/{fieldIdOrKey}/context/configuration\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getCustomFieldConfiguration"
+    },
+    {
+      "description": "Declare none paging for getApplicationProperty.",
+      "target": "$.paths[\"/rest/api/3/application-properties\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getApplicationProperty"
+    },
+    {
+      "description": "Declare none paging for getAdvancedSettings.",
+      "target": "$.paths[\"/rest/api/3/application-properties/advanced-settings\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAdvancedSettings"
+    },
+    {
+      "description": "Declare none paging for getAllApplicationRoles.",
+      "target": "$.paths[\"/rest/api/3/applicationrole\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllApplicationRoles"
+    },
+    {
+      "description": "Declare none paging for expandAttachmentForMachines.",
+      "target": "$.paths[\"/rest/api/3/attachment/{id}/expand/raw\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/entries",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_expandAttachmentForMachines"
+    },
+    {
+      "description": "Declare none paging for getAllSystemAvatars.",
+      "target": "$.paths[\"/rest/api/3/avatar/{type}/system\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/system",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllSystemAvatars"
+    },
+    {
+      "description": "Declare nextPageToken paging for getBulkChangelogs.",
+      "target": "$.paths[\"/rest/api/3/changelog/bulkfetch\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/issueChangeLogs",
+          "next": {
+            "kind": "token",
+            "path": "/nextPageToken"
+          },
+          "request": {
+            "limit": {
+              "in": "body",
+              "path": "/maxResults"
+            },
+            "token": {
+              "in": "body",
+              "path": "/nextPageToken"
+            }
+          },
+          "style": "nextPageToken"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getBulkChangelogs"
+    },
+    {
+      "description": "Declare none paging for getAllUserDataClassificationLevels.",
+      "target": "$.paths[\"/rest/api/3/classification-levels\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/classifications",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllUserDataClassificationLevels"
+    },
+    {
+      "description": "Declare none paging for getCommentsByIds.",
+      "target": "$.paths[\"/rest/api/3/comment/list\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "The body supplies explicit comment IDs; response envelope fields do not declare a continuation input.",
+      "x-as-test": "paging_platform_getCommentsByIds"
+    },
+    {
+      "description": "Declare none paging for getCommentPropertyKeys.",
+      "target": "$.paths[\"/rest/api/3/comment/{commentId}/properties\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/keys",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getCommentPropertyKeys"
+    },
+    {
+      "description": "Declare offset/limit paging for findComponentsForProjects.",
+      "target": "$.paths[\"/rest/api/3/component\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_findComponentsForProjects"
+    },
+    {
+      "description": "Declare offset/limit paging for getFieldAssociationSchemes.",
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getFieldAssociationSchemes"
+    },
+    {
+      "description": "Declare none paging for updateFieldsAssociatedWithSchemes.",
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes/fields\"].put",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/results",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_updateFieldsAssociatedWithSchemes"
+    },
+    {
+      "description": "Declare none paging for removeFieldsAssociatedWithSchemes.",
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes/fields\"].delete",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/results",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_removeFieldsAssociatedWithSchemes"
+    },
+    {
+      "description": "Declare none paging for updateFieldAssociationSchemeItemParameters.",
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes/fields/parameters\"].put",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/results",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_updateFieldAssociationSchemeItemParameters"
+    },
+    {
+      "description": "Declare offset/limit paging for getProjectsWithFieldSchemes.",
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes/projects\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getProjectsWithFieldSchemes"
+    },
+    {
+      "description": "Declare none paging for associateProjectsToFieldAssociationSchemes.",
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes/projects\"].put",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/results",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_associateProjectsToFieldAssociationSchemes"
+    },
+    {
+      "description": "Declare offset/limit paging for searchFieldAssociationSchemeFields.",
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes/{id}/fields\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_searchFieldAssociationSchemeFields"
+    },
+    {
+      "description": "Declare offset/limit paging for searchFieldAssociationSchemeProjects.",
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes/{id}/projects\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_searchFieldAssociationSchemeProjects"
+    },
+    {
+      "description": "Declare none paging for getAvailableTimeTrackingImplementations.",
+      "target": "$.paths[\"/rest/api/3/configuration/timetracking/list\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAvailableTimeTrackingImplementations"
+    },
+    {
+      "description": "Declare offset/limit paging for getAllDashboards.",
+      "target": "$.paths[\"/rest/api/3/dashboard\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/dashboards",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllDashboards"
+    },
+    {
+      "description": "Declare none paging for getAllAvailableDashboardGadgets.",
+      "target": "$.paths[\"/rest/api/3/dashboard/gadgets\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/gadgets",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllAvailableDashboardGadgets"
+    },
+    {
+      "description": "Declare offset/limit paging for getDashboardsPaginated.",
+      "target": "$.paths[\"/rest/api/3/dashboard/search\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getDashboardsPaginated"
+    },
+    {
+      "description": "Declare none paging for getAllGadgets.",
+      "target": "$.paths[\"/rest/api/3/dashboard/{dashboardId}/gadget\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/gadgets",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllGadgets"
+    },
+    {
+      "description": "Declare none paging for getDashboardItemPropertyKeys.",
+      "target": "$.paths[\"/rest/api/3/dashboard/{dashboardId}/items/{itemId}/properties\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/keys",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getDashboardItemPropertyKeys"
+    },
+    {
+      "description": "Declare none paging for getPolicies.",
+      "target": "$.paths[\"/rest/api/3/data-policy/project\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/projectDataPolicies",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getPolicies"
+    },
+    {
+      "description": "Declare none paging for getEvents.",
+      "target": "$.paths[\"/rest/api/3/events\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getEvents"
+    },
+    {
+      "description": "Declare none paging for analyseExpression.",
+      "target": "$.paths[\"/rest/api/3/expression/analyse\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/results",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_analyseExpression"
+    },
+    {
+      "description": "Declare none paging for getFields.",
+      "target": "$.paths[\"/rest/api/3/field\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getFields"
+    },
+    {
+      "description": "Declare offset/limit paging for getFieldsPaginated.",
+      "target": "$.paths[\"/rest/api/3/field/search\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getFieldsPaginated"
+    },
+    {
+      "description": "Declare offset/limit paging for getTrashedFieldsPaginated.",
+      "target": "$.paths[\"/rest/api/3/field/search/trashed\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getTrashedFieldsPaginated"
+    },
+    {
+      "description": "Declare offset/limit paging for getFieldProjectAssociations.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/association/project\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getFieldProjectAssociations"
+    },
+    {
+      "description": "Declare offset/limit paging for getContextsForField.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getContextsForField"
+    },
+    {
+      "description": "Declare offset/limit paging for getDefaultValues.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/defaultValue\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getDefaultValues"
+    },
+    {
+      "description": "Declare offset/limit paging for getContextDefaultValues.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/defaultValues\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getContextDefaultValues"
+    },
+    {
+      "description": "Declare offset/limit paging for getIssueTypeMappingsForContexts.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/issuetypemapping\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssueTypeMappingsForContexts"
+    },
+    {
+      "description": "Declare offset/limit paging for getCustomFieldContextsForProjectsAndIssueTypes.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/mapping\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getCustomFieldContextsForProjectsAndIssueTypes"
+    },
+    {
+      "description": "Declare offset/limit paging for getProjectContextMapping.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/projectmapping\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getProjectContextMapping"
+    },
+    {
+      "description": "Declare offset/limit paging for getOptionsForContext.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/{contextId}/option\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getOptionsForContext"
+    },
+    {
+      "description": "Declare none paging for updateCustomFieldOption.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/{contextId}/option\"].put",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/options",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_updateCustomFieldOption"
+    },
+    {
+      "description": "Declare none paging for createCustomFieldOption.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/{contextId}/option\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/options",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_createCustomFieldOption"
+    },
+    {
+      "description": "Declare offset/limit paging for getContextsForFieldDeprecated.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/contexts\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getContextsForFieldDeprecated"
+    },
+    {
+      "description": "Declare offset/limit paging for getScreensForField.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/screens\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getScreensForField"
+    },
+    {
+      "description": "Declare offset/limit paging for getAllIssueFieldOptions.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldKey}/option\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllIssueFieldOptions"
+    },
+    {
+      "description": "Declare offset/limit paging for getSelectableIssueFieldOptions.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldKey}/option/suggestions/edit\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getSelectableIssueFieldOptions"
+    },
+    {
+      "description": "Declare offset/limit paging for getVisibleIssueFieldOptions.",
+      "target": "$.paths[\"/rest/api/3/field/{fieldKey}/option/suggestions/search\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getVisibleIssueFieldOptions"
+    },
+    {
+      "description": "Declare offset/limit paging for getAllFieldConfigurations.",
+      "target": "$.paths[\"/rest/api/3/fieldconfiguration\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllFieldConfigurations"
+    },
+    {
+      "description": "Declare offset/limit paging for getFieldConfigurationItems.",
+      "target": "$.paths[\"/rest/api/3/fieldconfiguration/{id}/fields\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getFieldConfigurationItems"
+    },
+    {
+      "description": "Declare offset/limit paging for getAllFieldConfigurationSchemes.",
+      "target": "$.paths[\"/rest/api/3/fieldconfigurationscheme\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllFieldConfigurationSchemes"
+    },
+    {
+      "description": "Declare offset/limit paging for getFieldConfigurationSchemeMappings.",
+      "target": "$.paths[\"/rest/api/3/fieldconfigurationscheme/mapping\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getFieldConfigurationSchemeMappings"
+    },
+    {
+      "description": "Declare offset/limit paging for getFieldConfigurationSchemeProjectMapping.",
+      "target": "$.paths[\"/rest/api/3/fieldconfigurationscheme/project\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getFieldConfigurationSchemeProjectMapping"
+    },
+    {
+      "description": "Declare none paging for getFavouriteFilters.",
+      "target": "$.paths[\"/rest/api/3/filter/favourite\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getFavouriteFilters"
+    },
+    {
+      "description": "Declare none paging for getMyFilters.",
+      "target": "$.paths[\"/rest/api/3/filter/my\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getMyFilters"
+    },
+    {
+      "description": "Declare offset/limit paging for getFiltersPaginated.",
+      "target": "$.paths[\"/rest/api/3/filter/search\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getFiltersPaginated"
+    },
+    {
+      "description": "Declare none paging for getColumns.",
+      "target": "$.paths[\"/rest/api/3/filter/{id}/columns\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getColumns"
+    },
+    {
+      "description": "Declare none paging for getSharePermissions.",
+      "target": "$.paths[\"/rest/api/3/filter/{id}/permission\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getSharePermissions"
+    },
+    {
+      "description": "Declare offset/limit paging for bulkGetGroups.",
+      "target": "$.paths[\"/rest/api/3/group/bulk\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_bulkGetGroups"
+    },
+    {
+      "description": "Declare offset/limit paging for getUsersFromGroup.",
+      "target": "$.paths[\"/rest/api/3/group/member\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getUsersFromGroup"
+    },
+    {
+      "description": "Declare none paging for findGroups.",
+      "target": "$.paths[\"/rest/api/3/groups/picker\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/groups",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Group picker accepts a result cap only, with no offset or continuation input.",
+      "x-as-test": "paging_platform_findGroups"
+    },
+    {
+      "description": "Declare none paging for getLicense.",
+      "target": "$.paths[\"/rest/api/3/instance/license\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/applications",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getLicense"
+    },
+    {
+      "description": "Declare none paging for bulkFetchIssues.",
+      "target": "$.paths[\"/rest/api/3/issue/bulkfetch\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/issues",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_bulkFetchIssues"
+    },
+    {
+      "description": "Declare none paging for getCreateIssueMeta.",
+      "target": "$.paths[\"/rest/api/3/issue/createmeta\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/projects",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getCreateIssueMeta"
+    },
+    {
+      "description": "Declare offset/limit paging for getCreateIssueMetaIssueTypes.",
+      "target": "$.paths[\"/rest/api/3/issue/createmeta/{projectIdOrKey}/issuetypes\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/issueTypes",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getCreateIssueMetaIssueTypes"
+    },
+    {
+      "description": "Declare offset/limit paging for getCreateIssueMetaIssueTypeId.",
+      "target": "$.paths[\"/rest/api/3/issue/createmeta/{projectIdOrKey}/issuetypes/{issueTypeId}\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/results",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getCreateIssueMetaIssueTypeId"
+    },
+    {
+      "description": "Declare none paging for getIssuePickerResource.",
+      "target": "$.paths[\"/rest/api/3/issue/picker\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/sections",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssuePickerResource"
+    },
+    {
+      "description": "Declare none paging for addAttachment.",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/attachments\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_addAttachment"
+    },
+    {
+      "description": "Declare offset/limit paging for getChangeLogs.",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/changelog\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getChangeLogs"
+    },
+    {
+      "description": "Declare none paging for getChangeLogsByIds.",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/changelog/list\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/histories",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "The body supplies explicit changelog IDs; response envelope fields do not declare a continuation input.",
+      "x-as-test": "paging_platform_getChangeLogsByIds"
+    },
+    {
+      "description": "Declare offset/limit paging for getComments.",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/comments",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getComments"
+    },
+    {
+      "description": "Declare none paging for getIssuePropertyKeys.",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/properties\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/keys",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssuePropertyKeys"
+    },
+    {
+      "description": "Declare none paging for getTransitions.",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/transitions\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/transitions",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getTransitions"
+    },
+    {
+      "description": "Declare offset/limit paging for getIssueWorklog.",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/worklogs",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssueWorklog"
+    },
+    {
+      "description": "Declare none paging for getWorklogPropertyKeys.",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog/{worklogId}/properties\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/keys",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getWorklogPropertyKeys"
+    },
+    {
+      "description": "Declare none paging for getIssueLinkTypes.",
+      "target": "$.paths[\"/rest/api/3/issueLinkType\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/issueLinkTypes",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssueLinkTypes"
+    },
+    {
+      "description": "Declare none paging for getIssueSecuritySchemes.",
+      "target": "$.paths[\"/rest/api/3/issuesecurityschemes\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/issueSecuritySchemes",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssueSecuritySchemes"
+    },
+    {
+      "description": "Declare offset/limit paging for getSecurityLevels.",
+      "target": "$.paths[\"/rest/api/3/issuesecurityschemes/level\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getSecurityLevels"
+    },
+    {
+      "description": "Declare offset/limit paging for getSecurityLevelMembers.",
+      "target": "$.paths[\"/rest/api/3/issuesecurityschemes/level/member\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getSecurityLevelMembers"
+    },
+    {
+      "description": "Declare offset/limit paging for searchProjectsUsingSecuritySchemes.",
+      "target": "$.paths[\"/rest/api/3/issuesecurityschemes/project\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_searchProjectsUsingSecuritySchemes"
+    },
+    {
+      "description": "Declare offset/limit paging for searchSecuritySchemes.",
+      "target": "$.paths[\"/rest/api/3/issuesecurityschemes/search\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_searchSecuritySchemes"
+    },
+    {
+      "description": "Declare offset/limit paging for getIssueSecurityLevelMembers.",
+      "target": "$.paths[\"/rest/api/3/issuesecurityschemes/{issueSecuritySchemeId}/members\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssueSecurityLevelMembers"
+    },
+    {
+      "description": "Declare none paging for getIssueAllTypes.",
+      "target": "$.paths[\"/rest/api/3/issuetype\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssueAllTypes"
+    },
+    {
+      "description": "Declare none paging for getIssueTypesForProject.",
+      "target": "$.paths[\"/rest/api/3/issuetype/project\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssueTypesForProject"
+    },
+    {
+      "description": "Declare none paging for getAlternativeIssueTypes.",
+      "target": "$.paths[\"/rest/api/3/issuetype/{id}/alternatives\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAlternativeIssueTypes"
+    },
+    {
+      "description": "Declare none paging for getIssueTypePropertyKeys.",
+      "target": "$.paths[\"/rest/api/3/issuetype/{issueTypeId}/properties\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/keys",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssueTypePropertyKeys"
+    },
+    {
+      "description": "Declare offset/limit paging for getAllIssueTypeSchemes.",
+      "target": "$.paths[\"/rest/api/3/issuetypescheme\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllIssueTypeSchemes"
+    },
+    {
+      "description": "Declare offset/limit paging for getIssueTypeSchemesMapping.",
+      "target": "$.paths[\"/rest/api/3/issuetypescheme/mapping\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssueTypeSchemesMapping"
+    },
+    {
+      "description": "Declare offset/limit paging for getIssueTypeSchemeForProjects.",
+      "target": "$.paths[\"/rest/api/3/issuetypescheme/project\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssueTypeSchemeForProjects"
+    },
+    {
+      "description": "Declare offset/limit paging for getIssueTypeScreenSchemes.",
+      "target": "$.paths[\"/rest/api/3/issuetypescreenscheme\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssueTypeScreenSchemes"
+    },
+    {
+      "description": "Declare offset/limit paging for getIssueTypeScreenSchemeMappings.",
+      "target": "$.paths[\"/rest/api/3/issuetypescreenscheme/mapping\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssueTypeScreenSchemeMappings"
+    },
+    {
+      "description": "Declare offset/limit paging for getIssueTypeScreenSchemeProjectAssociations.",
+      "target": "$.paths[\"/rest/api/3/issuetypescreenscheme/project\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssueTypeScreenSchemeProjectAssociations"
+    },
+    {
+      "description": "Declare offset/limit paging for getProjectsForIssueTypeScreenScheme.",
+      "target": "$.paths[\"/rest/api/3/issuetypescreenscheme/{issueTypeScreenSchemeId}/project\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getProjectsForIssueTypeScreenScheme"
+    },
+    {
+      "description": "Declare none paging for getFieldAutoCompleteForQueryString.",
+      "target": "$.paths[\"/rest/api/3/jql/autocompletedata/suggestions\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/results",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getFieldAutoCompleteForQueryString"
+    },
+    {
+      "description": "Declare offset/limit paging for getPrecomputations.",
+      "target": "$.paths[\"/rest/api/3/jql/function/computation\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getPrecomputations"
+    },
+    {
+      "description": "Declare none paging for updatePrecomputations.",
+      "target": "$.paths[\"/rest/api/3/jql/function/computation\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/notFoundPrecomputationIDs",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_updatePrecomputations"
+    },
+    {
+      "description": "Declare none paging for matchIssues.",
+      "target": "$.paths[\"/rest/api/3/jql/match\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/matches",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_matchIssues"
+    },
+    {
+      "description": "Declare none paging for parseJqlQueries.",
+      "target": "$.paths[\"/rest/api/3/jql/parse\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/queries",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_parseJqlQueries"
+    },
+    {
+      "description": "Declare none paging for sanitiseJqlQueries.",
+      "target": "$.paths[\"/rest/api/3/jql/sanitize\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/queries",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_sanitiseJqlQueries"
+    },
+    {
+      "description": "Declare offset/limit paging for getAllLabels.",
+      "target": "$.paths[\"/rest/api/3/label\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllLabels"
+    },
+    {
+      "description": "Declare offset/limit paging for getNotificationSchemes.",
+      "target": "$.paths[\"/rest/api/3/notificationscheme\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getNotificationSchemes"
+    },
+    {
+      "description": "Declare offset/limit paging for getNotificationSchemeToProjectMappings.",
+      "target": "$.paths[\"/rest/api/3/notificationscheme/project\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getNotificationSchemeToProjectMappings"
+    },
+    {
+      "description": "Declare none paging for getPermittedProjects.",
+      "target": "$.paths[\"/rest/api/3/permissions/project\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/projects",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getPermittedProjects"
+    },
+    {
+      "description": "Declare none paging for getAllPermissionSchemes.",
+      "target": "$.paths[\"/rest/api/3/permissionscheme\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/permissionSchemes",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllPermissionSchemes"
+    },
+    {
+      "description": "Declare none paging for getPermissionSchemeGrants.",
+      "target": "$.paths[\"/rest/api/3/permissionscheme/{schemeId}/permission\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/permissions",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getPermissionSchemeGrants"
+    },
+    {
+      "description": "Declare cursor paging for getPlans.",
+      "target": "$.paths[\"/rest/api/3/plans/plan\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "next": {
+            "kind": "token",
+            "path": "/nextPageCursor"
+          },
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "token": {
+              "in": "query",
+              "name": "cursor"
+            }
+          },
+          "style": "cursor"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getPlans"
+    },
+    {
+      "description": "Declare cursor paging for getTeams.",
+      "target": "$.paths[\"/rest/api/3/plans/plan/{planId}/team\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "next": {
+            "kind": "token",
+            "path": "/nextPageCursor"
+          },
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "token": {
+              "in": "query",
+              "name": "cursor"
+            }
+          },
+          "style": "cursor"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getTeams"
+    },
+    {
+      "description": "Declare none paging for getPriorities.",
+      "target": "$.paths[\"/rest/api/3/priority\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getPriorities"
+    },
+    {
+      "description": "Declare offset/limit paging for searchPriorities.",
+      "target": "$.paths[\"/rest/api/3/priority/search\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_searchPriorities"
+    },
+    {
+      "description": "Declare offset/limit paging for getPrioritySchemes.",
+      "target": "$.paths[\"/rest/api/3/priorityscheme\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getPrioritySchemes"
+    },
+    {
+      "description": "Declare offset/limit paging for suggestedPrioritiesForMappings.",
+      "target": "$.paths[\"/rest/api/3/priorityscheme/mappings\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "body",
+              "path": "/maxResults"
+            },
+            "offset": {
+              "in": "body",
+              "path": "/startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_suggestedPrioritiesForMappings"
+    },
+    {
+      "description": "Declare offset/limit paging for getAvailablePrioritiesByPriorityScheme.",
+      "target": "$.paths[\"/rest/api/3/priorityscheme/priorities/available\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAvailablePrioritiesByPriorityScheme"
+    },
+    {
+      "description": "Declare offset/limit paging for getPrioritiesByPriorityScheme.",
+      "target": "$.paths[\"/rest/api/3/priorityscheme/{schemeId}/priorities\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getPrioritiesByPriorityScheme"
+    },
+    {
+      "description": "Declare offset/limit paging for getProjectsByPriorityScheme.",
+      "target": "$.paths[\"/rest/api/3/priorityscheme/{schemeId}/projects\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getProjectsByPriorityScheme"
+    },
+    {
+      "description": "Declare none paging for getAllProjects.",
+      "target": "$.paths[\"/rest/api/3/project\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllProjects"
+    },
+    {
+      "description": "Declare none paging for getRecent.",
+      "target": "$.paths[\"/rest/api/3/project/recent\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getRecent"
+    },
+    {
+      "description": "Declare offset/limit paging for searchProjects.",
+      "target": "$.paths[\"/rest/api/3/project/search\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_searchProjects"
+    },
+    {
+      "description": "Declare none paging for getAllProjectTypes.",
+      "target": "$.paths[\"/rest/api/3/project/type\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllProjectTypes"
+    },
+    {
+      "description": "Declare none paging for getAllAccessibleProjectTypes.",
+      "target": "$.paths[\"/rest/api/3/project/type/accessible\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllAccessibleProjectTypes"
+    },
+    {
+      "description": "Declare offset/limit paging for getProjectComponentsPaginated.",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/component\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getProjectComponentsPaginated"
+    },
+    {
+      "description": "Declare none paging for getProjectComponents.",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/components\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getProjectComponents"
+    },
+    {
+      "description": "Declare none paging for getFeaturesForProject.",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/features\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/features",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getFeaturesForProject"
+    },
+    {
+      "description": "Declare none paging for toggleFeatureForProject.",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/features/{featureKey}\"].put",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/features",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_toggleFeatureForProject"
+    },
+    {
+      "description": "Declare none paging for getProjectPropertyKeys.",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/properties\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/keys",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getProjectPropertyKeys"
+    },
+    {
+      "description": "Declare none paging for getProjectRoleDetails.",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/roledetails\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getProjectRoleDetails"
+    },
+    {
+      "description": "Declare none paging for getAllStatuses.",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/statuses\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllStatuses"
+    },
+    {
+      "description": "Declare offset/limit paging for getProjectVersionsPaginated.",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/version\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getProjectVersionsPaginated"
+    },
+    {
+      "description": "Declare none paging for getProjectVersions.",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/versions\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getProjectVersions"
+    },
+    {
+      "description": "Declare none paging for getProjectEmail.",
+      "target": "$.paths[\"/rest/api/3/project/{projectId}/email\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/emailAddressStatus",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getProjectEmail"
+    },
+    {
+      "description": "Declare none paging for getHierarchy.",
+      "target": "$.paths[\"/rest/api/3/project/{projectId}/hierarchy\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/hierarchy",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getHierarchy"
+    },
+    {
+      "description": "Declare none paging for getSecurityLevelsForProject.",
+      "target": "$.paths[\"/rest/api/3/project/{projectKeyOrId}/securitylevel\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/levels",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getSecurityLevelsForProject"
+    },
+    {
+      "description": "Declare none paging for getAllProjectCategories.",
+      "target": "$.paths[\"/rest/api/3/projectCategory\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllProjectCategories"
+    },
+    {
+      "description": "Declare offset/limit paging for getProjectFields.",
+      "target": "$.paths[\"/rest/api/3/projects/fields\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getProjectFields"
+    },
+    {
+      "description": "Declare none paging for getResolutions.",
+      "target": "$.paths[\"/rest/api/3/resolution\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getResolutions"
+    },
+    {
+      "description": "Declare offset/limit paging for searchResolutions.",
+      "target": "$.paths[\"/rest/api/3/resolution/search\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_searchResolutions"
+    },
+    {
+      "description": "Declare none paging for getAllProjectRoles.",
+      "target": "$.paths[\"/rest/api/3/role\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllProjectRoles"
+    },
+    {
+      "description": "Declare offset/limit paging for getScreens.",
+      "target": "$.paths[\"/rest/api/3/screens\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getScreens"
+    },
+    {
+      "description": "Declare none paging for getAvailableScreenFields.",
+      "target": "$.paths[\"/rest/api/3/screens/{screenId}/availableFields\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAvailableScreenFields"
+    },
+    {
+      "description": "Declare none paging for getAllScreenTabs.",
+      "target": "$.paths[\"/rest/api/3/screens/{screenId}/tabs\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllScreenTabs"
+    },
+    {
+      "description": "Declare none paging for getAllScreenTabFields.",
+      "target": "$.paths[\"/rest/api/3/screens/{screenId}/tabs/{tabId}/fields\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllScreenTabFields"
+    },
+    {
+      "description": "Declare offset/limit paging for getScreenSchemes.",
+      "target": "$.paths[\"/rest/api/3/screenscheme\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getScreenSchemes"
+    },
+    {
+      "description": "Declare offset/limit paging for searchForIssuesUsingJql.",
+      "target": "$.paths[\"/rest/api/3/search\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/issues",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_searchForIssuesUsingJql"
+    },
+    {
+      "description": "Declare offset/limit paging for searchForIssuesUsingJqlPost.",
+      "target": "$.paths[\"/rest/api/3/search\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/issues",
+          "request": {
+            "limit": {
+              "in": "body",
+              "path": "/maxResults"
+            },
+            "offset": {
+              "in": "body",
+              "path": "/startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_searchForIssuesUsingJqlPost"
+    },
+    {
+      "description": "Declare nextPageToken paging for searchAndReconsileIssuesUsingJql.",
+      "target": "$.paths[\"/rest/api/3/search/jql\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/issues",
+          "next": {
+            "kind": "token",
+            "path": "/nextPageToken"
+          },
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "token": {
+              "in": "query",
+              "name": "nextPageToken"
+            }
+          },
+          "response": {
+            "isLastPath": "/isLast"
+          },
+          "style": "nextPageToken"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_searchAndReconsileIssuesUsingJql"
+    },
+    {
+      "description": "Declare nextPageToken paging for searchAndReconsileIssuesUsingJqlPost.",
+      "target": "$.paths[\"/rest/api/3/search/jql\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/issues",
+          "next": {
+            "kind": "token",
+            "path": "/nextPageToken"
+          },
+          "request": {
+            "limit": {
+              "in": "body",
+              "path": "/maxResults"
+            },
+            "token": {
+              "in": "body",
+              "path": "/nextPageToken"
+            }
+          },
+          "response": {
+            "isLastPath": "/isLast"
+          },
+          "style": "nextPageToken"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_searchAndReconsileIssuesUsingJqlPost"
+    },
+    {
+      "description": "Declare none paging for getIssueNavigatorDefaultColumns.",
+      "target": "$.paths[\"/rest/api/3/settings/columns\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getIssueNavigatorDefaultColumns"
+    },
+    {
+      "description": "Declare none paging for getStatuses.",
+      "target": "$.paths[\"/rest/api/3/status\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getStatuses"
+    },
+    {
+      "description": "Declare none paging for getStatusCategories.",
+      "target": "$.paths[\"/rest/api/3/statuscategory\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getStatusCategories"
+    },
+    {
+      "description": "Declare none paging for getStatusesById.",
+      "target": "$.paths[\"/rest/api/3/statuses\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getStatusesById"
+    },
+    {
+      "description": "Declare none paging for createStatuses.",
+      "target": "$.paths[\"/rest/api/3/statuses\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_createStatuses"
+    },
+    {
+      "description": "Declare none paging for getStatusesByName.",
+      "target": "$.paths[\"/rest/api/3/statuses/byNames\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getStatusesByName"
+    },
+    {
+      "description": "Declare offset/limit paging for search.",
+      "target": "$.paths[\"/rest/api/3/statuses/search\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_search"
+    },
+    {
+      "description": "Declare offset/limit paging for getUiModifications.",
+      "target": "$.paths[\"/rest/api/3/uiModifications\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getUiModifications"
+    },
+    {
+      "description": "Declare offset/limit paging for bulkGetUsers.",
+      "target": "$.paths[\"/rest/api/3/user/bulk\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_bulkGetUsers"
+    },
+    {
+      "description": "Declare none paging for getUserDefaultColumns.",
+      "target": "$.paths[\"/rest/api/3/user/columns\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getUserDefaultColumns"
+    },
+    {
+      "description": "Declare none paging for getUserGroups.",
+      "target": "$.paths[\"/rest/api/3/user/groups\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getUserGroups"
+    },
+    {
+      "description": "Declare none paging for findUsersForPicker.",
+      "target": "$.paths[\"/rest/api/3/user/picker\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/users",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "User picker accepts a result cap only, with no offset or continuation input.",
+      "x-as-test": "paging_platform_findUsersForPicker"
+    },
+    {
+      "description": "Declare none paging for getUserPropertyKeys.",
+      "target": "$.paths[\"/rest/api/3/user/properties\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/keys",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getUserPropertyKeys"
+    },
+    {
+      "description": "Declare offset/limit paging for findUsersByQuery.",
+      "target": "$.paths[\"/rest/api/3/user/search/query\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_findUsersByQuery"
+    },
+    {
+      "description": "Declare offset/limit paging for findUserKeysByQuery.",
+      "target": "$.paths[\"/rest/api/3/user/search/query/key\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResult"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_findUserKeysByQuery"
+    },
+    {
+      "description": "Declare none paging for getRelatedWork.",
+      "target": "$.paths[\"/rest/api/3/version/{id}/relatedwork\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getRelatedWork"
+    },
+    {
+      "description": "Declare offset/limit paging for getDynamicWebhooksForApp.",
+      "target": "$.paths[\"/rest/api/3/webhook\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getDynamicWebhooksForApp"
+    },
+    {
+      "description": "Declare none paging for registerDynamicWebhooks.",
+      "target": "$.paths[\"/rest/api/3/webhook\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/webhookRegistrationResult",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_registerDynamicWebhooks"
+    },
+    {
+      "description": "Declare none paging for listWorkflowHistory.",
+      "target": "$.paths[\"/rest/api/3/workflow/history/list\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/entries",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_listWorkflowHistory"
+    },
+    {
+      "description": "Declare offset/limit paging for getWorkflowTransitionRuleConfigurations.",
+      "target": "$.paths[\"/rest/api/3/workflow/rule/config\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getWorkflowTransitionRuleConfigurations"
+    },
+    {
+      "description": "Declare none paging for updateWorkflowTransitionRuleConfigurations.",
+      "target": "$.paths[\"/rest/api/3/workflow/rule/config\"].put",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/updateResults",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_updateWorkflowTransitionRuleConfigurations"
+    },
+    {
+      "description": "Declare none paging for deleteWorkflowTransitionRuleConfigurations.",
+      "target": "$.paths[\"/rest/api/3/workflow/rule/config/delete\"].put",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/updateResults",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_deleteWorkflowTransitionRuleConfigurations"
+    },
+    {
+      "description": "Declare offset/limit paging for getWorkflowsPaginated.",
+      "target": "$.paths[\"/rest/api/3/workflow/search\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getWorkflowsPaginated"
+    },
+    {
+      "description": "Declare none paging for validateCreateWorkflows.",
+      "target": "$.paths[\"/rest/api/3/workflows/create/validation\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/errors",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_validateCreateWorkflows"
+    },
+    {
+      "description": "Declare offset/limit paging for searchWorkflows.",
+      "target": "$.paths[\"/rest/api/3/workflows/search\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_searchWorkflows"
+    },
+    {
+      "description": "Declare none paging for validateUpdateWorkflows.",
+      "target": "$.paths[\"/rest/api/3/workflows/update/validation\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/errors",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_validateUpdateWorkflows"
+    },
+    {
+      "description": "Declare offset/limit paging for getAllWorkflowSchemes.",
+      "target": "$.paths[\"/rest/api/3/workflowscheme\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {
+            "limit": {
+              "in": "query",
+              "name": "maxResults"
+            },
+            "offset": {
+              "in": "query",
+              "name": "startAt"
+            }
+          },
+          "response": {
+            "totalPath": "/total"
+          },
+          "style": "offset/limit"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getAllWorkflowSchemes"
+    },
+    {
+      "description": "Declare none paging for getWorkflowSchemeProjectAssociations.",
+      "target": "$.paths[\"/rest/api/3/workflowscheme/project\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/values",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getWorkflowSchemeProjectAssociations"
+    },
+    {
+      "description": "Declare none paging for readWorkflowSchemes.",
+      "target": "$.paths[\"/rest/api/3/workflowscheme/read\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_readWorkflowSchemes"
+    },
+    {
+      "description": "Declare none paging for getWorklogsForIds.",
+      "target": "$.paths[\"/rest/api/3/worklog/list\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getWorklogsForIds"
+    },
+    {
+      "description": "Declare none paging for AddonPropertiesResource.getAddonProperties_get.",
+      "target": "$.paths[\"/rest/atlassian-connect/1/addons/{addonKey}/properties\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/keys",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_AddonPropertiesResource.getAddonProperties_get"
+    },
+    {
+      "description": "Declare none paging for DynamicModulesResource.getModules_get.",
+      "target": "$.paths[\"/rest/atlassian-connect/1/app/module/dynamic\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/modules",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_DynamicModulesResource.getModules_get"
+    },
+    {
+      "description": "Declare none paging for ServiceRegistryResource.services_get.",
+      "target": "$.paths[\"/rest/atlassian-connect/1/service-registry\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_ServiceRegistryResource.services_get"
+    },
+    {
+      "description": "Declare none paging for getForgeAppPropertyKeys.",
+      "target": "$.paths[\"/rest/forge/1/app/properties\"].get",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/keys",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getForgeAppPropertyKeys"
+    },
+    {
+      "description": "Declare none paging for getWorklogsByIssueIdAndWorklogId.",
+      "target": "$.paths[\"/rest/internal/api/latest/worklog/bulk\"].post",
+      "update": {
+        "x-as-paging": {
+          "itemsPath": "/worklogs",
+          "request": {},
+          "style": "none"
+        }
+      },
+      "x-as-evidence": {
+        "date": "2026-09-07",
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      },
+      "x-as-origin": "JAS-45; research/atlassian-paging-styles-2026-09.md",
+      "x-as-reason": "Pinned Base Document request and response schema classification; hand decisions layer separately.",
+      "x-as-test": "paging_platform_getWorklogsByIssueIdAndWorklogId"
+    }
+  ],
+  "info": {
+    "title": "Jira platform generated paging (do not edit)",
+    "version": "1.0.0"
+  },
+  "overlay": "1.0.0"
+}

@@ -1,0 +1,219 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira servicedesk unique operation identities",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/customer/skip-permission-check\"].post",
+      "update": {
+        "operationId": "createCustomerWithoutPermissionCheck",
+        "x-as-note": "Atlassian operationId createCustomer at POST /rest/servicedeskapi/customer/skip-permission-check is exposed as createCustomerWithoutPermissionCheck to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId createCustomer at POST /rest/servicedeskapi/customer/skip-permission-check is exposed as createCustomerWithoutPermissionCheck to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_servicedesk_createCustomerWithoutPermissionCheck"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/property\"].get",
+      "update": {
+        "operationId": "getOrganizationPropertyKeys",
+        "x-as-note": "Atlassian operationId getPropertiesKeys at GET /rest/servicedeskapi/organization/{organizationId}/property is exposed as getOrganizationPropertyKeys to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId getPropertiesKeys at GET /rest/servicedeskapi/organization/{organizationId}/property is exposed as getOrganizationPropertyKeys to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_servicedesk_getOrganizationPropertyKeys"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/property/{propertyKey}\"].delete",
+      "update": {
+        "operationId": "deleteOrganizationProperty",
+        "x-as-note": "Atlassian operationId deleteProperty at DELETE /rest/servicedeskapi/organization/{organizationId}/property/{propertyKey} is exposed as deleteOrganizationProperty to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId deleteProperty at DELETE /rest/servicedeskapi/organization/{organizationId}/property/{propertyKey} is exposed as deleteOrganizationProperty to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_servicedesk_deleteOrganizationProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/property/{propertyKey}\"].get",
+      "update": {
+        "operationId": "getOrganizationProperty",
+        "x-as-note": "Atlassian operationId getProperty at GET /rest/servicedeskapi/organization/{organizationId}/property/{propertyKey} is exposed as getOrganizationProperty to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId getProperty at GET /rest/servicedeskapi/organization/{organizationId}/property/{propertyKey} is exposed as getOrganizationProperty to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_servicedesk_getOrganizationProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/property/{propertyKey}\"].put",
+      "update": {
+        "operationId": "setOrganizationProperty",
+        "x-as-note": "Atlassian operationId setProperty at PUT /rest/servicedeskapi/organization/{organizationId}/property/{propertyKey} is exposed as setOrganizationProperty to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId setProperty at PUT /rest/servicedeskapi/organization/{organizationId}/property/{propertyKey} is exposed as setOrganizationProperty to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_servicedesk_setOrganizationProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/attachment/{attachmentId}\"].get",
+      "update": {
+        "operationId": "getRequestAttachmentContent",
+        "x-as-note": "Atlassian operationId getAttachmentContent at GET /rest/servicedeskapi/request/{issueIdOrKey}/attachment/{attachmentId} is exposed as getRequestAttachmentContent to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId getAttachmentContent at GET /rest/servicedeskapi/request/{issueIdOrKey}/attachment/{attachmentId} is exposed as getRequestAttachmentContent to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_servicedesk_getRequestAttachmentContent"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/attachment/{attachmentId}/thumbnail\"].get",
+      "update": {
+        "operationId": "getRequestAttachmentThumbnail",
+        "x-as-note": "Atlassian operationId getAttachmentThumbnail at GET /rest/servicedeskapi/request/{issueIdOrKey}/attachment/{attachmentId}/thumbnail is exposed as getRequestAttachmentThumbnail to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId getAttachmentThumbnail at GET /rest/servicedeskapi/request/{issueIdOrKey}/attachment/{attachmentId}/thumbnail is exposed as getRequestAttachmentThumbnail to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_servicedesk_getRequestAttachmentThumbnail"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/customer/skip-permission-check\"].post",
+      "update": {
+        "operationId": "addCustomersWithoutPermissionCheck",
+        "x-as-note": "Atlassian operationId addCustomers at POST /rest/servicedeskapi/servicedesk/{serviceDeskId}/customer/skip-permission-check is exposed as addCustomersWithoutPermissionCheck to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId addCustomers at POST /rest/servicedeskapi/servicedesk/{serviceDeskId}/customer/skip-permission-check is exposed as addCustomersWithoutPermissionCheck to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_servicedesk_addCustomersWithoutPermissionCheck"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/knowledgebase/article\"].get",
+      "update": {
+        "operationId": "getServiceDeskArticles",
+        "x-as-note": "Atlassian operationId getArticles at GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/knowledgebase/article is exposed as getServiceDeskArticles to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId getArticles at GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/knowledgebase/article is exposed as getServiceDeskArticles to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_servicedesk_getServiceDeskArticles"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/organization\"].get",
+      "update": {
+        "operationId": "getServiceDeskOrganizations",
+        "x-as-note": "Atlassian operationId getOrganizations at GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/organization is exposed as getServiceDeskOrganizations to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId getOrganizations at GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/organization is exposed as getServiceDeskOrganizations to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_servicedesk_getServiceDeskOrganizations"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property\"].get",
+      "update": {
+        "operationId": "getRequestTypePropertyKeys",
+        "x-as-note": "Atlassian operationId getPropertiesKeys at GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property is exposed as getRequestTypePropertyKeys to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId getPropertiesKeys at GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property is exposed as getRequestTypePropertyKeys to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_servicedesk_getRequestTypePropertyKeys"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey}\"].delete",
+      "update": {
+        "operationId": "deleteRequestTypeProperty",
+        "x-as-note": "Atlassian operationId deleteProperty at DELETE /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey} is exposed as deleteRequestTypeProperty to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId deleteProperty at DELETE /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey} is exposed as deleteRequestTypeProperty to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_servicedesk_deleteRequestTypeProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey}\"].get",
+      "update": {
+        "operationId": "getRequestTypeProperty",
+        "x-as-note": "Atlassian operationId getProperty at GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey} is exposed as getRequestTypeProperty to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId getProperty at GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey} is exposed as getRequestTypeProperty to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_servicedesk_getRequestTypeProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey}\"].put",
+      "update": {
+        "operationId": "setRequestTypeProperty",
+        "x-as-note": "Atlassian operationId setProperty at PUT /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey} is exposed as setRequestTypeProperty to disambiguate the combined Jira surface."
+      },
+      "description": "Atlassian operationId setProperty at PUT /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey} is exposed as setRequestTypeProperty to disambiguate the combined Jira surface.",
+      "x-as-reason": "Published operationIds collide within or across the three primary Jira documents. Preserve every route with an explicit unique name.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "identity_servicedesk_setRequestTypeProperty"
+    }
+  ]
+}

@@ -1,0 +1,1535 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira platform help enrichment",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "target": "$.paths[\"/rest/api/3/app/field/context/configuration/list\"].post",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "POST /rest/api/3/app/field/context/configuration/list: discovery help for getCustomFieldsConfigurations.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getCustomFieldsConfigurations"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/app/field/{fieldIdOrKey}/context/configuration\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/app/field/{fieldIdOrKey}/context/configuration: discovery help for getCustomFieldConfiguration.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getCustomFieldConfiguration"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/auditing/record\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ],
+        "x-as-examples": [
+          {
+            "kind": "invocation",
+            "value": "jira-as api call getAuditRecords --offset 0 --parameter-limit 25 --all --limit 50"
+          }
+        ]
+      },
+      "description": "GET /rest/api/3/auditing/record: discovery help for getAuditRecords.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getAuditRecords",
+      "x-as-examples": [
+        {
+          "kind": "invocation",
+          "value": "jira-as api call getAuditRecords --offset 0 --parameter-limit 25 --all --limit 50"
+        }
+      ]
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/changelog/bulkfetch\"].post",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "POST /rest/api/3/changelog/bulkfetch: discovery help for getBulkChangelogs.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getBulkChangelogs"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/component\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/component: discovery help for findComponentsForProjects.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_findComponentsForProjects"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/config/fieldschemes: discovery help for getFieldAssociationSchemes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getFieldAssociationSchemes"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes/projects\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/config/fieldschemes/projects: discovery help for getProjectsWithFieldSchemes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getProjectsWithFieldSchemes"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes/{id}/fields\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "search"
+        ]
+      },
+      "description": "GET /rest/api/3/config/fieldschemes/{id}/fields: discovery help for searchFieldAssociationSchemeFields.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_searchFieldAssociationSchemeFields"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes/{id}/projects\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "search"
+        ]
+      },
+      "description": "GET /rest/api/3/config/fieldschemes/{id}/projects: discovery help for searchFieldAssociationSchemeProjects.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_searchFieldAssociationSchemeProjects"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/dashboard\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/dashboard: discovery help for getAllDashboards.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getAllDashboards"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/dashboard/search\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/dashboard/search: discovery help for getDashboardsPaginated.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getDashboardsPaginated"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/search\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/field/search: discovery help for getFieldsPaginated.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getFieldsPaginated"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/search/trashed\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/field/search/trashed: discovery help for getTrashedFieldsPaginated.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getTrashedFieldsPaginated"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/association/project\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/field/{fieldId}/association/project: discovery help for getFieldProjectAssociations.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getFieldProjectAssociations"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/field/{fieldId}/context: discovery help for getContextsForField.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getContextsForField"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/defaultValue\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/field/{fieldId}/context/defaultValue: discovery help for getDefaultValues.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getDefaultValues"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/defaultValues\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/field/{fieldId}/context/defaultValues: discovery help for getContextDefaultValues.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getContextDefaultValues"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/issuetypemapping\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/field/{fieldId}/context/issuetypemapping: discovery help for getIssueTypeMappingsForContexts.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getIssueTypeMappingsForContexts"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/mapping\"].post",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "POST /rest/api/3/field/{fieldId}/context/mapping: discovery help for getCustomFieldContextsForProjectsAndIssueTypes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getCustomFieldContextsForProjectsAndIssueTypes"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/projectmapping\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/field/{fieldId}/context/projectmapping: discovery help for getProjectContextMapping.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getProjectContextMapping"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/{contextId}/option\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/field/{fieldId}/context/{contextId}/option: discovery help for getOptionsForContext.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getOptionsForContext"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/contexts\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/field/{fieldId}/contexts: discovery help for getContextsForFieldDeprecated.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getContextsForFieldDeprecated"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/screens\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/field/{fieldId}/screens: discovery help for getScreensForField.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getScreensForField"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldKey}/option\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/field/{fieldKey}/option: discovery help for getAllIssueFieldOptions.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getAllIssueFieldOptions"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldKey}/option/suggestions/edit\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/field/{fieldKey}/option/suggestions/edit: discovery help for getSelectableIssueFieldOptions.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getSelectableIssueFieldOptions"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldKey}/option/suggestions/search\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/field/{fieldKey}/option/suggestions/search: discovery help for getVisibleIssueFieldOptions.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getVisibleIssueFieldOptions"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/fieldconfiguration\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/fieldconfiguration: discovery help for getAllFieldConfigurations.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getAllFieldConfigurations"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/fieldconfiguration/{id}/fields\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/fieldconfiguration/{id}/fields: discovery help for getFieldConfigurationItems.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getFieldConfigurationItems"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/fieldconfigurationscheme\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/fieldconfigurationscheme: discovery help for getAllFieldConfigurationSchemes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getAllFieldConfigurationSchemes"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/fieldconfigurationscheme/mapping\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/fieldconfigurationscheme/mapping: discovery help for getFieldConfigurationSchemeMappings.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getFieldConfigurationSchemeMappings"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/fieldconfigurationscheme/project\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/fieldconfigurationscheme/project: discovery help for getFieldConfigurationSchemeProjectMapping.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getFieldConfigurationSchemeProjectMapping"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/filter/search\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/filter/search: discovery help for getFiltersPaginated.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getFiltersPaginated"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/group/bulk\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/group/bulk: discovery help for bulkGetGroups.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_bulkGetGroups"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/group/member\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/group/member: discovery help for getUsersFromGroup.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getUsersFromGroup"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/createmeta/{projectIdOrKey}/issuetypes\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issue/createmeta/{projectIdOrKey}/issuetypes: discovery help for getCreateIssueMetaIssueTypes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getCreateIssueMetaIssueTypes"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/createmeta/{projectIdOrKey}/issuetypes/{issueTypeId}\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issue/createmeta/{projectIdOrKey}/issuetypes/{issueTypeId}: discovery help for getCreateIssueMetaIssueTypeId.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getCreateIssueMetaIssueTypeId"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}\"].get",
+      "update": {
+        "x-as-examples": [
+          {
+            "kind": "invocation",
+            "value": "jira-as api --transport responder call getIssue --issueIdOrKey SBX-1"
+          }
+        ]
+      },
+      "description": "GET /rest/api/3/issue/{issueIdOrKey}: discovery help for getIssue.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getIssue",
+      "x-as-examples": [
+        {
+          "kind": "invocation",
+          "value": "jira-as api --transport responder call getIssue --issueIdOrKey SBX-1"
+        }
+      ]
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/changelog\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issue/{issueIdOrKey}/changelog: discovery help for getChangeLogs.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getChangeLogs"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issue/{issueIdOrKey}/comment: discovery help for getComments.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getComments"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issue/{issueIdOrKey}/worklog: discovery help for getIssueWorklog.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getIssueWorklog"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuesecurityschemes/level\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issuesecurityschemes/level: discovery help for getSecurityLevels.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getSecurityLevels"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuesecurityschemes/level/member\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issuesecurityschemes/level/member: discovery help for getSecurityLevelMembers.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getSecurityLevelMembers"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuesecurityschemes/project\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "search"
+        ]
+      },
+      "description": "GET /rest/api/3/issuesecurityschemes/project: discovery help for searchProjectsUsingSecuritySchemes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_searchProjectsUsingSecuritySchemes"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuesecurityschemes/search\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "search"
+        ]
+      },
+      "description": "GET /rest/api/3/issuesecurityschemes/search: discovery help for searchSecuritySchemes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_searchSecuritySchemes"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuesecurityschemes/{issueSecuritySchemeId}/members\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issuesecurityschemes/{issueSecuritySchemeId}/members: discovery help for getIssueSecurityLevelMembers.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getIssueSecurityLevelMembers"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuetypescheme\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issuetypescheme: discovery help for getAllIssueTypeSchemes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getAllIssueTypeSchemes"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuetypescheme/mapping\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issuetypescheme/mapping: discovery help for getIssueTypeSchemesMapping.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getIssueTypeSchemesMapping"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuetypescheme/project\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issuetypescheme/project: discovery help for getIssueTypeSchemeForProjects.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getIssueTypeSchemeForProjects"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuetypescreenscheme\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issuetypescreenscheme: discovery help for getIssueTypeScreenSchemes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getIssueTypeScreenSchemes"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuetypescreenscheme/mapping\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issuetypescreenscheme/mapping: discovery help for getIssueTypeScreenSchemeMappings.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getIssueTypeScreenSchemeMappings"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuetypescreenscheme/project\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issuetypescreenscheme/project: discovery help for getIssueTypeScreenSchemeProjectAssociations.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getIssueTypeScreenSchemeProjectAssociations"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuetypescreenscheme/{issueTypeScreenSchemeId}/project\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/issuetypescreenscheme/{issueTypeScreenSchemeId}/project: discovery help for getProjectsForIssueTypeScreenScheme.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getProjectsForIssueTypeScreenScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/jql/function/computation\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/jql/function/computation: discovery help for getPrecomputations.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getPrecomputations"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/label\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/label: discovery help for getAllLabels.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getAllLabels"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/notificationscheme\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/notificationscheme: discovery help for getNotificationSchemes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getNotificationSchemes"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/notificationscheme/project\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/notificationscheme/project: discovery help for getNotificationSchemeToProjectMappings.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getNotificationSchemeToProjectMappings"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/plans/plan\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/plans/plan: discovery help for getPlans.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getPlans"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/plans/plan/{planId}/team\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/plans/plan/{planId}/team: discovery help for getTeams.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getTeams"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/priority/search\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "search"
+        ]
+      },
+      "description": "GET /rest/api/3/priority/search: discovery help for searchPriorities.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_searchPriorities"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/priorityscheme\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/priorityscheme: discovery help for getPrioritySchemes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getPrioritySchemes"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/priorityscheme/mappings\"].post",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "POST /rest/api/3/priorityscheme/mappings: discovery help for suggestedPrioritiesForMappings.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_suggestedPrioritiesForMappings"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/priorityscheme/priorities/available\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/priorityscheme/priorities/available: discovery help for getAvailablePrioritiesByPriorityScheme.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getAvailablePrioritiesByPriorityScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/priorityscheme/{schemeId}/priorities\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/priorityscheme/{schemeId}/priorities: discovery help for getPrioritiesByPriorityScheme.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getPrioritiesByPriorityScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/priorityscheme/{schemeId}/projects\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/priorityscheme/{schemeId}/projects: discovery help for getProjectsByPriorityScheme.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getProjectsByPriorityScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project/search\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "search"
+        ]
+      },
+      "description": "GET /rest/api/3/project/search: discovery help for searchProjects.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_searchProjects"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/component\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/project/{projectIdOrKey}/component: discovery help for getProjectComponentsPaginated.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getProjectComponentsPaginated"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/version\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/project/{projectIdOrKey}/version: discovery help for getProjectVersionsPaginated.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getProjectVersionsPaginated"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/projects/fields\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/projects/fields: discovery help for getProjectFields.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getProjectFields"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/resolution/search\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "search"
+        ]
+      },
+      "description": "GET /rest/api/3/resolution/search: discovery help for searchResolutions.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_searchResolutions"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/screens\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/screens: discovery help for getScreens.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getScreens"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/screenscheme\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/screenscheme: discovery help for getScreenSchemes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getScreenSchemes"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "search"
+        ]
+      },
+      "description": "GET /rest/api/3/search: discovery help for searchForIssuesUsingJql.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_searchForIssuesUsingJql"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search\"].post",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "search"
+        ]
+      },
+      "description": "POST /rest/api/3/search: discovery help for searchForIssuesUsingJqlPost.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_searchForIssuesUsingJqlPost"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search/jql\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "search"
+        ],
+        "x-as-examples": [
+          {
+            "kind": "invocation",
+            "value": "jira-as api call searchAndReconsileIssuesUsingJql --jql 'project = SBX' --maxResults 25 --all --limit 50"
+          }
+        ]
+      },
+      "description": "GET /rest/api/3/search/jql: discovery help for searchAndReconsileIssuesUsingJql.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_searchAndReconsileIssuesUsingJql",
+      "x-as-examples": [
+        {
+          "kind": "invocation",
+          "value": "jira-as api call searchAndReconsileIssuesUsingJql --jql 'project = SBX' --maxResults 25 --all --limit 50"
+        }
+      ]
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search/jql\"].post",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "search"
+        ],
+        "x-as-examples": [
+          {
+            "kind": "invocation",
+            "value": "jira-as api call searchAndReconsileIssuesUsingJqlPost --field 'jql=project = SBX' --field maxResults=25 --all --limit 50"
+          }
+        ]
+      },
+      "description": "POST /rest/api/3/search/jql: discovery help for searchAndReconsileIssuesUsingJqlPost.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_searchAndReconsileIssuesUsingJqlPost",
+      "x-as-examples": [
+        {
+          "kind": "invocation",
+          "value": "jira-as api call searchAndReconsileIssuesUsingJqlPost --field 'jql=project = SBX' --field maxResults=25 --all --limit 50"
+        }
+      ]
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/statuses/search\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "search"
+        ]
+      },
+      "description": "GET /rest/api/3/statuses/search: discovery help for search.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_search"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/uiModifications\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/uiModifications: discovery help for getUiModifications.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getUiModifications"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/user/bulk\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/user/bulk: discovery help for bulkGetUsers.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_bulkGetUsers"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/user/bulk/migration\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/user/bulk/migration: discovery help for bulkGetUsersMigration.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_bulkGetUsersMigration"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/user/search\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/user/search: discovery help for findUsers.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_findUsers"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/user/search/query\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/user/search/query: discovery help for findUsersByQuery.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_findUsersByQuery"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/user/search/query/key\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/user/search/query/key: discovery help for findUserKeysByQuery.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_findUserKeysByQuery"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/users\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/users: discovery help for getAllUsersDefault.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getAllUsersDefault"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/users/search\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/users/search: discovery help for getAllUsers.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getAllUsers"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/webhook\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/webhook: discovery help for getDynamicWebhooksForApp.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getDynamicWebhooksForApp"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/webhook/failed\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ],
+        "x-as-examples": [
+          {
+            "kind": "invocation",
+            "value": "jira-as api call getFailedWebhooks --maxResults 25 --all --limit 50"
+          }
+        ]
+      },
+      "description": "GET /rest/api/3/webhook/failed: discovery help for getFailedWebhooks.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getFailedWebhooks",
+      "x-as-examples": [
+        {
+          "kind": "invocation",
+          "value": "jira-as api call getFailedWebhooks --maxResults 25 --all --limit 50"
+        }
+      ]
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflow/rule/config\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/workflow/rule/config: discovery help for getWorkflowTransitionRuleConfigurations.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getWorkflowTransitionRuleConfigurations"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflow/search\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/workflow/search: discovery help for getWorkflowsPaginated.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getWorkflowsPaginated"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflows/search\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging",
+          "search"
+        ]
+      },
+      "description": "GET /rest/api/3/workflows/search: discovery help for searchWorkflows.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_searchWorkflows"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflowscheme\"].get",
+      "update": {
+        "x-as-topic": [
+          "paging"
+        ]
+      },
+      "description": "GET /rest/api/3/workflowscheme: discovery help for getAllWorkflowSchemes.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_getAllWorkflowSchemes"
+    },
+    {
+      "target": "$.paths[\"/rest/atlassian-connect/1/migration/workflow/rule/search\"].post",
+      "update": {
+        "x-as-topic": [
+          "search"
+        ]
+      },
+      "description": "POST /rest/atlassian-connect/1/migration/workflow/rule/search: discovery help for MigrationResource.workflowRuleSearch_post.",
+      "x-as-reason": "Seed help from declared paging controls, search identities, and Software board/epic/sprint routes; examples use the public generic CLI.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-45",
+      "x-as-test": "help_platform_MigrationResource.workflowRuleSearch_post"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "format_version": 1,
+  "documents": [
+    {
+      "id": "platform",
+      "file": "jira-platform-swagger-v3.json",
+      "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+      "tier": "primary",
+      "declared_version": "1001.0.0-SNAPSHOT-c69b1b3ac22a0efe14837fa9e25386d5c357b9e5",
+      "sha256": "713089acf94527c571cf0e8e7296e0ce6f886390e681c94a1f14c272881de6dd",
+      "fetched_at": "2026-09-07T10:51:10Z",
+      "overlays": [
+        "platform.identity.overlay.json",
+        "platform.paging.overlay.json",
+        "platform.paging-override.overlay.json",
+        "platform.overlay.json",
+        "platform.help.overlay.json"
+      ],
+      "strip_extensions": [
+        "x-atlassian-narrative"
+      ]
+    },
+    {
+      "id": "software",
+      "file": "jira-software-swagger-v3.json",
+      "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+      "tier": "primary",
+      "declared_version": "1001.0.0",
+      "sha256": "4e108d54b99064475c6ba0f986cce46dcace81336e034b58a5400b93174b927a",
+      "fetched_at": "2026-09-07T10:51:10Z",
+      "overlays": [
+        "software.identity.overlay.json",
+        "software.paging.overlay.json",
+        "software.paging-override.overlay.json",
+        "software.overlay.json",
+        "software.help.overlay.json"
+      ],
+      "strip_extensions": [
+        "x-atlassian-narrative"
+      ]
+    },
+    {
+      "id": "servicedesk",
+      "file": "jira-servicedesk-swagger-v3.json",
+      "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+      "tier": "primary",
+      "declared_version": "1001.0.0-SNAPSHOT-c69b1b3ac22a0efe14837fa9e25386d5c357b9e5",
+      "sha256": "7bc2b340a4a92fd5c79990be0bb93fc4659575bf7e310f92571b090d04581e6d",
+      "fetched_at": "2026-09-07T10:51:10Z",
+      "overlays": [
+        "servicedesk.identity.overlay.json",
+        "servicedesk.paging.overlay.json",
+        "servicedesk.paging-override.overlay.json",
+        "servicedesk.overlay.json",
+        "servicedesk.help.overlay.json"
+      ],
+      "strip_extensions": [
+        "x-atlassian-narrative"
+      ]
+    }
+  ]
+}
