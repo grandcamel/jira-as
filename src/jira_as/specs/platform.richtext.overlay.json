@@ -1,0 +1,757 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira platform ADF field paths",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "target": "$.paths[\"/rest/api/3/issue\"].post",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "request": {
+              "path": "/fields/description",
+              "shape": "value",
+              "nullable": true
+            },
+            "customFields": "textarea"
+          },
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "request": {
+              "path": "/fields/environment",
+              "shape": "value",
+              "nullable": true
+            },
+            "customFields": "textarea"
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "createIssue: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/issue].post.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_createIssue"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}\"].put",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "request": {
+              "path": "/fields/description",
+              "shape": "value",
+              "nullable": true
+            },
+            "customFields": "textarea"
+          },
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "request": {
+              "path": "/fields/environment",
+              "shape": "value",
+              "nullable": true
+            },
+            "customFields": "textarea"
+          },
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/fields/description",
+              "shape": "value",
+              "nullable": true
+            }
+          },
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/fields/environment",
+              "shape": "value",
+              "nullable": true
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "editIssue: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/issue/{issueIdOrKey}].put.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_editIssue"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/bulk\"].post",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "request": {
+              "path": "/fields/description",
+              "shape": "value",
+              "itemsPath": "/issueUpdates",
+              "nullable": true
+            },
+            "customFields": "textarea"
+          },
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "request": {
+              "path": "/fields/environment",
+              "shape": "value",
+              "itemsPath": "/issueUpdates",
+              "nullable": true
+            },
+            "customFields": "textarea"
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "createIssues: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/issue/bulk].post.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_createIssues"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}\"].get",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/fields/description",
+              "shape": "value",
+              "nullable": true
+            }
+          },
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/fields/environment",
+              "shape": "value",
+              "nullable": true
+            }
+          },
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/body",
+              "shape": "value",
+              "itemsPath": "/fields/comment/comments"
+            }
+          },
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/comment",
+              "shape": "value",
+              "itemsPath": "/fields/worklog/worklogs",
+              "nullable": true
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "getIssue: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/issue/{issueIdOrKey}].get.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_getIssue"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search\"].get",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/fields/description",
+              "shape": "value",
+              "itemsPath": "/issues",
+              "nullable": true
+            }
+          },
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/fields/environment",
+              "shape": "value",
+              "itemsPath": "/issues",
+              "nullable": true
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "searchForIssuesUsingJql: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/search].get.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_searchForIssuesUsingJql"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search\"].post",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/fields/description",
+              "shape": "value",
+              "itemsPath": "/issues",
+              "nullable": true
+            }
+          },
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/fields/environment",
+              "shape": "value",
+              "itemsPath": "/issues",
+              "nullable": true
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "searchForIssuesUsingJqlPost: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/search].post.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_searchForIssuesUsingJqlPost"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search/jql\"].get",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/fields/description",
+              "shape": "value",
+              "itemsPath": "/issues",
+              "nullable": true
+            }
+          },
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/fields/environment",
+              "shape": "value",
+              "itemsPath": "/issues",
+              "nullable": true
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "searchAndReconsileIssuesUsingJql: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/search/jql].get.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_searchAndReconsileIssuesUsingJql"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search/jql\"].post",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/fields/description",
+              "shape": "value",
+              "itemsPath": "/issues",
+              "nullable": true
+            }
+          },
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/fields/environment",
+              "shape": "value",
+              "itemsPath": "/issues",
+              "nullable": true
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "searchAndReconsileIssuesUsingJqlPost: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/search/jql].post.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_searchAndReconsileIssuesUsingJqlPost"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment\"].post",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "request": {
+              "path": "/body",
+              "shape": "value"
+            },
+            "response": {
+              "path": "/body",
+              "shape": "value"
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "addComment: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/issue/{issueIdOrKey}/comment].post.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_addComment"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment/{id}\"].put",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "request": {
+              "path": "/body",
+              "shape": "value"
+            },
+            "response": {
+              "path": "/body",
+              "shape": "value"
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "updateComment: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/issue/{issueIdOrKey}/comment/{id}].put.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_updateComment"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment/{id}\"].get",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/body",
+              "shape": "value"
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "getComment: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/issue/{issueIdOrKey}/comment/{id}].get.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_getComment"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment\"].get",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/body",
+              "shape": "value",
+              "itemsPath": "/comments"
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "getComments: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/issue/{issueIdOrKey}/comment].get.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_getComments"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/comment/list\"].post",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/body",
+              "shape": "value",
+              "itemsPath": "/values"
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "getCommentsByIds: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/comment/list].post.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_getCommentsByIds"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog\"].post",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "request": {
+              "path": "/comment",
+              "shape": "value",
+              "nullable": true
+            },
+            "response": {
+              "path": "/comment",
+              "shape": "value",
+              "nullable": true
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "addWorklog: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/issue/{issueIdOrKey}/worklog].post.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_addWorklog"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog/{id}\"].put",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "request": {
+              "path": "/comment",
+              "shape": "value",
+              "nullable": true
+            },
+            "response": {
+              "path": "/comment",
+              "shape": "value",
+              "nullable": true
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "updateWorklog: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/issue/{issueIdOrKey}/worklog/{id}].put.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_updateWorklog"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog/{id}\"].get",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/comment",
+              "shape": "value",
+              "nullable": true
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "getWorklog: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/issue/{issueIdOrKey}/worklog/{id}].get.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_getWorklog"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog\"].get",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/comment",
+              "shape": "value",
+              "itemsPath": "/worklogs",
+              "nullable": true
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "getIssueWorklog: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/issue/{issueIdOrKey}/worklog].get.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_getIssueWorklog"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/worklog/list\"].post",
+      "update": {
+        "x-as-richtext": [
+          {
+            "representations": {
+              "adf": {
+                "converter": "adf",
+                "encoding": "object"
+              }
+            },
+            "response": {
+              "path": "/comment",
+              "shape": "value",
+              "itemsPath": "",
+              "nullable": true
+            }
+          }
+        ],
+        "x-as-representation": {
+          "default": "adf"
+        }
+      },
+      "description": "getWorklogsForIds: convert only declared ADF fields; preserve unrelated fields and response metadata. Source: paths[/rest/api/3/worklog/list].post.",
+      "x-as-reason": "The v3 document exposes ADF values as free objects/maps; tagged paths enable Markdown input and rendered output without field-name guessing.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47; research/adf-machine-readable-schema-2026-09.md",
+      "x-as-test": "jas47_richtext_getWorklogsForIds"
+    }
+  ]
+}

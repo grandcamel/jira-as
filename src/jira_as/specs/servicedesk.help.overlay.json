@@ -372,6 +372,78 @@
       },
       "x-as-origin": "JAS-45",
       "x-as-test": "help_servicedesk_getRequestTypeGroups"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request\"].post",
+      "description": "createCustomerRequest: enroll the source-reviewed note in fields, adf, permissions help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-jsm/SKILL.md#L227",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json; /rest/servicedeskapi/request post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 63; jira-jsm/SKILL.md:227",
+      "x-as-test": "jas47_topic_servicedesk_createCustomerRequest",
+      "update": {
+        "x-as-topic": [
+          "fields",
+          "adf",
+          "permissions"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/comment\"].post",
+      "description": "createRequestComment: enroll the source-reviewed note in adf, permissions help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-jsm/SKILL.md#L231",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json; /rest/servicedeskapi/request/{issueIdOrKey}/comment post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 65; jira-jsm/SKILL.md:231",
+      "x-as-test": "jas47_topic_servicedesk_createRequestComment",
+      "update": {
+        "x-as-topic": [
+          "adf",
+          "permissions"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/field\"].get",
+      "description": "getRequestTypeFields: enroll the source-reviewed note in fields help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-jsm/SKILL.md#L227",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json; /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/field get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 64; jira-jsm/SKILL.md:227",
+      "x-as-test": "jas47_topic_servicedesk_getRequestTypeFields",
+      "update": {
+        "x-as-topic": [
+          "fields"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk\"].get",
+      "description": "getServiceDesks: enroll the source-reviewed note in rate-limits, sandbox help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-jsm/references/API_REFERENCE.md#L5",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json; /rest/servicedeskapi/servicedesk get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 72; jira-jsm/references/API_REFERENCE.md:5",
+      "x-as-test": "jas47_topic_servicedesk_getServiceDesks",
+      "update": {
+        "x-as-topic": [
+          "rate-limits",
+          "sandbox"
+        ]
+      }
     }
   ]
 }

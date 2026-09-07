@@ -62,7 +62,7 @@ Get board by filter id
 
 ## getBoardConfiguration
 
-Atlassian operationId getConfiguration at GET /rest/agile/1.0/board/{boardId}/configuration is exposed as getBoardConfiguration to disambiguate the combined Jira surface.
+Atlassian operationId getConfiguration at GET /rest/agile/1.0/board/{boardId}/configuration is exposed as getBoardConfiguration to disambiguate the combined Jira surface. The board’s estimation configuration can select a different custom field from another board. Discover its fieldId and use that board’s configuration instead of assuming a universal Story Points field.
 
 ## getBoardIssuesForEpic
 
@@ -126,7 +126,7 @@ Get issues for epic (enhanced)
 
 ## getIssuesForSprint
 
-Get issues for sprint
+Honor Retry-After on rate-limited requests rather than retrying immediately. This legacy Agile issue-list route is deprecated; inspect the pinned replacement route and its paging contract before migrating.
 
 ## getIssuesForSprintJSIS
 
@@ -172,20 +172,4 @@ Get sprint
 
 Atlassian operationId getProperty at GET /rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey} is exposed as getSprintProperty to disambiguate the combined Jira surface.
 
-## getSprintPropertyKeys
-
-Atlassian operationId getPropertiesKeys at GET /rest/agile/1.0/sprint/{sprintId}/properties is exposed as getSprintPropertyKeys to disambiguate the combined Jira surface.
-
-## moveIssuesToBoard
-
-Move issues to board
-
-## moveIssuesToEpic
-
-Move issues to epic
-
-## moveIssuesToSprintAndRank
-
-Move issues to sprint and rank
-
-Showing entries 1–46 of 55. Continue: help agile --offset 46 --tier software.
+Showing entries 1–42 of 55. Continue: help agile --offset 42 --tier software.

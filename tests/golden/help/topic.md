@@ -10,7 +10,7 @@ Search statuses paginated
 
 ## searchAndReconsileIssuesUsingJql
 
-Search for issues using JQL enhanced search (GET)
+Use /rest/api/3/search/jql and nextPageToken for issue search. A 429 is a rate limit: honor Retry-After and returned rate-limit headers; do not assume a universal requests-per-minute quota. --all follows the declared continuation and --limit caps collected issues.
 
 ```sh
 jira-as api call searchAndReconsileIssuesUsingJql --jql 'project = SBX' --maxResults 25 --all --limit 50
@@ -18,7 +18,7 @@ jira-as api call searchAndReconsileIssuesUsingJql --jql 'project = SBX' --maxRes
 
 ## searchAndReconsileIssuesUsingJqlPost
 
-Search for issues using JQL enhanced search (POST)
+Use /rest/api/3/search/jql and nextPageToken for issue search. A 429 is a rate limit: honor Retry-After and returned rate-limit headers; do not assume a universal requests-per-minute quota. --all follows the declared continuation and --limit caps collected issues.
 
 ```sh
 jira-as api call searchAndReconsileIssuesUsingJqlPost --field 'jql=project = SBX' --field maxResults=25 --all --limit 50
@@ -34,11 +34,11 @@ Search field scheme projects
 
 ## searchForIssuesUsingJql
 
-Currently being removed. Search for issues using JQL (GET)
+This removed /search operation is replaced by searchAndReconsileIssuesUsingJql at /rest/api/3/search/jql (CHANGE-2046). The replacement pages with nextPageToken, not startAt. The literal operationId search belongs to status discovery; use the full issue-search operationId.
 
 ## searchForIssuesUsingJqlPost
 
-Currently being removed. Search for issues using JQL (POST)
+This removed /search operation is replaced by searchAndReconsileIssuesUsingJqlPost at /rest/api/3/search/jql (CHANGE-2046). The replacement pages with nextPageToken, not startAt. The literal operationId search belongs to status discovery; use the full issue-search operationId.
 
 ## searchPriorities
 

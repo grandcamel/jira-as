@@ -4,5 +4,66 @@
     "title": "Jira servicedesk overlay.json",
     "version": "1.0.0"
   },
-  "actions": []
+  "actions": [
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request\"].post",
+      "description": "createCustomerRequest: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-jsm/SKILL.md#L227",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json; /rest/servicedeskapi/request post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 63; jira-jsm/SKILL.md:227",
+      "x-as-test": "jas47_note_servicedesk_createCustomerRequest",
+      "update": {
+        "x-as-note": "Discover the request type’s required fields before creating a portal request. raiseOnBehalfOf takes an account ID and is unavailable to customer-only callers. requestFieldValues stays unchanged here: ADF mode requires explicit isAdfRequest=true and already encoded ADF. Automatic textarea resolution and a per-call override are deferred to JAS-49."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/comment\"].post",
+      "description": "createRequestComment: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-jsm/SKILL.md#L231",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json; /rest/servicedeskapi/request/{issueIdOrKey}/comment post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 65; jira-jsm/SKILL.md:231",
+      "x-as-test": "jas47_note_servicedesk_createRequestComment",
+      "update": {
+        "x-as-note": "JSM request comment body is a string and is sent verbatim; it is not the platform v3 ADF comment endpoint. Set public explicitly to distinguish a customer-visible reply from an internal comment."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/field\"].get",
+      "description": "getRequestTypeFields: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-jsm/SKILL.md#L227",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json; /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/field get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 64; jira-jsm/SKILL.md:227",
+      "x-as-test": "jas47_note_servicedesk_getRequestTypeFields",
+      "update": {
+        "x-as-note": "Required fields and valid values depend on the selected service desk/request type and caller permissions. Use this metadata instead of assuming every Jira field is available on the portal form."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk\"].get",
+      "description": "getServiceDesks: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-jsm/references/API_REFERENCE.md#L5",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json; /rest/servicedeskapi/servicedesk get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 72; jira-jsm/references/API_REFERENCE.md:5",
+      "x-as-test": "jas47_note_servicedesk_getServiceDesks",
+      "update": {
+        "x-as-note": "JSM uses /rest/servicedeskapi, separate from platform /rest/api/3. Use responder mode for offline discovery; live rate limits are service-specific, so honor Retry-After and avoid hardcoded quota assumptions."
+      }
+    }
+  ]
 }

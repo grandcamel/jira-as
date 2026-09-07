@@ -146,7 +146,9 @@ def test_json_error_contract(status, code):
         "status": status,
         "messages": [f"Responder forced HTTP {status}"],
         "operation": "getIssue",
-        "note": None,
+        "note": create_surface(transport="responder").describe("getIssue")[
+            "extensions"
+        ]["x-as-note"],
     }
 
 

@@ -294,6 +294,34 @@ Site-level calls (including numeric board, sprint and service-desk routes) requi
 `JIRA_ALLOW_SITE_OPERATIONS=true`; the default is false. Discovery and help stay
 settings-free. See [project scope details](docs/allowed-projects.md#generic-surface-project-scope-20).
 
+### Rich text and notes
+
+Platform v3 description/environment, comment body and worklog comment paths
+accept Markdown. Use real newlines in UTF-8 files:
+
+```bash
+jira-as api --transport responder call createIssue \
+  --field fields.project.key=SBX --field fields.summary=x \
+  --field fields.issuetype.name=Task --field fields.description=@notes.md
+jira-as api --transport responder call addComment \
+  --issueIdOrKey SBX-1 --field body=@notes.md
+```
+
+Tagged reads render Markdown with lossless placeholders for unsupported ADF
+nodes; `--raw` preserves the stored ADF. Use a JSON `--body @request.json` or
+stdin for already encoded ADF or an explicit null. Bulk create converts the
+static paths in each `issueUpdates` item supplied as JSON. Custom fields pass
+through unchanged: textarea fields require ADF, while automatic instance
+resolution and a per-call override are deferred to JAS-49. JSM request fields
+also pass through unchanged; its explicit `isAdfRequest=true` mode requires
+caller-supplied ADF. JSM request comments remain strings.
+
+`help adf`, `help fields`, `help project-types`, `help rate-limits` and the other
+topics render source-backed entries. `api describe` and errors carry relevant
+notes. Removed issue-search operations name their `/search/jql` replacements;
+use `api describe searchForIssuesUsingJql` or `help search`. The operationId
+`search` continues to mean status discovery. Search hides deprecated operations
+unless `--include-deprecated` is supplied; calling one warns on stderr.
 
 ## Build
 

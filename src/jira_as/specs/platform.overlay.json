@@ -1,8 +1,4001 @@
 {
   "overlay": "1.0.0",
   "info": {
-    "title": "Jira platform overlay.json",
+    "title": "Jira platform JAS-47 corrections and deprecations",
     "version": "1.0.0"
   },
-  "actions": []
+  "actions": [
+    {
+      "target": "$.components.schemas",
+      "update": {
+        "Adf_alignment_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "alignment"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "align": {
+                  "enum": [
+                    "center",
+                    "end"
+                  ]
+                }
+              },
+              "required": [
+                "align"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "type",
+            "attrs"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_annotation_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "annotation"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "annotationType": {
+                  "enum": [
+                    "inlineComment"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "annotationType"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "type",
+            "attrs"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_backgroundColor_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "backgroundColor"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "color": {
+                  "pattern": "^#[0-9a-fA-F]{6}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "color"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "type",
+            "attrs"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_block_content": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Adf_blockCard_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_paragraph_with_no_marks_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_paragraph_with_alignment_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_paragraph_with_indentation_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_mediaSingle_caption_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_mediaSingle_full_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_codeBlock_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_taskList_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_bulletList_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_orderedList_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_heading_with_no_marks_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_heading_with_alignment_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_heading_with_indentation_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_mediaGroup_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_decisionList_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_rule_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_panel_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_blockquote_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_extension_with_marks_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_embedCard_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_table_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_expand_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_bodiedExtension_with_marks_node"
+            }
+          ]
+        },
+        "Adf_blockCard_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "blockCard"
+              ]
+            },
+            "attrs": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "localId": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "datasource": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "parameters": {},
+                        "views": {
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "properties": {},
+                              "type": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "type"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "minItems": 1,
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "parameters",
+                        "views"
+                      ]
+                    },
+                    "width": {
+                      "type": "number"
+                    },
+                    "layout": {
+                      "enum": [
+                        "wide",
+                        "full-width",
+                        "center",
+                        "wrap-right",
+                        "wrap-left",
+                        "align-end",
+                        "align-start"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "datasource"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    },
+                    "localId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "url"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {},
+                    "localId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_blockquote_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "blockquote"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Adf_paragraph_with_no_marks_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_orderedList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_bulletList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_codeBlock_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaSingle_caption_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaSingle_full_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaGroup_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_extension_with_marks_node"
+                  }
+                ]
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "content"
+          ]
+        },
+        "Adf_blockTaskItem_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "blockTaskItem"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "localId": {
+                  "type": "string"
+                },
+                "state": {
+                  "enum": [
+                    "TODO",
+                    "DONE"
+                  ]
+                }
+              },
+              "required": [
+                "localId",
+                "state"
+              ],
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": [
+                {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Adf_paragraph_with_no_marks_node"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Adf_paragraph_with_font_size_node"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Adf_extension_with_marks_node"
+                    }
+                  ]
+                },
+                {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Adf_paragraph_with_no_marks_node"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Adf_paragraph_with_font_size_node"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Adf_extension_with_marks_node"
+                    }
+                  ]
+                }
+              ],
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs",
+            "content"
+          ]
+        },
+        "Adf_bodiedExtension_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "bodiedExtension"
+              ]
+            },
+            "marks": {
+              "type": "array"
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "extensionKey": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "extensionType": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "parameters": {},
+                "text": {
+                  "type": "string"
+                },
+                "layout": {
+                  "enum": [
+                    "wide",
+                    "full-width",
+                    "default"
+                  ]
+                },
+                "localId": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "extensionKey",
+                "extensionType"
+              ],
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_non_nestable_block_content"
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs",
+            "content"
+          ]
+        },
+        "Adf_bodiedExtension_with_marks_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_bodiedExtension_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/Adf_dataConsumer_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_fragment_mark"
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_bodiedSyncBlock_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "bodiedSyncBlock"
+              ]
+            },
+            "marks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_breakout_mark"
+              }
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "resourceId": {
+                  "type": "string"
+                },
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "resourceId",
+                "localId"
+              ],
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Adf_paragraph_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_paragraph_with_alignment_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_paragraph_with_indentation_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_paragraph_with_no_marks_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_blockCard_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_blockquote_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_bulletList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_codeBlock_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_decisionList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_embedCard_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_expand_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_heading_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_heading_with_alignment_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_heading_with_indentation_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_heading_with_no_marks_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_layoutSection_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_layoutSection_full_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaGroup_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaSingle_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaSingle_caption_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaSingle_full_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_orderedList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_panel_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_rule_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_table_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_taskList_node"
+                  }
+                ]
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs",
+            "content"
+          ]
+        },
+        "Adf_border_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "border"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "size": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 3
+                },
+                "color": {
+                  "pattern": "^#[0-9a-fA-F]{8}$|^#[0-9a-fA-F]{6}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "size",
+                "color"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "type",
+            "attrs"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_breakout_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "breakout"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "enum": [
+                    "wide",
+                    "full-width"
+                  ]
+                },
+                "width": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "type",
+            "attrs"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_bulletList_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "bulletList"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_listItem_node"
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "content"
+          ]
+        },
+        "Adf_caption_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "caption"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Adf_hardBreak_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mention_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_emoji_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_date_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_placeholder_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_inlineCard_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_status_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_formatted_text_inline_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_code_inline_node"
+                  }
+                ]
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ]
+        },
+        "Adf_code_inline_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_text_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/Adf_code_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_link_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_annotation_mark"
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_code_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "code"
+              ]
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_codeBlock_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "codeBlock"
+              ]
+            },
+            "marks": {
+              "type": "array",
+              "maxItems": 0
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "language": {
+                  "type": "string"
+                },
+                "uniqueId": {
+                  "type": "string"
+                },
+                "localId": {
+                  "type": "string"
+                },
+                "wrap": {
+                  "type": "boolean"
+                },
+                "hideLineNumbers": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_text_with_no_marks_node"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ]
+        },
+        "Adf_codeBlock_root_only_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "codeBlock"
+              ]
+            },
+            "marks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_breakout_mark"
+              }
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "language": {
+                  "type": "string"
+                },
+                "uniqueId": {
+                  "type": "string"
+                },
+                "localId": {
+                  "type": "string"
+                },
+                "wrap": {
+                  "type": "boolean"
+                },
+                "hideLineNumbers": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_text_with_no_marks_node"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ]
+        },
+        "Adf_dataConsumer_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "dataConsumer"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "sources": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "sources"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "type",
+            "attrs"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_date_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "date"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "timestamp": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "timestamp"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_decisionItem_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "decisionItem"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "localId": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "localId",
+                "state"
+              ],
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_inline_node"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_decisionList_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "decisionList"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "localId"
+              ],
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_decisionItem_node"
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs",
+            "content"
+          ]
+        },
+        "Adf_doc_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "doc"
+              ]
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Adf_blockCard_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_codeBlock_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaSingle_caption_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaSingle_full_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_paragraph_with_alignment_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_paragraph_with_indentation_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_paragraph_with_no_marks_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_taskList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_orderedList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_bulletList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_blockquote_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_decisionList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_embedCard_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_extension_with_marks_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_heading_with_indentation_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_heading_with_no_marks_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_heading_with_alignment_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaGroup_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_rule_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_panel_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_table_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_bodiedExtension_with_marks_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_expand_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_codeBlock_root_only_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_layoutSection_full_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_expand_root_only_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_syncBlock_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_bodiedSyncBlock_node"
+                  }
+                ]
+              }
+            },
+            "version": {
+              "enum": [
+                1
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "type",
+            "content"
+          ]
+        },
+        "Adf_em_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "em"
+              ]
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_embedCard_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "embedCard"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string"
+                },
+                "layout": {
+                  "enum": [
+                    "wide",
+                    "full-width",
+                    "center",
+                    "wrap-right",
+                    "wrap-left",
+                    "align-end",
+                    "align-start"
+                  ]
+                },
+                "width": {
+                  "type": "number",
+                  "maximum": 100,
+                  "minimum": 0
+                },
+                "originalHeight": {
+                  "type": "number"
+                },
+                "originalWidth": {
+                  "type": "number"
+                },
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "url",
+                "layout"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_emoji_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "emoji"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "shortName": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "shortName"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_expand_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "expand"
+              ]
+            },
+            "marks": {
+              "type": "array",
+              "maxItems": 0
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Adf_non_nestable_block_content"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_nestedExpand_with_no_marks_node"
+                  }
+                ]
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "content"
+          ]
+        },
+        "Adf_expand_root_only_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "expand"
+              ]
+            },
+            "marks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_breakout_mark"
+              }
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Adf_non_nestable_block_content"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_nestedExpand_with_no_marks_node"
+                  }
+                ]
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "content"
+          ]
+        },
+        "Adf_extension_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "extension"
+              ]
+            },
+            "marks": {
+              "type": "array"
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "extensionKey": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "extensionType": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "parameters": {},
+                "text": {
+                  "type": "string"
+                },
+                "layout": {
+                  "enum": [
+                    "wide",
+                    "full-width",
+                    "default"
+                  ]
+                },
+                "localId": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "extensionKey",
+                "extensionType"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_extension_with_marks_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_extension_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/Adf_dataConsumer_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_fragment_mark"
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_fontSize_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "fontSize"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "fontSize": {
+                  "enum": [
+                    "small"
+                  ]
+                }
+              },
+              "required": [
+                "fontSize"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "type",
+            "attrs"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_formatted_text_inline_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_text_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/Adf_link_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_em_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_strong_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_strike_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_subsup_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_underline_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_textColor_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_annotation_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_backgroundColor_mark"
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_fragment_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "fragment"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "localId": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "localId"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "type",
+            "attrs"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_hardBreak_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "hardBreak"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "enum": [
+                    "\n"
+                  ]
+                },
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ]
+        },
+        "Adf_heading_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "heading"
+              ]
+            },
+            "marks": {
+              "type": "array"
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "level": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 6
+                },
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "level"
+              ],
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_inline_node"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_heading_with_alignment_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_heading_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Adf_alignment_mark"
+                  }
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_heading_with_indentation_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_heading_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Adf_indentation_mark"
+                  }
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_heading_with_no_marks_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_heading_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "maxItems": 0
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_indentation_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "indentation"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "level": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 6
+                }
+              },
+              "required": [
+                "level"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "type",
+            "attrs"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_inline_node": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Adf_formatted_text_inline_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_code_inline_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_date_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_emoji_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_hardBreak_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_inlineCard_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_mention_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_placeholder_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_status_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_inlineExtension_with_marks_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_mediaInline_node"
+            }
+          ]
+        },
+        "Adf_inlineCard_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "inlineCard"
+              ]
+            },
+            "attrs": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    },
+                    "localId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "url"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {},
+                    "localId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_inlineExtension_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "inlineExtension"
+              ]
+            },
+            "marks": {
+              "type": "array"
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "extensionKey": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "extensionType": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "parameters": {},
+                "text": {
+                  "type": "string"
+                },
+                "localId": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "extensionKey",
+                "extensionType"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_inlineExtension_with_marks_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_inlineExtension_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/Adf_dataConsumer_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_fragment_mark"
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_layoutColumn_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "layoutColumn"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "width": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "localId": {
+                  "type": "string"
+                },
+                "valign": {
+                  "enum": [
+                    "top",
+                    "middle",
+                    "bottom"
+                  ]
+                }
+              },
+              "required": [
+                "width"
+              ],
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_block_content"
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs",
+            "content"
+          ]
+        },
+        "Adf_layoutSection_full_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_layoutSection_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Adf_breakout_mark"
+                  }
+                },
+                "content": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Adf_layoutColumn_node"
+                  },
+                  "minItems": 2,
+                  "maxItems": 3
+                }
+              },
+              "required": [
+                "content"
+              ],
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_layoutSection_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "layoutSection"
+              ]
+            },
+            "marks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_breakout_mark"
+              }
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_layoutColumn_node"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "content"
+          ]
+        },
+        "Adf_link_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "link"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "href": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "collection": {
+                  "type": "string"
+                },
+                "occurrenceKey": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "href"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "type",
+            "attrs"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_listItem_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "listItem"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Adf_paragraph_with_font_size_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_paragraph_with_no_marks_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_bulletList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_orderedList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_taskList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaSingle_caption_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaSingle_full_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_codeBlock_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_extension_with_marks_node"
+                  }
+                ]
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "content"
+          ]
+        },
+        "Adf_media_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "media"
+              ]
+            },
+            "marks": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Adf_dataConsumer_mark"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_link_mark"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_annotation_mark"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_border_mark"
+                  }
+                ]
+              }
+            },
+            "attrs": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "enum": [
+                        "link",
+                        "file"
+                      ]
+                    },
+                    "localId": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "alt": {
+                      "type": "string"
+                    },
+                    "collection": {
+                      "type": "string"
+                    },
+                    "height": {
+                      "type": "number"
+                    },
+                    "occurrenceKey": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "width": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "id",
+                    "collection"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "enum": [
+                        "external"
+                      ]
+                    },
+                    "localId": {
+                      "type": "string"
+                    },
+                    "alt": {
+                      "type": "string"
+                    },
+                    "height": {
+                      "type": "number"
+                    },
+                    "width": {
+                      "type": "number"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "url"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_mediaGroup_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "mediaGroup"
+              ]
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_media_node"
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "content"
+          ]
+        },
+        "Adf_mediaInline_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "mediaInline"
+              ]
+            },
+            "marks": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Adf_dataConsumer_mark"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_link_mark"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_annotation_mark"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_border_mark"
+                  }
+                ]
+              }
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "enum": [
+                    "link",
+                    "file",
+                    "image"
+                  ]
+                },
+                "localId": {
+                  "type": "string"
+                },
+                "id": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "alt": {
+                  "type": "string"
+                },
+                "collection": {
+                  "type": "string"
+                },
+                "occurrenceKey": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "width": {
+                  "type": "number"
+                },
+                "height": {
+                  "type": "number"
+                },
+                "data": {}
+              },
+              "required": [
+                "id",
+                "collection"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_mediaSingle_caption_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_mediaSingle_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "$ref": "#/components/schemas/Adf_media_node"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Adf_caption_node"
+                    }
+                  ],
+                  "minItems": 1,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "content"
+              ],
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_mediaSingle_full_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_mediaSingle_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Adf_media_node"
+                  },
+                  "minItems": 1,
+                  "maxItems": 1
+                }
+              },
+              "required": [
+                "content"
+              ],
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_mediaSingle_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "mediaSingle"
+              ]
+            },
+            "marks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_link_mark"
+              }
+            },
+            "attrs": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "localId": {
+                      "type": "string"
+                    },
+                    "width": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "layout": {
+                      "enum": [
+                        "wide",
+                        "full-width",
+                        "center",
+                        "wrap-right",
+                        "wrap-left",
+                        "align-end",
+                        "align-start"
+                      ]
+                    },
+                    "widthType": {
+                      "enum": [
+                        "percentage"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "layout"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "localId": {
+                      "type": "string"
+                    },
+                    "width": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "widthType": {
+                      "enum": [
+                        "pixel"
+                      ]
+                    },
+                    "layout": {
+                      "enum": [
+                        "wide",
+                        "full-width",
+                        "center",
+                        "wrap-right",
+                        "wrap-left",
+                        "align-end",
+                        "align-start"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "width",
+                    "widthType",
+                    "layout"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "additionalProperties": true,
+          "required": [
+            "type"
+          ]
+        },
+        "Adf_mention_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "mention"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "localId": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "accessLevel": {
+                  "type": "string"
+                },
+                "userType": {
+                  "enum": [
+                    "DEFAULT",
+                    "SPECIAL",
+                    "APP"
+                  ]
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_nestedExpand_content": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Adf_paragraph_with_no_marks_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_paragraph_with_font_size_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_heading_with_no_marks_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_mediaSingle_caption_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_mediaSingle_full_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_mediaGroup_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_codeBlock_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_bulletList_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_orderedList_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_taskList_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_decisionList_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_rule_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_panel_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_blockquote_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_extension_with_marks_node"
+              }
+            ]
+          },
+          "minItems": 1
+        },
+        "Adf_nestedExpand_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "nestedExpand"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "$ref": "#/components/schemas/Adf_nestedExpand_content"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "content",
+            "attrs"
+          ]
+        },
+        "Adf_nestedExpand_with_no_marks_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_nestedExpand_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "maxItems": 0
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_non_nestable_block_content": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Adf_paragraph_with_no_marks_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_paragraph_with_font_size_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_panel_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_blockquote_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_orderedList_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_bulletList_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_rule_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_heading_with_no_marks_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_codeBlock_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_mediaGroup_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_mediaSingle_caption_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_mediaSingle_full_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_decisionList_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_taskList_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_table_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_blockCard_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_embedCard_node"
+            },
+            {
+              "$ref": "#/components/schemas/Adf_extension_with_marks_node"
+            }
+          ]
+        },
+        "Adf_orderedList_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "orderedList"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "order": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_listItem_node"
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "content"
+          ]
+        },
+        "Adf_panel_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "panel"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "panelType": {
+                  "enum": [
+                    "info",
+                    "note",
+                    "tip",
+                    "warning",
+                    "error",
+                    "success",
+                    "custom"
+                  ]
+                },
+                "panelIcon": {
+                  "type": "string"
+                },
+                "panelIconId": {
+                  "type": "string"
+                },
+                "panelIconText": {
+                  "type": "string"
+                },
+                "panelColor": {
+                  "type": "string"
+                },
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "panelType"
+              ],
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Adf_paragraph_with_no_marks_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_paragraph_with_font_size_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_heading_with_no_marks_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_bulletList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_orderedList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_blockCard_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaGroup_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaSingle_caption_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_mediaSingle_full_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_codeBlock_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_taskList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_rule_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_decisionList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_extension_with_marks_node"
+                  }
+                ]
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs",
+            "content"
+          ]
+        },
+        "Adf_paragraph_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "paragraph"
+              ]
+            },
+            "marks": {
+              "type": "array"
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_inline_node"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ]
+        },
+        "Adf_paragraph_with_alignment_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_paragraph_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/Adf_fontSize_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_alignment_mark"
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_paragraph_with_font_size_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_paragraph_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Adf_fontSize_mark"
+                  }
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_paragraph_with_indentation_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_paragraph_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/Adf_fontSize_mark"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Adf_indentation_mark"
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_paragraph_with_no_marks_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_paragraph_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "maxItems": 0
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_placeholder_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "placeholder"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_rule_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "rule"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ]
+        },
+        "Adf_status_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "status"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "color": {
+                  "enum": [
+                    "neutral",
+                    "purple",
+                    "blue",
+                    "red",
+                    "yellow",
+                    "green"
+                  ]
+                },
+                "localId": {
+                  "type": "string"
+                },
+                "style": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "color"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_strike_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "strike"
+              ]
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_strong_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "strong"
+              ]
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_subsup_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "subsup"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "enum": [
+                    "sub",
+                    "sup"
+                  ]
+                }
+              },
+              "required": [
+                "type"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "type",
+            "attrs"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_syncBlock_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "syncBlock"
+              ]
+            },
+            "marks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_breakout_mark"
+              }
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "resourceId": {
+                  "type": "string"
+                },
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "resourceId",
+                "localId"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_table_cell_content": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Adf_paragraph_with_no_marks_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_paragraph_with_alignment_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_panel_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_blockquote_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_orderedList_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_bulletList_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_rule_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_heading_with_no_marks_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_heading_with_alignment_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_heading_with_indentation_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_codeBlock_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_mediaSingle_caption_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_mediaSingle_full_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_mediaGroup_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_decisionList_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_taskList_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_blockCard_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_embedCard_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_extension_with_marks_node"
+              },
+              {
+                "$ref": "#/components/schemas/Adf_nestedExpand_with_no_marks_node"
+              }
+            ]
+          },
+          "minItems": 1
+        },
+        "Adf_table_cell_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "tableCell"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "colspan": {
+                  "type": "number"
+                },
+                "rowspan": {
+                  "type": "number"
+                },
+                "colwidth": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "background": {
+                  "type": "string"
+                },
+                "localId": {
+                  "type": "string"
+                },
+                "valign": {
+                  "enum": [
+                    "top",
+                    "middle",
+                    "bottom"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "$ref": "#/components/schemas/Adf_table_cell_content"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "content"
+          ]
+        },
+        "Adf_table_header_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "tableHeader"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "colspan": {
+                  "type": "number"
+                },
+                "rowspan": {
+                  "type": "number"
+                },
+                "colwidth": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "background": {
+                  "type": "string"
+                },
+                "localId": {
+                  "type": "string"
+                },
+                "valign": {
+                  "enum": [
+                    "top",
+                    "middle",
+                    "bottom"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "$ref": "#/components/schemas/Adf_table_cell_content"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "content"
+          ]
+        },
+        "Adf_table_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "table"
+              ]
+            },
+            "marks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_fragment_mark"
+              }
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "displayMode": {
+                  "enum": [
+                    "default",
+                    "fixed"
+                  ]
+                },
+                "isNumberColumnEnabled": {
+                  "type": "boolean"
+                },
+                "layout": {
+                  "enum": [
+                    "wide",
+                    "full-width",
+                    "center",
+                    "align-end",
+                    "align-start",
+                    "default"
+                  ]
+                },
+                "localId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "width": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_table_row_node"
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "content"
+          ]
+        },
+        "Adf_table_row_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "tableRow"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Adf_table_cell_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_table_header_node"
+                  }
+                ]
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "content"
+          ]
+        },
+        "Adf_taskItem_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "taskItem"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "localId": {
+                  "type": "string"
+                },
+                "state": {
+                  "enum": [
+                    "TODO",
+                    "DONE"
+                  ]
+                }
+              },
+              "required": [
+                "localId",
+                "state"
+              ],
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Adf_inline_node"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs"
+          ]
+        },
+        "Adf_taskList_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "taskList"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "localId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "localId"
+              ],
+              "additionalProperties": false
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Adf_taskItem_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_taskList_node"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Adf_blockTaskItem_node"
+                  }
+                ]
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "attrs",
+            "content"
+          ]
+        },
+        "Adf_text_node": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "text"
+              ]
+            },
+            "marks": {
+              "type": "array"
+            },
+            "text": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "text"
+          ]
+        },
+        "Adf_text_with_no_marks_node": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Adf_text_node"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "marks": {
+                  "type": "array",
+                  "maxItems": 0
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "Adf_textColor_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "textColor"
+              ]
+            },
+            "attrs": {
+              "type": "object",
+              "properties": {
+                "color": {
+                  "type": "string",
+                  "pattern": "^#[0-9a-fA-F]{6}$"
+                }
+              },
+              "required": [
+                "color"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "type",
+            "attrs"
+          ],
+          "additionalProperties": false
+        },
+        "Adf_underline_mark": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "underline"
+              ]
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "description": "Import the pinned ADF 57.3.4 definitions into the existing component registry with collision-safe names.",
+      "x-as-reason": "Comment and worklog fields need a local, complete ADF schema graph whose references remain resolvable after import.",
+      "x-as-evidence": {
+        "url": "https://unpkg.com/@atlaskit/adf-schema@57.3.4/dist/json-schema/v1/full.json",
+        "date": "2026-09-06"
+      },
+      "x-as-origin": "JAS-47",
+      "x-as-test": "jas47_adf_schema_import",
+      "x-as-examples": [
+        {
+          "kind": "json",
+          "value": "{\"version\":1,\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Example\"}]}]}",
+          "schema": "#/components/schemas/Adf_doc_node"
+        }
+      ]
+    },
+    {
+      "target": "$.components.schemas.Comment.properties.body",
+      "update": {
+        "$ref": "#/components/schemas/Adf_doc_node"
+      },
+      "description": "Correct the generated source pointer components.schemas.Comment.properties.body to the documented Atlassian Document Format body.",
+      "x-as-reason": "The comment body description already declares ADF, but the generated schema omitted its structural constraint.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-comments/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47",
+      "x-as-test": "jas47_comment_body_adf"
+    },
+    {
+      "target": "$.components.schemas.Worklog.properties.comment",
+      "update": {
+        "$ref": "#/components/schemas/Adf_doc_node"
+      },
+      "description": "Correct the generated source pointer components.schemas.Worklog.properties.comment to the documented Atlassian Document Format comment.",
+      "x-as-reason": "The worklog comment description already declares ADF, but the generated schema omitted its structural constraint.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-worklogs/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47",
+      "x-as-test": "jas47_worklog_comment_adf"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/classification-levels\"].get.parameters[0].schema.items.default",
+      "remove": true,
+      "description": "Remove the generated empty-string array-item default at /rest/api/3/classification-levels GET parameter 0.",
+      "x-as-reason": "An empty default lies outside the parameter item enum and makes the compiled schema internally inconsistent.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-classification-levels/#api-rest-api-3-classification-levels-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47",
+      "x-as-test": "jas47_remove_classification_levels_default"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/search\"].get.parameters[2].schema.items.default",
+      "remove": true,
+      "description": "Remove the generated empty-string array-item default at /rest/api/3/field/search GET parameter 2.",
+      "x-as-reason": "An empty default lies outside the parameter item enum and makes the compiled schema internally inconsistent.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-fields/#api-rest-api-3-field-search-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47",
+      "x-as-test": "jas47_remove_field_search_default"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/screens\"].get.parameters[4].schema.items.default",
+      "remove": true,
+      "description": "Remove the generated empty-string array-item default at /rest/api/3/screens GET parameter 4.",
+      "x-as-reason": "An empty default lies outside the parameter item enum and makes the compiled schema internally inconsistent.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-screens/#api-rest-api-3-screens-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47",
+      "x-as-test": "jas47_remove_screens_default"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflow/rule/config\"].get.parameters[2].schema.items.default",
+      "remove": true,
+      "description": "Remove the generated empty-string array-item default at /rest/api/3/workflow/rule/config GET parameter 2.",
+      "x-as-reason": "An empty default lies outside the parameter item enum and makes the compiled schema internally inconsistent.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-workflow-transition-rules/#api-rest-api-3-workflow-rule-config-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47",
+      "x-as-test": "jas47_remove_workflow_rule_config_default"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search\"].get",
+      "update": {
+        "x-as-deprecated": {
+          "replacement": "searchAndReconsileIssuesUsingJql"
+        }
+      },
+      "description": "Mark the generated GET /rest/api/3/search operation as deprecated while retaining its base description.",
+      "x-as-reason": "CHANGE-2046 removes this endpoint and directs callers to the replacement JQL search operation.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/changelog/#CHANGE-2046",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47",
+      "x-as-test": "jas47_deprecate_search_get"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search\"].post",
+      "update": {
+        "x-as-deprecated": {
+          "replacement": "searchAndReconsileIssuesUsingJqlPost"
+        }
+      },
+      "description": "Mark the generated POST /rest/api/3/search operation as deprecated while retaining its base description.",
+      "x-as-reason": "CHANGE-2046 removes this endpoint and directs callers to the replacement JQL search operation.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/changelog/#CHANGE-2046",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47",
+      "x-as-test": "jas47_deprecate_search_post"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search/jql\"].post.responses[\"200\"].content[\"application/json\"].example",
+      "update": "{\"isLast\":true,\"issues\":[{\"expand\":\"\",\"fields\":{\"watcher\":{\"isWatching\":false,\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers\",\"watchCount\":1},\"attachment\":[{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"accountType\":\"atlassian\",\"active\":false,\"avatarUrls\":{\"16x16\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=16&s=16\",\"24x24\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=24&s=24\",\"32x32\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=32&s=32\",\"48x48\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48\"},\"displayName\":\"Mia Krystof\",\"key\":\"\",\"name\":\"\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"content\":\"https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10001\",\"created\":\"2023-06-24T19:24:50.000+0000\",\"filename\":\"debuglog.txt\",\"id\":10001,\"mimeType\":\"text/plain\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/attachments/10001\",\"size\":2460}],\"sub-tasks\":[{\"id\":\"10000\",\"outwardIssue\":{\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}},\"id\":\"10003\",\"key\":\"ED-2\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/ED-2\"},\"type\":{\"id\":\"10000\",\"inward\":\"Parent\",\"name\":\"\",\"outward\":\"Sub-task\"}}],\"description\":{\"type\":\"doc\",\"version\":1,\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Main order flow broken\"}]}]},\"project\":{\"avatarUrls\":{\"16x16\":\"https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000\",\"24x24\":\"https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000\",\"32x32\":\"https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000\",\"48x48\":\"https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000\"},\"id\":\"10000\",\"insight\":{\"lastIssueUpdateTime\":\"2021-04-22T05:37:05.000+0000\",\"totalIssueCount\":100},\"key\":\"EX\",\"name\":\"Example\",\"projectCategory\":{\"description\":\"First Project Category\",\"id\":\"10000\",\"name\":\"FIRST\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/projectCategory/10000\"},\"self\":\"https://your-domain.atlassian.net/rest/api/3/project/EX\",\"simplified\":false,\"style\":\"classic\"},\"comment\":[{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"body\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget venenatis elit. Duis eu justo eget augue iaculis fermentum. Sed semper quam laoreet nisi egestas at posuere augue semper.\",\"created\":\"2021-01-17T12:34:00.000+0000\",\"id\":\"10000\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000\",\"updateAuthor\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"identifier\":\"Administrators\",\"type\":\"role\",\"value\":\"Administrators\"}}],\"issuelinks\":[{\"id\":\"10001\",\"outwardIssue\":{\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}},\"id\":\"10004L\",\"key\":\"PR-2\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/PR-2\"},\"type\":{\"id\":\"10000\",\"inward\":\"depends on\",\"name\":\"Dependent\",\"outward\":\"is depended by\"}},{\"id\":\"10002\",\"inwardIssue\":{\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}},\"id\":\"10004\",\"key\":\"PR-3\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/PR-3\"},\"type\":{\"id\":\"10000\",\"inward\":\"depends on\",\"name\":\"Dependent\",\"outward\":\"is depended by\"}}],\"worklog\":[{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"comment\":\"I did some work here.\",\"id\":\"100028\",\"issueId\":\"10002\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10010/worklog/10000\",\"started\":\"2021-01-17T12:34:00.000+0000\",\"timeSpent\":\"3h 20m\",\"timeSpentSeconds\":12000,\"updateAuthor\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"identifier\":\"276f955c-63d7-42c8-9520-92d01dca0625\",\"type\":\"group\",\"value\":\"jira-developers\"}}],\"updated\":1,\"timetracking\":{\"originalEstimate\":\"10m\",\"originalEstimateSeconds\":600,\"remainingEstimate\":\"3m\",\"remainingEstimateSeconds\":200,\"timeSpent\":\"6m\",\"timeSpentSeconds\":400}},\"id\":\"10002\",\"key\":\"ED-1\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10002\"}]}",
+      "description": "Correct searchAndReconsileIssuesUsingJqlPost serialized JSON response example: description is a v3 ADF value, not a plain string. Preserve every unrelated example field.",
+      "x-as-reason": "The pinned /search/jql example disagrees with v3 ADF field semantics and makes the strict responder rich-text path fail. Correct the example rather than accepting malformed ADF at runtime.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/apis/document/structure/",
+        "date": "2026-09-07",
+        "corroboration": "jira-platform-swagger-v3.json: paths./rest/api/3/search/jql.post.responses.200.content.application/json.example; platform intro ADF field semantics"
+      },
+      "x-as-origin": "JAS-47; JAS-45 learning ak (serialized JSON examples)",
+      "x-as-test": "jas47_adf_example_searchAndReconsileIssuesUsingJqlPost",
+      "x-as-examples": [
+        {
+          "kind": "json",
+          "value": "{\"isLast\":true,\"issues\":[{\"expand\":\"\",\"fields\":{\"watcher\":{\"isWatching\":false,\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers\",\"watchCount\":1},\"attachment\":[{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"accountType\":\"atlassian\",\"active\":false,\"avatarUrls\":{\"16x16\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=16&s=16\",\"24x24\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=24&s=24\",\"32x32\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=32&s=32\",\"48x48\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48\"},\"displayName\":\"Mia Krystof\",\"key\":\"\",\"name\":\"\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"content\":\"https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10001\",\"created\":\"2023-06-24T19:24:50.000+0000\",\"filename\":\"debuglog.txt\",\"id\":10001,\"mimeType\":\"text/plain\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/attachments/10001\",\"size\":2460}],\"sub-tasks\":[{\"id\":\"10000\",\"outwardIssue\":{\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}},\"id\":\"10003\",\"key\":\"ED-2\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/ED-2\"},\"type\":{\"id\":\"10000\",\"inward\":\"Parent\",\"name\":\"\",\"outward\":\"Sub-task\"}}],\"description\":{\"type\":\"doc\",\"version\":1,\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Main order flow broken\"}]}]},\"project\":{\"avatarUrls\":{\"16x16\":\"https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000\",\"24x24\":\"https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000\",\"32x32\":\"https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000\",\"48x48\":\"https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000\"},\"id\":\"10000\",\"insight\":{\"lastIssueUpdateTime\":\"2021-04-22T05:37:05.000+0000\",\"totalIssueCount\":100},\"key\":\"EX\",\"name\":\"Example\",\"projectCategory\":{\"description\":\"First Project Category\",\"id\":\"10000\",\"name\":\"FIRST\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/projectCategory/10000\"},\"self\":\"https://your-domain.atlassian.net/rest/api/3/project/EX\",\"simplified\":false,\"style\":\"classic\"},\"comment\":[{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"body\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget venenatis elit. Duis eu justo eget augue iaculis fermentum. Sed semper quam laoreet nisi egestas at posuere augue semper.\",\"created\":\"2021-01-17T12:34:00.000+0000\",\"id\":\"10000\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000\",\"updateAuthor\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"identifier\":\"Administrators\",\"type\":\"role\",\"value\":\"Administrators\"}}],\"issuelinks\":[{\"id\":\"10001\",\"outwardIssue\":{\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}},\"id\":\"10004L\",\"key\":\"PR-2\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/PR-2\"},\"type\":{\"id\":\"10000\",\"inward\":\"depends on\",\"name\":\"Dependent\",\"outward\":\"is depended by\"}},{\"id\":\"10002\",\"inwardIssue\":{\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}},\"id\":\"10004\",\"key\":\"PR-3\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/PR-3\"},\"type\":{\"id\":\"10000\",\"inward\":\"depends on\",\"name\":\"Dependent\",\"outward\":\"is depended by\"}}],\"worklog\":[{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"comment\":\"I did some work here.\",\"id\":\"100028\",\"issueId\":\"10002\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10010/worklog/10000\",\"started\":\"2021-01-17T12:34:00.000+0000\",\"timeSpent\":\"3h 20m\",\"timeSpentSeconds\":12000,\"updateAuthor\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"identifier\":\"276f955c-63d7-42c8-9520-92d01dca0625\",\"type\":\"group\",\"value\":\"jira-developers\"}}],\"updated\":1,\"timetracking\":{\"originalEstimate\":\"10m\",\"originalEstimateSeconds\":600,\"remainingEstimate\":\"3m\",\"remainingEstimateSeconds\":200,\"timeSpent\":\"6m\",\"timeSpentSeconds\":400}},\"id\":\"10002\",\"key\":\"ED-1\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10002\"}]}",
+          "schema": "#/components/schemas/SearchAndReconcileResults"
+        }
+      ]
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search/jql\"].get.responses[\"200\"].content[\"application/json\"].example",
+      "update": "{\"isLast\":true,\"issues\":[{\"expand\":\"\",\"fields\":{\"watcher\":{\"isWatching\":false,\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers\",\"watchCount\":1},\"attachment\":[{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"accountType\":\"atlassian\",\"active\":false,\"avatarUrls\":{\"16x16\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=16&s=16\",\"24x24\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=24&s=24\",\"32x32\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=32&s=32\",\"48x48\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48\"},\"displayName\":\"Mia Krystof\",\"key\":\"\",\"name\":\"\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"content\":\"https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10001\",\"created\":\"2023-06-24T19:24:50.000+0000\",\"filename\":\"debuglog.txt\",\"id\":10001,\"mimeType\":\"text/plain\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/attachments/10001\",\"size\":2460}],\"sub-tasks\":[{\"id\":\"10000\",\"outwardIssue\":{\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}},\"id\":\"10003\",\"key\":\"ED-2\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/ED-2\"},\"type\":{\"id\":\"10000\",\"inward\":\"Parent\",\"name\":\"\",\"outward\":\"Sub-task\"}}],\"description\":{\"type\":\"doc\",\"version\":1,\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Main order flow broken\"}]}]},\"project\":{\"avatarUrls\":{\"16x16\":\"https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000\",\"24x24\":\"https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000\",\"32x32\":\"https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000\",\"48x48\":\"https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000\"},\"id\":\"10000\",\"insight\":{\"lastIssueUpdateTime\":\"2021-04-22T05:37:05.000+0000\",\"totalIssueCount\":100},\"key\":\"EX\",\"name\":\"Example\",\"projectCategory\":{\"description\":\"First Project Category\",\"id\":\"10000\",\"name\":\"FIRST\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/projectCategory/10000\"},\"self\":\"https://your-domain.atlassian.net/rest/api/3/project/EX\",\"simplified\":false,\"style\":\"classic\"},\"comment\":[{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"body\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget venenatis elit. Duis eu justo eget augue iaculis fermentum. Sed semper quam laoreet nisi egestas at posuere augue semper.\",\"created\":\"2021-01-17T12:34:00.000+0000\",\"id\":\"10000\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000\",\"updateAuthor\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"identifier\":\"Administrators\",\"type\":\"role\",\"value\":\"Administrators\"}}],\"issuelinks\":[{\"id\":\"10001\",\"outwardIssue\":{\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}},\"id\":\"10004L\",\"key\":\"PR-2\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/PR-2\"},\"type\":{\"id\":\"10000\",\"inward\":\"depends on\",\"name\":\"Dependent\",\"outward\":\"is depended by\"}},{\"id\":\"10002\",\"inwardIssue\":{\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}},\"id\":\"10004\",\"key\":\"PR-3\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/PR-3\"},\"type\":{\"id\":\"10000\",\"inward\":\"depends on\",\"name\":\"Dependent\",\"outward\":\"is depended by\"}}],\"worklog\":[{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"comment\":\"I did some work here.\",\"id\":\"100028\",\"issueId\":\"10002\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10010/worklog/10000\",\"started\":\"2021-01-17T12:34:00.000+0000\",\"timeSpent\":\"3h 20m\",\"timeSpentSeconds\":12000,\"updateAuthor\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"identifier\":\"276f955c-63d7-42c8-9520-92d01dca0625\",\"type\":\"group\",\"value\":\"jira-developers\"}}],\"updated\":1,\"timetracking\":{\"originalEstimate\":\"10m\",\"originalEstimateSeconds\":600,\"remainingEstimate\":\"3m\",\"remainingEstimateSeconds\":200,\"timeSpent\":\"6m\",\"timeSpentSeconds\":400}},\"id\":\"10002\",\"key\":\"ED-1\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10002\"}]}",
+      "description": "Correct searchAndReconsileIssuesUsingJql serialized JSON response example: description is a v3 ADF value, not a plain string. Preserve every unrelated example field.",
+      "x-as-reason": "The pinned /search/jql example disagrees with v3 ADF field semantics and makes the strict responder rich-text path fail. Correct the example rather than accepting malformed ADF at runtime.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/apis/document/structure/",
+        "date": "2026-09-07",
+        "corroboration": "jira-platform-swagger-v3.json: paths./rest/api/3/search/jql.get.responses.200.content.application/json.example; platform intro ADF field semantics"
+      },
+      "x-as-origin": "JAS-47; JAS-45 learning ak (serialized JSON examples)",
+      "x-as-test": "jas47_adf_example_searchAndReconsileIssuesUsingJql",
+      "x-as-examples": [
+        {
+          "kind": "json",
+          "value": "{\"isLast\":true,\"issues\":[{\"expand\":\"\",\"fields\":{\"watcher\":{\"isWatching\":false,\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers\",\"watchCount\":1},\"attachment\":[{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"accountType\":\"atlassian\",\"active\":false,\"avatarUrls\":{\"16x16\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=16&s=16\",\"24x24\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=24&s=24\",\"32x32\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=32&s=32\",\"48x48\":\"https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48\"},\"displayName\":\"Mia Krystof\",\"key\":\"\",\"name\":\"\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"content\":\"https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10001\",\"created\":\"2023-06-24T19:24:50.000+0000\",\"filename\":\"debuglog.txt\",\"id\":10001,\"mimeType\":\"text/plain\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/attachments/10001\",\"size\":2460}],\"sub-tasks\":[{\"id\":\"10000\",\"outwardIssue\":{\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}},\"id\":\"10003\",\"key\":\"ED-2\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/ED-2\"},\"type\":{\"id\":\"10000\",\"inward\":\"Parent\",\"name\":\"\",\"outward\":\"Sub-task\"}}],\"description\":{\"type\":\"doc\",\"version\":1,\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Main order flow broken\"}]}]},\"project\":{\"avatarUrls\":{\"16x16\":\"https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000\",\"24x24\":\"https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000\",\"32x32\":\"https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000\",\"48x48\":\"https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000\"},\"id\":\"10000\",\"insight\":{\"lastIssueUpdateTime\":\"2021-04-22T05:37:05.000+0000\",\"totalIssueCount\":100},\"key\":\"EX\",\"name\":\"Example\",\"projectCategory\":{\"description\":\"First Project Category\",\"id\":\"10000\",\"name\":\"FIRST\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/projectCategory/10000\"},\"self\":\"https://your-domain.atlassian.net/rest/api/3/project/EX\",\"simplified\":false,\"style\":\"classic\"},\"comment\":[{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"body\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget venenatis elit. Duis eu justo eget augue iaculis fermentum. Sed semper quam laoreet nisi egestas at posuere augue semper.\",\"created\":\"2021-01-17T12:34:00.000+0000\",\"id\":\"10000\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000\",\"updateAuthor\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"identifier\":\"Administrators\",\"type\":\"role\",\"value\":\"Administrators\"}}],\"issuelinks\":[{\"id\":\"10001\",\"outwardIssue\":{\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}},\"id\":\"10004L\",\"key\":\"PR-2\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/PR-2\"},\"type\":{\"id\":\"10000\",\"inward\":\"depends on\",\"name\":\"Dependent\",\"outward\":\"is depended by\"}},{\"id\":\"10002\",\"inwardIssue\":{\"fields\":{\"status\":{\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/statuses/open.png\",\"name\":\"Open\"}},\"id\":\"10004\",\"key\":\"PR-3\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/PR-3\"},\"type\":{\"id\":\"10000\",\"inward\":\"depends on\",\"name\":\"Dependent\",\"outward\":\"is depended by\"}}],\"worklog\":[{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"comment\":\"I did some work here.\",\"id\":\"100028\",\"issueId\":\"10002\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10010/worklog/10000\",\"started\":\"2021-01-17T12:34:00.000+0000\",\"timeSpent\":\"3h 20m\",\"timeSpentSeconds\":12000,\"updateAuthor\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g\"},\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"identifier\":\"276f955c-63d7-42c8-9520-92d01dca0625\",\"type\":\"group\",\"value\":\"jira-developers\"}}],\"updated\":1,\"timetracking\":{\"originalEstimate\":\"10m\",\"originalEstimateSeconds\":600,\"remainingEstimate\":\"3m\",\"remainingEstimateSeconds\":200,\"timeSpent\":\"6m\",\"timeSpentSeconds\":400}},\"id\":\"10002\",\"key\":\"ED-1\",\"self\":\"https://your-domain.atlassian.net/rest/api/3/issue/10002\"}]}",
+          "schema": "#/components/schemas/SearchAndReconcileResults"
+        }
+      ]
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue\"].post",
+      "description": "createIssue: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-issue/SKILL.md#L202",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 9; jira-issue/SKILL.md:202; jira-issue/references/field_formats.md:23",
+      "x-as-test": "jas47_note_platform_createIssue",
+      "update": {
+        "x-as-note": "Static description/environment paths accept Markdown or @file and send ADF. Textarea custom fields require ADF, but their values pass through unchanged; automatic instance resolution and a per-call override arrive with JAS-49. Supply already encoded ADF for custom fields now. Create-screen metadata determines which fields can be set."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}\"].put",
+      "description": "editIssue: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-issue/SKILL.md#L199",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey} put"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 95; jira-issue/SKILL.md:199",
+      "x-as-test": "jas47_note_platform_editIssue",
+      "update": {
+        "x-as-note": "Static description/environment paths accept Markdown or @file and send ADF. Textarea custom fields require ADF, but their values pass through unchanged; automatic instance resolution and a per-call override arrive with JAS-49. Supply already encoded ADF for custom fields now. Fields must also be editable on the issue screen. Disabling notifyUsers requires Administer Jira; this generic call does not retry without the requested suppression."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/bulk\"].post",
+      "description": "createIssues: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract. Correct inventory fact 85: this endpoint permits 50 creations, not 1000.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-bulk-post",
+        "date": "2026-09-07",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/bulk post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 85; jira-bulk/docs/BEST_PRACTICES.md:140",
+      "x-as-test": "jas47_note_platform_createIssues",
+      "update": {
+        "x-as-note": "Static description/environment paths accept Markdown or @file and send ADF. Textarea custom fields require ADF, but their values pass through unchanged; automatic instance resolution and a per-call override arrive with JAS-49. Supply already encoded ADF for custom fields now. This bulk-create endpoint accepts at most 50 issues; supply issueUpdates as JSON and each item’s static ADF paths are converted."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}\"].get",
+      "description": "getIssue: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-collaborate/SKILL.md#L225",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey} get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 5; jira-collaborate/SKILL.md:225; jira-collaborate/references/COMMENT_FORMATS.md:122",
+      "x-as-test": "jas47_note_platform_getIssue",
+      "update": {
+        "x-as-note": "Tagged ADF fields render as Markdown with lossless placeholders; --raw preserves stored documents. Re-fetch after rich-text writes and inspect the stored structure. JSON errors on stderr include this note; authentication, permission and missing-issue failures have distinct exits."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment\"].post",
+      "description": "addComment: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-collaborate/references/COMMENT_FORMATS.md#L39",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey}/comment post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 2; jira-collaborate/references/COMMENT_FORMATS.md:39; jira-collaborate/references/adf_guide.md:52",
+      "x-as-test": "jas47_note_platform_addComment",
+      "update": {
+        "x-as-note": "Use --field body=@notes.md for UTF-8 Markdown with real newlines. Backslash-n is not a real newline; use a UTF-8 file for multiline content. JSON bodies may contain already encoded ADF; reads render Markdown with placeholders and --raw preserves the stored document."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment/{id}\"].put",
+      "description": "updateComment: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-collaborate/references/COMMENT_FORMATS.md#L39",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey}/comment/{id} put"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 2; jira-collaborate/references/COMMENT_FORMATS.md:39; jira-collaborate/references/adf_guide.md:52",
+      "x-as-test": "jas47_note_platform_updateComment",
+      "update": {
+        "x-as-note": "Use --field body=@notes.md for UTF-8 Markdown with real newlines. Backslash-n is not a real newline; use a UTF-8 file for multiline content. JSON bodies may contain already encoded ADF; reads render Markdown with placeholders and --raw preserves the stored document."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment/{id}\"].get",
+      "description": "getComment: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-collaborate/SKILL.md#L225",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey}/comment/{id} get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 5; jira-collaborate/SKILL.md:225; jira-collaborate/references/COMMENT_FORMATS.md:122",
+      "x-as-test": "jas47_note_platform_getComment",
+      "update": {
+        "x-as-note": "After writing, read the comment by ID with --raw and verify the ADF nodes/marks. ADF is a version-1 doc object; a literal Markdown string is not an ADF document."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field\"].get",
+      "description": "getFields: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-admin/docs/VOODOO_CONSTANTS.md#L9",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/field get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 25; jira-admin/docs/VOODOO_CONSTANTS.md:9; jira-agile/SKILL.md:199; jira-agile/docs/FIELD_REFERENCE.md:5; jira-fields/SKILL.md:253; jira-fields/SKILL.md:303; jira-issue/references/field_formats.md:432",
+      "x-as-test": "jas47_note_platform_getFields",
+      "update": {
+        "x-as-note": "Custom field IDs are instance-specific. Discover IDs and schema metadata instead of hardcoding common customfield_NNNNN values; textarea (paragraph) fields take ADF. Automatic per-instance rich-text resolution is deferred to JAS-49."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/createmeta/{projectIdOrKey}/issuetypes/{issueTypeId}\"].get",
+      "description": "getCreateIssueMetaIssueTypeId: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/shared/references/troubleshooting.md#L135",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/createmeta/{projectIdOrKey}/issuetypes/{issueTypeId} get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 49; jira-repo:shared/references/troubleshooting.md:135",
+      "x-as-test": "jas47_note_platform_getCreateIssueMetaIssueTypeId",
+      "update": {
+        "x-as-note": "A field can exist yet be unavailable on the create screen for this project and issue type. Consult create metadata and the relevant screen configuration before setting it."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project\"].post",
+      "description": "createProject: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-admin/docs/VOODOO_CONSTANTS.md#L190",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/project post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 33; jira-admin/docs/VOODOO_CONSTANTS.md:190; jira-fields/SKILL.md:272",
+      "x-as-test": "jas47_note_platform_createProject",
+      "update": {
+        "x-as-note": "Choose management style before creation. Company-managed Scrum uses projectTemplateKey com.pyxis.greenhopper.jira:gh-scrum-template; team-managed Scrum uses com.pyxis.greenhopper.jira:gh-simplified-agility-scrum. Read the created project’s style: classic means company-managed; next-gen means team-managed. These generic API fields are not the wrapper’s --style flag."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}\"].get",
+      "description": "getProject: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-admin/docs/subsystems/issue-type-schemes-guide.md#L236",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/project/{projectIdOrKey} get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 29; jira-admin/docs/subsystems/issue-type-schemes-guide.md:236",
+      "x-as-test": "jas47_note_platform_getProject",
+      "update": {
+        "x-as-note": "The returned style distinguishes classic (company-managed) from next-gen (team-managed). Team-managed projects manage their own issue types and use a simplified screen model; company-managed issue-type/screen-scheme guidance does not transfer directly."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/screens\"].get",
+      "description": "getScreens: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-admin/docs/subsystems/screen-management-guide.md#L212",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/screens get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 31; jira-admin/docs/subsystems/screen-management-guide.md:212",
+      "x-as-test": "jas47_note_platform_getScreens",
+      "update": {
+        "x-as-note": "Company-managed projects use the screen/tab/field configuration model. Team-managed projects use a different simplified model; enable relevant features in Project Settings rather than assuming a company-managed screen scheme applies."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/mypermissions\"].get",
+      "description": "getMyPermissions: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-permissions/#api-rest-api-3-mypermissions-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47",
+      "x-as-test": "jas47_note_platform_getMyPermissions",
+      "update": {
+        "x-as-note": "Permission results depend on the supplied project or issue context. A project-level check can be true when an issue-specific check is false because of issue security or workflow restrictions; check the actual issue when authorizing an issue operation."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/myself\"].get",
+      "description": "getCurrentUser: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-admin/docs/subsystems/user-group-guide.md#L151",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/myself get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 127; jira-admin/docs/subsystems/user-group-guide.md:151",
+      "x-as-test": "jas47_note_platform_getCurrentUser",
+      "update": {
+        "x-as-note": "Cloud identity is an Atlassian account ID. Email lookup and profile fields can be restricted by privacy controls. HTTP uses the configured credentials; discovery/help and the responder need no credentials."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/watchers\"].post",
+      "description": "addWatcher: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-collaborate/SKILL.md#L300",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey}/watchers post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 96; jira-collaborate/SKILL.md:300; jira-jsm/SKILL.md:99; jira-repo:shared/references/troubleshooting.md:241",
+      "x-as-test": "jas47_note_platform_addWatcher",
+      "update": {
+        "x-as-note": "Supply the watcher’s Atlassian account ID, not an email address. Adding another user requires Manage watcher list permission; privacy controls can prevent email-based discovery."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/serverInfo\"].get",
+      "description": "getServerInfo: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/jira-as/blob/main/README.md",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47",
+      "x-as-test": "jas47_note_platform_getServerInfo",
+      "update": {
+        "x-as-note": "Use jira-as api --transport responder call getServerInfo for an offline, stateless response from the pinned document. A responder result is not evidence of live site state; help and api describe are credential-free."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}\"].delete",
+      "description": "deleteProject: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-admin/docs/BEST_PRACTICES.md#L88",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/project/{projectIdOrKey} delete"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 128; jira-admin/docs/BEST_PRACTICES.md:88",
+      "x-as-test": "jas47_note_platform_deleteProject",
+      "update": {
+        "x-as-note": "Project deletion and permanent removal have different recovery consequences. Prefer archiving when appropriate and inspect the project state before retrying an asynchronous deletion. Generic --confirm is required only when an operation is explicitly risk-tagged; a note does not add a safeguard."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issueLinkType\"].get",
+      "description": "getIssueLinkTypes: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-relationships/SKILL.md#L272",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issueLinkType get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 97; jira-relationships/SKILL.md:272",
+      "x-as-test": "jas47_note_platform_getIssueLinkTypes",
+      "update": {
+        "x-as-note": "Discover link types on the instance before creating a relationship. Custom link names and inward/outward descriptions can differ from familiar defaults."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search\"].get",
+      "description": "searchForIssuesUsingJql: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-dev/docs/guides/release-notes.md#L19",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/search get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 21; jira-dev/docs/guides/release-notes.md:19",
+      "x-as-test": "jas47_note_platform_searchForIssuesUsingJql",
+      "update": {
+        "x-as-note": "This removed /search operation is replaced by searchAndReconsileIssuesUsingJql at /rest/api/3/search/jql (CHANGE-2046). The replacement pages with nextPageToken, not startAt. The literal operationId search belongs to status discovery; use the full issue-search operationId."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search\"].post",
+      "description": "searchForIssuesUsingJqlPost: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-dev/docs/guides/release-notes.md#L19",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/search post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 21; jira-dev/docs/guides/release-notes.md:19",
+      "x-as-test": "jas47_note_platform_searchForIssuesUsingJqlPost",
+      "update": {
+        "x-as-note": "This removed /search operation is replaced by searchAndReconsileIssuesUsingJqlPost at /rest/api/3/search/jql (CHANGE-2046). The replacement pages with nextPageToken, not startAt. The literal operationId search belongs to status discovery; use the full issue-search operationId."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search/jql\"].get",
+      "description": "searchAndReconsileIssuesUsingJql: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-agile/docs/TROUBLESHOOTING.md#L76",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/search/jql get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 75; jira-agile/docs/TROUBLESHOOTING.md:76; jira-jsm/references/RATE_LIMITS.md:14; jira-ops/docs/best-practices/ERROR_HANDLING.md:9; jira-time/SKILL.md:406; jira-time/docs/reference/error-codes.md:68; jira-time/docs/reporting-guide.md:470; jira-repo:shared/references/troubleshooting.md:76; confluence-repo:shared/docs/ERROR_HANDLING.md:9; confluence-repo:shared/docs/SAFEGUARDS.md:130; jira-jsm/docs/TROUBLESHOOTING.md:120",
+      "x-as-test": "jas47_note_platform_searchAndReconsileIssuesUsingJql",
+      "update": {
+        "x-as-note": "Use /rest/api/3/search/jql and nextPageToken for issue search. A 429 is a rate limit: honor Retry-After and returned rate-limit headers; do not assume a universal requests-per-minute quota. --all follows the declared continuation and --limit caps collected issues."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search/jql\"].post",
+      "description": "searchAndReconsileIssuesUsingJqlPost: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-agile/docs/TROUBLESHOOTING.md#L76",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/search/jql post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 75; jira-agile/docs/TROUBLESHOOTING.md:76; jira-jsm/references/RATE_LIMITS.md:14; jira-ops/docs/best-practices/ERROR_HANDLING.md:9; jira-time/SKILL.md:406; jira-time/docs/reference/error-codes.md:68; jira-time/docs/reporting-guide.md:470; jira-repo:shared/references/troubleshooting.md:76; confluence-repo:shared/docs/ERROR_HANDLING.md:9; confluence-repo:shared/docs/SAFEGUARDS.md:130; jira-jsm/docs/TROUBLESHOOTING.md:120",
+      "x-as-test": "jas47_note_platform_searchAndReconsileIssuesUsingJqlPost",
+      "update": {
+        "x-as-note": "Use /rest/api/3/search/jql and nextPageToken for issue search. A 429 is a rate limit: honor Retry-After and returned rate-limit headers; do not assume a universal requests-per-minute quota. --all follows the declared continuation and --limit caps collected issues."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog\"].post",
+      "description": "addWorklog: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-dev/docs/guides/smart-commits.md#L31",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey}/worklog post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 136; jira-dev/docs/guides/smart-commits.md:31; jira-time/docs/reference/time-format-quick-ref.md:54",
+      "x-as-test": "jas47_note_platform_addWorklog",
+      "update": {
+        "x-as-note": "The comment field accepts ADF and tagged Markdown. Workday/week duration units depend on the site’s time-tracking configuration; use timeSpentSeconds for an unambiguous duration. Set started with an explicit timezone offset when the intended work date matters."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog/{id}\"].put",
+      "description": "updateWorklog: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-dev/docs/guides/smart-commits.md#L31",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey}/worklog/{id} put"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 136; jira-dev/docs/guides/smart-commits.md:31; jira-time/docs/reference/time-format-quick-ref.md:54",
+      "x-as-test": "jas47_note_platform_updateWorklog",
+      "update": {
+        "x-as-note": "The comment field accepts ADF and tagged Markdown. Workday/week duration units depend on the site’s time-tracking configuration; use timeSpentSeconds for an unambiguous duration. Set started with an explicit timezone offset when the intended work date matters."
+      }
+    }
+  ]
 }

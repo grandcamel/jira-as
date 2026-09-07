@@ -4,5 +4,51 @@
     "title": "Jira software overlay.json",
     "version": "1.0.0"
   },
-  "actions": []
+  "actions": [
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/configuration\"].get",
+      "description": "getBoardConfiguration: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-fields/SKILL.md#L342",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json; /rest/agile/1.0/board/{boardId}/configuration get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 37; jira-fields/SKILL.md:342",
+      "x-as-test": "jas47_note_software_getBoardConfiguration",
+      "update": {
+        "x-as-note": "Atlassian operationId getConfiguration at GET /rest/agile/1.0/board/{boardId}/configuration is exposed as getBoardConfiguration to disambiguate the combined Jira surface. The board’s estimation configuration can select a different custom field from another board. Discover its fieldId and use that board’s configuration instead of assuming a universal Story Points field."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/issue\"].post",
+      "description": "moveIssuesToSprintAndRank: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-issue/references/EXAMPLES.md#L87",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json; /rest/agile/1.0/sprint/{sprintId}/issue post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 39; jira-issue/references/EXAMPLES.md:87",
+      "x-as-test": "jas47_note_software_moveIssuesToSprintAndRank",
+      "update": {
+        "x-as-note": "Assigning an issue to a sprint is a separate Agile operation. The target sprint must be open or active; sprint assignment is not inferred from issue creation or a board’s project alone."
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/issue\"].get",
+      "description": "getIssuesForSprint: source-reviewed Cloud advisory note.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-agile/docs/TROUBLESHOOTING.md#L76",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json; /rest/agile/1.0/sprint/{sprintId}/issue get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 75; jira-agile/docs/TROUBLESHOOTING.md:76; jira-jsm/references/RATE_LIMITS.md:14; jira-ops/docs/best-practices/ERROR_HANDLING.md:9; jira-time/SKILL.md:406; jira-time/docs/reference/error-codes.md:68; jira-time/docs/reporting-guide.md:470; jira-repo:shared/references/troubleshooting.md:76; confluence-repo:shared/docs/ERROR_HANDLING.md:9; confluence-repo:shared/docs/SAFEGUARDS.md:130; jira-jsm/docs/TROUBLESHOOTING.md:120",
+      "x-as-test": "jas47_note_software_getIssuesForSprint",
+      "update": {
+        "x-as-note": "Honor Retry-After on rate-limited requests rather than retrying immediately. This legacy Agile issue-list route is deprecated; inspect the pinned replacement route and its paging contract before migrating."
+      }
+    }
+  ]
 }

@@ -1530,6 +1530,391 @@
       },
       "x-as-origin": "JAS-45",
       "x-as-test": "help_platform_MigrationResource.workflowRuleSearch_post"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue\"].post",
+      "description": "createIssue: enroll the source-reviewed note in adf, fields help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-issue/SKILL.md#L202",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 9; jira-issue/SKILL.md:202; jira-issue/references/field_formats.md:23",
+      "x-as-test": "jas47_topic_platform_createIssue",
+      "update": {
+        "x-as-topic": [
+          "adf",
+          "fields"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}\"].put",
+      "description": "editIssue: enroll the source-reviewed note in adf, fields, permissions help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-issue/SKILL.md#L199",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey} put"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 95; jira-issue/SKILL.md:199",
+      "x-as-test": "jas47_topic_platform_editIssue",
+      "update": {
+        "x-as-topic": [
+          "adf",
+          "fields",
+          "permissions"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/bulk\"].post",
+      "description": "createIssues: enroll the source-reviewed note in adf, fields help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-bulk-post",
+        "date": "2026-09-07",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/bulk post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 85; jira-bulk/docs/BEST_PRACTICES.md:140",
+      "x-as-test": "jas47_topic_platform_createIssues",
+      "update": {
+        "x-as-topic": [
+          "adf",
+          "fields"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}\"].get",
+      "description": "getIssue: enroll the source-reviewed note in adf, errors help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-collaborate/SKILL.md#L225",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey} get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 5; jira-collaborate/SKILL.md:225; jira-collaborate/references/COMMENT_FORMATS.md:122",
+      "x-as-test": "jas47_topic_platform_getIssue",
+      "update": {
+        "x-as-topic": [
+          "adf",
+          "errors"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment\"].post",
+      "description": "addComment: enroll the source-reviewed note in adf, representations help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-collaborate/references/COMMENT_FORMATS.md#L39",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey}/comment post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 2; jira-collaborate/references/COMMENT_FORMATS.md:39; jira-collaborate/references/adf_guide.md:52",
+      "x-as-test": "jas47_topic_platform_addComment",
+      "update": {
+        "x-as-topic": [
+          "adf",
+          "representations"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment/{id}\"].put",
+      "description": "updateComment: enroll the source-reviewed note in adf, representations help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-collaborate/references/COMMENT_FORMATS.md#L39",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey}/comment/{id} put"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 2; jira-collaborate/references/COMMENT_FORMATS.md:39; jira-collaborate/references/adf_guide.md:52",
+      "x-as-test": "jas47_topic_platform_updateComment",
+      "update": {
+        "x-as-topic": [
+          "adf",
+          "representations"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment/{id}\"].get",
+      "description": "getComment: enroll the source-reviewed note in adf help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-collaborate/SKILL.md#L225",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey}/comment/{id} get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 5; jira-collaborate/SKILL.md:225; jira-collaborate/references/COMMENT_FORMATS.md:122",
+      "x-as-test": "jas47_topic_platform_getComment",
+      "update": {
+        "x-as-topic": [
+          "adf"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field\"].get",
+      "description": "getFields: enroll the source-reviewed note in fields help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-admin/docs/VOODOO_CONSTANTS.md#L9",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/field get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 25; jira-admin/docs/VOODOO_CONSTANTS.md:9; jira-agile/SKILL.md:199; jira-agile/docs/FIELD_REFERENCE.md:5; jira-fields/SKILL.md:253; jira-fields/SKILL.md:303; jira-issue/references/field_formats.md:432",
+      "x-as-test": "jas47_topic_platform_getFields",
+      "update": {
+        "x-as-topic": [
+          "fields"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/createmeta/{projectIdOrKey}/issuetypes/{issueTypeId}\"].get",
+      "description": "getCreateIssueMetaIssueTypeId: enroll the source-reviewed note in fields, errors help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/shared/references/troubleshooting.md#L135",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/createmeta/{projectIdOrKey}/issuetypes/{issueTypeId} get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 49; jira-repo:shared/references/troubleshooting.md:135",
+      "x-as-test": "jas47_topic_platform_getCreateIssueMetaIssueTypeId",
+      "update": {
+        "x-as-topic": [
+          "fields",
+          "errors"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project\"].post",
+      "description": "createProject: enroll the source-reviewed note in project-types help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-admin/docs/VOODOO_CONSTANTS.md#L190",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/project post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 33; jira-admin/docs/VOODOO_CONSTANTS.md:190; jira-fields/SKILL.md:272",
+      "x-as-test": "jas47_topic_platform_createProject",
+      "update": {
+        "x-as-topic": [
+          "project-types"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}\"].get",
+      "description": "getProject: enroll the source-reviewed note in project-types help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-admin/docs/subsystems/issue-type-schemes-guide.md#L236",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/project/{projectIdOrKey} get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 29; jira-admin/docs/subsystems/issue-type-schemes-guide.md:236",
+      "x-as-test": "jas47_topic_platform_getProject",
+      "update": {
+        "x-as-topic": [
+          "project-types"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/screens\"].get",
+      "description": "getScreens: enroll the source-reviewed note in project-types, fields help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-admin/docs/subsystems/screen-management-guide.md#L212",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/screens get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 31; jira-admin/docs/subsystems/screen-management-guide.md:212",
+      "x-as-test": "jas47_topic_platform_getScreens",
+      "update": {
+        "x-as-topic": [
+          "project-types",
+          "fields"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/mypermissions\"].get",
+      "description": "getMyPermissions: enroll the source-reviewed note in permissions, scope help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-permissions/#api-rest-api-3-mypermissions-get",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47",
+      "x-as-test": "jas47_topic_platform_getMyPermissions",
+      "update": {
+        "x-as-topic": [
+          "permissions",
+          "scope"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/myself\"].get",
+      "description": "getCurrentUser: enroll the source-reviewed note in auth help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-admin/docs/subsystems/user-group-guide.md#L151",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/myself get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 127; jira-admin/docs/subsystems/user-group-guide.md:151",
+      "x-as-test": "jas47_topic_platform_getCurrentUser",
+      "update": {
+        "x-as-topic": [
+          "auth"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/watchers\"].post",
+      "description": "addWatcher: enroll the source-reviewed note in permissions, auth help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-collaborate/SKILL.md#L300",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey}/watchers post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 96; jira-collaborate/SKILL.md:300; jira-jsm/SKILL.md:99; jira-repo:shared/references/troubleshooting.md:241",
+      "x-as-test": "jas47_topic_platform_addWatcher",
+      "update": {
+        "x-as-topic": [
+          "permissions",
+          "auth"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/serverInfo\"].get",
+      "description": "getServerInfo: enroll the source-reviewed note in sandbox help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/jira-as/blob/main/README.md",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-47",
+      "x-as-test": "jas47_topic_platform_getServerInfo",
+      "update": {
+        "x-as-topic": [
+          "sandbox"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}\"].delete",
+      "description": "deleteProject: enroll the source-reviewed note in risk help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-admin/docs/BEST_PRACTICES.md#L88",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/project/{projectIdOrKey} delete"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 128; jira-admin/docs/BEST_PRACTICES.md:88",
+      "x-as-test": "jas47_topic_platform_deleteProject",
+      "update": {
+        "x-as-topic": [
+          "risk"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issueLinkType\"].get",
+      "description": "getIssueLinkTypes: enroll the source-reviewed note in fields help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-relationships/SKILL.md#L272",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issueLinkType get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 97; jira-relationships/SKILL.md:272",
+      "x-as-test": "jas47_topic_platform_getIssueLinkTypes",
+      "update": {
+        "x-as-topic": [
+          "fields"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search/jql\"].get",
+      "description": "searchAndReconsileIssuesUsingJql: enroll the source-reviewed note in rate-limits help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-agile/docs/TROUBLESHOOTING.md#L76",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/search/jql get"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 75; jira-agile/docs/TROUBLESHOOTING.md:76; jira-jsm/references/RATE_LIMITS.md:14; jira-ops/docs/best-practices/ERROR_HANDLING.md:9; jira-time/SKILL.md:406; jira-time/docs/reference/error-codes.md:68; jira-time/docs/reporting-guide.md:470; jira-repo:shared/references/troubleshooting.md:76; confluence-repo:shared/docs/ERROR_HANDLING.md:9; confluence-repo:shared/docs/SAFEGUARDS.md:130; jira-jsm/docs/TROUBLESHOOTING.md:120",
+      "x-as-test": "jas47_topic_platform_searchAndReconsileIssuesUsingJql",
+      "update": {
+        "x-as-topic": [
+          "rate-limits"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/search/jql\"].post",
+      "description": "searchAndReconsileIssuesUsingJqlPost: enroll the source-reviewed note in rate-limits help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-agile/docs/TROUBLESHOOTING.md#L76",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/search/jql post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 75; jira-agile/docs/TROUBLESHOOTING.md:76; jira-jsm/references/RATE_LIMITS.md:14; jira-ops/docs/best-practices/ERROR_HANDLING.md:9; jira-time/SKILL.md:406; jira-time/docs/reference/error-codes.md:68; jira-time/docs/reporting-guide.md:470; jira-repo:shared/references/troubleshooting.md:76; confluence-repo:shared/docs/ERROR_HANDLING.md:9; confluence-repo:shared/docs/SAFEGUARDS.md:130; jira-jsm/docs/TROUBLESHOOTING.md:120",
+      "x-as-test": "jas47_topic_platform_searchAndReconsileIssuesUsingJqlPost",
+      "update": {
+        "x-as-topic": [
+          "rate-limits"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog\"].post",
+      "description": "addWorklog: enroll the source-reviewed note in adf, fields help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-dev/docs/guides/smart-commits.md#L31",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey}/worklog post"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 136; jira-dev/docs/guides/smart-commits.md:31; jira-time/docs/reference/time-format-quick-ref.md:54",
+      "x-as-test": "jas47_topic_platform_addWorklog",
+      "update": {
+        "x-as-topic": [
+          "adf",
+          "fields"
+        ]
+      }
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog/{id}\"].put",
+      "description": "updateWorklog: enroll the source-reviewed note in adf, fields help.",
+      "x-as-reason": "Expose the relevant gotcha in describe, errors and topic help without changing the API contract.",
+      "x-as-evidence": {
+        "url": "https://github.com/grandcamel/JIRA-Assistant-Skills/blob/main/skills/jira-dev/docs/guides/smart-commits.md#L31",
+        "date": "2026-09-06",
+        "corroboration": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json; /rest/api/3/issue/{issueIdOrKey}/worklog/{id} put"
+      },
+      "x-as-origin": "JAS-47; research/skills-content-classification-2026-09.md fact 136; jira-dev/docs/guides/smart-commits.md:31; jira-time/docs/reference/time-format-quick-ref.md:54",
+      "x-as-test": "jas47_topic_platform_updateWorklog",
+      "update": {
+        "x-as-topic": [
+          "adf",
+          "fields"
+        ]
+      }
     }
   ]
 }

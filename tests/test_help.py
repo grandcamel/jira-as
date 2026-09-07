@@ -82,8 +82,7 @@ def test_all_standard_topics_are_bounded_and_unseeded_topics_are_explicit():
         result = runner.invoke(cli, ["help", topic])
         assert result.exit_code == 0, result.output
         assert token_estimate(result.stdout) <= CAPS["topic"]
-        if topic not in {"paging", "search"}:
-            assert "No entries tagged" in result.stdout
+        assert "No entries tagged" not in result.stdout
     assert "No entries tagged" not in runner.invoke(cli, ["help", "paging"]).stdout
 
 

@@ -15,6 +15,7 @@
         "platform.paging-override.overlay.json",
         "platform.scope.overlay.json",
         "platform.scope-override.overlay.json",
+        "platform.richtext.overlay.json",
         "platform.overlay.json",
         "platform.help.overlay.json"
       ],
