@@ -59,6 +59,15 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
   auto-resolve markdown to ADF on `api call`, and repeatable `--adf-field`
   overrides per call. ADF helpers no longer emit empty text nodes (JAS-27).
   Attachment transport and risk-tag enrichment follow in JAS-65. (JAS-49)
+- Risk enrichment (JAS-65): every DELETE operation in the three pinned Jira
+  documents (platform 89, software 24, servicedesk 10) and 24 destructive
+  bulk, move, archive and removal operations carry `x-as-risk` (`destructive`
+  or `irreversible`), activating the default zero-request preview and the
+  explicit `--confirm` on `api call`; the `risk` help topic lists the
+  irreversible set. Attachment downloads (`getAttachmentContent`,
+  `getAttachmentThumbnail`) stream to `api call --output PATH`;
+  `addAttachment` sends multipart uploads; the two attachment migration hints
+  no longer carry a limitation note. (JAS-65)
 
 ### Removed verbs
 
