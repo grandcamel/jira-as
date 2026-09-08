@@ -102,6 +102,11 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
 
 ### Fixed
 - JAS-62: `test_real_worktree_identity_does_not_follow_cwd` skips outside a git checkout (a `git archive` export, as the Promotion dry run builds); cherry-picked from 1.2.1.
+- JAS-73: the live SBX suite waits for Jira's JQL index before a search that
+  follows a create (the bulk-update dry run, `contract:search:0` and the
+  generic JQL search case): `SbxSession.wait_for_index` polls the gated
+  search at most 5 times 3 s apart, reports the lag in the test output and
+  names the key and attempts on exhaustion; the assertions are unchanged.
 
 ## [1.2.0] - 2026-09-06
 
