@@ -68,6 +68,12 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
   `getAttachmentThumbnail`) stream to `api call --output PATH`;
   `addAttachment` sends multipart uploads; the two attachment migration hints
   no longer carry a limitation note. (JAS-65)
+- Cassette-backed Compatibility Contract tests (synthetic fixture and argv
+  sidecar under tests/cassettes/), an SBX-only cassette recorder
+  (scripts/record_cassettes.py), a cleanup-tracked live suite under tests/live
+  for the dev wrapper, generated dev-wrapper argv checks, and a three-document
+  Base Document drift job (scripts/check_base_document_drift.py, drift
+  workflow). Live SBX recording and the live run remain host steps. (JAS-50)
 
 ### Removed verbs
 
