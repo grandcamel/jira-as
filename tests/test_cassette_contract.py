@@ -750,6 +750,134 @@ def test_cleanup_verification_retries_until_index_clears(cleanup_runner, interme
     assert waits == [3]
 
 
+@pytest.fixture
+def index_runner(monkeypatch):
+    """Keep invoke's argv gate and create tracking while simulating index lag."""
+    from contextlib import nullcontext
+
+    from tests.live import sbx_profile
+
+    waits = []
+    monkeypatch.setattr(sbx_profile.time, "sleep", waits.append)
+
+    def make(searches):
+        session = SbxSession(prefix="safe", transport="cassette")
+        commands = []
+        indexed = False
+
+        def invoke(_cli, argv, **_):
+            nonlocal indexed
+            commands.append(list(argv))
+            if argv[:3] == ["api", "call", "createIssue"]:
+                payload = {"key": "SBX-9"}
+            elif "--all" in argv:
+                assert argv[:3] == ["api", "call", "searchAndReconsileIssuesUsingJql"]
+                assert argv[argv.index("--fields") + 1] == "key"
+                assert argv[argv.index("--jql") + 1] == "project = SBX AND key = SBX-9"
+                payload = searches.pop(0)
+                indexed = any(item.get("key") == "SBX-9" for item in payload)
+            elif argv[:2] == ["search", "bulk-update"]:
+                assert argv == [
+                    "search",
+                    "bulk-update",
+                    "project = SBX AND key = SBX-9",
+                    "--add-labels",
+                    "dry-run-probe",
+                    "--dry-run",
+                    "--output",
+                    "json",
+                ]
+                payload = {
+                    "would_update": int(indexed),
+                    "issues": ["SBX-9"] if indexed else [],
+                    "changes": {
+                        "add_labels": ["dry-run-probe"],
+                        "remove_labels": None,
+                        "priority": None,
+                    },
+                }
+            else:
+                assert indexed, "measured search ran before index readiness"
+                if argv[:2] == ["search", "query"]:
+                    stdout = (
+                        "Found 1 issue(s)\n"
+                        "Key Type Status Priority Assignee Reporter Summary\n"
+                    )
+                    return SimpleNamespace(
+                        exit_code=0, stdout=stdout, stderr="", output=stdout
+                    )
+                assert argv[:3] == ["api", "call", "searchAndReconsileIssuesUsingJql"]
+                payload = {"issues": [{"key": "SBX-9"}]}
+            stdout = json.dumps(payload)
+            return SimpleNamespace(exit_code=0, stdout=stdout, stderr="", output=stdout)
+
+        monkeypatch.setattr(session, "_ensure_surface", lambda: None)
+        monkeypatch.setattr(session, "use_surface", lambda surface: nullcontext())
+        monkeypatch.setattr(session.runner, "invoke", invoke)
+        return session, commands, waits
+
+    return make
+
+
+@pytest.mark.parametrize("misses", [0, 1, 4])
+def test_index_wait_returns_attempts_and_reports_only_lag(index_runner, capsys, misses):
+    session, commands, waits = index_runner([[]] * misses + [[{"key": "SBX-9"}]])
+    assert session.wait_for_index("SBX-9") == misses + 1
+    assert len(commands) == misses + 1
+    assert waits == [3] * misses
+    output = capsys.readouterr().out
+    if misses:
+        assert f"JQL index lag: SBX-9 visible after {misses + 1} attempts" in output
+    else:
+        assert output == ""
+
+
+def test_bulk_dry_run_waits_for_exact_indexed_key(index_runner, tmp_path, capsys):
+    from tests.live.test_live_suite import test_survivor_bulk_update_dry_run
+
+    session, commands, waits = index_runner([[], [{"key": "SBX-9"}]])
+    test_survivor_bulk_update_dry_run(session, tmp_path)
+    assert session.created_keys == {"SBX-9"}
+    assert [argv[:3] for argv in commands] == [
+        ["api", "call", "createIssue"],
+        ["api", "call", "searchAndReconsileIssuesUsingJql"],
+        ["api", "call", "searchAndReconsileIssuesUsingJql"],
+        ["search", "bulk-update", "project = SBX AND key = SBX-9"],
+    ]
+    assert waits == [3]
+    assert "JQL index lag: SBX-9 visible after 2 attempts" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("miss", [[], [{"key": "SBX-8"}]])
+def test_bulk_dry_run_index_bound_exhausted(index_runner, tmp_path, miss):
+    from tests.live.test_live_suite import test_survivor_bulk_update_dry_run
+
+    session, commands, waits = index_runner([miss] * 5)
+    with pytest.raises(
+        RuntimeError, match="JQL index lag: SBX-9 not visible after 5 attempts"
+    ):
+        test_survivor_bulk_update_dry_run(session, tmp_path)
+    assert len(commands) == 6  # One create and exactly five readiness searches.
+    assert all(argv[:2] != ["search", "bulk-update"] for argv in commands)
+    assert waits == [3] * 4
+
+
+@pytest.mark.parametrize(
+    "case_id", ["contract:search:0", "generic:searchAndReconsileIssuesUsingJql"]
+)
+def test_post_create_search_scenarios_wait_for_index(index_runner, tmp_path, case_id):
+    from tests.live.scenarios import CASES
+    from tests.live.test_live_suite import test_contract_and_generic_scenarios
+
+    case = next(case for case in CASES if case["id"] == case_id)
+    session, commands, waits = index_runner([[], [{"key": "SBX-9"}]])
+    test_contract_and_generic_scenarios(session, tmp_path, case)
+    assert len(commands) == 4  # Create, two readiness searches, measured search.
+    assert "--all" in commands[1] and "--all" in commands[2]
+    assert "--all" not in commands[3]
+    assert waits == [3]
+
+
 def test_cleanup_indexed_live_key_is_a_leak(cleanup_runner):
     session, commands, waits = cleanup_runner(
         [[], [{"key": "SBX-9"}]],

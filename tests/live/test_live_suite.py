@@ -58,6 +58,8 @@ def test_contract_and_generic_scenarios(sbx_session, tmp_path, case):
         pytest.skip("simulation lacks link-type prerequisite capability")
     materialized = sbx_session.prepare(case, tmp_path)
     for step in materialized["steps"]:
+        if step["argv"][:2] == ["search", "query"] or "--jql" in step["argv"]:
+            sbx_session.wait_for_index(materialized["key"])
         result = sbx_session.invoke(step["argv"])
         _simulation_gap(case, step["output"], result)
         assert result.exit_code == step["exit"], result.output
@@ -115,11 +117,13 @@ def test_survivor_bulk_update_dry_run(sbx_session, tmp_path):
         "setup": {"issue": True},
     }
     issue = sbx_session.prepare(case, tmp_path)["key"]
+    jql = f"project = SBX AND key = {issue}"
+    sbx_session.wait_for_index(issue, jql)
     dry_run = sbx_session.invoke(
         [
             "search",
             "bulk-update",
-            f"project = SBX AND key = {issue}",
+            jql,
             "--add-labels",
             "dry-run-probe",
             "--dry-run",

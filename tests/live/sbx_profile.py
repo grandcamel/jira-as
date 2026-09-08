@@ -210,6 +210,43 @@ class SbxSession:
         finally:
             os.chdir(previous)
 
+    def wait_for_index(self, key: str, jql: str | None = None) -> int:
+        """Wait at most five searches for a newly written SBX key to be indexed."""
+        if not _SBX_KEY.fullmatch(key):
+            raise ValueError("SBX index wait requires an SBX key")
+        argv = [
+            "api",
+            "call",
+            "searchAndReconsileIssuesUsingJql",
+            "--jql",
+            jql or f"project = SBX AND key = {key}",
+            "--all",
+            "--fields",
+            "key",
+            "--format",
+            "json",
+        ]
+        for attempt in range(1, 6):
+            result = self.invoke(argv)
+            if result.exit_code:
+                raise RuntimeError(
+                    f"SBX JQL index search failed for {key} on attempt {attempt}: "
+                    f"{self._result_detail(result)}"
+                )
+            payload = json.loads(result.stdout)
+            if not isinstance(payload, list) or any(
+                not isinstance(item, dict) or not isinstance(item.get("key"), str)
+                for item in payload
+            ):
+                raise ValueError("SBX JQL index search returned a malformed envelope")
+            if any(item["key"] == key for item in payload):
+                if attempt > 1:
+                    print(f"SBX JQL index lag: {key} visible after {attempt} attempts")
+                return attempt
+            if attempt < 5:
+                time.sleep(3)
+        raise RuntimeError(f"SBX JQL index lag: {key} not visible after 5 attempts")
+
     def _create_issue(self, directory: Path, suffix: str) -> str:
         if self.create_attempts >= self.max_created:
             raise RuntimeError(
