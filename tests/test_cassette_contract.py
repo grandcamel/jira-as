@@ -565,7 +565,15 @@ def cleanup_runner(monkeypatch):
     waits = []
     monkeypatch.setattr(sbx_profile.time, "sleep", waits.append)
 
-    def make(searches, *, tracked=True, get_status=404, error_at=None, max_created=40):
+    def make(
+        searches,
+        *,
+        tracked=True,
+        get_status=404,
+        error_at=None,
+        max_created=40,
+        captured_argv=None,
+    ):
         session = SbxSession(prefix="safe", transport="http", max_created=max_created)
         if tracked:
             session.created_keys.add("SBX-9")
@@ -573,6 +581,8 @@ def cleanup_runner(monkeypatch):
         commands = []
 
         def invoke(_cli, argv, **_):
+            if captured_argv is not None:
+                captured_argv.append(list(argv))
             operation = argv[2]
             commands.append(operation)
             if operation == "searchAndReconsileIssuesUsingJql":
@@ -605,6 +615,82 @@ def cleanup_runner(monkeypatch):
         return session, commands, waits
 
     return make
+
+
+@pytest.mark.parametrize("verification", [False, True])
+@pytest.mark.parametrize("item", [{"id": "24688"}, {"id": "24688", "key": None}])
+def test_cleanup_missing_key_names_malformed_item_fields(
+    cleanup_runner, verification, item
+):
+    responses = [[], [item]] if verification else [[item], []]
+    session, commands, waits = cleanup_runner(responses, tracked=False)
+    phase = "label-verification" if verification else "label-recovery"
+    with pytest.raises(RuntimeError, match=f"{phase}: .*malformed envelope") as caught:
+        session.cleanup()
+    assert f"item keys: {sorted(item)}" in str(caught.value)
+    assert "non-SBX key" not in str(caught.value)
+    assert "deleteIssue" not in commands
+    assert not waits
+
+
+def test_cleanup_recovers_populated_id_and_key_with_explicit_fields(cleanup_runner):
+    captured_argv = []
+    session, _, waits = cleanup_runner(
+        [[{"id": "24688", "key": "SBX-5"}], []],
+        captured_argv=captured_argv,
+    )
+    session.create_attempts = 2  # One known key and one lost create response.
+    assert "remaining=0" in session.cleanup()
+    assert session.created_keys == session.deleted_keys == {"SBX-5", "SBX-9"}
+    searches = [
+        argv for argv in captured_argv if argv[2] == "searchAndReconsileIssuesUsingJql"
+    ]
+    assert (
+        searches
+        == [
+            [
+                "api",
+                "call",
+                "searchAndReconsileIssuesUsingJql",
+                "--jql",
+                'project = SBX AND labels = "safe"',
+                "--all",
+                "--fields",
+                "key",
+                "--format",
+                "json",
+            ]
+        ]
+        * 2
+    )
+    deletes = [argv for argv in captured_argv if argv[2] == "deleteIssue"]
+    assert [argv[argv.index("--issueIdOrKey") + 1] for argv in deletes] == [
+        "SBX-5",
+        "SBX-9",
+    ]
+    assert not waits
+
+
+def test_cleanup_empty_count_stderr_recovers_no_keys(cleanup_runner):
+    session, commands, waits = cleanup_runner(
+        [SimpleNamespace(exit_code=0, stdout="[]", stderr="count=0\n")],
+        tracked=False,
+    )
+    assert "tracked=0 remaining=0" in session.cleanup()
+    assert not session.created_keys
+    assert commands == ["searchAndReconsileIssuesUsingJql"] * 2
+    assert not waits
+
+
+def test_cleanup_foreign_key_remains_a_non_sbx_refusal(cleanup_runner):
+    session, commands, waits = cleanup_runner(
+        [[{"id": "24688", "key": "OTHER-5"}]], tracked=False
+    )
+    with pytest.raises(RuntimeError, match="non-SBX key") as caught:
+        session.cleanup()
+    assert "malformed envelope" not in str(caught.value)
+    assert "deleteIssue" not in commands
+    assert not waits
 
 
 def test_cleanup_empty_recovery_still_deletes_known_keys(cleanup_runner):

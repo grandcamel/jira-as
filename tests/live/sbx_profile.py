@@ -365,6 +365,8 @@ class SbxSession:
                 "--jql",
                 f'project = SBX AND labels = "{self.run_label}"',
                 "--all",
+                "--fields",
+                "key",
                 "--format",
                 "json",
             ]
@@ -385,11 +387,17 @@ class SbxSession:
             raise ValueError("SBX cleanup label search returned a malformed envelope")
         recovered = set()
         for item in payload:
-            if (
-                not isinstance(item, dict)
-                or not isinstance(item.get("key"), str)
-                or not _SBX_KEY.fullmatch(item["key"])
-            ):
+            if not isinstance(item, dict):
+                raise ValueError(
+                    "SBX cleanup label search returned a malformed envelope: "
+                    "item is not an object"
+                )
+            if not isinstance(item.get("key"), str):
+                raise ValueError(
+                    "SBX cleanup label search returned a malformed envelope: "
+                    f"item has no string key (item keys: {sorted(item)})"
+                )
+            if not _SBX_KEY.fullmatch(item["key"]):
                 raise ValueError("SBX cleanup label search returned a non-SBX key")
             recovered.add(item["key"])
         if len(recovered | self.created_keys) > self.max_created:

@@ -75,6 +75,7 @@ A failure exits nonzero and prints the retained SBX key ledger and run label
 for supervisor cleanup; partial files are not accepted fixtures.
 Failed steps print their case, gated argv, exit and captured output/stderr before
 cleanup; a cleanup error is reported separately and preserves the original failure.
+Cleanup label searches request `--fields key`; an item missing a string key is reported as a malformed envelope with its field names, while a foreign key retains the non-SBX refusal.
 
 Before adopting a host recording:
 
