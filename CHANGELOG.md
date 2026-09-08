@@ -44,6 +44,21 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
   and legacy exit codes; added responder compatibility coverage, normalized
   spaced and unspaced worklog durations, explicit description input formats,
   and bounded project-safe search ordering and link support (JAS-48). (JAS-48)
+- Wrapper Verbs under the rule (JAS-49): all 208 legacy verbs classified in
+  `tests/wrapper_verbs.json` / `docs/wrapper-verbs.md` — 35 survivors (bulk,
+  clone, transition/resolve/reopen, project discovery and cache, JSM
+  sequences, reports, local transforms, cache/autocomplete affordances)
+  rebuilt on the generic transport with the stateful simulation; 143 single-
+  operation and prerequisite-chain wrappers REMOVED and replaced by migration
+  shims that name the indexed `api call` replacement and exit 2 (admin 56, JSM
+  34, agile 11, collaborate 9, lifecycle 9, search 8, time 5, issue 4, fields
+  3, dev 2, relationships 2); the 14 Compatibility Contract verbs unchanged;
+  16 verbs deferred on the legacy client pending JAS-64 (Automation, Assets,
+  dev-status). New `fields list/get/cache warm` over a v2 instance-fields
+  cache (`JIRA_FIELDS_CACHE_DIR`, 24 h TTL); cached textarea custom fields
+  auto-resolve markdown to ADF on `api call`, and repeatable `--adf-field`
+  overrides per call. ADF helpers no longer emit empty text nodes (JAS-27).
+  Attachment transport and risk-tag enrichment follow in JAS-65. (JAS-49)
 
 ### Removed verbs
 
