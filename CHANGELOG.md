@@ -78,6 +78,12 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
   also fails; the SBX live-suite cleanup tolerates the JQL index's lag with
   per-key leak checks and detailed errors; recreated SBX keys are owned again;
   the bulk-update dry-run check asserts would_update/issues/changes. (JAS-68)
+- SBX live-suite cleanup asks the JQL search for the issue key (`--fields
+  key`) in label recovery and verification — the current Jira Cloud search
+  returns id-only items otherwise — and reports id-only items as a malformed
+  envelope; `tests/cassettes/compatibility.json` re-recorded with the as-
+  engine response-header allowlist (Authorization and Set-Cookie placeholders
+  removed from all 37 interactions). (JAS-71)
 
 ### Removed verbs
 
