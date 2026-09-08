@@ -21,7 +21,7 @@
             "group": "collaborate attachment",
             "verb": "upload",
             "invocation": "api call addAttachment --issueIdOrKey ISSUE_KEY --body @body.json",
-            "note": "Single indexed operation or prerequisite-only chain; use the generic surface. Jira multipart/binary enrichment remains pending JAS-65; this indexed pointer does not claim completed attachment transport."
+            "note": "Multipart upload: use --field file=@PATH; the transport adds X-Atlassian-Token: nocheck."
           }
         ],
         "x-as-topic": [
@@ -853,7 +853,7 @@
             "group": "collaborate attachment",
             "verb": "download",
             "invocation": "api call getAttachmentContent --id ID",
-            "note": "Single indexed operation or prerequisite-only chain; use the generic surface. Jira multipart/binary enrichment remains pending JAS-65; this indexed pointer does not claim completed attachment transport."
+            "note": "Binary download: use --output PATH; the existing site-operation scope guard still applies. One same-origin redirect is allowed."
           }
         ]
       }

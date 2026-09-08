@@ -28,7 +28,7 @@
   {"argv": ["api", "--transport", "responder", "call", "getSprint", "--project", "SBX", "--sprintId", "99"], "site": true},
   {"argv": ["api", "--transport", "responder", "call", "getIssuesForBoard", "--project", "SBX", "--boardId", "42", "--jql", "project = SBX AND status = Open"], "site": true},
   {"argv": ["api", "--transport", "responder", "call", "getIssuesForSprint", "--project", "SBX", "--sprintId", "99", "--jql", "project = SBX"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "moveIssuesToSprintAndRank", "--project", "SBX", "--sprintId", "99", "--field", "issues=[\"SBX-14\"]"], "site": true},
+  {"argv": ["api", "--transport", "responder", "call", "moveIssuesToSprintAndRank", "--project", "SBX", "--sprintId", "99", "--field", "issues=[\"SBX-14\"]", "--confirm"], "site": true},
   {"argv": ["api", "--transport", "responder", "call", "getCustomerRequestByIdOrKey", "--issueIdOrKey", "SBX-15"]},
   {"argv": ["api", "--transport", "responder", "call", "getCustomerRequestStatus", "--issueIdOrKey", "SBX-16"]},
   {"argv": ["api", "--transport", "responder", "call", "getServiceDesks", "--project", "SBX"], "site": true},

@@ -1,0 +1,1628 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira platform risk classification",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "target": "$.paths[\"/rest/api/3/attachment/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Deletes attachment content; the API does not restore deleted bytes.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Deletes attachment content; the API does not restore deleted bytes.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeAttachment"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/bulk/issues/delete\"].post",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Permanently deletes the selected issues in bulk.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Permanently deletes the selected issues in bulk.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_submitBulkDelete"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/bulk/issues/move\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Moves existing issues between project/type/parent contexts; inverse moves require retained source mappings.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Moves existing issues between project/type/parent contexts; inverse moves require retained source mappings.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_submitBulkMove"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/comment/{commentId}/properties/{propertyKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete comment property; a retained property value can be set again through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete comment property; a retained property value can be set again through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteCommentProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/component/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete component; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete component; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteComponent"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes/fields\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove fields associated with field schemes; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove fields associated with field schemes; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeFieldsAssociatedWithSchemes"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes/fields/parameters\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove field parameters; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove field parameters; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeFieldAssociationSchemeItemParameters"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/config/fieldschemes/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete a field scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete a field scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteFieldAssociationScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/dashboard/{dashboardId}/gadget/{gadgetId}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove gadget from dashboard; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove gadget from dashboard; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeGadget"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/dashboard/{dashboardId}/items/{itemId}/properties/{propertyKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete dashboard item property; a retained property value can be set again through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete dashboard item property; a retained property value can be set again through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteDashboardItemProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/dashboard/{id}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Deletes a dashboard; briefing classifies recovery by recreating retained dashboard configuration.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Deletes a dashboard; briefing classifies recovery by recreating retained dashboard configuration.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteDashboard"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/association\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove associations; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove associations; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeAssociations"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/{contextId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete custom field context; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete custom field context; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteCustomFieldContext"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/{contextId}/issuetype/remove\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove issue types from context; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove issue types from context; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeIssueTypesFromContext"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/{contextId}/option/{optionId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete custom field options (context); treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete custom field options (context); treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteCustomFieldOption"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/{contextId}/option/{optionId}/issue\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Replaces option selections; restoring prior selections requires retained issue-to-option mappings.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Replaces option selections; restoring prior selections requires retained issue-to-option mappings.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_replaceCustomFieldOption"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldId}/context/{contextId}/project/remove\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove custom field context from projects; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove custom field context from projects; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeCustomFieldContextFromProjects"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldKey}/option/{optionId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete issue field option; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete issue field option; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteIssueFieldOption"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{fieldKey}/option/{optionId}/issue\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Deselects or replaces options on issues; prior selections require retained issue-to-option mappings.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Deselects or replaces options on issues; prior selections require retained issue-to-option mappings.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_replaceIssueFieldOption"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Permanently deletes the custom field even when it is already in trash.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Permanently deletes the custom field even when it is already in trash.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteCustomField"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/field/{id}/trash\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Moves the field to trash; restoreCustomField can restore it.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Moves the field to trash; restoreCustomField can restore it.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_trashCustomField"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/fieldconfiguration/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete field configuration; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete field configuration; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteFieldConfiguration"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/fieldconfigurationscheme/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete field configuration scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete field configuration scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteFieldConfigurationScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/fieldconfigurationscheme/{id}/mapping/delete\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove issue types from field configuration scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove issue types from field configuration scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeIssueTypesFromGlobalFieldConfigurationScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/filter/{id}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Deletes a filter; briefing classifies recovery by recreating retained filter configuration.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Deletes a filter; briefing classifies recovery by recreating retained filter configuration.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteFilter"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/filter/{id}/columns\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Reset columns; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Reset columns; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_resetColumns"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/filter/{id}/favourite\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove filter as favorite; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove filter as favorite; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteFavouriteForFilter"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/filter/{id}/permission/{permissionId}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete share permission; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete share permission; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteSharePermission"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/group\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Remove group; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove group; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeGroup"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/group/user\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove user from group; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove user from group; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeUserFromGroup"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/archive\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Archives issues selected by JQL; unarchiveIssues can restore them.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Archives issues selected by JQL; unarchiveIssues can restore them.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_archiveIssuesAsync"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/archive\"].put",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Archives issues by key or ID; unarchiveIssues can restore them.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Archives issues by key or ID; unarchiveIssues can restore them.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_archiveIssues"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/properties/{propertyKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Bulk delete issue property; a retained property value can be set again through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Bulk delete issue property; a retained property value can be set again through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_bulkDeleteIssueProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Permanently deletes the issue and optionally its subtasks.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Permanently deletes the issue and optionally its subtasks.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteIssue"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Deletes the comment and its original record.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Deletes the comment and its original record.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteComment"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/properties/{propertyKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete issue property; a retained property value can be set again through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete issue property; a retained property value can be set again through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteIssueProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/remotelink\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete remote issue link by global ID; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete remote issue link by global ID; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteRemoteIssueLinkByGlobalId"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/remotelink/{linkId}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete remote issue link by ID; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete remote issue link by ID; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteRemoteIssueLinkById"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/votes\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete vote; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete vote; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeVote"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/watchers\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete watcher; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete watcher; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeWatcher"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Deletes selected worklog records in bulk.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Deletes selected worklog records in bulk.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_bulkDeleteWorklogs"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog/move\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Moves worklogs between issues without recording issue history; inverse moves require retained source IDs.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Moves worklogs between issues without recording issue history; inverse moves require retained source IDs.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_bulkMoveWorklogs"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Deletes a worklog and its original time-tracking record.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Deletes a worklog and its original time-tracking record.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteWorklog"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog/{worklogId}/properties/{propertyKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete worklog property; a retained property value can be set again through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete worklog property; a retained property value can be set again through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteWorklogProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issueLink/{linkId}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete issue link; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete issue link; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteIssueLink"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issueLinkType/{issueLinkTypeId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete issue link type; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete issue link type; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteIssueLinkType"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuesecurityschemes/{schemeId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete issue security scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete issue security scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteSecurityScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuesecurityschemes/{schemeId}/level/{levelId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Remove issue security level; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove issue security level; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeLevel"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuesecurityschemes/{schemeId}/level/{levelId}/member/{memberId}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove member from issue security level; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove member from issue security level; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeMemberFromSecurityLevel"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuetype/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete issue type; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete issue type; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteIssueType"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuetype/{issueTypeId}/properties/{propertyKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete issue type property; a retained property value can be set again through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete issue type property; a retained property value can be set again through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteIssueTypeProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuetypescheme/{issueTypeSchemeId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete issue type scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete issue type scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteIssueTypeScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuetypescheme/{issueTypeSchemeId}/issuetype/{issueTypeId}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove issue type from issue type scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove issue type from issue type scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeIssueTypeFromIssueTypeScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuetypescreenscheme/{issueTypeScreenSchemeId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete issue type screen scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete issue type screen scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteIssueTypeScreenScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/issuetypescreenscheme/{issueTypeScreenSchemeId}/mapping/remove\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove mappings from issue type screen scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove mappings from issue type screen scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeMappingsFromIssueTypeScreenScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/mypreferences\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete preference; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete preference; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removePreference"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/notificationscheme/{notificationSchemeId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete notification scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete notification scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteNotificationScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/notificationscheme/{notificationSchemeId}/notification/{notificationId}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove notification from notification scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove notification from notification scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeNotificationFromNotificationScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/permissionscheme/{schemeId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete permission scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete permission scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deletePermissionScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/permissionscheme/{schemeId}/permission/{permissionId}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete permission scheme grant; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete permission scheme grant; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deletePermissionSchemeEntity"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/plans/plan/{planId}/archive\"].put",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Archives the plan; classify as recoverable archival rather than permanent deletion.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Archives the plan; classify as recoverable archival rather than permanent deletion.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_archivePlan"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/plans/plan/{planId}/team/atlassian/{atlassianTeamId}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove Atlassian team from plan; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove Atlassian team from plan; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeAtlassianTeam"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/plans/plan/{planId}/team/planonly/{planOnlyTeamId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete plan-only team; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete plan-only team; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deletePlanOnlyTeam"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/plans/plan/{planId}/trash\"].put",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Moves the plan to trash; classify as recoverable trashing rather than permanent deletion.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Moves the plan to trash; classify as recoverable trashing rather than permanent deletion.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_trashPlan"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/priority/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete priority; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete priority; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deletePriority"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/priorityscheme/{schemeId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete priority scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete priority scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deletePriorityScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project-template/remove-template\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Deletes a custom project template; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Deletes a custom project template; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeTemplate"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Deletes the project under the briefing recovery policy; project restore is a separate operation.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Deletes the project under the briefing recovery policy; project restore is a separate operation.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteProject"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/archive\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Archives the project; restoring it is a separate operation.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Archives the project; restoring it is a separate operation.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_archiveProject"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/avatar/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete project avatar; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete project avatar; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteProjectAvatar"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/classification-level/default\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove the default data classification level from a project; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove the default data classification level from a project; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeDefaultProjectClassification"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/delete\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Submits project deletion under the briefing recovery policy; project restore is separate.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Submits project deletion under the briefing recovery policy; project restore is separate.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteProjectAsynchronously"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/properties/{propertyKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete project property; a retained property value can be set again through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete project property; a retained property value can be set again through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteProjectProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/role/{id}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete actors from project role; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete actors from project role; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteActor"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/projectCategory/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete project category; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete project category; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeProjectCategory"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/resolution/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete resolution; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete resolution; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteResolution"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/role/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete project role; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete project role; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteProjectRole"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/role/{id}/actors\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete default actors from project role; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete default actors from project role; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteProjectRoleActorsFromRole"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/screens/{screenId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete screen; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete screen; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteScreen"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/screens/{screenId}/tabs/{tabId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete screen tab; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete screen tab; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteScreenTab"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/screens/{screenId}/tabs/{tabId}/fields/{id}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove screen tab field; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove screen tab field; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeScreenTabField"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/screenscheme/{screenSchemeId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete screen scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete screen scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteScreenScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/statuses\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Bulk delete Statuses; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Bulk delete Statuses; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteStatusesById"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/uiModifications/{uiModificationId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete UI modification; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete UI modification; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteUiModification"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/universal_avatar/type/{type}/owner/{owningObjectId}/avatar/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete avatar; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete avatar; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteAvatar"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/user\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Removes Jira user access while retaining the Atlassian account; access can be granted again.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Removes Jira user access while retaining the Atlassian account; access can be granted again.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_removeUser"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/user/columns\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Reset user default columns; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Reset user default columns; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_resetUserColumns"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/user/properties/{propertyKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete user property; a retained property value can be set again through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete user property; a retained property value can be set again through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteUserProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/version/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete version; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete version; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteVersion"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/version/{id}/mergeto/{moveIssuesTo}\"].put",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Deletes the source version and replaces its fixVersion occurrences with the target version.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Deletes the source version and replaces its fixVersion occurrences with the target version.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_mergeVersions"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/version/{id}/removeAndSwap\"].post",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Deletes the version and clears or replaces its occurrences on issues.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Deletes the version and clears or replaces its occurrences on issues.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteAndReplaceVersion"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/version/{versionId}/relatedwork/{relatedWorkId}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete related work; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete related work; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteRelatedWork"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/webhook\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete webhooks by ID; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete webhooks by ID; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteWebhookById"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflow/rule/config/delete\"].put",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Deletes workflow transition rule configurations; existing rule identities are lost.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Deletes workflow transition rule configurations; existing rule identities are lost.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteWorkflowTransitionRuleConfigurations"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflow/{entityId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete inactive workflow; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete inactive workflow; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteInactiveWorkflow"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflowscheme/{id}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete workflow scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete workflow scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteWorkflowScheme"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflowscheme/{id}/default\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete default workflow; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete default workflow; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteDefaultWorkflow"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflowscheme/{id}/draft\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete draft workflow scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete draft workflow scheme; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteWorkflowSchemeDraft"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflowscheme/{id}/draft/default\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete draft default workflow; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete draft default workflow; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteDraftDefaultWorkflow"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflowscheme/{id}/draft/issuetype/{issueType}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete workflow for issue type in draft workflow scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete workflow for issue type in draft workflow scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteWorkflowSchemeDraftIssueType"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflowscheme/{id}/draft/workflow\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete issue types for workflow in draft workflow scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete issue types for workflow in draft workflow scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteDraftWorkflowMapping"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflowscheme/{id}/issuetype/{issueType}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete workflow for issue type in workflow scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete workflow for issue type in workflow scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteWorkflowSchemeIssueType"
+    },
+    {
+      "target": "$.paths[\"/rest/api/3/workflowscheme/{id}/workflow\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete issue types for workflow in workflow scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete issue types for workflow in workflow scheme; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteWorkflowMapping"
+    },
+    {
+      "target": "$.paths[\"/rest/atlassian-connect/1/addons/{addonKey}/properties/{propertyKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete app property; a retained property value can be set again through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete app property; a retained property value can be set again through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_AddonPropertiesResource_deleteAddonProperty_delete"
+    },
+    {
+      "target": "$.paths[\"/rest/atlassian-connect/1/app/module/dynamic\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove modules; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove modules; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_DynamicModulesResource_removeModules_delete"
+    },
+    {
+      "target": "$.paths[\"/rest/forge/1/app/properties/{propertyKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete app property (Forge); a retained property value can be set again through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete app property (Forge); a retained property value can be set again through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_platform_deleteForgeAppProperty"
+    }
+  ]
+}

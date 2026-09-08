@@ -212,3 +212,36 @@ Decision 21 accepts 208 original verbs: **35 survivors, 143 dropped, 14 contract
 | time report | B | survivor | Rule: Search scoped issues; loop worklog reads; aggregate by requested report dimensions. | searchAndReconsileIssuesUsingJql, getIssueWorklog |
 | time export | B | survivor | Rule: Search scoped issues; loop worklog reads; transform rows to CSV file. | searchAndReconsileIssuesUsingJql, getIssueWorklog |
 | time bulk-log | B | survivor | Rule: Select scoped issues; loop validation and worklog mutation with dry-run and checkpoints. | searchAndReconsileIssuesUsingJql, getIssue, addWorklog |
+
+
+## Risk and confirmed calls
+
+The generic surface now tags every DELETE and the documented destructive
+non-DELETE operations as `destructive` or `irreversible`. Both levels default to
+a JSON preview (exit 0), containing `dry_run`, `operationId`, `risk`, `method`,
+`path`, validated `parameters` and `body`. No request, prerequisite lookup or
+version read occurs. The preview reports unresolved aliases and version
+requirements when applicable; it does not prove scope or remote validation.
+Use `--confirm` to run the usual guarded call. `api describe OPERATION` shows the
+level; `help risk` lists tagged irreversible operations and existing risk notes,
+with explicit `--offset` continuation. Direct Python Surface calls retain their
+existing behavior, and surviving workflows keep their own preview/confirmation.
+
+```bash
+jira-as api --transport responder call deleteIssue --issueIdOrKey SBX-1
+jira-as api --transport responder call deleteIssue --issueIdOrKey SBX-1 --confirm
+```
+
+The two attachment migration hints above were recorded before JAS-65. Their
+indexed replacements now support multipart upload with `--field file=@PATH`
+(`X-Atlassian-Token: nocheck` is added) and binary download with `--output PATH`.
+Downloads without `--output` use the sanitized response filename. File writes
+are atomic; one same-origin redirect is allowed, and all cross-origin redirects
+are refused. A numeric attachment ID has no project identity, so the existing
+site-operation guard still applies. For an offline responder download only:
+
+```bash
+JIRA_ALLOWED_PROJECTS=SBX JIRA_ALLOW_SITE_OPERATIONS=true jira-as api --transport responder call getAttachmentContent --id 10000 --output attachment.bin
+```
+
+With only `JIRA_ALLOWED_PROJECTS=SBX`, that download remains refused (exit 4).

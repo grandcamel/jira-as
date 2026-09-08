@@ -1,0 +1,41 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira platform attachment binary responses",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "description": "getAttachmentContent writes binary response bytes to a file; one same-origin redirect is allowed and every cross-origin redirect is refused.",
+      "target": "$.paths[\"/rest/api/3/attachment/content/{id}\"].get",
+      "update": {
+        "x-as-response": {
+          "kind": "binary"
+        }
+      },
+      "x-as-reason": "The Jira Base Document needs an explicit binary response tag to select streamed file output.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_binary_getAttachmentContent"
+    },
+    {
+      "description": "getAttachmentThumbnail writes binary response bytes to a file; one same-origin redirect is allowed and every cross-origin redirect is refused.",
+      "target": "$.paths[\"/rest/api/3/attachment/thumbnail/{id}\"].get",
+      "update": {
+        "x-as-response": {
+          "kind": "binary"
+        }
+      },
+      "x-as-reason": "The Jira Base Document needs an explicit binary response tag to select streamed file output.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_binary_getAttachmentThumbnail"
+    }
+  ]
+}

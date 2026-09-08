@@ -312,6 +312,14 @@ and automation-template, `dev get-commits`, and JSM asset commands. Jira
 attachment multipart/binary transport and generic risk enrichment remain pending
 JAS-65; their migration hints do not claim those capabilities are available.
 
+### Destructive operations
+
+Every indexed DELETE and the documented bulk delete, move, archive and removal
+operations carry a risk level. `api call` defaults `destructive` and `irreversible`
+operations to a JSON preview with zero requests (exit 0); add `--confirm` to send
+the request through the normal scope guard. Inspect the level with `api describe
+OPERATION`, and browse irreversible operations with `help risk`.
+
 ### Instance fields cache
 
 `fields cache warm` fetches instance metadata into

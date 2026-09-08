@@ -1,0 +1,495 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira software risk classification",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "target": "$.paths[\"/rest/agile/1.0/backlog/issue\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Changes existing issue board, sprint or epic membership; restoring it requires retained prior assignments.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Changes existing issue board, sprint or epic membership; restoring it requires retained prior assignments.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_moveIssuesToBacklog"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/backlog/{boardId}/issue\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Changes existing issue board, sprint or epic membership; restoring it requires retained prior assignments.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Changes existing issue board, sprint or epic membership; restoring it requires retained prior assignments.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_moveIssuesToBacklogForBoard"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete board; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete board; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteBoard"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/issue\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Changes existing issue board, sprint or epic membership; restoring it requires retained prior assignments.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Changes existing issue board, sprint or epic membership; restoring it requires retained prior assignments.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_moveIssuesToBoard"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/properties/{propertyKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete board property; a retained property value can be set again through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete board property; a retained property value can be set again through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteBoardProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/epic/none/issue\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Changes existing issue board, sprint or epic membership; restoring it requires retained prior assignments.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Changes existing issue board, sprint or epic membership; restoring it requires retained prior assignments.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_removeIssuesFromEpic"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/epic/{epicIdOrKey}/issue\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Changes existing issue board, sprint or epic membership; restoring it requires retained prior assignments.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Changes existing issue board, sprint or epic membership; restoring it requires retained prior assignments.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_moveIssuesToEpic"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete sprint; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete sprint; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteSprint"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/issue\"].post",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Changes existing issue board, sprint or epic membership; restoring it requires retained prior assignments.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Changes existing issue board, sprint or epic membership; restoring it requires retained prior assignments.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_moveIssuesToSprintAndRank"
+    },
+    {
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete property; a retained property value can be set again through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete property; a retained property value can be set again through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteSprintProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/builds/0.1/bulkByProperties\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete builds by Property; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete builds by Property; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteBuildsByProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/builds/0.1/pipelines/{pipelineId}/builds/{buildNumber}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete a build by key; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete a build by key; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteBuildByKey"
+    },
+    {
+      "target": "$.paths[\"/rest/deployments/0.1/bulkByProperties\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete deployments by Property; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete deployments by Property; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteDeploymentsByProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/deployments/0.1/pipelines/{pipelineId}/environments/{environmentId}/deployments/{deploymentSequenceNumber}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete a deployment by key; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete a deployment by key; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteDeploymentByKey"
+    },
+    {
+      "target": "$.paths[\"/rest/devinfo/0.10/bulkByProperties\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete development information by properties; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete development information by properties; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteByProperties"
+    },
+    {
+      "target": "$.paths[\"/rest/devinfo/0.10/repository/{repositoryId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete repository; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete repository; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteRepository"
+    },
+    {
+      "target": "$.paths[\"/rest/devinfo/0.10/repository/{repositoryId}/{entityType}/{entityId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete development information entity; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete development information entity; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteEntity"
+    },
+    {
+      "target": "$.paths[\"/rest/devopscomponents/1.0/bulkByProperties\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete DevOps Components by Property; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete DevOps Components by Property; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteComponentsByProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/devopscomponents/1.0/devopscomponents/{componentId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete a Component by ID; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete a Component by ID; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteComponentById"
+    },
+    {
+      "target": "$.paths[\"/rest/featureflags/0.1/bulkByProperties\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete Feature Flags by Property; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete Feature Flags by Property; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteFeatureFlagsByProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/featureflags/0.1/flag/{featureFlagId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete a Feature Flag by ID; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete a Feature Flag by ID; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteFeatureFlagById"
+    },
+    {
+      "target": "$.paths[\"/rest/operations/1.0/bulkByProperties\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete Incidents or Review by Property; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete Incidents or Review by Property; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteEntityByProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/operations/1.0/incidents/{incidentId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete a Incident by ID; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete a Incident by ID; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteIncidentById"
+    },
+    {
+      "target": "$.paths[\"/rest/operations/1.0/linkedWorkspaces/bulk\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete Operations Workpaces by Id; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete Operations Workpaces by Id; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteWorkspaces"
+    },
+    {
+      "target": "$.paths[\"/rest/operations/1.0/post-incident-reviews/{reviewId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete a Review by ID; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete a Review by ID; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteReviewById"
+    },
+    {
+      "target": "$.paths[\"/rest/remotelinks/1.0/bulkByProperties\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete Remote Links by Property; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete Remote Links by Property; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteRemoteLinksByProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/remotelinks/1.0/remotelink/{remoteLinkId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete a Remote Link by ID; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete a Remote Link by ID; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteRemoteLinkById"
+    },
+    {
+      "target": "$.paths[\"/rest/security/1.0/bulkByProperties\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete Vulnerabilities by Property; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete Vulnerabilities by Property; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteVulnerabilitiesByProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/security/1.0/linkedWorkspaces/bulk\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete linked Security Workspaces; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete linked Security Workspaces; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteLinkedWorkspaces"
+    },
+    {
+      "target": "$.paths[\"/rest/security/1.0/vulnerability/{vulnerabilityId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete a Vulnerability by ID; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete a Vulnerability by ID; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/software/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_software_deleteVulnerabilityById"
+    }
+  ]
+}

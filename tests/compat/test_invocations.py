@@ -534,6 +534,25 @@ def test_public_api_metadata_and_delete_remain_site_refused(
     result = CliRunner().invoke(
         cli, ["api", "--transport", "responder", "call", operation, *arguments]
     )
+    if operation == "deleteIssueLink":
+        assert result.exit_code == 0, result.output
+        preview = json.loads(result.output)
+        assert preview["dry_run"] is True
+        assert preview["risk"] == "destructive"
+        assert preview["operationId"] == "deleteIssueLink"
+        assert responder_wire == []
+        result = CliRunner().invoke(
+            cli,
+            [
+                "api",
+                "--transport",
+                "responder",
+                "call",
+                operation,
+                *arguments,
+                "--confirm",
+            ],
+        )
     assert result.exit_code == 4, result.output
     assert responder_wire == []
 

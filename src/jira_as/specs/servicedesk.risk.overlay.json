@@ -1,0 +1,172 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira servicedesk risk classification",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/customer/user/{accountId}/revoke-portal-only-access\"].put",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Revokes portal-only access; a separate grant operation can enable access again.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Revokes portal-only access; a separate grant operation can enable access again.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_servicedesk_revokePortalOnlyAccessForUser"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete organization; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete organization; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_servicedesk_deleteOrganization"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/property/{propertyKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete property; a retained property value can be set again through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete property; a retained property value can be set again through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_servicedesk_deleteOrganizationProperty"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/user\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove users from organization; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove users from organization; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_servicedesk_removeUsersFromOrganization"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/notification\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Unsubscribe; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Unsubscribe; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_servicedesk_unsubscribe"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/participant\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove request participants; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove request participants; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_servicedesk_removeRequestParticipants"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/request/{requestIdOrKey}/feedback\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete feedback; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete feedback; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_servicedesk_deleteFeedback"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/customer\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove customers; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove customers; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_servicedesk_removeCustomers"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/organization\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Remove organization; retained associations or settings can be reapplied through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Remove organization; retained associations or settings can be reapplied through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_servicedesk_removeOrganization"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}\"].delete",
+      "update": {
+        "x-as-risk": "irreversible",
+        "x-as-topic": [
+          "risk"
+        ]
+      },
+      "description": "Delete request type; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete request type; treat deletion of the original resource or configuration as irreversible.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_servicedesk_deleteRequestType"
+    },
+    {
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey}\"].delete",
+      "update": {
+        "x-as-risk": "destructive"
+      },
+      "description": "Delete property; a retained property value can be set again through the API.",
+      "x-as-reason": "Pinned Jira Base Document does not declare destructive-operation risk. Delete property; a retained property value can be set again through the API.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/service-desk/swagger.v3.json",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-65",
+      "x-as-test": "jas65_risk_servicedesk_deleteRequestTypeProperty"
+    }
+  ]
+}

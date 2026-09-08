@@ -17,6 +17,8 @@
         "platform.scope-override.overlay.json",
         "platform.richtext.overlay.json",
         "platform.overlay.json",
+        "platform.risk.overlay.json",
+        "platform.attachments.overlay.json",
         "platform.compat.overlay.json",
         "platform.rename.overlay.json",
         "platform.help.overlay.json"
@@ -40,6 +42,7 @@
         "software.scope.overlay.json",
         "software.scope-override.overlay.json",
         "software.overlay.json",
+        "software.risk.overlay.json",
         "software.rename.overlay.json",
         "software.help.overlay.json"
       ],
@@ -62,6 +65,7 @@
         "servicedesk.scope.overlay.json",
         "servicedesk.scope-override.overlay.json",
         "servicedesk.overlay.json",
+        "servicedesk.risk.overlay.json",
         "servicedesk.rename.overlay.json",
         "servicedesk.help.overlay.json"
       ],

@@ -80,6 +80,8 @@ def _call_help(operation: Any) -> str:
         "Arrays: repeat the flag or use a JSON array; booleans: true|false.",
     ]
     tags = operation.extensions
+    if tags.get("x-as-response") == {"kind": "binary"}:
+        lines.append(_binary_help())
     if "x-as-paging" in tags:
         lines.append(
             "Paging: --all aggregates pages; with --all, --limit is the total item cap; "
@@ -108,6 +110,33 @@ def _call_help(operation: Any) -> str:
             + "."
         )
     return "\n".join(lines)
+
+
+def _binary_help() -> str:
+    return (
+        "Binary output: --output PATH writes response bytes to that file; "
+        "otherwise use the response filename. One same-origin redirect is allowed."
+    )
+
+
+def _output_flags(arguments: tuple[str, ...]) -> tuple[list[str], str | None]:
+    """Consume the product's destination flag before spec-derived parsing."""
+    remaining = []
+    output = None
+    tokens = iter(arguments)
+    for token in tokens:
+        key, equal, value = token.partition("=")
+        if key != "--output":
+            remaining.append(token)
+            continue
+        if output is not None:
+            raise ValueError("Duplicate flag: --output")
+        if not equal:
+            value = next(tokens, "")
+        if not value or (not equal and value.startswith("--")):
+            raise ValueError("Missing value for --output")
+        output = value
+    return remaining, output
 
 
 def _preview(
@@ -214,7 +243,7 @@ def call(
         click.echo(
             "api call OPERATION [--parameter value] [--body @file|-] [--field path=value] "
             "[--project KEY] [--validate-body] [--confirm] [--format json|table|markdown]\n"
-            "[--representation NAME] [--raw]\n"
+            "[--representation NAME] [--raw] [--output PATH]\n"
             "Use api call OPERATION --help for parameter flags."
         )
         return
@@ -222,7 +251,8 @@ def call(
     surface = _surface(ctx)
     _, index, operation = surface.resolve(name)
     try:
-        parameters, options = parse_call_flags(operation, arguments[1:])
+        call_arguments, output = _output_flags(arguments[1:])
+        parameters, options = parse_call_flags(operation, call_arguments)
         if options["help"] or options["examples"]:
             value = (
                 examples_document(operation)
@@ -293,6 +323,7 @@ def call(
             version=options["version"],
             representation=options["representation"],
             raw=options["raw"],
+            output=output,
             warn=lambda message: click.echo(message, err=True),
         )
         click.echo(render_output(response.body, options["format"]))
@@ -351,6 +382,8 @@ def describe(
         if examples
         else describe_document(surface.describe(operation, full=full))
     )
+    if not examples and op.extensions.get("x-as-response") == {"kind": "binary"}:
+        value["sections"].append({"text": _binary_help()})
     click.echo(render_help(value, output_format))
 
 

@@ -1352,7 +1352,7 @@
     "verb": "collaborate attachment upload",
     "classification": "A",
     "decision": "dropped",
-    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface. Jira multipart/binary enrichment remains pending JAS-65; this indexed pointer does not claim completed attachment transport.",
+    "reason": "Multipart upload: use --field file=@PATH; the transport adds X-Atlassian-Token: nocheck.",
     "operationIds": [
       "addAttachment"
     ],
@@ -1382,7 +1382,7 @@
     "verb": "collaborate attachment download",
     "classification": "B",
     "decision": "dropped",
-    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface. Jira multipart/binary enrichment remains pending JAS-65; this indexed pointer does not claim completed attachment transport.",
+    "reason": "Binary download: use --output PATH; the existing site-operation scope guard still applies. One same-origin redirect is allowed.",
     "operationIds": [
       "getAttachmentContent"
     ],
