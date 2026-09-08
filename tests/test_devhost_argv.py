@@ -2,6 +2,7 @@
 
 import json
 import re
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -128,8 +129,8 @@ def shapes():
 
 
 def test_fixture_has_forty_replayable_shapes(shapes):
-    assert len(shapes) == 40
-    for shape in shapes:
+    assert len(shapes[:40]) == 40
+    for shape in shapes[:40]:
         _check_gate(shape["argv"])
         assert _visible_project_identity(shape["argv"])
 
@@ -189,3 +190,159 @@ def test_every_host_shape_reaches_responder(monkeypatch, tmp_path, shapes, shape
 def test_local_gate_rejects_representative_unsafe_argv(argv):
     with pytest.raises(AssertionError):
         _check_gate(argv)
+
+
+def contract_shapes():
+    """Every machine contract variant, ordered pair step and typed preflight."""
+    contract = json.loads(
+        (Path(__file__).parents[1] / "src/jira_as/compat/contract.json").read_text()
+    )
+    rows = []
+    for operation in contract["operations"]:
+        for variant_index, variant in enumerate(operation["variants"]):
+            tokens = variant["argv"]
+            chunks = (
+                [tokens[: tokens.index("=>")], tokens[tokens.index("=>") + 1 :]]
+                if "=>" in tokens
+                else [tokens]
+            )
+            if variant.get("preflight"):
+                chunks = [variant["preflight"]["argv"], *chunks]
+            for step_index, argv in enumerate(chunks):
+                rows.append(
+                    {
+                        "origin": "contract",
+                        "case": f"{operation['host_op']}:{variant_index}:{step_index}",
+                        "argv": argv,
+                        **(
+                            {"files": {"comment.md": "Cassette comment"}}
+                            if "@comment.md" in argv
+                            else {}
+                        ),
+                    }
+                )
+    return rows
+
+
+def generic_shapes():
+    """Bounded deterministic sample, derived from compiled parameter schemas.
+
+    These are argv-gate probes. The original forty rows independently exercise
+    actual CLI dispatch; arbitrary sampled operations are never sent to Jira.
+    """
+    from jira_as.engine import create_surface
+
+    surface = create_surface(transport="responder")
+    rows = []
+    for document, index in surface.indexes.primary():
+        candidates = []
+        for operation in sorted(
+            index.operations.values(), key=lambda item: item.operationId
+        ):
+            identities = [
+                p
+                for p in operation.parameters
+                if p["name"]
+                in {
+                    "issueIdOrKey",
+                    "issueKey",
+                    "projectIdOrKey",
+                    "projectKeyOrId",
+                    "projectKey",
+                }
+            ]
+            if identities and not operation.deprecated:
+                candidates.append((operation, identities))
+        for operation, identities in candidates[:20]:
+            argv = ["api", "call", operation.operationId]
+            for parameter in operation.parameters:
+                if parameter not in identities and not parameter.get("required"):
+                    continue
+                name = parameter["name"]
+                value = (
+                    "SBX"
+                    if name.lower().startswith("project")
+                    else "SBX-1"
+                    if parameter in identities
+                    else "1"
+                    if parameter.get("type") in {"integer", "number"}
+                    else "fixture"
+                )
+                argv += ["--" + name, value]
+            files = {}
+            if operation.request_body_required:
+                # Keep body values out of argv, including project-bearing maps.
+                files["sample.json"] = {"fields": {"project": {"key": "SBX"}}}
+                argv += ["--body", "@sample.json"]
+            if operation.extensions.get("x-as-risk", "safe") != "safe":
+                argv += ["--confirm"]
+            for selector in ([], ["--project", "SBX"]):
+                rows.append(
+                    {
+                        "origin": "generic",
+                        "case": f"{document}:{operation.operationId}:{bool(selector)}",
+                        "argv": [*argv, *selector],
+                        **({"files": files} if files else {}),
+                    }
+                )
+    return rows
+
+
+def generated_shapes():
+    """Replayable export with provenance; import lazily to avoid recorder cycles."""
+    from scripts.record_cassettes import RECORDER_ARGV
+    from tests.live.scenarios import LIVE_ARGV
+
+    return [
+        *contract_shapes(),
+        *({**deepcopy(row), "origin": "recorder"} for row in RECORDER_ARGV),
+        *({**deepcopy(row), "origin": "live"} for row in LIVE_ARGV),
+        *generic_shapes(),
+    ]
+
+
+def test_generated_shapes_match_replayable_export(shapes):
+    generated = generated_shapes()
+    assert shapes[40:] == generated
+    for row in generated:
+        _check_gate(row["argv"])
+    counts = {
+        origin: sum(row["origin"] == origin for row in generated)
+        for origin in ("contract", "recorder", "live", "generic")
+    }
+    print("devhost generated counts: " + json.dumps(counts, sort_keys=True))
+    assert len({row["case"].split(":")[0] for row in contract_shapes()}) == 14
+    assert counts["contract"] == 28
+    assert all(counts.values())
+
+
+def test_generated_materialized_file_arguments_pass_gate(tmp_path):
+    """The gate sees filenames, and the body checks prove the hidden SBX scope."""
+    for row in generated_shapes():
+        argv = list(row["argv"])
+        for name, body in row.get("files", {}).items():
+            target = tmp_path / name
+            target.write_text(json.dumps(body) if not isinstance(body, str) else body)
+            argv = ["@" + target.name if item == "@" + name else item for item in argv]
+            if isinstance(body, dict) and "project" in body.get("fields", {}):
+                assert body["fields"]["project"] == {"key": "SBX"}
+        _check_gate(argv)
+
+
+def test_gc278_field_project_shape_is_a_recorded_refusal():
+    """Keep the host finding visible; an @file form is admitted separately."""
+    with pytest.raises(AssertionError):
+        _check_gate(
+            [
+                "api",
+                "call",
+                "createIssue",
+                "--project",
+                "SBX",
+                "--field",
+                "fields.project.key=SBX",
+            ]
+        )
+    _check_gate(
+        ["api", "call", "createIssue", "--project", "SBX", "--body", "@create.json"]
+    )

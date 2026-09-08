@@ -1,42 +1,4390 @@
 [
-  {"argv": ["api", "--transport", "responder", "call", "getIssue", "--issueIdOrKey", "SBX-1"]},
-  {"argv": ["api", "--transport", "responder", "call", "getIssue", "--issueIdOrKey", "SBX-2", "--fields", "customfield_10000"]},
-  {"argv": ["api", "--transport", "responder", "call", "getProject", "--projectIdOrKey", "SBX"]},
-  {"argv": ["api", "--transport", "responder", "call", "getProjectVersions", "--projectIdOrKey", "SBX"]},
-  {"argv": ["api", "--transport", "responder", "call", "getProjectComponents", "--projectIdOrKey", "SBX"]},
-  {"argv": ["api", "--transport", "responder", "call", "editIssue", "--issueIdOrKey", "SBX-3", "--field", "fields.customfield_10000=updated"]},
-  {"argv": ["api", "--transport", "responder", "call", "doTransition", "--issueIdOrKey", "SBX-4", "--body", "@TRANSITION"], "files": {"TRANSITION": {"transition": {"id": "31"}}}},
-  {"argv": ["api", "--transport", "responder", "call", "addComment", "--issueIdOrKey", "SBX-5", "--field", "body=comment"]},
-  {"argv": ["api", "--transport", "responder", "call", "addWorklog", "--issueIdOrKey", "SBX-6", "--field", "timeSpent=1h"]},
-  {"argv": ["api", "--transport", "responder", "call", "deleteIssue", "--issueIdOrKey", "SBX-7", "--confirm"]},
-  {"argv": ["api", "--transport", "responder", "call", "getAvailableTransitions", "--issueIdsOrKeys", "SBX-8"]},
-  {"argv": ["api", "--transport", "responder", "call", "getTransitions", "--issueIdOrKey", "SBX-9"]},
-  {"argv": ["api", "--transport", "responder", "call", "getIssueWorklog", "--issueIdOrKey", "SBX-10"]},
-  {"argv": ["api", "--transport", "responder", "call", "searchAndReconsileIssuesUsingJql", "--jql", "project = SBX AND status = Open"]},
-  {"argv": ["api", "--transport", "responder", "call", "searchAndReconsileIssuesUsingJqlPost", "--project", "SBX", "--field", "jql=project = SBX AND status = Open"]},
-  {"argv": ["api", "--transport", "responder", "call", "createIssue", "--project", "SBX", "--body", "@CREATE"], "files": {"CREATE": {"fields": {"project": {"key": "SBX"}, "customfield_10000": "fixture", "issuetype": {"name": "Task"}}}}},
-  {"argv": ["api", "--transport", "responder", "call", "createIssue", "--project", "SBX", "--body", "@BODY"], "files": {"BODY": {"fields": {"project": {"key": "SBX"}, "summary": "from file", "issuetype": {"name": "Task"}}}}},
-  {"argv": ["api", "--transport", "responder", "call", "getProjectIssueSecurityScheme", "--projectKeyOrId", "SBX"]},
-  {"argv": ["api", "--transport", "responder", "call", "getProjectRoles", "--projectIdOrKey", "SBX"]},
-  {"argv": ["api", "--transport", "responder", "call", "getProjectPropertyKeys", "--projectIdOrKey", "SBX"]},
-  {"argv": ["api", "--transport", "responder", "call", "getSoftwareIssue", "--issueIdOrKey", "SBX-11"]},
-  {"argv": ["api", "--transport", "responder", "call", "rankIssues", "--project", "SBX", "--field", "issues=[\"SBX-12\"]", "--field", "rankBeforeIssue=SBX-13"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "getAllBoards", "--projectKeyOrId", "SBX"]},
-  {"argv": ["api", "--transport", "responder", "call", "getBoard", "--project", "SBX", "--boardId", "42"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "getBoardConfiguration", "--project", "SBX", "--boardId", "42"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "getAllSprints", "--project", "SBX", "--boardId", "42"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "getSprint", "--project", "SBX", "--sprintId", "99"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "getIssuesForBoard", "--project", "SBX", "--boardId", "42", "--jql", "project = SBX AND status = Open"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "getIssuesForSprint", "--project", "SBX", "--sprintId", "99", "--jql", "project = SBX"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "moveIssuesToSprintAndRank", "--project", "SBX", "--sprintId", "99", "--field", "issues=[\"SBX-14\"]", "--confirm"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "getCustomerRequestByIdOrKey", "--issueIdOrKey", "SBX-15"]},
-  {"argv": ["api", "--transport", "responder", "call", "getCustomerRequestStatus", "--issueIdOrKey", "SBX-16"]},
-  {"argv": ["api", "--transport", "responder", "call", "getServiceDesks", "--project", "SBX"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "getServiceDeskById", "--project", "SBX", "--serviceDeskId", "7"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "getServiceDeskOrganizations", "--project", "SBX", "--serviceDeskId", "7"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "getServiceDeskArticles", "--project", "SBX", "--serviceDeskId", "7", "--query", "knowledge"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "getOrganization", "--project", "SBX", "--organizationId", "18"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "getOrganizations", "--project", "SBX"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "createCustomerRequest", "--project", "SBX", "--field", "serviceDeskId=7", "--field", "requestTypeId=12", "--field", "requestFieldValues.customfield_10000=SBX request"], "site": true},
-  {"argv": ["api", "--transport", "responder", "call", "addOrganization", "--project", "SBX", "--serviceDeskId", "7", "--field", "organizationId=18"], "site": true}
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getIssue",
+      "--issueIdOrKey",
+      "SBX-1"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getIssue",
+      "--issueIdOrKey",
+      "SBX-2",
+      "--fields",
+      "customfield_10000"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getProject",
+      "--projectIdOrKey",
+      "SBX"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getProjectVersions",
+      "--projectIdOrKey",
+      "SBX"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getProjectComponents",
+      "--projectIdOrKey",
+      "SBX"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "editIssue",
+      "--issueIdOrKey",
+      "SBX-3",
+      "--field",
+      "fields.customfield_10000=updated"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "doTransition",
+      "--issueIdOrKey",
+      "SBX-4",
+      "--body",
+      "@TRANSITION"
+    ],
+    "files": {
+      "TRANSITION": {
+        "transition": {
+          "id": "31"
+        }
+      }
+    }
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "addComment",
+      "--issueIdOrKey",
+      "SBX-5",
+      "--field",
+      "body=comment"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "addWorklog",
+      "--issueIdOrKey",
+      "SBX-6",
+      "--field",
+      "timeSpent=1h"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "deleteIssue",
+      "--issueIdOrKey",
+      "SBX-7",
+      "--confirm"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getAvailableTransitions",
+      "--issueIdsOrKeys",
+      "SBX-8"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getTransitions",
+      "--issueIdOrKey",
+      "SBX-9"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getIssueWorklog",
+      "--issueIdOrKey",
+      "SBX-10"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "searchAndReconsileIssuesUsingJql",
+      "--jql",
+      "project = SBX AND status = Open"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "searchAndReconsileIssuesUsingJqlPost",
+      "--project",
+      "SBX",
+      "--field",
+      "jql=project = SBX AND status = Open"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "createIssue",
+      "--project",
+      "SBX",
+      "--body",
+      "@CREATE"
+    ],
+    "files": {
+      "CREATE": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          },
+          "customfield_10000": "fixture",
+          "issuetype": {
+            "name": "Task"
+          }
+        }
+      }
+    }
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "createIssue",
+      "--project",
+      "SBX",
+      "--body",
+      "@BODY"
+    ],
+    "files": {
+      "BODY": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          },
+          "summary": "from file",
+          "issuetype": {
+            "name": "Task"
+          }
+        }
+      }
+    }
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getProjectIssueSecurityScheme",
+      "--projectKeyOrId",
+      "SBX"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getProjectRoles",
+      "--projectIdOrKey",
+      "SBX"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getProjectPropertyKeys",
+      "--projectIdOrKey",
+      "SBX"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getSoftwareIssue",
+      "--issueIdOrKey",
+      "SBX-11"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "rankIssues",
+      "--project",
+      "SBX",
+      "--field",
+      "issues=[\"SBX-12\"]",
+      "--field",
+      "rankBeforeIssue=SBX-13"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getAllBoards",
+      "--projectKeyOrId",
+      "SBX"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getBoard",
+      "--project",
+      "SBX",
+      "--boardId",
+      "42"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getBoardConfiguration",
+      "--project",
+      "SBX",
+      "--boardId",
+      "42"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getAllSprints",
+      "--project",
+      "SBX",
+      "--boardId",
+      "42"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getSprint",
+      "--project",
+      "SBX",
+      "--sprintId",
+      "99"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getIssuesForBoard",
+      "--project",
+      "SBX",
+      "--boardId",
+      "42",
+      "--jql",
+      "project = SBX AND status = Open"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getIssuesForSprint",
+      "--project",
+      "SBX",
+      "--sprintId",
+      "99",
+      "--jql",
+      "project = SBX"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "moveIssuesToSprintAndRank",
+      "--project",
+      "SBX",
+      "--sprintId",
+      "99",
+      "--field",
+      "issues=[\"SBX-14\"]",
+      "--confirm"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getCustomerRequestByIdOrKey",
+      "--issueIdOrKey",
+      "SBX-15"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getCustomerRequestStatus",
+      "--issueIdOrKey",
+      "SBX-16"
+    ]
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getServiceDesks",
+      "--project",
+      "SBX"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getServiceDeskById",
+      "--project",
+      "SBX",
+      "--serviceDeskId",
+      "7"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getServiceDeskOrganizations",
+      "--project",
+      "SBX",
+      "--serviceDeskId",
+      "7"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getServiceDeskArticles",
+      "--project",
+      "SBX",
+      "--serviceDeskId",
+      "7",
+      "--query",
+      "knowledge"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getOrganization",
+      "--project",
+      "SBX",
+      "--organizationId",
+      "18"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "getOrganizations",
+      "--project",
+      "SBX"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "createCustomerRequest",
+      "--project",
+      "SBX",
+      "--field",
+      "serviceDeskId=7",
+      "--field",
+      "requestTypeId=12",
+      "--field",
+      "requestFieldValues.customfield_10000=SBX request"
+    ],
+    "site": true
+  },
+  {
+    "argv": [
+      "api",
+      "--transport",
+      "responder",
+      "call",
+      "addOrganization",
+      "--project",
+      "SBX",
+      "--serviceDeskId",
+      "7",
+      "--field",
+      "organizationId=18"
+    ],
+    "site": true
+  },
+  {
+    "origin": "contract",
+    "case": "read:0:0",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "read:1:0",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-1",
+      "--detailed"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "read:2:0",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-1",
+      "--output",
+      "json"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "read:3:0",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-1",
+      "--fields",
+      "labels",
+      "--output",
+      "json"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "comments:0:0",
+    "argv": [
+      "collaborate",
+      "comment",
+      "list",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "comments:1:0",
+    "argv": [
+      "collaborate",
+      "comment",
+      "list",
+      "SBX-17"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "comment:0:0",
+    "argv": [
+      "collaborate",
+      "comment",
+      "add",
+      "SBX-17",
+      "--body",
+      "A markdown comment: **bold** and a list",
+      "--format",
+      "markdown"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "comment:1:0",
+    "argv": [
+      "collaborate",
+      "comment",
+      "add",
+      "SBX-17",
+      "--body-file",
+      "@comment.md",
+      "--format",
+      "markdown"
+    ],
+    "files": {
+      "comment.md": "Cassette comment"
+    }
+  },
+  {
+    "origin": "contract",
+    "case": "create:0:0",
+    "argv": [
+      "issue",
+      "create",
+      "--project",
+      "SBX",
+      "--type",
+      "Task",
+      "--summary",
+      "Compatibility Contract capture probe (disposable)",
+      "--description",
+      "Created by the JAS supervisor seat to capture the pinned-line invocation shapes for the Compatibility Contract ticket. Disposable."
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "update:0:0",
+    "argv": [
+      "issue",
+      "update",
+      "SBX-17",
+      "--summary",
+      "Compatibility Contract capture probe (disposable, updated)"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "update:1:0",
+    "argv": [
+      "issue",
+      "update",
+      "SBX-17",
+      "--description",
+      "Updated description with **markdown** auto-detection."
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "transitions:0:0",
+    "argv": [
+      "lifecycle",
+      "transitions",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "transition:0:0",
+    "argv": [
+      "lifecycle",
+      "transition",
+      "SBX-17",
+      "--to",
+      "In Progress"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "transition:1:0",
+    "argv": [
+      "lifecycle",
+      "transition",
+      "SBX-17",
+      "--to",
+      "Done"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "link:0:0",
+    "argv": [
+      "relationships",
+      "link-types",
+      "--output",
+      "json"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "link:0:1",
+    "argv": [
+      "relationships",
+      "link",
+      "SBX-17",
+      "--type",
+      "Blocks",
+      "--to",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "unlink:0:0",
+    "argv": [
+      "relationships",
+      "link-types",
+      "--output",
+      "json"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "unlink:0:1",
+    "argv": [
+      "relationships",
+      "unlink",
+      "SBX-17",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "get-links:0:0",
+    "argv": [
+      "relationships",
+      "get-links",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "get-links:1:0",
+    "argv": [
+      "relationships",
+      "get-links",
+      "SBX-17"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "link-types:0:0",
+    "argv": [
+      "relationships",
+      "link-types"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "labels:0:0",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-17",
+      "--fields",
+      "labels",
+      "--output",
+      "json"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "labels:0:1",
+    "argv": [
+      "issue",
+      "update",
+      "SBX-17",
+      "--labels",
+      "compat-capture,disposable"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "search:0:0",
+    "argv": [
+      "search",
+      "query",
+      "project = SBX AND statusCategory != Done ORDER BY key ASC"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "enrich:0:0",
+    "argv": [
+      "agile",
+      "estimate",
+      "SBX-17",
+      "--points",
+      "5"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "enrich:1:0",
+    "argv": [
+      "time",
+      "log",
+      "SBX-17",
+      "--time",
+      "2h30m",
+      "--comment",
+      "capture probe worklog"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "enrich:2:0",
+    "argv": [
+      "time",
+      "log",
+      "SBX-17",
+      "--time",
+      "2h 30m",
+      "--comment",
+      "capture probe worklog"
+    ]
+  },
+  {
+    "origin": "contract",
+    "case": "enrich:3:0",
+    "argv": [
+      "collaborate",
+      "comment",
+      "add",
+      "SBX-17",
+      "--body-file",
+      "@comment.md",
+      "--format",
+      "markdown"
+    ],
+    "files": {
+      "comment.md": "Cassette comment"
+    }
+  },
+  {
+    "id": "contract:read:0",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-1"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:read:1",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-1",
+      "--detailed"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:read:2",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-1",
+      "--output",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:read:3",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-1",
+      "--fields",
+      "labels",
+      "--output",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:comments:0",
+    "argv": [
+      "collaborate",
+      "comment",
+      "list",
+      "SBX-1"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:comments:1",
+    "argv": [
+      "collaborate",
+      "comment",
+      "list",
+      "SBX-17"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:comment:0",
+    "argv": [
+      "collaborate",
+      "comment",
+      "add",
+      "SBX-17",
+      "--body",
+      "A markdown comment: **bold** and a list",
+      "--format",
+      "markdown"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:comment:1",
+    "argv": [
+      "collaborate",
+      "comment",
+      "add",
+      "SBX-17",
+      "--body-file",
+      "@comment.md",
+      "--format",
+      "markdown"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:create:0",
+    "argv": [
+      "issue",
+      "create",
+      "--project",
+      "SBX",
+      "--type",
+      "Task",
+      "--summary",
+      "Compatibility Contract capture probe (disposable)",
+      "--description",
+      "Created by the JAS supervisor seat to capture the pinned-line invocation shapes for the Compatibility Contract ticket. Disposable."
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:update:0",
+    "argv": [
+      "issue",
+      "update",
+      "SBX-17",
+      "--summary",
+      "Compatibility Contract capture probe (disposable, updated)"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:update:1",
+    "argv": [
+      "issue",
+      "update",
+      "SBX-17",
+      "--description",
+      "Updated description with **markdown** auto-detection."
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:transitions:0",
+    "argv": [
+      "lifecycle",
+      "transitions",
+      "SBX-1"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:transition:0",
+    "argv": [
+      "lifecycle",
+      "transition",
+      "SBX-17",
+      "--to",
+      "In Progress"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:transition:1",
+    "argv": [
+      "lifecycle",
+      "transition",
+      "SBX-17",
+      "--to",
+      "Done"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:link:0",
+    "argv": [
+      "relationships",
+      "link",
+      "SBX-17",
+      "--type",
+      "Blocks",
+      "--to",
+      "SBX-1"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "preflight:link:0",
+    "argv": [
+      "relationships",
+      "link-types",
+      "--output",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:unlink:0",
+    "argv": [
+      "relationships",
+      "unlink",
+      "SBX-17",
+      "SBX-1"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "preflight:unlink:0",
+    "argv": [
+      "relationships",
+      "link-types",
+      "--output",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:get-links:0",
+    "argv": [
+      "relationships",
+      "get-links",
+      "SBX-1"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:get-links:1",
+    "argv": [
+      "relationships",
+      "get-links",
+      "SBX-17"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:link-types:0",
+    "argv": [
+      "relationships",
+      "link-types"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:labels:0",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-17",
+      "--fields",
+      "labels",
+      "--output",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:labels:0",
+    "argv": [
+      "issue",
+      "update",
+      "SBX-17",
+      "--labels",
+      "compat-capture,disposable"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:search:0",
+    "argv": [
+      "search",
+      "query",
+      "project = SBX AND statusCategory != Done ORDER BY key ASC"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:enrich:0",
+    "argv": [
+      "agile",
+      "estimate",
+      "SBX-17",
+      "--points",
+      "5"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:enrich:1",
+    "argv": [
+      "time",
+      "log",
+      "SBX-17",
+      "--time",
+      "2h30m",
+      "--comment",
+      "capture probe worklog"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:enrich:2",
+    "argv": [
+      "time",
+      "log",
+      "SBX-17",
+      "--time",
+      "2h 30m",
+      "--comment",
+      "capture probe worklog"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:enrich:3",
+    "argv": [
+      "collaborate",
+      "comment",
+      "add",
+      "SBX-17",
+      "--body-file",
+      "@comment.md",
+      "--format",
+      "markdown"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "generic:getIssue",
+    "argv": [
+      "api",
+      "call",
+      "getIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "generic:createIssue",
+    "argv": [
+      "api",
+      "call",
+      "createIssue",
+      "--project",
+      "SBX",
+      "--body",
+      "@create.json",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "generic:editIssue",
+    "argv": [
+      "api",
+      "call",
+      "editIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@edit.json",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "generic:searchAndReconsileIssuesUsingJql",
+    "argv": [
+      "api",
+      "call",
+      "searchAndReconsileIssuesUsingJql",
+      "--jql",
+      "project = SBX",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "generic:owned-deleted-key404",
+    "argv": [
+      "api",
+      "call",
+      "getIssue",
+      "--issueIdOrKey",
+      "SBX-404",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "generic:api-search",
+    "argv": [
+      "api",
+      "search",
+      "issue",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "generic:api-describe",
+    "argv": [
+      "api",
+      "describe",
+      "getIssue",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "generic:api-topics",
+    "argv": [
+      "api",
+      "topics",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "setup:create",
+    "argv": [
+      "api",
+      "call",
+      "createIssue",
+      "--project",
+      "SBX",
+      "--body",
+      "@setup.json",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "setup.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    },
+    "origin": "recorder"
+  },
+  {
+    "id": "setup:comment",
+    "argv": [
+      "collaborate",
+      "comment",
+      "add",
+      "SBX-1",
+      "--body",
+      "seed comment",
+      "--format",
+      "markdown"
+    ],
+    "files": {},
+    "origin": "recorder"
+  },
+  {
+    "id": "setup:link",
+    "argv": [
+      "relationships",
+      "link",
+      "SBX-1",
+      "--type",
+      "Blocks",
+      "--to",
+      "SBX-2"
+    ],
+    "files": {},
+    "origin": "recorder"
+  },
+  {
+    "id": "cleanup:delete",
+    "argv": [
+      "api",
+      "call",
+      "deleteIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--confirm",
+      "--format",
+      "json"
+    ],
+    "files": {},
+    "origin": "recorder"
+  },
+  {
+    "id": "cleanup:get404",
+    "argv": [
+      "api",
+      "call",
+      "getIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--format",
+      "json"
+    ],
+    "files": {},
+    "origin": "recorder"
+  },
+  {
+    "id": "cleanup:label-search",
+    "argv": [
+      "api",
+      "call",
+      "searchAndReconsileIssuesUsingJql",
+      "--jql",
+      "project = SBX AND labels = \"jas-cassette-xrun\"",
+      "--all",
+      "--format",
+      "json"
+    ],
+    "files": {},
+    "origin": "recorder"
+  },
+  {
+    "id": "contract:read:0",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-1"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:read:1",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-1",
+      "--detailed"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:read:2",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-1",
+      "--output",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:read:3",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-1",
+      "--fields",
+      "labels",
+      "--output",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:comments:0",
+    "argv": [
+      "collaborate",
+      "comment",
+      "list",
+      "SBX-1"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:comments:1",
+    "argv": [
+      "collaborate",
+      "comment",
+      "list",
+      "SBX-17"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:comment:0",
+    "argv": [
+      "collaborate",
+      "comment",
+      "add",
+      "SBX-17",
+      "--body",
+      "A markdown comment: **bold** and a list",
+      "--format",
+      "markdown"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:comment:1",
+    "argv": [
+      "collaborate",
+      "comment",
+      "add",
+      "SBX-17",
+      "--body-file",
+      "@comment.md",
+      "--format",
+      "markdown"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:create:0",
+    "argv": [
+      "issue",
+      "create",
+      "--project",
+      "SBX",
+      "--type",
+      "Task",
+      "--summary",
+      "Compatibility Contract capture probe (disposable)",
+      "--description",
+      "Created by the JAS supervisor seat to capture the pinned-line invocation shapes for the Compatibility Contract ticket. Disposable."
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:update:0",
+    "argv": [
+      "issue",
+      "update",
+      "SBX-17",
+      "--summary",
+      "Compatibility Contract capture probe (disposable, updated)"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:update:1",
+    "argv": [
+      "issue",
+      "update",
+      "SBX-17",
+      "--description",
+      "Updated description with **markdown** auto-detection."
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:transitions:0",
+    "argv": [
+      "lifecycle",
+      "transitions",
+      "SBX-1"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:transition:0",
+    "argv": [
+      "lifecycle",
+      "transition",
+      "SBX-17",
+      "--to",
+      "In Progress"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:transition:1",
+    "argv": [
+      "lifecycle",
+      "transition",
+      "SBX-17",
+      "--to",
+      "Done"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:link:0",
+    "argv": [
+      "relationships",
+      "link",
+      "SBX-17",
+      "--type",
+      "Blocks",
+      "--to",
+      "SBX-1"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "preflight:link:0",
+    "argv": [
+      "relationships",
+      "link-types",
+      "--output",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:unlink:0",
+    "argv": [
+      "relationships",
+      "unlink",
+      "SBX-17",
+      "SBX-1"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "preflight:unlink:0",
+    "argv": [
+      "relationships",
+      "link-types",
+      "--output",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:get-links:0",
+    "argv": [
+      "relationships",
+      "get-links",
+      "SBX-1"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:get-links:1",
+    "argv": [
+      "relationships",
+      "get-links",
+      "SBX-17"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:link-types:0",
+    "argv": [
+      "relationships",
+      "link-types"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:labels:0",
+    "argv": [
+      "issue",
+      "get",
+      "SBX-17",
+      "--fields",
+      "labels",
+      "--output",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:labels:0",
+    "argv": [
+      "issue",
+      "update",
+      "SBX-17",
+      "--labels",
+      "compat-capture,disposable"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:search:0",
+    "argv": [
+      "search",
+      "query",
+      "project = SBX AND statusCategory != Done ORDER BY key ASC"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:enrich:0",
+    "argv": [
+      "agile",
+      "estimate",
+      "SBX-17",
+      "--points",
+      "5"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:enrich:1",
+    "argv": [
+      "time",
+      "log",
+      "SBX-17",
+      "--time",
+      "2h30m",
+      "--comment",
+      "capture probe worklog"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:enrich:2",
+    "argv": [
+      "time",
+      "log",
+      "SBX-17",
+      "--time",
+      "2h 30m",
+      "--comment",
+      "capture probe worklog"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "contract:enrich:3",
+    "argv": [
+      "collaborate",
+      "comment",
+      "add",
+      "SBX-17",
+      "--body-file",
+      "@comment.md",
+      "--format",
+      "markdown"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "generic:getIssue",
+    "argv": [
+      "api",
+      "call",
+      "getIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "generic:createIssue",
+    "argv": [
+      "api",
+      "call",
+      "createIssue",
+      "--project",
+      "SBX",
+      "--body",
+      "@create.json",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "generic:editIssue",
+    "argv": [
+      "api",
+      "call",
+      "editIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@edit.json",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "generic:searchAndReconsileIssuesUsingJql",
+    "argv": [
+      "api",
+      "call",
+      "searchAndReconsileIssuesUsingJql",
+      "--jql",
+      "project = SBX",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "generic:owned-deleted-key404",
+    "argv": [
+      "api",
+      "call",
+      "getIssue",
+      "--issueIdOrKey",
+      "SBX-404",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "generic:api-search",
+    "argv": [
+      "api",
+      "search",
+      "issue",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "generic:api-describe",
+    "argv": [
+      "api",
+      "describe",
+      "getIssue",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "generic:api-topics",
+    "argv": [
+      "api",
+      "topics",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "comment.md": "A markdown comment: **bold** and a list",
+      "create.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      },
+      "edit.json": {
+        "fields": {}
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "setup:create",
+    "argv": [
+      "api",
+      "call",
+      "createIssue",
+      "--project",
+      "SBX",
+      "--body",
+      "@setup.json",
+      "--format",
+      "json"
+    ],
+    "files": {
+      "setup.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    },
+    "origin": "live"
+  },
+  {
+    "id": "setup:comment",
+    "argv": [
+      "collaborate",
+      "comment",
+      "add",
+      "SBX-1",
+      "--body",
+      "seed comment",
+      "--format",
+      "markdown"
+    ],
+    "files": {},
+    "origin": "live"
+  },
+  {
+    "id": "setup:link",
+    "argv": [
+      "relationships",
+      "link",
+      "SBX-1",
+      "--type",
+      "Blocks",
+      "--to",
+      "SBX-2"
+    ],
+    "files": {},
+    "origin": "live"
+  },
+  {
+    "id": "cleanup:delete",
+    "argv": [
+      "api",
+      "call",
+      "deleteIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--confirm",
+      "--format",
+      "json"
+    ],
+    "files": {},
+    "origin": "live"
+  },
+  {
+    "id": "cleanup:get404",
+    "argv": [
+      "api",
+      "call",
+      "getIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--format",
+      "json"
+    ],
+    "files": {},
+    "origin": "live"
+  },
+  {
+    "id": "cleanup:label-search",
+    "argv": [
+      "api",
+      "call",
+      "searchAndReconsileIssuesUsingJql",
+      "--jql",
+      "project = SBX AND labels = \"jas-cassette-xrun\"",
+      "--all",
+      "--format",
+      "json"
+    ],
+    "files": {},
+    "origin": "live"
+  },
+  {
+    "id": "risk:preview",
+    "argv": [
+      "api",
+      "call",
+      "deleteIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--format",
+      "json"
+    ],
+    "files": {},
+    "origin": "live"
+  },
+  {
+    "id": "risk:confirm",
+    "argv": [
+      "api",
+      "call",
+      "deleteIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--confirm",
+      "--format",
+      "json"
+    ],
+    "files": {},
+    "origin": "live"
+  },
+  {
+    "id": "survivor:bulk-update",
+    "argv": [
+      "search",
+      "bulk-update",
+      "project = SBX AND labels = \"jas-cassette-xrun\"",
+      "--add-labels",
+      "dry-run-probe",
+      "--dry-run",
+      "--output",
+      "json"
+    ],
+    "files": {},
+    "origin": "live"
+  },
+  {
+    "id": "survivor:fields-warm",
+    "argv": [
+      "fields",
+      "cache",
+      "warm"
+    ],
+    "files": {},
+    "origin": "live"
+  },
+  {
+    "origin": "generic",
+    "case": "platform:addActorUsers:False",
+    "argv": [
+      "api",
+      "call",
+      "addActorUsers",
+      "--projectIdOrKey",
+      "SBX",
+      "--id",
+      "1",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:addActorUsers:True",
+    "argv": [
+      "api",
+      "call",
+      "addActorUsers",
+      "--projectIdOrKey",
+      "SBX",
+      "--id",
+      "1",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:addAttachment:False",
+    "argv": [
+      "api",
+      "call",
+      "addAttachment",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:addAttachment:True",
+    "argv": [
+      "api",
+      "call",
+      "addAttachment",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:addComment:False",
+    "argv": [
+      "api",
+      "call",
+      "addComment",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:addComment:True",
+    "argv": [
+      "api",
+      "call",
+      "addComment",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:addVote:False",
+    "argv": [
+      "api",
+      "call",
+      "addVote",
+      "--issueIdOrKey",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:addVote:True",
+    "argv": [
+      "api",
+      "call",
+      "addVote",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:addWatcher:False",
+    "argv": [
+      "api",
+      "call",
+      "addWatcher",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:addWatcher:True",
+    "argv": [
+      "api",
+      "call",
+      "addWatcher",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:addWorklog:False",
+    "argv": [
+      "api",
+      "call",
+      "addWorklog",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:addWorklog:True",
+    "argv": [
+      "api",
+      "call",
+      "addWorklog",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:archiveProject:False",
+    "argv": [
+      "api",
+      "call",
+      "archiveProject",
+      "--projectIdOrKey",
+      "SBX",
+      "--confirm"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:archiveProject:True",
+    "argv": [
+      "api",
+      "call",
+      "archiveProject",
+      "--projectIdOrKey",
+      "SBX",
+      "--confirm",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:assignIssue:False",
+    "argv": [
+      "api",
+      "call",
+      "assignIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:assignIssue:True",
+    "argv": [
+      "api",
+      "call",
+      "assignIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:assignPermissionScheme:False",
+    "argv": [
+      "api",
+      "call",
+      "assignPermissionScheme",
+      "--projectKeyOrId",
+      "SBX",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:assignPermissionScheme:True",
+    "argv": [
+      "api",
+      "call",
+      "assignPermissionScheme",
+      "--projectKeyOrId",
+      "SBX",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:bulkDeleteWorklogs:False",
+    "argv": [
+      "api",
+      "call",
+      "bulkDeleteWorklogs",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--confirm"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:bulkDeleteWorklogs:True",
+    "argv": [
+      "api",
+      "call",
+      "bulkDeleteWorklogs",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--confirm",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:bulkMoveWorklogs:False",
+    "argv": [
+      "api",
+      "call",
+      "bulkMoveWorklogs",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--confirm"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:bulkMoveWorklogs:True",
+    "argv": [
+      "api",
+      "call",
+      "bulkMoveWorklogs",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--confirm",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:createOrUpdateRemoteIssueLink:False",
+    "argv": [
+      "api",
+      "call",
+      "createOrUpdateRemoteIssueLink",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:createOrUpdateRemoteIssueLink:True",
+    "argv": [
+      "api",
+      "call",
+      "createOrUpdateRemoteIssueLink",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:createProjectAvatar:False",
+    "argv": [
+      "api",
+      "call",
+      "createProjectAvatar",
+      "--projectIdOrKey",
+      "SBX",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:createProjectAvatar:True",
+    "argv": [
+      "api",
+      "call",
+      "createProjectAvatar",
+      "--projectIdOrKey",
+      "SBX",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "platform:deleteActor:False",
+    "argv": [
+      "api",
+      "call",
+      "deleteActor",
+      "--projectIdOrKey",
+      "SBX",
+      "--id",
+      "1",
+      "--confirm"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:deleteActor:True",
+    "argv": [
+      "api",
+      "call",
+      "deleteActor",
+      "--projectIdOrKey",
+      "SBX",
+      "--id",
+      "1",
+      "--confirm",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:deleteComment:False",
+    "argv": [
+      "api",
+      "call",
+      "deleteComment",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--id",
+      "fixture",
+      "--confirm"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:deleteComment:True",
+    "argv": [
+      "api",
+      "call",
+      "deleteComment",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--id",
+      "fixture",
+      "--confirm",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:deleteIssue:False",
+    "argv": [
+      "api",
+      "call",
+      "deleteIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--confirm"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:deleteIssue:True",
+    "argv": [
+      "api",
+      "call",
+      "deleteIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--confirm",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:deleteIssueProperty:False",
+    "argv": [
+      "api",
+      "call",
+      "deleteIssueProperty",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--propertyKey",
+      "fixture",
+      "--confirm"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:deleteIssueProperty:True",
+    "argv": [
+      "api",
+      "call",
+      "deleteIssueProperty",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--propertyKey",
+      "fixture",
+      "--confirm",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:deleteProject:False",
+    "argv": [
+      "api",
+      "call",
+      "deleteProject",
+      "--projectIdOrKey",
+      "SBX",
+      "--confirm"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:deleteProject:True",
+    "argv": [
+      "api",
+      "call",
+      "deleteProject",
+      "--projectIdOrKey",
+      "SBX",
+      "--confirm",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:deleteProjectAsynchronously:False",
+    "argv": [
+      "api",
+      "call",
+      "deleteProjectAsynchronously",
+      "--projectIdOrKey",
+      "SBX",
+      "--confirm"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:deleteProjectAsynchronously:True",
+    "argv": [
+      "api",
+      "call",
+      "deleteProjectAsynchronously",
+      "--projectIdOrKey",
+      "SBX",
+      "--confirm",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:deleteProjectAvatar:False",
+    "argv": [
+      "api",
+      "call",
+      "deleteProjectAvatar",
+      "--projectIdOrKey",
+      "SBX",
+      "--id",
+      "1",
+      "--confirm"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "platform:deleteProjectAvatar:True",
+    "argv": [
+      "api",
+      "call",
+      "deleteProjectAvatar",
+      "--projectIdOrKey",
+      "SBX",
+      "--id",
+      "1",
+      "--confirm",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "software:estimateIssueForBoard:False",
+    "argv": [
+      "api",
+      "call",
+      "estimateIssueForBoard",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "software:estimateIssueForBoard:True",
+    "argv": [
+      "api",
+      "call",
+      "estimateIssueForBoard",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "software:getAllBoards:False",
+    "argv": [
+      "api",
+      "call",
+      "getAllBoards",
+      "--projectKeyOrId",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "software:getAllBoards:True",
+    "argv": [
+      "api",
+      "call",
+      "getAllBoards",
+      "--projectKeyOrId",
+      "SBX",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "software:getIssueEstimationForBoard:False",
+    "argv": [
+      "api",
+      "call",
+      "getIssueEstimationForBoard",
+      "--issueIdOrKey",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "software:getIssueEstimationForBoard:True",
+    "argv": [
+      "api",
+      "call",
+      "getIssueEstimationForBoard",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "software:getSoftwareIssue:False",
+    "argv": [
+      "api",
+      "call",
+      "getSoftwareIssue",
+      "--issueIdOrKey",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "software:getSoftwareIssue:True",
+    "argv": [
+      "api",
+      "call",
+      "getSoftwareIssue",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:addRequestParticipants:False",
+    "argv": [
+      "api",
+      "call",
+      "addRequestParticipants",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:addRequestParticipants:True",
+    "argv": [
+      "api",
+      "call",
+      "addRequestParticipants",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:answerApproval:False",
+    "argv": [
+      "api",
+      "call",
+      "answerApproval",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--approvalId",
+      "1",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:answerApproval:True",
+    "argv": [
+      "api",
+      "call",
+      "answerApproval",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--approvalId",
+      "1",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:createCommentWithAttachment:False",
+    "argv": [
+      "api",
+      "call",
+      "createCommentWithAttachment",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:createCommentWithAttachment:True",
+    "argv": [
+      "api",
+      "call",
+      "createCommentWithAttachment",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:createRequestComment:False",
+    "argv": [
+      "api",
+      "call",
+      "createRequestComment",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:createRequestComment:True",
+    "argv": [
+      "api",
+      "call",
+      "createRequestComment",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getApprovalById:False",
+    "argv": [
+      "api",
+      "call",
+      "getApprovalById",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--approvalId",
+      "1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getApprovalById:True",
+    "argv": [
+      "api",
+      "call",
+      "getApprovalById",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--approvalId",
+      "1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getApprovals:False",
+    "argv": [
+      "api",
+      "call",
+      "getApprovals",
+      "--issueIdOrKey",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getApprovals:True",
+    "argv": [
+      "api",
+      "call",
+      "getApprovals",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getAttachmentsForRequest:False",
+    "argv": [
+      "api",
+      "call",
+      "getAttachmentsForRequest",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--start",
+      "1",
+      "--limit",
+      "1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getAttachmentsForRequest:True",
+    "argv": [
+      "api",
+      "call",
+      "getAttachmentsForRequest",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--start",
+      "1",
+      "--limit",
+      "1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getCommentAttachments:False",
+    "argv": [
+      "api",
+      "call",
+      "getCommentAttachments",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--commentId",
+      "1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getCommentAttachments:True",
+    "argv": [
+      "api",
+      "call",
+      "getCommentAttachments",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--commentId",
+      "1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getCustomerRequestByIdOrKey:False",
+    "argv": [
+      "api",
+      "call",
+      "getCustomerRequestByIdOrKey",
+      "--issueIdOrKey",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getCustomerRequestByIdOrKey:True",
+    "argv": [
+      "api",
+      "call",
+      "getCustomerRequestByIdOrKey",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getCustomerRequestStatus:False",
+    "argv": [
+      "api",
+      "call",
+      "getCustomerRequestStatus",
+      "--issueIdOrKey",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getCustomerRequestStatus:True",
+    "argv": [
+      "api",
+      "call",
+      "getCustomerRequestStatus",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getCustomerTransitions:False",
+    "argv": [
+      "api",
+      "call",
+      "getCustomerTransitions",
+      "--issueIdOrKey",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getCustomerTransitions:True",
+    "argv": [
+      "api",
+      "call",
+      "getCustomerTransitions",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getRequestAttachmentContent:False",
+    "argv": [
+      "api",
+      "call",
+      "getRequestAttachmentContent",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--attachmentId",
+      "1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getRequestAttachmentContent:True",
+    "argv": [
+      "api",
+      "call",
+      "getRequestAttachmentContent",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--attachmentId",
+      "1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getRequestAttachmentThumbnail:False",
+    "argv": [
+      "api",
+      "call",
+      "getRequestAttachmentThumbnail",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--attachmentId",
+      "1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getRequestAttachmentThumbnail:True",
+    "argv": [
+      "api",
+      "call",
+      "getRequestAttachmentThumbnail",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--attachmentId",
+      "1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getRequestCommentById:False",
+    "argv": [
+      "api",
+      "call",
+      "getRequestCommentById",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--commentId",
+      "1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getRequestCommentById:True",
+    "argv": [
+      "api",
+      "call",
+      "getRequestCommentById",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--commentId",
+      "1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getRequestComments:False",
+    "argv": [
+      "api",
+      "call",
+      "getRequestComments",
+      "--issueIdOrKey",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getRequestComments:True",
+    "argv": [
+      "api",
+      "call",
+      "getRequestComments",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getRequestParticipants:False",
+    "argv": [
+      "api",
+      "call",
+      "getRequestParticipants",
+      "--issueIdOrKey",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getRequestParticipants:True",
+    "argv": [
+      "api",
+      "call",
+      "getRequestParticipants",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getSlaInformation:False",
+    "argv": [
+      "api",
+      "call",
+      "getSlaInformation",
+      "--issueIdOrKey",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getSlaInformation:True",
+    "argv": [
+      "api",
+      "call",
+      "getSlaInformation",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getSlaInformationById:False",
+    "argv": [
+      "api",
+      "call",
+      "getSlaInformationById",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--slaMetricId",
+      "1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getSlaInformationById:True",
+    "argv": [
+      "api",
+      "call",
+      "getSlaInformationById",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--slaMetricId",
+      "1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getSubscriptionStatus:False",
+    "argv": [
+      "api",
+      "call",
+      "getSubscriptionStatus",
+      "--issueIdOrKey",
+      "SBX-1"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:getSubscriptionStatus:True",
+    "argv": [
+      "api",
+      "call",
+      "getSubscriptionStatus",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--project",
+      "SBX"
+    ]
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:performCustomerTransition:False",
+    "argv": [
+      "api",
+      "call",
+      "performCustomerTransition",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  },
+  {
+    "origin": "generic",
+    "case": "servicedesk:performCustomerTransition:True",
+    "argv": [
+      "api",
+      "call",
+      "performCustomerTransition",
+      "--issueIdOrKey",
+      "SBX-1",
+      "--body",
+      "@sample.json",
+      "--project",
+      "SBX"
+    ],
+    "files": {
+      "sample.json": {
+        "fields": {
+          "project": {
+            "key": "SBX"
+          }
+        }
+      }
+    }
+  }
 ]

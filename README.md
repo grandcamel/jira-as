@@ -395,3 +395,11 @@ provenance, scope rules and responder suite are described in
 [Compatibility Contract](docs/compatibility-contract.md). Duration input accepts
 both `2h30m` and `2h 30m`; `issue update --format markdown|text|adf` supplements
 existing description auto-detection.
+
+### Cassettes and the live suite
+
+Offline cassette tests replay every Compatibility Contract variant and the
+Generic Surface with networking disabled. The SBX live suite is gated by
+`--live`, supports an offline simulation rehearsal, and creates and cleans up
+its own disposable issues. See [recording, replay and drift checks](docs/testing-cassettes.md)
+for the supervisor's host commands and fixture review process.

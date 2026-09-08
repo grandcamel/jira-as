@@ -1,0 +1,908 @@
+{
+  "cases": [
+    {
+      "files": {},
+      "id": "contract:read:0",
+      "steps": [
+        {
+          "argv": [
+            "issue",
+            "get",
+            "SBX-1"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Key:\\s+[A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ],
+            "table_headers": [
+              "Type",
+              "Status",
+              "Summary"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:read:1",
+      "steps": [
+        {
+          "argv": [
+            "issue",
+            "get",
+            "SBX-2",
+            "--detailed"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Key:\\s+[A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$",
+              "^Reporter:.*$"
+            ],
+            "table_headers": [
+              "Created",
+              "Updated"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:read:2",
+      "steps": [
+        {
+          "argv": [
+            "issue",
+            "get",
+            "SBX-3",
+            "--output",
+            "json"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "json",
+            "required": {
+              "expand": "string",
+              "fields": {
+                "required": {
+                  "labels": "array"
+                },
+                "type": "object"
+              },
+              "id": "string",
+              "key": "string",
+              "self": "string"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:read:3",
+      "steps": [
+        {
+          "argv": [
+            "issue",
+            "get",
+            "SBX-4",
+            "--fields",
+            "labels",
+            "--output",
+            "json"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "json",
+            "required": {
+              "expand": "string",
+              "fields": {
+                "required": {
+                  "labels": "array"
+                },
+                "type": "object"
+              },
+              "id": "string",
+              "key": "string",
+              "self": "string"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:comments:0",
+      "steps": [
+        {
+          "argv": [
+            "collaborate",
+            "comment",
+            "list",
+            "SBX-5"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Comments on [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* \\(0 total\\):$",
+              "^No comments found\\.$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:comments:1",
+      "steps": [
+        {
+          "argv": [
+            "collaborate",
+            "comment",
+            "list",
+            "SBX-6"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Comments on [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* \\([1-9][0-9]* total\\):$"
+            ],
+            "table_headers": [
+              "ID",
+              "Author",
+              "Date",
+              "Body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:comment:0",
+      "steps": [
+        {
+          "argv": [
+            "collaborate",
+            "comment",
+            "add",
+            "SBX-7",
+            "--body",
+            "A markdown comment: **bold** and a list",
+            "--format",
+            "markdown"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^\u2713 Added comment to [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* \\(ID: [0-9]+\\)$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {
+        "comment.md": "A markdown comment: **bold** and a list"
+      },
+      "id": "contract:comment:1",
+      "steps": [
+        {
+          "argv": [
+            "collaborate",
+            "comment",
+            "add",
+            "SBX-8",
+            "--body-file",
+            "@comment.md",
+            "--format",
+            "markdown"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^\u2713 Added comment to [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* \\(ID: [0-9]+\\)$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:create:0",
+      "steps": [
+        {
+          "argv": [
+            "issue",
+            "create",
+            "--project",
+            "SBX",
+            "--type",
+            "Task",
+            "--summary",
+            "jas-cassette-synthetic Compatibility Contract capture probe (disposable)",
+            "--description",
+            "jas-cassette-synthetic Created by the JAS supervisor seat to capture the pinned-line invocation shapes for the Compatibility Contract ticket. Disposable.",
+            "--labels",
+            "jas-cassette-synthetic"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^\u2713 Created issue: [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$",
+              "^URL: https?://.+/browse/[A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:update:0",
+      "steps": [
+        {
+          "argv": [
+            "issue",
+            "update",
+            "SBX-9",
+            "--summary",
+            "jas-cassette-synthetic Compatibility Contract capture probe (disposable, updated)"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^\u2713 Updated issue: [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:update:1",
+      "steps": [
+        {
+          "argv": [
+            "issue",
+            "update",
+            "SBX-10",
+            "--description",
+            "jas-cassette-synthetic Updated description with **markdown** auto-detection."
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^\u2713 Updated issue: [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:transitions:0",
+      "steps": [
+        {
+          "argv": [
+            "lifecycle",
+            "transitions",
+            "SBX-11"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Available transitions for [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*:$"
+            ],
+            "table_headers": [
+              "ID",
+              "Name",
+              "To Status"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:transition:0",
+      "steps": [
+        {
+          "argv": [
+            "lifecycle",
+            "transition",
+            "SBX-12",
+            "--to",
+            "In Progress"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^\u2713 Transitioned [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* to In Progress$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:transition:1",
+      "steps": [
+        {
+          "argv": [
+            "lifecycle",
+            "transition",
+            "SBX-13",
+            "--to",
+            "Done"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^\u2713 Transitioned [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* to Done$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:link:0",
+      "steps": [
+        {
+          "argv": [
+            "relationships",
+            "link",
+            "SBX-15",
+            "--type",
+            "Blocks",
+            "--to",
+            "SBX-14"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Linked [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* to [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "preflight:link:0",
+      "steps": [
+        {
+          "argv": [
+            "relationships",
+            "link-types",
+            "--output",
+            "json"
+          ],
+          "exit": 0,
+          "output": {
+            "items": {
+              "required": {
+                "id": "string",
+                "inward": "string",
+                "name": "string",
+                "outward": "string",
+                "self": "string"
+              },
+              "type": "object"
+            },
+            "kind": "json",
+            "root": "array"
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:unlink:0",
+      "steps": [
+        {
+          "argv": [
+            "relationships",
+            "unlink",
+            "SBX-17",
+            "SBX-16"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Removed link between [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* and [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "preflight:unlink:0",
+      "steps": [
+        {
+          "argv": [
+            "relationships",
+            "link-types",
+            "--output",
+            "json"
+          ],
+          "exit": 0,
+          "output": {
+            "items": {
+              "required": {
+                "id": "string",
+                "inward": "string",
+                "name": "string",
+                "outward": "string",
+                "self": "string"
+              },
+              "type": "object"
+            },
+            "kind": "json",
+            "root": "array"
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:get-links:0",
+      "steps": [
+        {
+          "argv": [
+            "relationships",
+            "get-links",
+            "SBX-18"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^No links found for [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:get-links:1",
+      "steps": [
+        {
+          "argv": [
+            "relationships",
+            "get-links",
+            "SBX-20"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Links for [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*:$",
+              "^Total: [1-9][0-9]* link\\(s\\)$"
+            ],
+            "table_headers": [
+              "Outward"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:link-types:0",
+      "steps": [
+        {
+          "argv": [
+            "relationships",
+            "link-types"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Available Link Types:$",
+              "^Total: [0-9]+ link type\\(s\\)$"
+            ],
+            "table_headers": [
+              "Name",
+              "Outward",
+              "Inward"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:labels:0",
+      "steps": [
+        {
+          "argv": [
+            "issue",
+            "get",
+            "SBX-22",
+            "--fields",
+            "labels",
+            "--output",
+            "json"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "json",
+            "required": {
+              "expand": "string",
+              "fields": {
+                "required": {
+                  "labels": "array"
+                },
+                "type": "object"
+              },
+              "id": "string",
+              "key": "string",
+              "self": "string"
+            }
+          }
+        },
+        {
+          "argv": [
+            "issue",
+            "update",
+            "SBX-22",
+            "--labels",
+            "compat-capture,disposable,jas-cassette-synthetic"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^\u2713 Updated issue: [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:search:0",
+      "steps": [
+        {
+          "argv": [
+            "search",
+            "query",
+            "project = SBX AND labels = \"jas-cassette-synthetic\" ORDER BY key ASC"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Found [0-9]+ issue\\(s\\)$"
+            ],
+            "table_headers": [
+              "Key",
+              "Type",
+              "Status",
+              "Priority",
+              "Assignee",
+              "Reporter",
+              "Summary"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:enrich:0",
+      "steps": [
+        {
+          "argv": [
+            "agile",
+            "estimate",
+            "SBX-24",
+            "--points",
+            "5"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Updated 1 issue\\(s\\)$",
+              "^Story points: set to 5\\.0$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:enrich:1",
+      "steps": [
+        {
+          "argv": [
+            "time",
+            "log",
+            "SBX-25",
+            "--time",
+            "2h30m",
+            "--comment",
+            "capture probe worklog",
+            "--started",
+            "2026-09-01T00:00:00Z"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Worklog added to [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*:$",
+              "^\\s*Worklog ID: [0-9]+$",
+              "^\\s*Time logged: 2h 30m \\(9000 seconds\\)$",
+              "^\\s*Started: .+$",
+              "^\\s*Comment: .+$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "contract:enrich:2",
+      "steps": [
+        {
+          "argv": [
+            "time",
+            "log",
+            "SBX-26",
+            "--time",
+            "2h 30m",
+            "--comment",
+            "capture probe worklog",
+            "--started",
+            "2026-09-01T00:00:00Z"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^Worklog added to [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]*:$",
+              "^\\s*Worklog ID: [0-9]+$",
+              "^\\s*Time logged: 2h 30m \\(9000 seconds\\)$",
+              "^\\s*Started: .+$",
+              "^\\s*Comment: .+$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {
+        "comment.md": "A markdown comment: **bold** and a list"
+      },
+      "id": "contract:enrich:3",
+      "steps": [
+        {
+          "argv": [
+            "collaborate",
+            "comment",
+            "add",
+            "SBX-27",
+            "--body-file",
+            "@comment.md",
+            "--format",
+            "markdown"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "text",
+            "lines": [
+              "^\u2713 Added comment to [A-Z][A-Z0-9_]{1,9}-[1-9][0-9]* \\(ID: [0-9]+\\)$"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "generic:getIssue",
+      "steps": [
+        {
+          "argv": [
+            "api",
+            "call",
+            "getIssue",
+            "--issueIdOrKey",
+            "SBX-28",
+            "--format",
+            "json"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "json",
+            "required": {
+              "fields": "object",
+              "key": "string"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "files": {
+        "create.json": "{\"fields\": {\"issuetype\": {\"name\": \"Task\"}, \"labels\": [\"jas-cassette-synthetic\"], \"project\": {\"key\": \"SBX\"}, \"summary\": \"jas-cassette-synthetic generic create\"}}"
+      },
+      "id": "generic:createIssue",
+      "steps": [
+        {
+          "argv": [
+            "api",
+            "call",
+            "createIssue",
+            "--project",
+            "SBX",
+            "--body",
+            "@create.json",
+            "--format",
+            "json"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "json",
+            "required": {
+              "id": "string",
+              "key": "string"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "files": {
+        "edit.json": "{\"fields\": {\"labels\": [\"jas-cassette-synthetic\"], \"summary\": \"jas-cassette-synthetic generic edit\"}}"
+      },
+      "id": "generic:editIssue",
+      "steps": [
+        {
+          "argv": [
+            "api",
+            "call",
+            "editIssue",
+            "--issueIdOrKey",
+            "SBX-29",
+            "--body",
+            "@edit.json",
+            "--format",
+            "json"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "none"
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "generic:searchAndReconsileIssuesUsingJql",
+      "steps": [
+        {
+          "argv": [
+            "api",
+            "call",
+            "searchAndReconsileIssuesUsingJql",
+            "--jql",
+            "project = SBX AND labels = \"jas-cassette-synthetic\"",
+            "--format",
+            "json"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "json",
+            "required": {
+              "issues": "array"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "generic:owned-deleted-key404",
+      "steps": [
+        {
+          "argv": [
+            "api",
+            "call",
+            "getIssue",
+            "--issueIdOrKey",
+            "SBX-31",
+            "--format",
+            "json"
+          ],
+          "exit": 5,
+          "output": {
+            "kind": "error"
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "generic:api-search",
+      "steps": [
+        {
+          "argv": [
+            "api",
+            "search",
+            "issue",
+            "--format",
+            "json"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "array"
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "generic:api-describe",
+      "steps": [
+        {
+          "argv": [
+            "api",
+            "describe",
+            "getIssue",
+            "--format",
+            "json"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "json",
+            "required": {
+              "operationId": "string"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "files": {},
+      "id": "generic:api-topics",
+      "steps": [
+        {
+          "argv": [
+            "api",
+            "topics",
+            "--format",
+            "json"
+          ],
+          "exit": 0,
+          "output": {
+            "kind": "array"
+          }
+        }
+      ]
+    }
+  ],
+  "invocations_sha256": "21be597c59f28e57a4c16d5c903c487ebe7dcc7fd6dd94df22b4868245bb9f02",
+  "source": "jira-as CLI invocation inventory"
+}
