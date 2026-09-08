@@ -74,6 +74,10 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
   for the dev wrapper, generated dev-wrapper argv checks, and a three-document
   Base Document drift job (scripts/check_base_document_drift.py, drift
   workflow). Live SBX recording and the live run remain host steps. (JAS-50)
+- Cassette recorder keeps and reports its original failed step when cleanup
+  also fails; the SBX live-suite cleanup tolerates the JQL index's lag with
+  per-key leak checks and detailed errors; recreated SBX keys are owned again;
+  the bulk-update dry-run check asserts would_update/issues/changes. (JAS-68)
 
 ### Removed verbs
 
