@@ -84,6 +84,13 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
   envelope; `tests/cassettes/compatibility.json` re-recorded with the as-
   engine response-header allowlist (Authorization and Set-Cookie placeholders
   removed from all 37 interactions). (JAS-71)
+- `agile estimate` and the contract's story-points resolution on a site with
+  both "Story Points" and "Story point estimate" fields: the field is chosen
+  by project type (team-managed → Story point estimate, company-managed →
+  Story Points) through one guarded `getProject` read, memoised per project;
+  explicit per-project configuration still overrides; a single candidate needs
+  no project read; the refusal remains only when neither rule names one field.
+  (JAS-67)
 
 ### Removed verbs
 
