@@ -23,8 +23,6 @@ from jira_as.cli.commands.relationships_cmds import (
     _bulk_link_impl,
     _clone_issue_impl,
     _create_remote_link_impl,
-    _get_blockers_impl,
-    _get_dependencies_impl,
     _get_link_stats_impl,
     _get_link_types_impl,
     _get_links_impl,
@@ -244,142 +242,9 @@ def _blocks_link(link_id: str, key: str, status_name: str) -> dict:
     }
 
 
-@pytest.mark.unit
-class TestGetBlockersImpl:
-    """Tests for the _get_blockers_impl implementation function."""
-
-    def test_get_blockers_inward(self, mock_jira_client, sample_blocker_links):
-        """Completed blockers are filtered out by default."""
-        mock_jira_client.get_issue_links.return_value = deepcopy(sample_blocker_links)
-
-        with patch(
-            "jira_as.cli.commands.relationships_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _get_blockers_impl(issue_key="PROJ-123", direction="inward")
-
-        # The fixture holds one Open and one Done blocker.
-        assert result["total"] == 1
-        assert result["direction"] == "inward"
-        assert result["include_done"] is False
-        assert [b["key"] for b in result["blockers"]] == ["PROJ-200"]
-
-    def test_get_blockers_include_done(self, mock_jira_client, sample_blocker_links):
-        """--include-done keeps completed blockers in the result."""
-        mock_jira_client.get_issue_links.return_value = deepcopy(sample_blocker_links)
-
-        with patch(
-            "jira_as.cli.commands.relationships_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _get_blockers_impl(
-                issue_key="PROJ-123", direction="inward", include_done=True
-            )
-
-        assert result["total"] == 2
-        assert result["include_done"] is True
-        assert [b["key"] for b in result["blockers"]] == ["PROJ-200", "PROJ-201"]
-
-    def test_get_blockers_uses_status_category(
-        self, mock_jira_client, sample_blocker_links
-    ):
-        """statusCategory wins over the status name when both are present."""
-        links = deepcopy(sample_blocker_links)
-        # A non-English status name that is nonetheless in the done category.
-        links[0]["outwardIssue"]["fields"]["status"] = {
-            "name": "Erledigt",
-            "statusCategory": {"key": "done", "name": "Done"},
-        }
-        # A status literally named "Done" but still in progress.
-        links[1]["outwardIssue"]["fields"]["status"] = {
-            "name": "Done",
-            "statusCategory": {"key": "indeterminate", "name": "In Progress"},
-        }
-        mock_jira_client.get_issue_links.return_value = links
-
-        with patch(
-            "jira_as.cli.commands.relationships_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _get_blockers_impl(issue_key="PROJ-123", direction="inward")
-
-        assert [b["key"] for b in result["blockers"]] == ["PROJ-201"]
-
-    def test_get_blockers_recursive_filters_done(self, mock_jira_client):
-        """Recursive traversal applies the same completed-blocker filter."""
-
-        def _links(issue_key):
-            if issue_key == "PROJ-123":
-                return [
-                    _blocks_link("1", "PROJ-200", "Open"),
-                    _blocks_link("2", "PROJ-201", "Done"),
-                ]
-            if issue_key == "PROJ-200":
-                return [_blocks_link("3", "PROJ-300", "Done")]
-            return []
-
-        mock_jira_client.get_issue_links.side_effect = _links
-
-        with patch(
-            "jira_as.cli.commands.relationships_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _get_blockers_impl(
-                issue_key="PROJ-123", direction="inward", recursive=True
-            )
-
-        assert [b["key"] for b in result["all_blockers"]] == ["PROJ-200"]
-
-    def test_get_blockers_no_results(self, mock_jira_client):
-        """Test when no blockers exist."""
-        mock_jira_client.get_issue_links.return_value = []
-
-        with patch(
-            "jira_as.cli.commands.relationships_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _get_blockers_impl(issue_key="PROJ-123")
-
-        assert result["total"] == 0
-        assert len(result["blockers"]) == 0
-
-
 # =============================================================================
 # Get Dependencies Implementation Tests
 # =============================================================================
-
-
-@pytest.mark.unit
-class TestGetDependenciesImpl:
-    """Tests for the _get_dependencies_impl implementation function."""
-
-    def test_get_all_dependencies(self, mock_jira_client, sample_issue_links):
-        """Test getting all dependencies."""
-        mock_jira_client.get_issue_links.return_value = deepcopy(sample_issue_links)
-
-        with patch(
-            "jira_as.cli.commands.relationships_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _get_dependencies_impl(issue_key="PROJ-123")
-
-        assert result["total"] == 2
-        assert len(result["dependencies"]) == 2
-        assert "status_summary" in result
-
-    def test_get_dependencies_filter_by_type(
-        self, mock_jira_client, sample_issue_links
-    ):
-        """Test filtering dependencies by type."""
-        mock_jira_client.get_issue_links.return_value = deepcopy(sample_issue_links)
-
-        with patch(
-            "jira_as.cli.commands.relationships_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _get_dependencies_impl(issue_key="PROJ-123", link_types=["Blocks"])
-
-        assert result["total"] == 1
 
 
 # =============================================================================
@@ -632,44 +497,47 @@ class TestGetLinksCommand:
 class TestCloneCommand:
     """Tests for the clone CLI command."""
 
-    def test_clone_cli(
-        self, cli_runner, mock_jira_client, sample_issue, sample_cloned_issue
-    ):
-        """Test CLI clone command."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-        mock_jira_client.create_issue.return_value = deepcopy(sample_cloned_issue)
-
-        with patch(
-            "jira_as.cli.commands.relationships_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                relationships,
-                ["clone", "PROJ-123"],
-            )
-
-        assert result.exit_code == 0
+    def test_clone_cli(self, cli_runner, workflow_sim):
+        result = cli_runner.invoke(
+            relationships, ["clone", "SBX-1", "--transport", "simulation"]
+        )
+        assert result.exit_code == 0, result.output
         assert "Cloned" in result.output
-        assert "PROJ-300" in result.output
+        assert "SBX-3" in result.output
+        assert workflow_sim.issues[2]["fields"]["summary"] == "[Clone] First task"
+        assert (
+            workflow_sim.issues[2]["fields"]["issuelinks"][0]["outwardIssue"]["key"]
+            == "SBX-1"
+        )
 
 
 @pytest.mark.unit
 class TestBulkLinkCommand:
     """Tests for the bulk-link CLI command."""
 
-    def test_bulk_link_cli(self, cli_runner, mock_jira_client):
-        """Test CLI bulk-link command."""
-        with patch(
-            "jira_as.cli.commands.relationships_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                relationships,
-                ["bulk-link", "--issues", "PROJ-1,PROJ-2", "--blocks", "PROJ-100"],
-            )
-
-        assert result.exit_code == 0
+    def test_bulk_link_cli(self, cli_runner, workflow_sim):
+        target = deepcopy(workflow_sim.issues[0])
+        target.update(id="100", key="SBX-100")
+        workflow_sim.issues.append(target)
+        result = cli_runner.invoke(
+            relationships,
+            [
+                "bulk-link",
+                "--issues",
+                "SBX-1,SBX-2",
+                "--blocks",
+                "SBX-100",
+                "--transport",
+                "simulation",
+            ],
+        )
+        assert result.exit_code == 0, result.output
         assert "Bulk link" in result.output
+        assert len(target["fields"]["issuelinks"]) == 2
+        assert all(
+            i["fields"]["issuelinks"][0]["outwardIssue"]["key"] == "SBX-100"
+            for i in workflow_sim.issues[:2]
+        )
 
     def test_bulk_link_cli_no_issues_error(self, cli_runner, mock_jira_client):
         """Test CLI bulk-link command fails without issues."""
@@ -827,3 +695,18 @@ class TestLinkCommandRemoteUrl:
 
         assert result.exit_code != 0
         assert "--remote-url" in result.output
+
+
+@pytest.fixture
+def workflow_sim(monkeypatch):
+    """Use the compiled Surface and independent state for survivor CLI cases."""
+    from as_engine.simulation import JiraSimulationStore
+
+    from jira_as import engine
+
+    store = JiraSimulationStore()
+    surface = engine.create_surface(transport="simulation", store=store)
+    surface.scope_allowlist = ("SBX",)
+    surface.scope_allow_site = False
+    monkeypatch.setattr(engine, "create_surface", lambda **_: surface)
+    return store

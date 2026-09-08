@@ -1799,6 +1799,10 @@ def sprint_get(ctx, sprint_id, board, active, include_issues, output):
     default="text",
     help="Output format",
 )
+@click.option("--project", "-p")
+@click.option("--transport", type=click.Choice(["http", "responder", "simulation"]))
+@click.option("--dry-run", is_flag=True)
+@click.option("--confirm", "--yes", is_flag=True)
 @click.pass_context
 @handle_jira_errors
 def sprint_manage(
@@ -1812,46 +1816,71 @@ def sprint_manage(
     start_date,
     end_date,
     output,
+    project,
+    transport,
+    dry_run,
+    confirm,
 ):
-    """Manage sprint lifecycle (start, close, update)."""
-    client = get_client_from_context(ctx)
-    if do_start:
-        result = _start_sprint_impl(
-            sprint_id, start_date=start_date, end_date=end_date, client=client
+    from .bulk_cmds import workflow_call, workflow_surface
+
+    if do_start and do_close:
+        raise click.UsageError("--start and --close are mutually exclusive")
+    if move_incomplete_to and not do_close:
+        raise click.UsageError("--move-incomplete-to requires --close")
+    payload = {
+        key: value
+        for key, value in {
+            "name": name,
+            "goal": goal,
+            "startDate": start_date,
+            "endDate": end_date,
+        }.items()
+        if value is not None
+    }
+    if do_start or do_close:
+        payload["state"] = "active" if do_start else "closed"
+    if not payload:
+        raise click.UsageError("Supply --start, --close or update options")
+    surface = workflow_surface(transport)
+    keys = []
+    if do_close and move_incomplete_to:
+        if not project:
+            raise click.UsageError("--project is required to select incomplete issues")
+        query = (
+            f'project = "{project}" AND sprint = {sprint_id} AND statusCategory != Done'
         )
-        if output == "json":
-            click.echo(format_json(result))
-        else:
-            click.echo(f"Started sprint: {result['name']}")
-    elif do_close:
-        result = _close_sprint_impl(
-            sprint_id, move_incomplete_to=move_incomplete_to, client=client
+        keys = [
+            row["key"]
+            for row in workflow_call(
+                surface,
+                "searchAndReconsileIssuesUsingJql",
+                {"jql": query},
+                all_pages=True,
+            )
+        ]
+    if dry_run or (do_close and not confirm):
+        click.echo(
+            format_json(
+                {
+                    "dry_run": True,
+                    "sprint": sprint_id,
+                    "body": payload,
+                    "move_issues": keys,
+                }
+            )
         )
-        if output == "json":
-            click.echo(format_json(result))
-        else:
-            click.echo(f"Closed sprint: {result['name']}")
-            if "moved_issues" in result:
-                click.echo(
-                    f"Moved {result['moved_issues']} incomplete issues to next sprint"
-                )
-    elif name or goal or start_date or end_date:
-        result = _update_sprint_impl(
-            sprint_id,
-            name=name,
-            goal=goal,
-            start_date=start_date,
-            end_date=end_date,
-            client=client,
+        return
+    for offset in range(0, len(keys), 50):
+        workflow_call(
+            surface,
+            "moveIssuesToSprintAndRank",
+            {"sprintId": move_incomplete_to},
+            {"issues": keys[offset : offset + 50]},
         )
-        if output == "json":
-            click.echo(format_json(result))
-        else:
-            click.echo(f"Updated sprint: {result['name']}")
-    else:
-        raise click.UsageError(
-            "No action specified. Use --start, --close, or update options."
-        )
+    result = workflow_call(
+        surface, "partiallyUpdateSprint", {"sprintId": sprint_id}, payload
+    )
+    click.echo(format_json({**result, "moved_issues": len(keys)}))
 
 
 @sprint.command(name="move-issues")
@@ -1867,50 +1896,43 @@ def sprint_manage(
     default="text",
     help="Output format",
 )
+@click.option("--transport", type=click.Choice(["http", "responder", "simulation"]))
+@click.option("--checkpoint", type=click.Path(dir_okay=False))
 @click.pass_context
 @handle_jira_errors
-def sprint_move_issues(ctx, sprint, backlog, issues, jql, dry_run, output):
-    """Move issues to a sprint or backlog."""
-    if not sprint and not backlog:
-        raise click.UsageError("Either --sprint or --backlog is required")
-    if sprint and backlog:
-        raise click.UsageError("--sprint and --backlog are mutually exclusive")
-    if not issues and not jql:
-        raise click.UsageError("Either --issues or --jql is required")
-    if issues and jql:
-        raise click.UsageError("--issues and --jql are mutually exclusive")
+def sprint_move_issues(
+    ctx, sprint, backlog, issues, jql, dry_run, output, transport, checkpoint
+):
+    from .bulk_cmds import WorkflowCheckpoint, workflow_call, workflow_surface
 
-    issue_list = parse_comma_list(issues)
-
-    client = get_client_from_context(ctx)
-    if backlog:
-        result = _move_to_backlog_impl(
-            issue_keys=issue_list, jql=jql, dry_run=dry_run, client=client
-        )
-        if output == "json":
-            click.echo(format_json(result))
-        elif dry_run:
-            click.echo(
-                f"Would move {result.get('would_move_to_backlog', 0)} issues to backlog"
+    if bool(sprint) == bool(backlog):
+        raise click.UsageError("Supply exactly one of --sprint or --backlog")
+    surface = workflow_surface(transport)
+    saved = WorkflowCheckpoint(
+        checkpoint,
+        "agile sprint move-issues",
+        {"issues": issues, "jql": jql},
+        {"sprint": sprint, "backlog": backlog},
+    )
+    rows = saved.select(surface, issues, jql, 10000)
+    keys = [row["key"] for row in rows]
+    if not dry_run:
+        for offset in range(0, len(keys), 50):
+            chunk = keys[offset : offset + 50]
+            saved.step(
+                f"move:{offset}",
+                lambda chunk=chunk: workflow_call(
+                    surface,
+                    "moveIssuesToBacklog" if backlog else "moveIssuesToSprintAndRank",
+                    {} if backlog else {"sprintId": sprint},
+                    {"issues": chunk},
+                ),
             )
-        else:
-            click.echo(f"Moved {result['moved_to_backlog']} issues to backlog")
-    else:
-        result = _move_to_sprint_impl(
-            sprint_id=sprint,
-            issue_keys=issue_list,
-            jql=jql,
-            dry_run=dry_run,
-            client=client,
+    click.echo(
+        format_json(
+            {"dry_run": dry_run, "issues": keys, "sprint": sprint, "backlog": backlog}
         )
-        if output == "json":
-            click.echo(format_json(result))
-        elif dry_run:
-            click.echo(
-                f"Would move {result.get('would_move', 0)} issues to sprint {sprint}"
-            )
-        else:
-            click.echo(f"Moved {result['moved']} issues to sprint {sprint}")
+    )
 
 
 # --- Other Agile Commands ---
@@ -2143,27 +2165,86 @@ def agile_estimates(ctx, sprint, project, epic, group_by, output):
     default="text",
     help="Output format",
 )
+@click.option("--transport", type=click.Choice(["http", "responder", "simulation"]))
 @click.pass_context
 @handle_jira_errors
-def agile_velocity(ctx, board, project, sprints, output):
-    """Calculate velocity from completed sprints."""
-    if not board and not project:
-        raise click.UsageError("Either --board or --project is required")
-    if board and project:
-        raise click.UsageError("--board and --project are mutually exclusive")
+def agile_velocity(ctx, board, project, sprints, output, transport):
+    from .bulk_cmds import workflow_call, workflow_surface
 
-    client = get_client_from_context(ctx)
-    result = _get_velocity_impl(
-        board_id=board, project_key=project, num_sprints=sprints, client=client
-    )
-
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(_format_velocity(result))
-        click.echo(
-            f"\nVelocity: {result['average_velocity']} points/sprint (based on {result['sprints_analyzed']} sprints)"
+    if not project:
+        raise click.UsageError("--project is required for scoped velocity searches")
+    if sprints < 1:
+        raise click.UsageError("--sprints must be positive")
+    surface = workflow_surface(transport)
+    if board is None:
+        candidates = workflow_call(surface, "getAllBoards", {"projectKeyOrId": project})
+        values = candidates.get("values", [])
+        if len(values) != 1 or not candidates.get("isLast", True):
+            raise click.UsageError(
+                "Project board is ambiguous; supply --board and --project"
+            )
+        board = values[0]["id"]
+    closed = []
+    start = 0
+    while True:
+        page = workflow_call(
+            surface,
+            "getAllSprints",
+            {"boardId": board, "startAt": start, "maxResults": 50},
         )
+        closed.extend(
+            row for row in page.get("values", []) if row.get("state") == "closed"
+        )
+        if page.get("isLast", True):
+            break
+        if not page.get("values"):
+            raise click.ClickException("Sprint paging made no progress")
+        start += len(page["values"])
+    from jira_as.autocomplete_cache import InstanceFieldsCache
+
+    point_fields = [
+        row["id"]
+        for row in InstanceFieldsCache().read() or []
+        if row["name"].casefold() in {"story points", "story point estimate"}
+    ]
+    if len(point_fields) != 1:
+        raise click.ClickException(
+            "Warm fields cache with one unambiguous Story Points field"
+        )
+    result = []
+    for row in sorted(
+        closed,
+        key=lambda item: item.get("completeDate", item.get("endDate", "")),
+        reverse=True,
+    )[:sprints]:
+        query = f'project = "{project}" AND sprint = {row["id"]}'
+        issues = workflow_call(
+            surface, "searchAndReconsileIssuesUsingJql", {"jql": query}, all_pages=True
+        )
+        points = sum(
+            float(issue.get("fields", {}).get(point_fields[0]) or 0)
+            for issue in issues
+            if issue.get("fields", {})
+            .get("status", {})
+            .get("statusCategory", {})
+            .get("key")
+            == "done"
+        )
+        result.append(
+            {"sprint": row["id"], "name": row.get("name"), "completed_points": points}
+        )
+    click.echo(
+        format_json(
+            {
+                "sprints": result,
+                "sprints_analyzed": len(result),
+                "average_velocity": sum(row["completed_points"] for row in result)
+                / len(result)
+                if result
+                else 0,
+            }
+        )
+    )
 
 
 @agile.command(name="subtask")

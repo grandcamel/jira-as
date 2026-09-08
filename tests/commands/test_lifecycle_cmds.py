@@ -18,16 +18,12 @@ import pytest
 
 from jira_as import text_to_adf
 from jira_as.cli.commands.lifecycle_cmds import (
-    _assign_issue_impl,
-    _create_component_impl,
-    _create_version_impl,
     _get_components_impl,
     _get_transitions_impl,
     _get_versions_impl,
     _reopen_issue_impl,
     _resolve_issue_impl,
     _transition_issue_impl,
-    lifecycle,
 )
 
 # =============================================================================
@@ -382,112 +378,6 @@ class TestTransitionIssueImpl:
 # =============================================================================
 
 
-@pytest.mark.unit
-class TestAssignIssueImpl:
-    """Tests for the _assign_issue_impl implementation function."""
-
-    def test_assign_to_user(self, mock_jira_client, sample_issue):
-        """Test assigning an issue to a user."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _assign_issue_impl(
-                issue_key="PROJ-123",
-                user="user@example.com",
-            )
-
-        assert result["issue_key"] == "PROJ-123"
-        assert result["target_assignee"] == "user@example.com"
-        mock_jira_client.assign_issue.assert_called_once_with(
-            "PROJ-123", "user@example.com"
-        )
-
-    def test_assign_to_self(self, mock_jira_client, sample_issue):
-        """Test assigning an issue to self."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _assign_issue_impl(
-                issue_key="PROJ-123",
-                assign_to_self=True,
-            )
-
-        assert result["action"] == "assign to self"
-        mock_jira_client.assign_issue.assert_called_once_with("PROJ-123", "-1")
-
-    def test_unassign(self, mock_jira_client, sample_issue):
-        """Test unassigning an issue."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _assign_issue_impl(
-                issue_key="PROJ-123",
-                unassign=True,
-            )
-
-        assert result["action"] == "unassign"
-        mock_jira_client.assign_issue.assert_called_once_with("PROJ-123", None)
-
-    def test_assign_dry_run(self, mock_jira_client, sample_issue):
-        """Test dry-run mode doesn't make changes."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _assign_issue_impl(
-                issue_key="PROJ-123",
-                user="user@example.com",
-                dry_run=True,
-            )
-
-        assert result["dry_run"] is True
-        mock_jira_client.assign_issue.assert_not_called()
-
-    def test_assign_multiple_options_raises_error(self, mock_jira_client):
-        """Test that specifying multiple assignment options raises error."""
-        from jira_as import ValidationError
-
-        with (
-            patch(
-                "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
-                return_value=mock_jira_client,
-            ),
-            pytest.raises(ValidationError, match="Specify exactly one"),
-        ):
-            _assign_issue_impl(
-                issue_key="PROJ-123",
-                user="user@example.com",
-                assign_to_self=True,
-            )
-
-    def test_assign_uses_context_manager(self, mock_jira_client, sample_issue):
-        """Test that client is used as context manager."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            _assign_issue_impl(
-                issue_key="PROJ-123",
-                user="user@example.com",
-            )
-
-        mock_jira_client.__enter__.assert_called_once()
-        mock_jira_client.__exit__.assert_called_once()
-
-
 # =============================================================================
 # Tests for _resolve_issue_impl
 # =============================================================================
@@ -655,18 +545,6 @@ class TestGetVersionsImpl:
         assert len(result) == 3
         mock_jira_client.get_project_versions.assert_called_once_with("PROJ")
 
-    def test_get_versions_unreleased_filter(self, mock_jira_client, sample_versions):
-        """Test filtering for unreleased versions."""
-        mock_jira_client.get_project_versions.return_value = deepcopy(sample_versions)
-
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _get_versions_impl(project="PROJ", unreleased=True)
-
-        assert all(not v.get("released") for v in result)
-
     def test_get_versions_uses_context_manager(self, mock_jira_client, sample_versions):
         """Test that client is used as context manager."""
         mock_jira_client.get_project_versions.return_value = deepcopy(sample_versions)
@@ -679,35 +557,6 @@ class TestGetVersionsImpl:
 
         mock_jira_client.__enter__.assert_called_once()
         mock_jira_client.__exit__.assert_called_once()
-
-
-@pytest.mark.unit
-class TestCreateVersionImpl:
-    """Tests for the _create_version_impl implementation function."""
-
-    def test_create_version_basic(self, mock_jira_client, sample_created_version):
-        """Test creating a basic version."""
-        mock_jira_client.create_version.return_value = deepcopy(sample_created_version)
-
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _create_version_impl(project="PROJ", name="v1.0.0")
-
-        assert result["name"] == "v1.0.0"
-        mock_jira_client.create_version.assert_called_once()
-
-    def test_create_version_dry_run(self, mock_jira_client):
-        """Test dry-run mode doesn't create version."""
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _create_version_impl(project="PROJ", name="v1.0.0", dry_run=True)
-
-        assert result is None
-        mock_jira_client.create_version.assert_not_called()
 
 
 # =============================================================================
@@ -752,39 +601,6 @@ class TestGetComponentsImpl:
         mock_jira_client.__exit__.assert_called_once()
 
 
-@pytest.mark.unit
-class TestCreateComponentImpl:
-    """Tests for the _create_component_impl implementation function."""
-
-    def test_create_component_basic(self, mock_jira_client, sample_created_component):
-        """Test creating a basic component."""
-        mock_jira_client.create_component.return_value = deepcopy(
-            sample_created_component
-        )
-
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _create_component_impl(project="PROJ", name="Backend")
-
-        assert result["name"] == "Backend"
-        mock_jira_client.create_component.assert_called_once()
-
-    def test_create_component_dry_run(self, mock_jira_client):
-        """Test dry-run mode doesn't create component."""
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _create_component_impl(
-                project="PROJ", name="Backend", dry_run=True
-            )
-
-        assert result is None
-        mock_jira_client.create_component.assert_not_called()
-
-
 # =============================================================================
 # Tests for CLI Commands
 # =============================================================================
@@ -798,63 +614,3 @@ class TestTransitionCommand:
 @pytest.mark.unit
 class TestTransitionsCommand:
     """Tests for the transitions Click command."""
-
-
-@pytest.mark.unit
-class TestAssignCommand:
-    """Tests for the assign Click command."""
-
-    def test_assign_cli_self(self, cli_runner, mock_jira_client, sample_issue):
-        """Test CLI assign command with --self."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(lifecycle, ["assign", "PROJ-123", "--self"])
-
-        assert result.exit_code == 0
-        assert "Assigned" in result.output
-
-
-@pytest.mark.unit
-class TestVersionCommands:
-    """Tests for version subcommands."""
-
-    def test_version_list_cli_success(
-        self, cli_runner, mock_jira_client, sample_versions
-    ):
-        """Test CLI version list command success."""
-        mock_jira_client.get_project_versions.return_value = deepcopy(sample_versions)
-
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(lifecycle, ["version", "list", "PROJ"])
-
-        assert result.exit_code == 0
-        assert "Versions for project" in result.output
-
-
-@pytest.mark.unit
-class TestComponentCommands:
-    """Tests for component subcommands."""
-
-    def test_component_list_cli_success(
-        self, cli_runner, mock_jira_client, sample_components
-    ):
-        """Test CLI component list command success."""
-        mock_jira_client.get_project_components.return_value = deepcopy(
-            sample_components
-        )
-
-        with patch(
-            "jira_as.cli.commands.lifecycle_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(lifecycle, ["component", "list", "PROJ"])
-
-        assert result.exit_code == 0
-        assert "Components for project" in result.output

@@ -170,9 +170,9 @@ class TestParseWikiInline:
     """Tests for _parse_wiki_inline helper function."""
 
     def test_empty_string(self):
-        """Test empty string returns empty text node."""
+        """Empty input emits no text node, as required by the ADF schema."""
         result = _parse_wiki_inline("")
-        assert result == [{"type": "text", "text": ""}]
+        assert result == []
 
     def test_plain_text_only(self):
         """Test plain text without formatting."""

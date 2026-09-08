@@ -1,32 +1,23 @@
 """Tests for JSM CLI commands."""
 
-import json
 from unittest.mock import MagicMock, patch
 
 import pytest
 from click.testing import CliRunner
 
-from jira_as import JiraError, ValidationError
 from jira_as.cli.commands.jsm_cmds import (
-    _add_request_comment_impl,
-    _build_request_fields,
-    _create_request_impl,
-    _create_service_desk_impl,
     _format_approvals,  # Approval impl; Asset impl; Customer impl; KB impl; Organization impl; Participant impl; Queue impl; Request impl; SLA impl; Request Type impl; Helper functions; CLI commands
     _format_asset,
     _format_assets,
     _format_customers,
     _format_datetime,
     _format_kb_article,
-    _format_kb_search_results,
     _format_organization,
     _format_organizations,
-    _format_participants,
     _format_pending_approvals,
     _format_queue,
     _format_queues,
     _format_request,
-    _format_request_type_fields,
     _format_request_types,
     _format_requests,
     _format_service_desk,
@@ -38,15 +29,11 @@ from jira_as.cli.commands.jsm_cmds import (
     _format_sla_time,
     _format_transitions,
     _get_approvals_impl,
-    _get_participants_impl,
     _get_request_comments_impl,
-    _get_request_status_impl,
-    _get_request_type_fields_impl,
     _is_sla_breached,
     _parse_attributes,
     _parse_comma_list,
     _remove_participant_impl,
-    _search_kb_impl,
     _suggest_kb_impl,
     jsm,
 )
@@ -458,26 +445,6 @@ class TestFormatRequestTypes:
         assert "No request types found" in result
 
 
-class TestFormatRequestTypeFields:
-    """Tests for _format_request_type_fields."""
-
-    def test_format_fields(self):
-        """Test formatting request type fields."""
-        fields = [
-            {"fieldId": "summary", "name": "Summary", "required": True},
-            {"fieldId": "description", "name": "Description", "required": False},
-        ]
-        result = _format_request_type_fields(fields)
-        assert "Request Type Fields:" in result
-        assert "summary" in result
-        assert "Yes" in result
-
-    def test_format_empty_fields(self):
-        """Test formatting empty fields."""
-        result = _format_request_type_fields([])
-        assert "No fields defined" in result
-
-
 # =============================================================================
 # Request Formatting Tests
 # =============================================================================
@@ -761,24 +728,6 @@ class TestFormatPendingApprovals:
 # =============================================================================
 
 
-class TestFormatKbSearchResults:
-    """Tests for _format_kb_search_results."""
-
-    def test_format_kb_results(self, sample_kb_articles):
-        """Test formatting KB search results."""
-        result = _format_kb_search_results(sample_kb_articles)
-        assert "Knowledge Base Search Results" in result
-        assert "How to reset password" in result
-        assert "VPN Setup Guide" in result
-        # HTML tags should be stripped
-        assert "<em>" not in result
-
-    def test_format_empty_kb_results(self):
-        """Test formatting empty KB results."""
-        result = _format_kb_search_results([])
-        assert "No KB articles found" in result
-
-
 class TestFormatKbArticle:
     """Tests for _format_kb_article."""
 
@@ -831,304 +780,60 @@ class TestFormatAsset:
 # =============================================================================
 
 
-class TestFormatParticipants:
-    """Tests for _format_participants."""
-
-    def test_format_participants(self):
-        """Test formatting participants."""
-        participants = [
-            {
-                "accountId": "abc123",
-                "displayName": "John Doe",
-                "emailAddress": "john@example.com",
-            }
-        ]
-        result = _format_participants(participants)
-        assert "Participants:" in result
-        assert "John Doe" in result
-        assert "john@example.com" in result
-
-    def test_format_empty_participants(self):
-        """Test formatting empty participants."""
-        result = _format_participants([])
-        assert "No participants found" in result
-
-
 # =============================================================================
 # CLI Command Tests
 # =============================================================================
 
 
-class TestServiceDeskListCommand:
-    """Tests for service-desk list command."""
-
-    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
-    def test_list_service_desks(
-        self, mock_get_client, runner, mock_client, sample_service_desks
-    ):
-        """Test listing service desks."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_service_desks.return_value = sample_service_desks
-
-        result = runner.invoke(jsm, ["service-desk", "list"])
-        assert result.exit_code == 0
-        assert "SD" in result.output
-
-    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
-    def test_list_service_desks_json(
-        self, mock_get_client, runner, mock_client, sample_service_desks
-    ):
-        """Test listing service desks in JSON format."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_service_desks.return_value = sample_service_desks
-
-        result = runner.invoke(jsm, ["service-desk", "list", "--output", "json"])
-        assert result.exit_code == 0
-        assert '"projectKey"' in result.output
-
-
-class TestServiceDeskGetCommand:
-    """Tests for service-desk get command."""
-
-    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
-    def test_get_service_desk(self, mock_get_client, runner, mock_client):
-        """Test getting service desk details."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_service_desk.return_value = {
-            "id": "1",
-            "projectId": "10001",
-            "projectKey": "SD",
-            "projectName": "Service Desk",
-        }
-
-        result = runner.invoke(jsm, ["service-desk", "get", "1"])
-        assert result.exit_code == 0
-        assert "Service Desk Details:" in result.output
-
-
-class TestServiceDeskCreateCommand:
-    """Tests for service-desk create command."""
-
-    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
-    def test_create_service_desk_dry_run(self, mock_get_client, runner):
-        """Test creating service desk with dry run."""
-        result = runner.invoke(
-            jsm, ["service-desk", "create", "PROJ", "Test Desk", "--dry-run"]
-        )
-        assert result.exit_code == 0
-        assert "DRY RUN MODE" in result.output
-        assert "PROJ" in result.output
-
-
-class TestRequestTypeListCommand:
-    """Tests for request-type list command."""
-
-    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
-    def test_list_request_types(
-        self, mock_get_client, runner, mock_client, sample_request_types
-    ):
-        """Test listing request types."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_request_types.return_value = sample_request_types
-
-        result = runner.invoke(jsm, ["request-type", "list", "1"])
-        assert result.exit_code == 0
-        assert "Hardware Request" in result.output
-
-
-class TestRequestListCommand:
-    """Tests for request list command."""
-
-    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
-    def test_list_requests(self, mock_get_client, runner, mock_client):
-        """Test listing requests."""
-        mock_get_client.return_value.__enter__.return_value = mock_client
-        mock_get_client.return_value.__exit__.return_value = None
-        mock_client.search_issues.return_value = {
-            "issues": [
-                {
-                    "key": "SD-123",
-                    "fields": {
-                        "summary": "Test",
-                        "status": {"name": "Open"},
-                        "reporter": {"emailAddress": "test@example.com"},
-                    },
-                }
-            ],
-            "total": 1,
-        }
-
-        result = runner.invoke(jsm, ["request", "list", "SD"])
-        assert result.exit_code == 0
-        assert "SD-123" in result.output
-
-
-class TestRequestCreateCommand:
-    """Tests for request create command."""
-
-    def test_create_request_dry_run(self, runner):
-        """Test creating request with dry run."""
-        result = runner.invoke(
-            jsm,
-            ["request", "create", "1", "10", "--summary", "Test request", "--dry-run"],
-        )
-        assert result.exit_code == 0
-        assert "DRY RUN MODE" in result.output
-        assert "Test request" in result.output
-
-
 class TestRequestTransitionCommand:
     """Tests for request transition command."""
 
-    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
-    def test_show_transitions(self, mock_get_client, runner, mock_client):
-        """Test showing available transitions."""
-        mock_get_client.return_value.__enter__.return_value = mock_client
-        mock_get_client.return_value.__exit__.return_value = None
-        mock_client.get_request_transitions.return_value = [
-            {"id": "11", "name": "Start Progress", "to": {"name": "In Progress"}}
-        ]
-
-        result = runner.invoke(
-            jsm, ["request", "transition", "SD-123", "--show-transitions"]
-        )
-        assert result.exit_code == 0
-        assert "Start Progress" in result.output
-
-    def test_transition_dry_run(self, runner):
-        """Test transition with dry run."""
+    def test_show_transitions(self, generic_workflow, runner):
         result = runner.invoke(
             jsm,
-            ["request", "transition", "SD-123", "--to", "In Progress", "--dry-run"],
+            [
+                "request",
+                "transition",
+                "SBX-1",
+                "--show-transitions",
+                "--transport",
+                "simulation",
+            ],
         )
-        assert result.exit_code == 0
-        assert "DRY RUN MODE" in result.output
+        assert result.exit_code == 0, result.output
+        assert "Done" in result.output
+        assert [call[0] for call in generic_workflow.calls] == [
+            "getCustomerTransitions"
+        ]
 
-
-class TestCustomerListCommand:
-    """Tests for customer list command."""
-
-    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
-    def test_list_customers(
-        self, mock_get_client, runner, mock_client, sample_customers
-    ):
-        """Test listing customers."""
-        mock_get_client.return_value.__enter__.return_value = mock_client
-        mock_get_client.return_value.__exit__.return_value = None
-        mock_client.get_service_desk_customers.return_value = sample_customers
-
-        result = runner.invoke(jsm, ["customer", "list", "1"])
-        assert result.exit_code == 0
-        assert "john@example.com" in result.output
-
-
-class TestOrganizationListCommand:
-    """Tests for organization list command."""
-
-    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
-    def test_list_organizations(
-        self, mock_get_client, runner, mock_client, sample_organizations
-    ):
-        """Test listing organizations."""
-        mock_get_client.return_value.__enter__.return_value = mock_client
-        mock_get_client.return_value.__exit__.return_value = None
-        mock_client.get_organizations.return_value = sample_organizations
-
-        result = runner.invoke(jsm, ["organization", "list"])
-        assert result.exit_code == 0
-        assert "Acme Corp" in result.output
-
-
-class TestOrganizationCreateCommand:
-    """Tests for organization create command."""
-
-    def test_create_organization_dry_run(self, runner):
-        """Test creating organization with dry run."""
+    def test_transition_dry_run(self, generic_workflow, runner):
+        before = generic_workflow.snapshot()
         result = runner.invoke(
-            jsm, ["organization", "create", "--name", "Test Org", "--dry-run"]
+            jsm,
+            [
+                "request",
+                "transition",
+                "SBX-1",
+                "--to",
+                "Done",
+                "--dry-run",
+                "--transport",
+                "simulation",
+            ],
         )
-        assert result.exit_code == 0
-        assert "DRY RUN MODE" in result.output
-        assert "Test Org" in result.output
-
-
-class TestQueueListCommand:
-    """Tests for queue list command."""
-
-    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
-    def test_list_queues(self, mock_get_client, runner, mock_client, sample_queues):
-        """Test listing queues."""
-        mock_get_client.return_value.__enter__.return_value = mock_client
-        mock_get_client.return_value.__exit__.return_value = None
-        mock_client.get_service_desk_queues.return_value = sample_queues
-
-        result = runner.invoke(jsm, ["queue", "list", "1"])
-        assert result.exit_code == 0
-        assert "Unassigned" in result.output
-
-
-class TestSlaGetCommand:
-    """Tests for sla get command."""
-
-    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
-    def test_get_sla(self, mock_get_client, runner, mock_client, sample_sla_data):
-        """Test getting SLA information."""
-        mock_get_client.return_value.__enter__.return_value = mock_client
-        mock_get_client.return_value.__exit__.return_value = None
-        mock_client.get_request_slas.return_value = sample_sla_data
-
-        result = runner.invoke(jsm, ["sla", "get", "SD-123"])
-        assert result.exit_code == 0
-        assert "SLA Information:" in result.output
+        assert result.exit_code == 0, result.output
+        assert '"dry_run": true' in result.output
+        assert generic_workflow.snapshot() == before
 
 
 class TestSlaReportCommand:
     """Tests for sla report command."""
 
-    def test_sla_report_missing_args(self, runner):
-        """Test SLA report with missing arguments."""
+    def test_sla_report_missing_args(self, generic_workflow, runner):
         result = runner.invoke(jsm, ["sla", "report"])
         assert result.exit_code == 1
-        assert "Must specify" in result.output
-
-
-class TestApprovalListCommand:
-    """Tests for approval list command."""
-
-    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
-    def test_list_approvals(
-        self, mock_get_client, runner, mock_client, sample_approvals
-    ):
-        """Test listing approvals."""
-        mock_get_client.return_value.__enter__.return_value = mock_client
-        mock_get_client.return_value.__exit__.return_value = None
-        # The servicedeskapi endpoint returns a paginated envelope.
-        mock_client.get_request_approvals.return_value = {
-            "size": len(sample_approvals),
-            "isLastPage": True,
-            "values": sample_approvals,
-        }
-
-        result = runner.invoke(jsm, ["approval", "list", "SD-123"])
-        assert result.exit_code == 0
-        assert "Manager Approval" in result.output
-
-
-class TestKbSearchCommand:
-    """Tests for kb search command."""
-
-    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
-    def test_search_kb(self, mock_get_client, runner, mock_client, sample_kb_articles):
-        """Test searching KB articles."""
-        mock_get_client.return_value.__enter__.return_value = mock_client
-        mock_get_client.return_value.__exit__.return_value = None
-        mock_client.search_kb_articles.return_value = sample_kb_articles
-
-        result = runner.invoke(
-            jsm, ["kb", "search", "--service-desk", "1", "--query", "password"]
-        )
-        assert result.exit_code == 0
-        assert "How to reset password" in result.output
+        assert "--project or scoped --jql is required" in result.output
+        assert generic_workflow.calls == []
 
 
 class TestAssetListCommand:
@@ -1235,16 +940,6 @@ class TestServiceDeskApiEnvelopes:
 
         spec_client.get_request_comments.assert_called_once_with("SD-1", public=None)
 
-    def test_participants_are_unwrapped(self, spec_client):
-        """'request participants' returns the list, not the envelope."""
-        spec_client.get_request_participants.return_value = {
-            "values": [{"accountId": "abc", "displayName": "A"}]
-        }
-
-        result = _get_participants_impl("SD-1", client=spec_client)
-
-        assert result == [{"accountId": "abc", "displayName": "A"}]
-
     def test_approvals_are_unwrapped(self, spec_client):
         """'approval list' returns the list, not the envelope."""
         spec_client.get_request_approvals.return_value = {
@@ -1255,17 +950,6 @@ class TestServiceDeskApiEnvelopes:
             {"id": "1", "name": "Manager Approval"}
         ]
 
-    def test_request_type_fields_are_unwrapped(self, spec_client):
-        """Request type fields live under 'requestTypeFields'."""
-        spec_client.get_request_type_fields.return_value = {
-            "requestTypeFields": [{"fieldId": "summary", "required": True}],
-            "canRaiseOnBehalfOf": True,
-        }
-
-        assert _get_request_type_fields_impl("1", "2", client=spec_client) == [
-            {"fieldId": "summary", "required": True}
-        ]
-
     def test_remove_participant_uses_plural_client_method(self, spec_client):
         """The client method is remove_request_participants and takes a list."""
         _remove_participant_impl("SD-1", "abc123", client=spec_client)
@@ -1273,24 +957,6 @@ class TestServiceDeskApiEnvelopes:
         spec_client.remove_request_participants.assert_called_once_with(
             "SD-1", account_ids=["abc123"]
         )
-
-    def test_create_service_desk_uses_name_and_key(self, spec_client):
-        """The endpoint takes name and key, not project_key/description."""
-        spec_client.create_service_desk.return_value = {"id": "1"}
-
-        _create_service_desk_impl("SD", "Service Desk", client=spec_client)
-
-        spec_client.create_service_desk.assert_called_once_with(
-            name="Service Desk", key="SD"
-        )
-
-    def test_kb_search_passes_limit_not_highlight(self, spec_client):
-        """max_results is the limit; the third positional arg is 'highlight'."""
-        spec_client.search_kb_articles.return_value = []
-
-        _search_kb_impl(1, "vpn", max_results=10, client=spec_client)
-
-        spec_client.search_kb_articles.assert_called_once_with(1, "vpn", limit=10)
 
     def test_kb_suggest_uses_existing_client_method(self, spec_client):
         """suggest_kb_articles does not exist; suggest_kb_for_request does."""
@@ -1301,253 +967,26 @@ class TestServiceDeskApiEnvelopes:
         spec_client.suggest_kb_for_request.assert_called_once_with("SD-1", 3)
 
 
-class TestRequestStatus:
-    """'request status' reads the status history envelope."""
+@pytest.fixture
+def generic_workflow(tmp_path, monkeypatch):
+    from as_engine.simulation import JiraSimulationStore
 
-    def test_latest_status_is_reported(self, spec_client):
-        """The most recent history entry wins."""
-        spec_client.get_request_status.return_value = {
-            "values": [
-                {
-                    "status": "Waiting for support",
-                    "statusCategory": "NEW",
-                    "statusDate": {"epochMillis": 1000},
-                },
-                {
-                    "status": "In Progress",
-                    "statusCategory": "INDETERMINATE",
-                    "statusDate": {"epochMillis": 2000},
-                },
-            ]
-        }
+    from jira_as import engine
+    from jira_as.autocomplete_cache import InstanceFieldsCache
 
-        result = _get_request_status_impl("SD-1", client=spec_client)
-
-        assert result["status"] == "In Progress"
-        assert result["statusCategory"] == "INDETERMINATE"
-        assert len(result["history"]) == 2
-
-    def test_bare_status_object_still_works(self, spec_client):
-        """A response without a history envelope passes straight through."""
-        spec_client.get_request_status.return_value = {
-            "status": "Waiting for support",
-            "statusCategory": "NEW",
-        }
-
-        result = _get_request_status_impl("SD-1", client=spec_client)
-
-        assert result["status"] == "Waiting for support"
-
-    def test_command_prints_the_status(self, runner, spec_client):
-        """The text output no longer shows N/A when a status exists."""
-        spec_client.get_request_status.return_value = {
-            "values": [
-                {
-                    "status": "In Progress",
-                    "statusCategory": "INDETERMINATE",
-                    "statusDate": {"epochMillis": 2000},
-                }
-            ]
-        }
-
-        with patch(
-            "jira_as.cli.commands.jsm_cmds.get_jira_client", return_value=spec_client
-        ):
-            result = runner.invoke(jsm, ["request", "status", "SD-1"])
-
-        assert result.exit_code == 0
-        assert "Status: In Progress" in result.output
-        assert "N/A" not in result.output
-
-
-class TestRequestCreateOptions:
-    """'request create' field building, required-field checks and dry run."""
-
-    def test_summary_is_optional(self, spec_client):
-        """A request type that derives its summary needs no --summary."""
-        spec_client.get_request_type_fields.return_value = {"requestTypeFields": []}
-        spec_client.create_request.return_value = {"issueKey": "SD-9"}
-
-        _create_request_impl(1, 2, description="details", client=spec_client)
-
-        kwargs = spec_client.create_request.call_args.kwargs
-        assert "summary" not in kwargs["fields"]
-        assert kwargs["fields"]["description"] == "details"
-
-    def test_priority_and_labels_are_sent(self, spec_client):
-        """--priority and --labels reach requestFieldValues."""
-        spec_client.get_request_type_fields.return_value = {"requestTypeFields": []}
-        spec_client.create_request.return_value = {"issueKey": "SD-9"}
-
-        _create_request_impl(
-            1,
-            2,
-            summary="S",
-            priority="High",
-            labels=["a", "b"],
-            client=spec_client,
-        )
-
-        fields = spec_client.create_request.call_args.kwargs["fields"]
-        assert fields["priority"] == {"name": "High"}
-        assert fields["labels"] == ["a", "b"]
-
-    def test_ids_are_sent_as_strings(self, spec_client):
-        """The API takes string IDs even though the CLI parses ints."""
-        spec_client.get_request_type_fields.return_value = {"requestTypeFields": []}
-        spec_client.create_request.return_value = {"issueKey": "SD-9"}
-
-        _create_request_impl(1, 2, summary="S", client=spec_client)
-
-        kwargs = spec_client.create_request.call_args.kwargs
-        assert kwargs["service_desk_id"] == "1"
-        assert kwargs["request_type_id"] == "2"
-
-    def test_portal_only_required_field_is_reported(self, spec_client):
-        """A required field the API cannot set fails with a clear message."""
-        spec_client.get_request_type_fields.return_value = {
-            "requestTypeFields": [
-                {
-                    "fieldId": "customfield_10100",
-                    "name": "Asset",
-                    "required": True,
-                    "visible": False,
-                }
-            ]
-        }
-
-        with pytest.raises(ValidationError, match="portal-only"):
-            _create_request_impl(1, 2, summary="S", client=spec_client)
-
-        spec_client.create_request.assert_not_called()
-
-    def test_missing_required_field_is_reported(self, spec_client):
-        """A settable but absent required field names itself."""
-        spec_client.get_request_type_fields.return_value = {
-            "requestTypeFields": [
-                {"fieldId": "customfield_10200", "name": "Category", "required": True}
-            ]
-        }
-
-        with pytest.raises(ValidationError, match="Category"):
-            _create_request_impl(1, 2, summary="S", client=spec_client)
-
-    def test_supplied_required_field_passes(self, spec_client):
-        """A required field provided via --fields satisfies the check."""
-        spec_client.get_request_type_fields.return_value = {
-            "requestTypeFields": [
-                {"fieldId": "customfield_10200", "name": "Category", "required": True}
-            ]
-        }
-        spec_client.create_request.return_value = {"issueKey": "SD-9"}
-
-        _create_request_impl(
-            1, 2, summary="S", fields={"customfield_10200": "X"}, client=spec_client
-        )
-
-        spec_client.create_request.assert_called_once()
-
-    def test_metadata_failure_does_not_block_creation(self, spec_client):
-        """If field metadata cannot be read, the create still goes ahead."""
-        spec_client.get_request_type_fields.side_effect = JiraError("no access")
-        spec_client.create_request.return_value = {"issueKey": "SD-9"}
-
-        _create_request_impl(1, 2, summary="S", client=spec_client)
-
-        spec_client.create_request.assert_called_once()
-
-    def test_build_request_fields_merges_explicit_fields(self):
-        """Named options and --fields end up in one mapping."""
-        result = _build_request_fields(
-            summary="S",
-            description="D",
-            priority="High",
-            labels=["x"],
-            fields={"customfield_1": "v"},
-        )
-
-        assert result == {
-            "customfield_1": "v",
-            "summary": "S",
-            "description": "D",
-            "priority": {"name": "High"},
-            "labels": ["x"],
-        }
-
-    def test_dry_run_json_output(self, runner, spec_client):
-        """--dry-run respects -o json instead of printing prose."""
-        with patch(
-            "jira_as.cli.commands.jsm_cmds.get_jira_client", return_value=spec_client
-        ):
-            result = runner.invoke(
-                jsm,
-                [
-                    "request",
-                    "create",
-                    "1",
-                    "2",
-                    "--summary",
-                    "S",
-                    "--priority",
-                    "High",
-                    "--dry-run",
-                    "-o",
-                    "json",
-                ],
-            )
-
-        assert result.exit_code == 0
-        payload = json.loads(result.output)
-        assert payload["dry_run"] is True
-        assert payload["fields"]["summary"] == "S"
-        assert payload["fields"]["priority"] == {"name": "High"}
-        spec_client.create_request.assert_not_called()
-
-
-class TestRequestCommentFormat:
-    """'request comment' sends the body verbatim in both formats."""
-
-    def test_text_body_is_sent_verbatim(self, spec_client):
-        """No ADF conversion for JSM comments."""
-        spec_client.add_request_comment.return_value = {"id": "1"}
-
-        _add_request_comment_impl("SD-1", "plain body", client=spec_client)
-
-        spec_client.add_request_comment.assert_called_once_with(
-            "SD-1", "plain body", public=True
-        )
-
-    def test_wiki_body_is_sent_verbatim(self, spec_client):
-        """Wiki markup reaches the API untouched, not converted."""
-        spec_client.add_request_comment.return_value = {"id": "1"}
-        body = "h1. Heading\n* bullet"
-
-        _add_request_comment_impl("SD-1", body, body_format="wiki", client=spec_client)
-
-        spec_client.add_request_comment.assert_called_once_with(
-            "SD-1", body, public=True
-        )
-
-    def test_invalid_format_is_rejected(self, spec_client):
-        """An unknown format fails before the API call."""
-        with pytest.raises(ValidationError, match="Invalid comment format"):
-            _add_request_comment_impl(
-                "SD-1", "body", body_format="markdown", client=spec_client
-            )
-
-        spec_client.add_request_comment.assert_not_called()
-
-    def test_dry_run_does_not_post(self, runner, spec_client):
-        """--dry-run shows the payload and posts nothing."""
-        with patch(
-            "jira_as.cli.commands.jsm_cmds.get_jira_client", return_value=spec_client
-        ):
-            result = runner.invoke(
-                jsm,
-                ["request", "comment", "SD-1", "hello", "--internal", "--dry-run"],
-            )
-
-        assert result.exit_code == 0
-        assert "DRY RUN" in result.output
-        assert "Internal" in result.output
-        spec_client.add_request_comment.assert_not_called()
+    monkeypatch.setenv("JIRA_ALLOWED_PROJECTS", "SBX")
+    monkeypatch.setenv("JIRA_ALLOW_SITE_OPERATIONS", "true")
+    monkeypatch.setenv("JIRA_FIELDS_CACHE_DIR", str(tmp_path))
+    seed = JiraSimulationStore().snapshot()
+    seed["sprints"] = [
+        {"id": 456, "originBoardId": 1, "name": "Sprint 456", "state": "future"},
+        {"id": 457, "originBoardId": 1, "name": "Closed", "state": "closed"},
+    ]
+    seed["issues"][0]["fields"].update(
+        {"sprint": 457, "status": {"name": "Done"}, "customfield_10016": 8}
+    )
+    store = JiraSimulationStore(seed)
+    surface = engine.create_surface(transport="simulation", store=store)
+    monkeypatch.setattr(engine, "create_surface", lambda **_: surface)
+    InstanceFieldsCache(tmp_path).write(store.fields)
+    return store

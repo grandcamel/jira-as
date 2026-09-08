@@ -718,61 +718,42 @@ class TestBulkTransitionCommand:
         """Create CLI runner."""
         return CliRunner()
 
-    @patch("jira_as.cli.commands.bulk_cmds.get_client_from_context")
-    @patch("jira_as.cli.commands.bulk_cmds.validate_jql")
-    def test_transition_command_dry_run(
-        self, mock_validate, mock_get_client, runner, mock_client, sample_issues
-    ):
-        """Test transition command dry run."""
-        mock_get_client.return_value = mock_client
-        mock_validate.return_value = "project = TEST"
-        mock_client.search_issues.return_value = {"issues": sample_issues}
-
+    def test_transition_command_dry_run(self, runner, workflow_sim):
         result = runner.invoke(
             bulk,
             [
                 "transition",
                 "--jql",
-                "project = TEST",
+                "project = SBX",
                 "--to",
                 "Done",
+                "--dry-run",
+                "--transport",
+                "simulation",
             ],
         )
-
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
         assert "DRY RUN" in result.output
+        assert all(i["fields"]["status"]["name"] == "Open" for i in workflow_sim.issues)
+        assert not any(c[0] == "doTransition" for c in workflow_sim.calls)
 
-    @patch("jira_as.cli.commands.bulk_cmds.get_client_from_context")
-    @patch("jira_as.cli.commands.bulk_cmds.validate_jql")
-    def test_transition_command_execute(
-        self,
-        mock_validate,
-        mock_get_client,
-        runner,
-        mock_client,
-        sample_issues,
-        sample_transitions,
-    ):
-        """Test transition command execution."""
-        mock_get_client.return_value = mock_client
-        mock_validate.return_value = "project = TEST"
-        mock_client.search_issues.return_value = {"issues": sample_issues}
-        mock_client.get_transitions.return_value = sample_transitions
-
+    def test_transition_command_execute(self, runner, workflow_sim):
         result = runner.invoke(
             bulk,
             [
                 "transition",
                 "--jql",
-                "project = TEST",
+                "project = SBX",
                 "--to",
                 "Done",
                 "--yes",
+                "--transport",
+                "simulation",
             ],
         )
-
-        assert result.exit_code == 0
-        assert "succeeded" in result.output
+        assert result.exit_code == 0, result.output
+        assert "2 succeeded" in result.output
+        assert all(i["fields"]["status"]["name"] == "Done" for i in workflow_sim.issues)
 
     def test_transition_command_missing_input(self, runner):
         """Test transition command requires JQL or issues."""
@@ -790,52 +771,43 @@ class TestBulkAssignCommand:
         """Create CLI runner."""
         return CliRunner()
 
-    @patch("jira_as.cli.commands.bulk_cmds.get_client_from_context")
-    @patch("jira_as.cli.commands.bulk_cmds.validate_jql")
-    def test_assign_command(
-        self, mock_validate, mock_get_client, runner, mock_client, sample_issues
-    ):
-        """Test assign command."""
-        mock_get_client.return_value = mock_client
-        mock_validate.return_value = "project = TEST"
-        mock_client.search_issues.return_value = {"issues": sample_issues}
-
+    def test_assign_command(self, runner, workflow_sim):
         result = runner.invoke(
             bulk,
             [
                 "assign",
                 "--jql",
-                "project = TEST",
+                "project = SBX",
                 "--assignee",
                 "user123",
                 "--yes",
+                "--transport",
+                "simulation",
             ],
         )
+        assert result.exit_code == 0, result.output
+        assert all(
+            i["fields"]["assignee"] == {"accountId": "user123"}
+            for i in workflow_sim.issues
+        )
 
-        assert result.exit_code == 0
-
-    @patch("jira_as.cli.commands.bulk_cmds.get_client_from_context")
-    @patch("jira_as.cli.commands.bulk_cmds.validate_jql")
-    def test_unassign_command(
-        self, mock_validate, mock_get_client, runner, mock_client, sample_issues
-    ):
-        """Test unassign command."""
-        mock_get_client.return_value = mock_client
-        mock_validate.return_value = "project = TEST"
-        mock_client.search_issues.return_value = {"issues": sample_issues}
-
+    def test_unassign_command(self, runner, workflow_sim):
+        for issue in workflow_sim.issues:
+            issue["fields"]["assignee"] = {"accountId": "former-user"}
         result = runner.invoke(
             bulk,
             [
                 "assign",
                 "--jql",
-                "project = TEST",
+                "project = SBX",
                 "--unassign",
                 "--yes",
+                "--transport",
+                "simulation",
             ],
         )
-
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
+        assert all(i["fields"]["assignee"] is None for i in workflow_sim.issues)
 
     def test_assign_requires_action(self, runner):
         """Test assign requires assignee or unassign."""
@@ -860,29 +832,24 @@ class TestBulkSetPriorityCommand:
         """Create CLI runner."""
         return CliRunner()
 
-    @patch("jira_as.cli.commands.bulk_cmds.get_client_from_context")
-    @patch("jira_as.cli.commands.bulk_cmds.validate_jql")
-    def test_set_priority_command(
-        self, mock_validate, mock_get_client, runner, mock_client, sample_issues
-    ):
-        """Test set-priority command."""
-        mock_get_client.return_value = mock_client
-        mock_validate.return_value = "project = TEST"
-        mock_client.search_issues.return_value = {"issues": sample_issues}
-
+    def test_set_priority_command(self, runner, workflow_sim):
         result = runner.invoke(
             bulk,
             [
                 "set-priority",
                 "--jql",
-                "project = TEST",
+                "project = SBX",
                 "--priority",
                 "High",
                 "--yes",
+                "--transport",
+                "simulation",
             ],
         )
-
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
+        assert all(
+            i["fields"]["priority"] == {"name": "High"} for i in workflow_sim.issues
+        )
 
 
 class TestBulkCloneCommand:
@@ -893,28 +860,17 @@ class TestBulkCloneCommand:
         """Create CLI runner."""
         return CliRunner()
 
-    @patch("jira_as.cli.commands.bulk_cmds.get_client_from_context")
-    @patch("jira_as.cli.commands.bulk_cmds.validate_jql")
-    def test_clone_command(
-        self, mock_validate, mock_get_client, runner, mock_client, sample_issues
-    ):
-        """Test clone command."""
-        mock_get_client.return_value = mock_client
-        mock_validate.return_value = "project = TEST"
-        mock_client.search_issues.return_value = {"issues": sample_issues}
-        mock_client.create_issue.return_value = {"key": "TEST-NEW", "id": "99"}
-
+    def test_clone_command(self, runner, workflow_sim):
         result = runner.invoke(
             bulk,
-            [
-                "clone",
-                "--jql",
-                "project = TEST",
-                "--yes",
-            ],
+            ["clone", "--jql", "project = SBX", "--yes", "--transport", "simulation"],
         )
-
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
+        assert len(workflow_sim.issues) == 4
+        assert [i["fields"]["summary"] for i in workflow_sim.issues[2:]] == [
+            "[Clone] First task",
+            "[Clone] Second task",
+        ]
 
 
 class TestBulkDeleteCommand:
@@ -925,64 +881,42 @@ class TestBulkDeleteCommand:
         """Create CLI runner."""
         return CliRunner()
 
-    @patch("jira_as.cli.commands.bulk_cmds.get_client_from_context")
-    @patch("jira_as.cli.commands.bulk_cmds.validate_jql")
-    def test_delete_command_dry_run(
-        self, mock_validate, mock_get_client, runner, mock_client, sample_issues
-    ):
-        """Test delete command dry run."""
-        mock_get_client.return_value = mock_client
-        mock_validate.return_value = "project = TEST"
-        mock_client.search_issues.return_value = {"issues": sample_issues}
-
+    def test_delete_command_dry_run(self, runner, workflow_sim):
+        before = workflow_sim.snapshot()
         result = runner.invoke(
             bulk,
             [
                 "delete",
                 "--jql",
-                "project = TEST",
+                "project = SBX",
                 "--dry-run",
+                "--transport",
+                "simulation",
             ],
         )
-
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
         assert "DRY RUN" in result.output
+        assert workflow_sim.snapshot() == before
+        assert not any(c[0] == "deleteIssue" for c in workflow_sim.calls)
 
-    @patch("jira_as.cli.commands.bulk_cmds.get_client_from_context")
-    @patch("jira_as.cli.commands.bulk_cmds.validate_jql")
-    def test_delete_command_execute(
-        self, mock_validate, mock_get_client, runner, mock_client, sample_issues
-    ):
-        """Test delete command execution."""
-        mock_get_client.return_value = mock_client
-        mock_validate.return_value = "project = TEST"
-        mock_client.search_issues.return_value = {"issues": sample_issues}
-
+    def test_delete_command_execute(self, runner, workflow_sim):
         result = runner.invoke(
             bulk,
-            [
-                "delete",
-                "--jql",
-                "project = TEST",
-                "--yes",
-            ],
+            ["delete", "--jql", "project = SBX", "--yes", "--transport", "simulation"],
         )
+        assert result.exit_code == 0, result.output
+        assert "2 succeeded" in result.output
+        assert workflow_sim.issues == []
 
-        assert result.exit_code == 0
-        assert "succeeded" in result.output
-
-    def test_delete_shows_warning(self, runner):
-        """Test delete shows warning without yes."""
+    def test_delete_shows_warning(self, runner, workflow_sim):
         result = runner.invoke(
-            bulk,
-            [
-                "delete",
-                "--jql",
-                "project = TEST",
-            ],
+            bulk, ["delete", "--jql", "project = SBX", "--transport", "simulation"]
         )
-
-        assert "WARNING" in result.output
+        assert result.exit_code == 0, result.output
+        assert "DRY RUN" in result.output
+        assert "--confirm" in result.output
+        assert len(workflow_sim.issues) == 2
+        assert not any(c[0] == "deleteIssue" for c in workflow_sim.calls)
 
 
 # =============================================================================
@@ -998,28 +932,23 @@ class TestErrorHandling:
         """Create CLI runner."""
         return CliRunner()
 
-    @patch("jira_as.cli.commands.bulk_cmds.get_client_from_context")
-    def test_jira_error_handling(self, mock_get_client, runner):
-        """Test JiraError is handled properly."""
-        mock_client = MagicMock()
-        mock_client.__enter__ = MagicMock(return_value=mock_client)
-        mock_client.__exit__ = MagicMock(return_value=None)
-        mock_get_client.return_value = mock_client
-        mock_client.search_issues.side_effect = JiraError("API Error")
-
+    def test_jira_error_handling(self, runner, workflow_sim):
         result = runner.invoke(
             bulk,
             [
                 "transition",
-                "--jql",
-                "project = TEST",
+                "--issues",
+                "SBX-999",
                 "--to",
                 "Done",
                 "--yes",
+                "--transport",
+                "simulation",
             ],
         )
-
         assert result.exit_code == 1
+        assert "Issue not found" in result.output
+        assert not any(c[0] == "doTransition" for c in workflow_sim.calls)
 
     @patch("jira_as.cli.commands.bulk_cmds.get_jira_client")
     @patch("jira_as.cli.commands.bulk_cmds.validate_jql")
@@ -1045,3 +974,18 @@ class TestErrorHandling:
         assert result["success"] == 2
         assert result["failed"] == 1
         assert "TEST-2" in result["errors"]
+
+
+@pytest.fixture
+def workflow_sim(monkeypatch):
+    """Use the compiled Surface and independent state for survivor CLI cases."""
+    from as_engine.simulation import JiraSimulationStore
+
+    from jira_as import engine
+
+    store = JiraSimulationStore()
+    surface = engine.create_surface(transport="simulation", store=store)
+    surface.scope_allowlist = ("SBX",)
+    surface.scope_allow_site = False
+    monkeypatch.setattr(engine, "create_surface", lambda **_: surface)
+    return store

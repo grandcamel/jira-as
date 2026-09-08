@@ -179,39 +179,16 @@ def markdown_to_adf(markdown: str) -> dict[str, Any]:
             while i < len(lines) and not lines[i].startswith("```"):
                 code_lines.append(lines[i])
                 i += 1
-            content.append(
-                {
-                    "type": "codeBlock",
-                    "content": [{"type": "text", "text": "\n".join(code_lines)}],
-                }
-            )
+            content.append(create_adf_code_block("\n".join(code_lines)))
             i += 1
             continue
 
         if line.startswith("# "):
-            content.append(
-                {
-                    "type": "heading",
-                    "attrs": {"level": 1},
-                    "content": [{"type": "text", "text": line[2:].strip()}],
-                }
-            )
+            content.append(create_adf_heading(line[2:].strip(), level=1))
         elif line.startswith("## "):
-            content.append(
-                {
-                    "type": "heading",
-                    "attrs": {"level": 2},
-                    "content": [{"type": "text", "text": line[3:].strip()}],
-                }
-            )
+            content.append(create_adf_heading(line[3:].strip(), level=2))
         elif line.startswith("### "):
-            content.append(
-                {
-                    "type": "heading",
-                    "attrs": {"level": 3},
-                    "content": [{"type": "text", "text": line[4:].strip()}],
-                }
-            )
+            content.append(create_adf_heading(line[4:].strip(), level=3))
         elif line.startswith("- ") or line.startswith("* "):
             list_items = []
             while i < len(lines) and (
@@ -271,7 +248,7 @@ def _parse_inline_formatting(text: str) -> list[dict[str, Any]]:
         List of ADF text nodes with formatting
     """
     if not text:
-        return [{"type": "text", "text": ""}]
+        return []
 
     result: list[dict[str, Any]] = []
     remaining = text
@@ -332,7 +309,7 @@ def _parse_inline_formatting(text: str) -> list[dict[str, Any]]:
 
         remaining = remaining[match.end() :]
 
-    return result if result else [{"type": "text", "text": ""}]
+    return result
 
 
 def adf_to_text(adf: dict[str, Any]) -> str:
@@ -430,7 +407,7 @@ def create_adf_paragraph(text: str, **marks) -> dict[str, Any]:
     if text_marks:
         text_node["marks"] = text_marks
 
-    return {"type": "paragraph", "content": [text_node]}
+    return {"type": "paragraph", "content": [text_node] if text else []}
 
 
 def create_adf_heading(text: str, level: int = 1) -> dict[str, Any]:
@@ -447,7 +424,7 @@ def create_adf_heading(text: str, level: int = 1) -> dict[str, Any]:
     return {
         "type": "heading",
         "attrs": {"level": min(max(level, 1), 6)},
-        "content": [{"type": "text", "text": text}],
+        "content": [{"type": "text", "text": text}] if text else [],
     }
 
 
@@ -468,7 +445,7 @@ def create_adf_code_block(code: str, language: str = "") -> dict[str, Any]:
 
     node: dict[str, Any] = {
         "type": "codeBlock",
-        "content": [{"type": "text", "text": code}],
+        "content": [{"type": "text", "text": code}] if code else [],
     }
 
     if attrs:
@@ -537,7 +514,7 @@ def _parse_wiki_inline(text: str) -> list[dict[str, Any]]:
         List of ADF text nodes with formatting
     """
     if not text:
-        return [{"type": "text", "text": ""}]
+        return []
 
     result: list[dict[str, Any]] = []
     remaining = text
@@ -588,4 +565,4 @@ def _parse_wiki_inline(text: str) -> list[dict[str, Any]]:
 
         remaining = remaining[match.end() :]
 
-    return result if result else [{"type": "text", "text": ""}]
+    return result

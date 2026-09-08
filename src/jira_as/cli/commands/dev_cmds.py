@@ -25,6 +25,7 @@ from jira_as import (
 )
 
 from ..cli_utils import format_json, get_client_from_context, handle_jira_errors
+from .bulk_cmds import workflow_call, workflow_surface
 
 if TYPE_CHECKING:
     from jira_as import JiraClient
@@ -795,6 +796,150 @@ def _format_commits(commits: list[dict], output: str, detailed: bool) -> str:
     return "\n".join(lines)
 
 
+def _surface_branch(surface, issue_key, prefix=None, auto_prefix=False):
+    issue_key = validate_issue_key(issue_key)
+    issue = workflow_call(surface, "getIssue", {"issueIdOrKey": issue_key})
+
+    fields = issue.get("fields", {})
+    summary = fields.get("summary", "")
+    issue_type = fields.get("issuetype", {}).get("name", "")
+
+    # Determine prefix
+    if prefix:
+        branch_prefix = prefix.lower()
+    elif auto_prefix:
+        branch_prefix = _get_prefix_for_issue_type(issue_type)
+    else:
+        branch_prefix = DEFAULT_PREFIX
+
+    # Sanitize summary
+    sanitized_summary = _sanitize_for_branch(summary)
+    issue_key_lower = issue_key.lower()
+
+    # Build branch name
+    if not sanitized_summary:
+        branch_name = f"{branch_prefix}/{issue_key_lower}"
+    else:
+        prefix_part_len = len(branch_prefix) + 1
+        key_part_len = len(issue_key_lower) + 1
+        max_summary_len = MAX_BRANCH_LENGTH - prefix_part_len - key_part_len
+
+        if len(sanitized_summary) > max_summary_len:
+            truncated = sanitized_summary[:max_summary_len]
+            last_hyphen = truncated.rfind("-")
+            if last_hyphen > max_summary_len // 2:
+                truncated = truncated[:last_hyphen]
+            sanitized_summary = truncated.rstrip("-")
+
+        branch_name = f"{branch_prefix}/{issue_key_lower}-{sanitized_summary}"
+
+    return {
+        "branch_name": branch_name,
+        "issue_key": issue_key,
+        "issue_type": issue_type,
+        "summary": summary,
+        "git_command": f"git checkout -b {branch_name}",
+    }
+
+
+def _surface_pr(
+    surface,
+    issue_key,
+    include_checklist=False,
+    include_labels=False,
+    include_components=False,
+):
+    issue_key = validate_issue_key(issue_key)
+    issue = workflow_call(surface, "getIssue", {"issueIdOrKey": issue_key})
+
+    fields = issue.get("fields", {})
+    summary = fields.get("summary", "")
+    description = fields.get("description")
+    issue_type = fields.get("issuetype", {}).get("name", "")
+    labels = fields.get("labels", [])
+    components = [comp.get("name", "") for comp in fields.get("components", [])]
+    priority = (
+        fields.get("priority", {}).get("name", "") if fields.get("priority") else ""
+    )
+
+    # Convert ADF description to text
+    if isinstance(description, dict):
+        raise click.ClickException("getIssue returned unconverted rich text")
+    else:
+        desc_text = description or ""
+
+    jira_url = str(issue.get("self", "")).split("/rest/", 1)[0]
+
+    # Build PR description
+    lines: list[str] = []
+
+    lines.append("## Summary")
+    lines.append("")
+    lines.append(summary)
+    lines.append("")
+
+    lines.append("## JIRA Issue")
+    lines.append("")
+    lines.append(f"[{issue_key}]({jira_url}/browse/{issue_key})")
+    lines.append("")
+
+    if issue_type or priority:
+        lines.append(f"**Type:** {issue_type}")
+        if priority:
+            lines.append(f"**Priority:** {priority}")
+        lines.append("")
+
+    if desc_text:
+        lines.append("## Description")
+        lines.append("")
+        if len(desc_text) > 500:
+            lines.append(desc_text[:500] + "...")
+        else:
+            lines.append(desc_text)
+        lines.append("")
+
+    if include_labels and labels:
+        lines.append("## Labels")
+        lines.append("")
+        lines.append(", ".join([f"`{label}`" for label in labels]))
+        lines.append("")
+
+    if include_components and components:
+        lines.append("## Components")
+        lines.append("")
+        lines.append(", ".join(components))
+        lines.append("")
+
+    acceptance_criteria = _extract_acceptance_criteria(desc_text)
+    if acceptance_criteria:
+        lines.append("## Acceptance Criteria")
+        lines.append("")
+        for criterion in acceptance_criteria:
+            lines.append(f"- [ ] {criterion}")
+        lines.append("")
+
+    if include_checklist:
+        lines.append("## Testing Checklist")
+        lines.append("")
+        lines.append("- [ ] Unit tests added/updated")
+        lines.append("- [ ] Integration tests pass")
+        lines.append("- [ ] Manual testing completed")
+        lines.append("- [ ] No regressions introduced")
+        lines.append("")
+
+    markdown = "\n".join(lines)
+
+    return {
+        "markdown": markdown,
+        "issue_key": issue_key,
+        "issue_type": issue_type,
+        "summary": summary,
+        "priority": priority,
+        "labels": labels,
+        "components": components,
+    }
+
+
 # =============================================================================
 # CLI Commands
 # =============================================================================
@@ -807,6 +952,7 @@ def dev():
 
 
 @dev.command(name="branch-name")
+@click.option("--transport", type=click.Choice(["simulation", "responder", "http"]))
 @click.argument("issue_key")
 @click.option(
     "--prefix",
@@ -829,15 +975,20 @@ def dev():
 @click.pass_context
 @handle_jira_errors
 def dev_branch_name(
-    ctx: click.Context, issue_key: str, prefix: str, auto_prefix: bool, output: str
+    ctx: click.Context,
+    issue_key: str,
+    prefix: str,
+    auto_prefix: bool,
+    output: str,
+    transport,
 ):
     """Generate a Git branch name from an issue."""
-    client = get_client_from_context(ctx)
-    result = _create_branch_name_impl(
+    surface = workflow_surface(transport)
+    result = _surface_branch(
+        surface,
         issue_key=issue_key,
         prefix=prefix,
         auto_prefix=auto_prefix,
-        client=client,
     )
 
     if output == "json":
@@ -847,6 +998,7 @@ def dev_branch_name(
 
 
 @dev.command(name="pr-description")
+@click.option("--transport", type=click.Choice(["simulation", "responder", "http"]))
 @click.argument("issue_key")
 @click.option(
     "--include-checklist", "-c", is_flag=True, help="Include testing checklist"
@@ -871,15 +1023,16 @@ def dev_pr_description(
     include_components: bool,
     output: str,
     copy: bool,
+    transport,
 ):
     """Generate a PR description from an issue."""
-    client = get_client_from_context(ctx)
-    result = _create_pr_description_impl(
+    surface = workflow_surface(transport)
+    result = _surface_pr(
+        surface,
         issue_key=issue_key,
         include_checklist=include_checklist,
         include_labels=include_labels,
         include_components=include_components,
-        client=client,
     )
 
     if copy:

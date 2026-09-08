@@ -29,6 +29,7 @@ from jira_as.cli.commands.ops_cmds import (
     _is_critical_error,
     ops,
 )
+from tests.test_utility_survivors import utility_simulation as utility_simulation
 
 # =============================================================================
 # Helper Function Tests
@@ -546,70 +547,31 @@ class TestCacheWarmCommand:
         assert result.exit_code != 0
         assert "At least one warming option" in result.output
 
-    def test_cache_warm_cli_projects(self, cli_runner, mock_jira_client):
-        """Test CLI cache-warm with --projects."""
-        mock_cache = MagicMock()
-        mock_cache.get_stats.return_value = MockCacheStats()
-        mock_jira_client.get.return_value = [{"key": "PROJ"}]
-
-        with (
-            patch(
-                "jira_as.cli.cli_utils.get_jira_client",
-                return_value=mock_jira_client,
-            ),
-            patch(
-                "jira_as.cli.commands.ops_cmds.JiraCache",
-                return_value=mock_cache,
-            ),
-        ):
-            result = cli_runner.invoke(ops, ["cache-warm", "--projects"])
-
-        assert result.exit_code == 0
+    def test_cache_warm_cli_projects(self, utility_simulation, cli_runner):
+        result = cli_runner.invoke(
+            ops, ["cache-warm", "--projects", "--transport", "simulation"]
+        )
+        assert result.exit_code == 0, result.output
+        assert utility_simulation.calls[0][0] == "searchProjects"
 
 
 @pytest.mark.unit
 class TestDiscoverProjectCommand:
     """Tests for the discover-project CLI command."""
 
-    def test_discover_project_cli(self, cli_runner, mock_jira_client, sample_project):
-        """Test CLI discover-project command."""
-        mock_jira_client.get_project.return_value = deepcopy(sample_project)
-        mock_jira_client.get_project_statuses.return_value = []
-        mock_jira_client.get_project_components.return_value = []
-        mock_jira_client.get_project_versions.return_value = []
-        mock_jira_client.get.return_value = []
-        mock_jira_client.find_assignable_users.return_value = []
-        mock_jira_client.search_issues.return_value = {"issues": []}
+    def test_discover_project_cli(self, utility_simulation, cli_runner):
+        result = cli_runner.invoke(
+            ops, ["discover-project", "SBX", "--transport", "simulation"]
+        )
+        assert result.exit_code == 0, result.output
+        assert "Project: SBX" in result.output
 
-        with patch(
-            "jira_as.cli.commands.ops_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(ops, ["discover-project", "PROJ"])
-
-        assert result.exit_code == 0
-        assert "Project: PROJ" in result.output
-
-    def test_discover_project_cli_json(
-        self, cli_runner, mock_jira_client, sample_project
-    ):
-        """Test CLI discover-project with JSON output."""
-        mock_jira_client.get_project.return_value = deepcopy(sample_project)
-        mock_jira_client.get_project_statuses.return_value = []
-        mock_jira_client.get_project_components.return_value = []
-        mock_jira_client.get_project_versions.return_value = []
-        mock_jira_client.get.return_value = []
-        mock_jira_client.find_assignable_users.return_value = []
-        mock_jira_client.search_issues.return_value = {"issues": []}
-
-        with patch(
-            "jira_as.cli.commands.ops_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(ops, ["discover-project", "PROJ", "-o", "json"])
-
-        assert result.exit_code == 0
-        assert "{" in result.output
+    def test_discover_project_cli_json(self, utility_simulation, cli_runner):
+        result = cli_runner.invoke(
+            ops, ["discover-project", "SBX", "-o", "json", "--transport", "simulation"]
+        )
+        assert result.exit_code == 0, result.output
+        assert '"project_key": "SBX"' in result.output
 
 
 # =============================================================================

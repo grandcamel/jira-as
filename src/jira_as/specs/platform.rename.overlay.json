@@ -1,0 +1,1767 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira platform legacy verb migration",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_addAttachment",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/attachments\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "collaborate attachment",
+            "verb": "upload",
+            "invocation": "api call addAttachment --issueIdOrKey ISSUE_KEY --body @body.json",
+            "note": "Single indexed operation or prerequisite-only chain; use the generic surface. Jira multipart/binary enrichment remains pending JAS-65; this indexed pointer does not claim completed attachment transport."
+          }
+        ],
+        "x-as-topic": [
+          "migration"
+        ],
+        "x-as-note": "Legacy verbs now report an indexed replacement with exit 2. Read docs/wrapper-verbs.md or invoke an old group or verb for the complete migration hints."
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_addComment",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "issue",
+            "verb": "comment",
+            "invocation": "api call addComment --issueIdOrKey ISSUE_KEY --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_addNotifications",
+      "target": "$.paths[\"/rest/api/3/notificationscheme/{id}/notification\"].put",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin notification",
+            "verb": "add",
+            "invocation": "api call addNotifications --id ID --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_addScreenTabField",
+      "target": "$.paths[\"/rest/api/3/screens/{screenId}/tabs/{tabId}/fields\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin screen",
+            "verb": "add-field",
+            "invocation": "api call addScreenTabField --screenId SCREEN_ID --tabId TAB_ID --body @body.json"
+          },
+          {
+            "group": "fields",
+            "verb": "configure-agile",
+            "invocation": "api call addScreenTabField --screenId SCREEN_ID --tabId TAB_ID --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_addSharePermission",
+      "target": "$.paths[\"/rest/api/3/filter/{id}/permission\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "search filter",
+            "verb": "share",
+            "invocation": "api call addSharePermission --id ID --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_addUserToGroup",
+      "target": "$.paths[\"/rest/api/3/group/user\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin group",
+            "verb": "add-user",
+            "invocation": "api call addUserToGroup --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_archiveProject",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/archive\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin project",
+            "verb": "archive",
+            "invocation": "api call archiveProject --projectIdOrKey PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_assignIssue",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/assignee\"].put",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "lifecycle",
+            "verb": "assign",
+            "invocation": "api call assignIssue --issueIdOrKey ISSUE_KEY --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_assignIssueTypeSchemeToProject",
+      "target": "$.paths[\"/rest/api/3/issuetypescheme/project\"].put",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin issue-type-scheme",
+            "verb": "assign",
+            "invocation": "api call assignIssueTypeSchemeToProject --body @body.json --project PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_assignPermissionScheme",
+      "target": "$.paths[\"/rest/api/3/project/{projectKeyOrId}/permissionscheme\"].put",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin permission-scheme",
+            "verb": "assign",
+            "invocation": "api call assignPermissionScheme --projectKeyOrId PROJECT_KEY_OR_ID --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createComponent",
+      "target": "$.paths[\"/rest/api/3/component\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "lifecycle component",
+            "verb": "create",
+            "invocation": "api call createComponent --body @body.json --project PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createCustomField",
+      "target": "$.paths[\"/rest/api/3/field\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "fields",
+            "verb": "create",
+            "invocation": "api call createCustomField --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createFilter",
+      "target": "$.paths[\"/rest/api/3/filter\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "search filter",
+            "verb": "create",
+            "invocation": "api call createFilter --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createGroup",
+      "target": "$.paths[\"/rest/api/3/group\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin group",
+            "verb": "create",
+            "invocation": "api call createGroup --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createIssue",
+      "target": "$.paths[\"/rest/api/3/issue\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "agile epic",
+            "verb": "create",
+            "invocation": "api call createIssue --body @body.json --project PROJECT_KEY"
+          },
+          {
+            "group": "agile",
+            "verb": "subtask",
+            "invocation": "api call createIssue --body @body.json --project PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createIssueType",
+      "target": "$.paths[\"/rest/api/3/issuetype\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin issue-type",
+            "verb": "create",
+            "invocation": "api call createIssueType --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createIssueTypeScheme",
+      "target": "$.paths[\"/rest/api/3/issuetypescheme\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin issue-type-scheme",
+            "verb": "create",
+            "invocation": "api call createIssueTypeScheme --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createNotificationScheme",
+      "target": "$.paths[\"/rest/api/3/notificationscheme\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin notification-scheme",
+            "verb": "create",
+            "invocation": "api call createNotificationScheme --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createPermissionScheme",
+      "target": "$.paths[\"/rest/api/3/permissionscheme\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin permission-scheme",
+            "verb": "create",
+            "invocation": "api call createPermissionScheme --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createProject",
+      "target": "$.paths[\"/rest/api/3/project\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin project",
+            "verb": "create",
+            "invocation": "api call createProject --body @body.json"
+          },
+          {
+            "group": "jsm service-desk",
+            "verb": "create",
+            "invocation": "api call createProject --field key=KEY --field name=NAME --field projectTypeKey=service_desk --field projectTemplateKey=TEMPLATE --field leadAccountId=ACCOUNT_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createProjectCategory",
+      "target": "$.paths[\"/rest/api/3/projectCategory\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin category",
+            "verb": "create",
+            "invocation": "api call createProjectCategory --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createVersion",
+      "target": "$.paths[\"/rest/api/3/version\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "lifecycle version",
+            "verb": "create",
+            "invocation": "api call createVersion --body @body.json --project PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_deleteComment",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment/{id}\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "collaborate comment",
+            "verb": "delete",
+            "invocation": "api call deleteComment --issueIdOrKey ISSUE_KEY --id ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_deleteComponent",
+      "target": "$.paths[\"/rest/api/3/component/{id}\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "lifecycle component",
+            "verb": "delete",
+            "invocation": "api call deleteComponent --id ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_deleteFilter",
+      "target": "$.paths[\"/rest/api/3/filter/{id}\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "search filter",
+            "verb": "delete",
+            "invocation": "api call deleteFilter --id ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_deleteIssue",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "issue",
+            "verb": "delete",
+            "invocation": "api call deleteIssue --issueIdOrKey ISSUE_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_deleteIssueType",
+      "target": "$.paths[\"/rest/api/3/issuetype/{id}\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin issue-type",
+            "verb": "delete",
+            "invocation": "api call deleteIssueType --id ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_deleteProject",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin project",
+            "verb": "delete",
+            "invocation": "api call deleteProject --projectIdOrKey PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_deleteWorklog",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog/{id}\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "time",
+            "verb": "delete-worklog",
+            "invocation": "api call deleteWorklog --issueIdOrKey ISSUE_KEY --id ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_doTransition",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/transitions\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "issue",
+            "verb": "transition",
+            "invocation": "lifecycle transition ISSUE_KEY --to TRANSITION_NAME",
+            "note": "Duplicate of the preserved lifecycle transition contract verb; use its fuzzy matching workflow."
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_editIssue",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}\"].put",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "collaborate",
+            "verb": "update-fields",
+            "invocation": "api call editIssue --issueIdOrKey ISSUE_KEY --body @body.json"
+          },
+          {
+            "group": "time",
+            "verb": "estimate",
+            "invocation": "api call editIssue --issueIdOrKey ISSUE_KEY --field fields.timetracking.originalEstimate=VALUE --field fields.timetracking.remainingEstimate=VALUE",
+            "note": "Read-merge-write is a prerequisite chain. Pass both originalEstimate and remainingEstimate values."
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_findGroups",
+      "target": "$.paths[\"/rest/api/3/groups/picker\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin group",
+            "verb": "list",
+            "invocation": "api call findGroups"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_findUsers",
+      "target": "$.paths[\"/rest/api/3/user/search\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin user",
+            "verb": "search",
+            "invocation": "api call findUsers"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getAllIssueTypeSchemes",
+      "target": "$.paths[\"/rest/api/3/issuetypescheme\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin issue-type-scheme",
+            "verb": "list",
+            "invocation": "api call getAllIssueTypeSchemes"
+          },
+          {
+            "group": "admin issue-type-scheme",
+            "verb": "get",
+            "invocation": "api call getAllIssueTypeSchemes"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getAllPermissionSchemes",
+      "target": "$.paths[\"/rest/api/3/permissionscheme\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin permission-scheme",
+            "verb": "list",
+            "invocation": "api call getAllPermissionSchemes"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getAllPermissions",
+      "target": "$.paths[\"/rest/api/3/permissions\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin permission",
+            "verb": "list",
+            "invocation": "api call getAllPermissions"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getAllProjectCategories",
+      "target": "$.paths[\"/rest/api/3/projectCategory\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin category",
+            "verb": "list",
+            "invocation": "api call getAllProjectCategories"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getAllScreenTabFields",
+      "target": "$.paths[\"/rest/api/3/screens/{screenId}/tabs/{tabId}/fields\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin screen",
+            "verb": "fields",
+            "invocation": "api call getAllScreenTabFields --screenId SCREEN_ID --tabId TAB_ID --projectKey PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getAllScreenTabs",
+      "target": "$.paths[\"/rest/api/3/screens/{screenId}/tabs\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin screen",
+            "verb": "tabs",
+            "invocation": "api call getAllScreenTabs --screenId SCREEN_ID --projectKey PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getAllWorkflowSchemes",
+      "target": "$.paths[\"/rest/api/3/workflowscheme\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin workflow-scheme",
+            "verb": "list",
+            "invocation": "api call getAllWorkflowSchemes"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getAttachmentContent",
+      "target": "$.paths[\"/rest/api/3/attachment/content/{id}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "collaborate attachment",
+            "verb": "download",
+            "invocation": "api call getAttachmentContent --id ID",
+            "note": "Single indexed operation or prerequisite-only chain; use the generic surface. Jira multipart/binary enrichment remains pending JAS-65; this indexed pointer does not claim completed attachment transport."
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getChangeLogs",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/changelog\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "collaborate",
+            "verb": "activity",
+            "invocation": "api call getChangeLogs --issueIdOrKey ISSUE_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getCreateIssueMetaIssueTypeId",
+      "target": "$.paths[\"/rest/api/3/issue/createmeta/{projectIdOrKey}/issuetypes/{issueTypeId}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "fields",
+            "verb": "check-project",
+            "invocation": "api call getCreateIssueMetaIssueTypeId --projectIdOrKey PROJECT_KEY --issueTypeId ISSUE_TYPE_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getFiltersPaginated",
+      "target": "$.paths[\"/rest/api/3/filter/search\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "search filter",
+            "verb": "list",
+            "invocation": "api call getFiltersPaginated --projectId PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getIssue",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "agile epic",
+            "verb": "get",
+            "invocation": "api call getIssue --issueIdOrKey ISSUE_KEY"
+          },
+          {
+            "group": "collaborate attachment",
+            "verb": "list",
+            "invocation": "api call getIssue --issueIdOrKey ISSUE_KEY"
+          },
+          {
+            "group": "relationships",
+            "verb": "get-blockers",
+            "invocation": "api call getIssue --issueIdOrKey ISSUE_KEY"
+          },
+          {
+            "group": "relationships",
+            "verb": "get-dependencies",
+            "invocation": "api call getIssue --issueIdOrKey ISSUE_KEY"
+          },
+          {
+            "group": "time",
+            "verb": "tracking",
+            "invocation": "api call getIssue --issueIdOrKey ISSUE_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getIssueAllTypes",
+      "target": "$.paths[\"/rest/api/3/issuetype\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin issue-type",
+            "verb": "list",
+            "invocation": "api call getIssueAllTypes"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getIssueType",
+      "target": "$.paths[\"/rest/api/3/issuetype/{id}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin issue-type",
+            "verb": "get",
+            "invocation": "api call getIssueType --id ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getIssueTypeSchemeForProjects",
+      "target": "$.paths[\"/rest/api/3/issuetypescheme/project\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin issue-type-scheme",
+            "verb": "project",
+            "invocation": "api call getIssueTypeSchemeForProjects --projectId PROJECT_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getIssueWatchers",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/watchers\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "collaborate",
+            "verb": "watchers",
+            "invocation": "api call getIssueWatchers --issueIdOrKey ISSUE_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getIssueWorklog",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "time",
+            "verb": "worklogs",
+            "invocation": "api call getIssueWorklog --issueIdOrKey ISSUE_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getMyPermissions",
+      "target": "$.paths[\"/rest/api/3/mypermissions\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin permission",
+            "verb": "check",
+            "invocation": "api call getMyPermissions"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getNotificationScheme",
+      "target": "$.paths[\"/rest/api/3/notificationscheme/{id}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin notification-scheme",
+            "verb": "get",
+            "invocation": "api call getNotificationScheme --id ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getNotificationSchemes",
+      "target": "$.paths[\"/rest/api/3/notificationscheme\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin notification-scheme",
+            "verb": "list",
+            "invocation": "api call getNotificationSchemes --projectId PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getPermissionScheme",
+      "target": "$.paths[\"/rest/api/3/permissionscheme/{schemeId}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin permission-scheme",
+            "verb": "get",
+            "invocation": "api call getPermissionScheme --schemeId SCHEME_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getProject",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin project",
+            "verb": "get",
+            "invocation": "api call getProject --projectIdOrKey PROJECT_KEY"
+          },
+          {
+            "group": "admin config",
+            "verb": "get",
+            "invocation": "api call getProject --projectIdOrKey PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getProjectComponents",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/components\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "lifecycle component",
+            "verb": "list",
+            "invocation": "api call getProjectComponents --projectIdOrKey PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getProjectVersions",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/versions\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "lifecycle version",
+            "verb": "list",
+            "invocation": "api call getProjectVersions --projectIdOrKey PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getScreenSchemes",
+      "target": "$.paths[\"/rest/api/3/screenscheme\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin screen-scheme",
+            "verb": "list",
+            "invocation": "api call getScreenSchemes"
+          },
+          {
+            "group": "admin screen-scheme",
+            "verb": "get",
+            "invocation": "api call getScreenSchemes"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getScreens",
+      "target": "$.paths[\"/rest/api/3/screens\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin screen",
+            "verb": "list",
+            "invocation": "api call getScreens"
+          },
+          {
+            "group": "admin screen",
+            "verb": "get",
+            "invocation": "api call getScreens"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getStatuses",
+      "target": "$.paths[\"/rest/api/3/status\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin status",
+            "verb": "list",
+            "invocation": "api call getStatuses"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getTransitions",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/transitions\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "issue",
+            "verb": "transitions",
+            "invocation": "api call getTransitions --issueIdOrKey ISSUE_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getUser",
+      "target": "$.paths[\"/rest/api/3/user\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin user",
+            "verb": "get",
+            "invocation": "api call getUser"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getUsersFromGroup",
+      "target": "$.paths[\"/rest/api/3/group/member\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin group",
+            "verb": "members",
+            "invocation": "api call getUsersFromGroup"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getWorkflowScheme",
+      "target": "$.paths[\"/rest/api/3/workflowscheme/{id}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin workflow-scheme",
+            "verb": "get",
+            "invocation": "api call getWorkflowScheme --id ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getWorkflowsPaginated",
+      "target": "$.paths[\"/rest/api/3/workflow/search\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin workflow",
+            "verb": "list",
+            "invocation": "api call getWorkflowsPaginated"
+          },
+          {
+            "group": "admin workflow",
+            "verb": "get",
+            "invocation": "api call getWorkflowsPaginated"
+          },
+          {
+            "group": "admin workflow",
+            "verb": "search",
+            "invocation": "api call getWorkflowsPaginated"
+          },
+          {
+            "group": "admin workflow",
+            "verb": "for-issue",
+            "invocation": "api call getWorkflowsPaginated"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_notify",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/notify\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "collaborate",
+            "verb": "notify",
+            "invocation": "api call notify --issueIdOrKey ISSUE_KEY --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_parseJqlQueries",
+      "target": "$.paths[\"/rest/api/3/jql/parse\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "search",
+            "verb": "validate",
+            "invocation": "api call parseJqlQueries --validation VALIDATION --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_removeGroup",
+      "target": "$.paths[\"/rest/api/3/group\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin group",
+            "verb": "delete",
+            "invocation": "api call removeGroup"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_removeNotificationFromNotificationScheme",
+      "target": "$.paths[\"/rest/api/3/notificationscheme/{notificationSchemeId}/notification/{notificationId}\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin notification",
+            "verb": "remove",
+            "invocation": "api call removeNotificationFromNotificationScheme --notificationSchemeId NOTIFICATION_SCHEME_ID --notificationId NOTIFICATION_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_removeScreenTabField",
+      "target": "$.paths[\"/rest/api/3/screens/{screenId}/tabs/{tabId}/fields/{id}\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin screen",
+            "verb": "remove-field",
+            "invocation": "api call removeScreenTabField --screenId SCREEN_ID --tabId TAB_ID --id ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_removeUserFromGroup",
+      "target": "$.paths[\"/rest/api/3/group/user\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin group",
+            "verb": "remove-user",
+            "invocation": "api call removeUserFromGroup --accountId ACCOUNT_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_restore",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}/restore\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin project",
+            "verb": "restore",
+            "invocation": "api call restore --projectIdOrKey PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_searchAndReconsileIssuesUsingJql",
+      "target": "$.paths[\"/rest/api/3/search/jql\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm request",
+            "verb": "list",
+            "invocation": "api call searchAndReconsileIssuesUsingJql --jql PROJECT_KEY"
+          },
+          {
+            "group": "search filter",
+            "verb": "run",
+            "invocation": "api call searchAndReconsileIssuesUsingJql --jql PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_searchProjects",
+      "target": "$.paths[\"/rest/api/3/project/search\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin project",
+            "verb": "list",
+            "invocation": "api call searchProjects"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_setFavouriteForFilter",
+      "target": "$.paths[\"/rest/api/3/filter/{id}/favourite\"].put",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "search filter",
+            "verb": "favourite",
+            "invocation": "api call setFavouriteForFilter --id ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_switchWorkflowSchemeForProject",
+      "target": "$.paths[\"/rest/api/3/workflowscheme/project/switch\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin workflow-scheme",
+            "verb": "assign",
+            "invocation": "api call switchWorkflowSchemeForProject --body @body.json --project PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_updateComment",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/comment/{id}\"].put",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "collaborate comment",
+            "verb": "update",
+            "invocation": "api call updateComment --issueIdOrKey ISSUE_KEY --id ID --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_updateComponent",
+      "target": "$.paths[\"/rest/api/3/component/{id}\"].put",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "lifecycle component",
+            "verb": "update",
+            "invocation": "api call updateComponent --id ID --body @body.json --project PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_updateFilter",
+      "target": "$.paths[\"/rest/api/3/filter/{id}\"].put",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "search filter",
+            "verb": "update",
+            "invocation": "api call updateFilter --id ID --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_updateIssueType",
+      "target": "$.paths[\"/rest/api/3/issuetype/{id}\"].put",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin issue-type",
+            "verb": "update",
+            "invocation": "api call updateIssueType --id ID --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_updateProject",
+      "target": "$.paths[\"/rest/api/3/project/{projectIdOrKey}\"].put",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "admin project",
+            "verb": "update",
+            "invocation": "api call updateProject --projectIdOrKey PROJECT_KEY --body @body.json"
+          },
+          {
+            "group": "admin category",
+            "verb": "assign",
+            "invocation": "api call updateProject --projectIdOrKey PROJECT_KEY --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_updateVersion",
+      "target": "$.paths[\"/rest/api/3/version/{id}\"].put",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "lifecycle version",
+            "verb": "release",
+            "invocation": "api call updateVersion --id ID --body @body.json --project PROJECT_KEY"
+          },
+          {
+            "group": "lifecycle version",
+            "verb": "archive",
+            "invocation": "api call updateVersion --id ID --body @body.json --project PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_updateWorklog",
+      "target": "$.paths[\"/rest/api/3/issue/{issueIdOrKey}/worklog/{id}\"].put",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "time",
+            "verb": "update-worklog",
+            "invocation": "api call updateWorklog --issueIdOrKey ISSUE_KEY --id ID --body @body.json"
+          }
+        ]
+      }
+    }
+  ]
+}

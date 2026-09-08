@@ -271,11 +271,9 @@ Discovery and responder mode need no credentials. HTTP calls use the existing
 `JIRA_SITE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` and configuration chain only
 when a call is sent. `JIRA_AS_TRANSPORT` selects `http`, `responder`, `cassette`
 (with `JIRA_AS_CASSETTE`), or `simulation` (optional `JIRA_AS_SIMULATION_SEED`).
-`JIRA_AS_RECORD` records HTTP responses through the shared scrubber. Cassette
-and simulation content will follow in the Jira migration. The existing legacy
-groups and `JIRA_MOCK_MODE` remain available. Project guard enrichment is the
-next migration step (JAS-46); rich-text tags follow in JAS-47. Risk-tagged
-operations preview without sending until `--confirm` is supplied.
+`JIRA_AS_RECORD` records HTTP responses through the shared scrubber. Simulation
+is stateful for the supported wrapper workflows. Risk-tagged operations preview
+without sending until `--confirm` is supplied.
 
 Published operation IDs that collide are corrected in each document's
 `identity.overlay.json`; descriptions/notes preserve their original names and
@@ -294,6 +292,38 @@ Site-level calls (including numeric board, sprint and service-desk routes) requi
 `JIRA_ALLOW_SITE_OPERATIONS=true`; the default is false. Discovery and help stay
 settings-free. See [project scope details](docs/allowed-projects.md#generic-surface-project-scope-20).
 
+### Wrapper migration
+
+JAS-49 retains 35 wrappers that need a workflow, local transform, cache, or
+autocomplete affordance; 14 compatibility verbs retain their 1.x names. The
+remaining 143 wrappers are migration hints: invoking one performs no transport,
+prints the indexed replacement, and exits 2; `--help` exits 0. Use `help
+migration` or [the wrapper table](docs/wrapper-verbs.md) for the complete map.
+
+The survivor groups are bulk, lifecycle, fields, ops, relationships, search,
+time, dev, agile, and JSM. `fields list`, `fields get`, and `fields cache warm`
+use the v2 cached instance metadata. `api call --adf-field customfield_ID`
+explicitly converts Markdown to ADF; a warm textarea-field cache enables the
+same conversion automatically. Stateful simulation exercises supported survivor
+workflows without HTTP.
+
+Sixteen commands remain on the legacy client pending JAS-64: admin automation
+and automation-template, `dev get-commits`, and JSM asset commands. Jira
+attachment multipart/binary transport and generic risk enrichment remain pending
+JAS-65; their migration hints do not claim those capabilities are available.
+
+### Instance fields cache
+
+`fields cache warm` fetches instance metadata into
+`~/.cache/jira-as/v2/instance-fields.json`, with a 24-hour TTL. Set
+`JIRA_FIELDS_CACHE_DIR` (or `jira.fields_cache_dir` in configuration) to select
+the directory; use separate directories for different Jira instances. Reads
+never fetch metadata or migrate a 1.x cache. Missing, expired, or malformed
+metadata is cold: `fields list` reports it, and `api describe createIssue`
+explains that automatic textarea conversion is inactive. Explicit
+`api call createIssue --adf-field customfield_ID …` still works with a cold
+cache. For an offline warm-up, use `fields cache warm --transport responder`.
+
 ### Rich text and notes
 
 Platform v3 description/environment, comment body and worklog comment paths
@@ -310,11 +340,13 @@ jira-as api --transport responder call addComment \
 Tagged reads render Markdown with lossless placeholders for unsupported ADF
 nodes; `--raw` preserves the stored ADF. Use a JSON `--body @request.json` or
 stdin for already encoded ADF or an explicit null. Bulk create converts the
-static paths in each `issueUpdates` item supplied as JSON. Custom fields pass
-through unchanged: textarea fields require ADF, while automatic instance
-resolution and a per-call override are deferred to JAS-49. JSM request fields
-also pass through unchanged; its explicit `isAdfRequest=true` mode requires
-caller-supplied ADF. JSM request comments remain strings.
+static paths in each `issueUpdates` item supplied as JSON. Use `--adf-field
+customfield_ID` to convert a selected custom field; a warm instance-field cache
+also converts textarea custom fields automatically. A cold cache leaves
+unselected custom fields literal, and pre-encoded ADF passes through unchanged.
+JSM request fields also pass through unchanged; its explicit
+`isAdfRequest=true` mode requires caller-supplied ADF. JSM request comments
+remain strings.
 
 `help adf`, `help fields`, `help project-types`, `help rate-limits` and the other
 topics render source-backed entries. `api describe` and errors carry relevant

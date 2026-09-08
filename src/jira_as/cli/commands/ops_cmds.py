@@ -15,7 +15,8 @@ import click
 
 from jira_as import JiraCache, get_agile_fields, get_jira_client
 
-from ..cli_utils import format_json, get_client_from_context, handle_jira_errors
+from ..cli_utils import format_json, handle_jira_errors
+from .bulk_cmds import workflow_call, workflow_surface
 
 if TYPE_CHECKING:
     from jira_as import JiraClient
@@ -1008,6 +1009,304 @@ def _format_discover_project(context: dict) -> str:
     return "\n".join(lines)
 
 
+def _surface_warm(
+    surface, projects, fields, users, warm_all, project_keys, issue_keys, cache_dir
+):
+    from jira_as import validate_issue_key, validate_project_key
+
+    project_keys = [validate_project_key(key) for key in project_keys]
+    issue_keys = [validate_issue_key(key) for key in issue_keys]
+    if users and (not project_keys or not issue_keys):
+        raise click.UsageError(
+            "--users requires --project and --issue-key; the indexed user lookup is scoped by issue key"
+        )
+    if users and any(key.rsplit("-", 1)[0] not in project_keys for key in issue_keys):
+        raise click.UsageError("Every --issue-key must belong to an explicit --project")
+    cache = JiraCache(cache_dir=cache_dir)
+    warmed, total = [], 0
+
+    def persist(rows, category, prefix):
+        nonlocal total
+        row_prefix = {
+            "projects": (),
+            "fields": (),
+            "issue_types": ("issuetype",),
+            "priorities": ("priority",),
+        }.get(prefix, (prefix,))
+        all_prefix = {
+            "projects": None,
+            "fields": (),
+            "issue_types": ("issuetypes",),
+            "priorities": ("priorities",),
+        }.get(prefix, (prefix,))
+        for row in rows:
+            identity = row.get("key", row.get("id", row.get("accountId")))
+            cache.set(
+                cache.generate_key(category, *row_prefix, str(identity)),
+                row,
+                category=category,
+            )
+        if all_prefix is not None:
+            cache.set(
+                cache.generate_key(category, *all_prefix, "all"),
+                rows,
+                category=category,
+            )
+        warmed.append(prefix)
+        total += len(rows)
+
+    if projects or warm_all:
+        parameters = {"keys": project_keys} if project_keys else {}
+        persist(
+            workflow_call(surface, "searchProjects", parameters, all_pages=True),
+            "project",
+            "projects",
+        )
+    if fields or warm_all:
+        for name, operation in (
+            ("fields", "getFields"),
+            ("issue_types", "getIssueAllTypes"),
+            ("priorities", "getPriorities"),
+        ):
+            persist(workflow_call(surface, operation), "field", name)
+    if users:
+        for key in issue_keys:
+            rows = workflow_call(
+                surface,
+                "findAssignableUsers",
+                {"issueKey": key, "project": key.rsplit("-", 1)[0], "maxResults": 1000},
+            )
+            persist(rows, "user", key)
+    stats = cache.get_stats()
+    return {
+        "total_cached": total,
+        "warmed": warmed,
+        "cache_size_bytes": stats.total_size_bytes,
+        "entry_count": stats.entry_count,
+    }
+
+
+def _surface_discover(surface, project_key, sample_size, sample_period_days, verbose):
+    from jira_as import validate_project_key
+
+    project_key = validate_project_key(project_key)
+    if sample_size < 1 or sample_period_days < 1:
+        raise click.BadParameter("Sample size and days must be positive")
+    project = workflow_call(
+        surface,
+        "getProject",
+        {"projectIdOrKey": project_key, "expand": "lead,description"},
+    )
+    statuses = workflow_call(surface, "getAllStatuses", {"projectIdOrKey": project_key})
+    metadata = {
+        "project_key": project_key,
+        "project_name": project.get("name", project_key),
+        "project_type": project.get("projectTypeKey", "software"),
+        "is_team_managed": project.get("simplified", False),
+        "project_lead": project.get("lead"),
+        "issue_types": [
+            {
+                "id": item.get("id"),
+                "name": item.get("name"),
+                "subtask": item.get("subtask", False),
+                "statuses": [status.get("name") for status in item.get("statuses", [])],
+            }
+            for item in statuses
+        ],
+        "components": workflow_call(
+            surface, "getProjectComponents", {"projectIdOrKey": project_key}
+        ),
+        "versions": workflow_call(
+            surface, "getProjectVersions", {"projectIdOrKey": project_key}
+        ),
+    }
+    patterns = _surface_patterns(
+        surface, project_key, sample_size, sample_period_days, verbose
+    )
+    return {"metadata": metadata, "patterns": patterns}
+
+
+def _surface_patterns(
+    surface,
+    project_key: str,
+    sample_size: int = 100,
+    sample_period_days: int = 30,
+    verbose: bool = False,
+) -> dict[str, Any]:
+    """Analyze recent issues to discover usage patterns."""
+    if verbose:
+        click.echo(
+            f"Discovering patterns (last {sample_period_days} days, up to {sample_size} issues)..."
+        )
+
+    patterns: dict[str, Any] = {
+        "project_key": project_key,
+        "sample_size": 0,
+        "sample_period_days": sample_period_days,
+        "discovered_at": datetime.now(timezone.utc).isoformat() + "Z",
+        "by_issue_type": {},
+        "common_labels": [],
+        "top_assignees": [],
+    }
+
+    # Build JQL for recent issues
+    since_date = (
+        datetime.now(timezone.utc) - timedelta(days=sample_period_days)
+    ).strftime("%Y-%m-%d")
+    jql = (
+        f'project = "{project_key}" AND created >= "{since_date}" ORDER BY created DESC'
+    )
+
+    story_points_field = get_agile_fields(project_key=project_key)["story_points"]
+    fields = [
+        "issuetype",
+        "assignee",
+        "reporter",
+        "priority",
+        "labels",
+        "components",
+        "status",
+        "parent",
+        "fixVersions",
+        "duedate",
+        "description",
+        story_points_field,
+    ]
+
+    issues = workflow_call(
+        surface,
+        "searchAndReconsileIssuesUsingJql",
+        {"jql": jql, "fields": fields, "maxResults": min(sample_size, 100)},
+        all_pages=True,
+        limit=sample_size,
+        raw=True,
+    )
+    patterns["sample_size"] = len(issues)
+
+    if not issues:
+        return patterns
+
+    # Aggregate by issue type
+    by_type: dict[str, dict] = defaultdict(
+        lambda: {
+            "issue_count": 0,
+            "assignees": defaultdict(lambda: {"count": 0, "display_name": ""}),
+            "labels": defaultdict(int),
+            "components": defaultdict(int),
+            "priorities": defaultdict(int),
+            "story_points": [],
+        }
+    )
+
+    all_labels: dict[str, int] = defaultdict(int)
+    all_assignees: dict[str, dict] = defaultdict(
+        lambda: {"count": 0, "display_name": ""}
+    )
+
+    for issue in issues:
+        fields_data = issue.get("fields", {})
+        issue_type = fields_data.get("issuetype", {}).get("name", "Unknown")
+
+        type_data = by_type[issue_type]
+        type_data["issue_count"] += 1
+
+        # Assignee
+        assignee = fields_data.get("assignee")
+        if assignee:
+            account_id = assignee.get("accountId", "unknown")
+            display_name = assignee.get("displayName", "Unknown")
+            type_data["assignees"][account_id]["count"] += 1
+            type_data["assignees"][account_id]["display_name"] = display_name
+            all_assignees[account_id]["count"] += 1
+            all_assignees[account_id]["display_name"] = display_name
+
+        # Labels
+        labels = fields_data.get("labels", [])
+        for label in labels:
+            type_data["labels"][label] += 1
+            all_labels[label] += 1
+
+        # Components
+        components = fields_data.get("components", [])
+        for comp in components:
+            comp_name = comp.get("name", "Unknown")
+            type_data["components"][comp_name] += 1
+
+        # Priority
+        priority = fields_data.get("priority")
+        if priority:
+            priority_name = priority.get("name", "Unknown")
+            type_data["priorities"][priority_name] += 1
+
+        # Story points
+        story_points = fields_data.get(story_points_field)
+        if story_points is not None:
+            type_data["story_points"].append(story_points)
+
+    # Convert to final format
+    for type_name, type_data in by_type.items():
+        issue_count = type_data["issue_count"]
+
+        assignees = {}
+        for account_id, data in type_data["assignees"].items():
+            assignees[account_id] = {
+                "display_name": data["display_name"],
+                "count": data["count"],
+                "percentage": round(data["count"] / issue_count * 100, 1),
+            }
+
+        priorities = {}
+        for priority_name, count in type_data["priorities"].items():
+            priorities[priority_name] = {
+                "count": count,
+                "percentage": round(count / issue_count * 100, 1),
+            }
+
+        story_points_list = type_data["story_points"]
+        story_points_info = {}
+        if story_points_list:
+            story_points_info = {
+                "avg": round(sum(story_points_list) / len(story_points_list), 1),
+            }
+
+        patterns["by_issue_type"][type_name] = {
+            "issue_count": issue_count,
+            "assignees": assignees,
+            "labels": dict(type_data["labels"]),
+            "components": dict(type_data["components"]),
+            "priorities": priorities,
+            "story_points": story_points_info,
+        }
+
+    # Common labels
+    sorted_labels = sorted(all_labels.items(), key=lambda x: x[1], reverse=True)
+    patterns["common_labels"] = [label for label, _ in sorted_labels[:20]]
+
+    # Top assignees
+    sorted_assignees = sorted(
+        all_assignees.items(), key=lambda x: x[1]["count"], reverse=True
+    )
+    patterns["top_assignees"] = [
+        {
+            "account_id": account_id,
+            "display_name": data["display_name"],
+            "total_assignments": data["count"],
+        }
+        for account_id, data in sorted_assignees[:20]
+    ]
+
+    patterns["field_fill_rates"] = _analyze_field_fill_rates(issues, fields)
+    patterns["value_distributions"] = _analyze_value_distributions(issues)
+    patterns["parent_hierarchy"] = _analyze_parent_hierarchy(issues)
+
+    if verbose:
+        click.echo(
+            f"  Found {len(patterns['by_issue_type'])} issue types with patterns"
+        )
+
+    return patterns
+
+
 # =============================================================================
 # CLI Commands
 # =============================================================================
@@ -1097,6 +1396,17 @@ def ops_cache_clear(
 
 
 @ops.command(name="cache-warm")
+@click.option("--transport", type=click.Choice(["simulation", "responder", "http"]))
+@click.option(
+    "--project", "project_keys", multiple=True, help="Select project keys (repeatable)"
+)
+@click.option(
+    "--issue-key",
+    "issue_keys",
+    multiple=True,
+    help="Issue scope for assignable user lookup (repeatable)",
+)
+@click.option("--cache-dir", type=click.Path(file_okay=False))
 @click.option("--projects", is_flag=True, help="Cache project list")
 @click.option("--fields", is_flag=True, help="Cache field definitions")
 @click.option(
@@ -1115,27 +1425,26 @@ def ops_cache_warm(
     warm_all: bool,
     verbose: bool,
     output_json: bool,
+    transport,
+    project_keys,
+    issue_keys,
+    cache_dir,
 ):
     """Pre-warm cache with commonly accessed data."""
     if not any([projects, fields, users, warm_all]):
         click.echo("Error: At least one warming option is required", err=True)
         ctx.exit(1)
 
-    if users:
-        click.echo(
-            "User caching requires a project context. Use search scripts instead.",
-            err=True,
-        )
-        return
-
-    client = get_client_from_context(ctx)
-    result = _cache_warm_impl(
+    surface = workflow_surface(transport)
+    result = _surface_warm(
+        surface,
         projects=projects,
         fields=fields,
         users=users,
         warm_all=warm_all,
-        verbose=verbose,
-        client=client,
+        project_keys=project_keys,
+        issue_keys=issue_keys,
+        cache_dir=cache_dir,
     )
 
     if result.get("errors"):
@@ -1154,6 +1463,7 @@ def ops_cache_warm(
 
 
 @ops.command(name="discover-project")
+@click.option("--transport", type=click.Choice(["simulation", "responder", "http"]))
 @click.argument("project_key")
 @click.option(
     "--sample-size",
@@ -1180,15 +1490,16 @@ def ops_discover_project(
     days: int,
     output: str,
     verbose: bool,
+    transport,
 ):
     """Discover project configuration and capabilities."""
-    client = get_client_from_context(ctx)
-    result = _discover_project_impl(
+    surface = workflow_surface(transport)
+    result = _surface_discover(
+        surface,
         project_key=project_key,
         sample_size=sample_size,
         sample_period_days=days,
         verbose=verbose,
-        client=client,
     )
 
     if output == "json":

@@ -148,6 +148,10 @@ class AutocompleteCache:
             List of field definition dicts
         """
         if not force_refresh:
+            instance_fields = InstanceFieldsCache().read()
+            if instance_fields is not None:
+                return instance_fields
+        if not force_refresh:
             cached = self._cache.get(self.KEY_FIELDS_LIST, category="field")
             if cached:
                 return cached
@@ -363,3 +367,92 @@ def get_autocomplete_cache() -> AutocompleteCache:
             if _autocomplete_cache is None:
                 _autocomplete_cache = AutocompleteCache()
     return _autocomplete_cache
+
+
+class InstanceFieldsCache:
+    """Explicit v2 instance metadata; reads never fetch or migrate old caches."""
+
+    def __init__(self, directory=None, *, ttl_seconds: int = 86400):
+        from pathlib import Path
+
+        if directory is None:
+            from jira_as.config_manager import ConfigManager
+
+            directory = ConfigManager.get_instance().get_fields_cache_directory()
+        self.path = Path(directory).expanduser() / "instance-fields.json"
+        self.ttl_seconds = ttl_seconds
+
+    @staticmethod
+    def validate(value: Any) -> list[dict[str, Any]]:
+        from copy import deepcopy
+
+        if not isinstance(value, list):
+            raise ValueError("instance fields must be an array")
+        seen = set()
+        for row in value:
+            if (
+                not isinstance(row, dict)
+                or not isinstance(row.get("id"), str)
+                or not row["id"]
+                or not isinstance(row.get("name"), str)
+                or not isinstance(row.get("schema", {}), dict)
+                or row["id"] in seen
+            ):
+                raise ValueError("invalid or duplicate instance field metadata")
+            seen.add(row["id"])
+        return deepcopy(value)
+
+    def read(self) -> list[dict[str, Any]] | None:
+        import json
+        import math
+
+        try:
+            value = json.loads(self.path.read_text(encoding="utf-8"))
+            if not isinstance(value, dict) or value.get("version") != 2:
+                return None
+            fetched = value["fetched_at"]
+            if (
+                type(fetched) not in (int, float)
+                or not math.isfinite(fetched)
+                or not 0 <= time.time() - fetched < self.ttl_seconds
+            ):
+                return None
+            return self.validate(value["fields"])
+        except (OSError, ValueError, KeyError, TypeError):
+            return None
+
+    def write(self, fields: Any) -> list[dict[str, Any]]:
+        import json
+        import os
+        import tempfile
+
+        checked = self.validate(fields)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        descriptor, temporary = tempfile.mkstemp(
+            prefix=".instance-fields-", dir=self.path.parent
+        )
+        try:
+            with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+                json.dump(
+                    {"version": 2, "fetched_at": time.time(), "fields": checked}, stream
+                )
+                stream.write("\n")
+            os.replace(temporary, self.path)
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
+        saved = self.read()
+        if saved != checked:
+            raise ValueError("instance fields cache read-back differs")
+        return saved
+
+    def textarea_fields(self) -> tuple[str, ...]:
+        import re
+
+        return tuple(
+            row["id"]
+            for row in self.read() or []
+            if re.fullmatch(r"customfield_[0-9]+", row["id"])
+            and row.get("schema", {}).get("custom")
+            == "com.atlassian.jira.plugin.system.customfieldtypes:textarea"
+        )

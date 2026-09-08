@@ -19,13 +19,9 @@ from jira_as.cli.commands.fields_cmds import (
     AGILE_PATTERNS,
     FIELD_TYPES,
     _add_field_to_screen,
-    _check_project_fields_impl,
-    _configure_agile_fields_impl,
-    _create_field_impl,
     _find_agile_fields,
     _find_project_screens,
     _format_agile_config,
-    _format_created_field,
     _format_fields_list,
     _format_project_fields,
     _list_fields_impl,
@@ -262,63 +258,6 @@ class TestListFieldsImpl:
 # =============================================================================
 
 
-@pytest.mark.unit
-class TestCreateFieldImpl:
-    """Tests for the _create_field_impl implementation function."""
-
-    def test_create_field_text(self, mock_jira_client, sample_created_field):
-        """Test creating a text field."""
-        mock_jira_client.post.return_value = deepcopy(sample_created_field)
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _create_field_impl(name="Custom Text Field", field_type="text")
-
-        assert result["id"] == "customfield_10005"
-        mock_jira_client.post.assert_called_once()
-        call_args = mock_jira_client.post.call_args
-        assert call_args[1]["data"]["name"] == "Custom Text Field"
-        mock_jira_client.__enter__.assert_called_once()
-        mock_jira_client.__exit__.assert_called_once()
-
-    def test_create_field_with_description(
-        self, mock_jira_client, sample_created_field
-    ):
-        """Test creating a field with description."""
-        mock_jira_client.post.return_value = deepcopy(sample_created_field)
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            _create_field_impl(
-                name="Custom Text Field",
-                field_type="text",
-                description="A custom text field",
-            )
-
-        call_args = mock_jira_client.post.call_args
-        assert "description" in call_args[1]["data"]
-        assert call_args[1]["data"]["description"] == "A custom text field"
-
-    def test_create_field_invalid_type(self, mock_jira_client):
-        """Test that invalid field type raises ValidationError."""
-        from jira_as import ValidationError
-
-        with (
-            patch(
-                "jira_as.cli.commands.fields_cmds.get_jira_client",
-                return_value=mock_jira_client,
-            ),
-            pytest.raises(ValidationError, match="Invalid field type"),
-        ):
-            _create_field_impl(name="Test Field", field_type="invalid_type")
-
-        mock_jira_client.post.assert_not_called()
-
-
 # =============================================================================
 # Check Project Fields Implementation Tests
 # =============================================================================
@@ -369,225 +308,10 @@ class TestCheckProjectFieldsImpl:
             ]
         }
 
-    def test_check_project_fields_basic(
-        self,
-        mock_jira_client,
-        sample_project_classic,
-        sample_issuetypes_meta,
-        sample_fields_meta_task,
-        sample_fields_meta_bug,
-    ):
-        """Test checking project fields."""
-        mock_jira_client.get.return_value = deepcopy(sample_project_classic)
-        mock_jira_client.get_create_issue_meta_issuetypes.return_value = deepcopy(
-            sample_issuetypes_meta
-        )
-        mock_jira_client.get_create_issue_meta_fields.side_effect = [
-            deepcopy(sample_fields_meta_task),
-            deepcopy(sample_fields_meta_bug),
-        ]
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _check_project_fields_impl(project_key="PROJ")
-
-        assert result["project_key"] == "PROJ"
-        assert result["project"]["key"] == "PROJ"
-        assert result["is_team_managed"] is False
-        assert len(result["issue_types"]) == 2
-        mock_jira_client.__enter__.assert_called_once()
-        mock_jira_client.__exit__.assert_called_once()
-
-    def test_check_project_fields_team_managed(
-        self,
-        mock_jira_client,
-        sample_project_nextgen,
-        sample_issuetypes_meta,
-        sample_fields_meta_task,
-        sample_fields_meta_bug,
-    ):
-        """Test checking team-managed project fields."""
-        mock_jira_client.get.return_value = deepcopy(sample_project_nextgen)
-        mock_jira_client.get_create_issue_meta_issuetypes.return_value = deepcopy(
-            sample_issuetypes_meta
-        )
-        mock_jira_client.get_create_issue_meta_fields.side_effect = [
-            deepcopy(sample_fields_meta_task),
-            deepcopy(sample_fields_meta_bug),
-        ]
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _check_project_fields_impl(project_key="TEAM")
-
-        assert result["is_team_managed"] is True
-
-    def test_check_project_fields_with_agile(
-        self,
-        mock_jira_client,
-        sample_project_classic,
-        sample_issuetypes_meta,
-        sample_fields_meta_task,
-        sample_fields_meta_bug,
-    ):
-        """Test checking project fields with Agile check."""
-        mock_jira_client.get.return_value = deepcopy(sample_project_classic)
-        mock_jira_client.get_create_issue_meta_issuetypes.return_value = deepcopy(
-            sample_issuetypes_meta
-        )
-        mock_jira_client.get_create_issue_meta_fields.side_effect = [
-            deepcopy(sample_fields_meta_task),
-            deepcopy(sample_fields_meta_bug),
-        ]
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _check_project_fields_impl(project_key="PROJ", check_agile=True)
-
-        assert "agile_fields" in result
-        # Story Points should be found
-        assert result["agile_fields"]["story_points"] is not None
-
-    def test_check_project_fields_specific_issue_type(
-        self, mock_jira_client, sample_project_classic, sample_fields_meta_task
-    ):
-        """Test checking fields for specific issue type."""
-        # Only Task issue type returned (filtered)
-        sample_issuetypes_filtered = {
-            "values": [
-                {"id": "10001", "name": "Task", "description": "A task"},
-            ]
-        }
-        mock_jira_client.get.return_value = deepcopy(sample_project_classic)
-        mock_jira_client.get_create_issue_meta_issuetypes.return_value = (
-            sample_issuetypes_filtered
-        )
-        mock_jira_client.get_create_issue_meta_fields.return_value = deepcopy(
-            sample_fields_meta_task
-        )
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _check_project_fields_impl(project_key="PROJ", issue_type="Task")
-
-        # Should still work but pass issue type to API
-        assert result["project_key"] == "PROJ"
-        assert len(result["issue_types"]) == 1
-
 
 # =============================================================================
 # Configure Agile Fields Implementation Tests
 # =============================================================================
-
-
-@pytest.mark.unit
-class TestConfigureAgileFieldsImpl:
-    """Tests for the _configure_agile_fields_impl implementation function."""
-
-    def test_configure_agile_fields_dry_run(
-        self,
-        mock_jira_client,
-        sample_project_classic,
-        sample_fields,
-        sample_screens,
-    ):
-        """Test configure Agile fields with dry-run."""
-        mock_jira_client.get.side_effect = [
-            deepcopy(sample_project_classic),
-            deepcopy(sample_fields),  # For finding agile fields
-            deepcopy(sample_project_classic),  # For finding screens
-            {"values": []},  # No scheme mappings
-            deepcopy(sample_screens),
-        ]
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _configure_agile_fields_impl(project_key="PROJ", dry_run=True)
-
-        assert result["dry_run"] is True
-        assert result["project"] == "PROJ"
-        assert "fields_found" in result
-        mock_jira_client.__enter__.assert_called_once()
-        mock_jira_client.__exit__.assert_called_once()
-
-    def test_configure_agile_fields_team_managed_error(
-        self, mock_jira_client, sample_project_nextgen
-    ):
-        """Test that team-managed project raises ValidationError."""
-        from jira_as import ValidationError
-
-        mock_jira_client.get.return_value = deepcopy(sample_project_nextgen)
-
-        with (
-            patch(
-                "jira_as.cli.commands.fields_cmds.get_jira_client",
-                return_value=mock_jira_client,
-            ),
-            pytest.raises(ValidationError, match="team-managed"),
-        ):
-            _configure_agile_fields_impl(project_key="TEAM")
-
-    def test_configure_agile_fields_no_agile_fields_error(
-        self, mock_jira_client, sample_project_classic
-    ):
-        """Test error when no Agile fields found."""
-        from jira_as import ValidationError
-
-        mock_jira_client.get.side_effect = [
-            deepcopy(sample_project_classic),
-            [],  # No fields
-        ]
-
-        with (
-            patch(
-                "jira_as.cli.commands.fields_cmds.get_jira_client",
-                return_value=mock_jira_client,
-            ),
-            pytest.raises(ValidationError, match="No Agile fields found"),
-        ):
-            _configure_agile_fields_impl(project_key="PROJ")
-
-    def test_configure_agile_fields_with_explicit_ids(
-        self,
-        mock_jira_client,
-        sample_project_classic,
-        sample_fields,
-        sample_screens,
-        sample_screen_tabs,
-        sample_screen_fields,
-    ):
-        """Test configure with explicit field IDs."""
-        mock_jira_client.get.side_effect = [
-            deepcopy(sample_project_classic),
-            deepcopy(sample_fields),
-            deepcopy(sample_project_classic),
-            {"values": []},
-            deepcopy(sample_screens),
-            deepcopy(sample_screen_tabs),
-            deepcopy(sample_screen_fields),
-        ]
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _configure_agile_fields_impl(
-                project_key="PROJ",
-                story_points_id="customfield_99999",
-                dry_run=True,
-            )
-
-        assert result["fields_found"]["story_points"] == "customfield_99999"
 
 
 # =============================================================================
@@ -617,19 +341,6 @@ class TestFormatFieldsList:
         assert "Story Points" in result
         assert "Epic Link" in result
         assert "customfield_10001" in result
-
-
-@pytest.mark.unit
-class TestFormatCreatedField:
-    """Tests for the _format_created_field formatting function."""
-
-    def test_format_created_field(self, sample_created_field):
-        """Test formatting created field."""
-        result = _format_created_field(sample_created_field)
-
-        assert "Created field" in result
-        assert "Custom Text Field" in result
-        assert "customfield_10005" in result
 
 
 @pytest.mark.unit
@@ -737,193 +448,29 @@ class TestFormatAgileConfig:
 class TestFieldsListCommand:
     """Tests for the fields list CLI command."""
 
-    def test_fields_list_cli(self, cli_runner, mock_jira_client, sample_fields):
-        """Test CLI fields list command."""
-        mock_jira_client.get.return_value = deepcopy(sample_fields)
+    def test_fields_list_cli(self, generic_workflow, cli_runner):
+        result = cli_runner.invoke(fields, ["list"])
+        assert result.exit_code == 0, result.output
+        assert "Found 2 field(s)" in result.output
+        assert "Notes" in result.output
+        assert generic_workflow.calls == []
 
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(fields, ["list"])
+    def test_fields_list_cli_json(self, generic_workflow, cli_runner):
+        import json
 
-        assert result.exit_code == 0
-        assert "Found" in result.output
+        result = cli_runner.invoke(fields, ["list", "--output", "json"])
+        assert result.exit_code == 0, result.output
+        assert {row["id"] for row in json.loads(result.output)} == {
+            "customfield_10010",
+            "customfield_10016",
+        }
+        assert generic_workflow.calls == []
 
-    def test_fields_list_cli_json(self, cli_runner, mock_jira_client, sample_fields):
-        """Test CLI fields list with JSON output."""
-        mock_jira_client.get.return_value = deepcopy(sample_fields)
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(fields, ["list", "--output", "json"])
-
-        assert result.exit_code == 0
-        assert "[" in result.output  # JSON array
-
-    def test_fields_list_cli_agile(self, cli_runner, mock_jira_client, sample_fields):
-        """Test CLI fields list with --agile flag."""
-        mock_jira_client.get.return_value = deepcopy(sample_fields)
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(fields, ["list", "--agile"])
-
-        assert result.exit_code == 0
-
-
-@pytest.mark.unit
-class TestFieldsCreateCommand:
-    """Tests for the fields create CLI command."""
-
-    def test_fields_create_cli(
-        self, cli_runner, mock_jira_client, sample_created_field
-    ):
-        """Test CLI fields create command."""
-        mock_jira_client.post.return_value = deepcopy(sample_created_field)
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                fields, ["create", "--name", "Test Field", "--type", "text"]
-            )
-
-        assert result.exit_code == 0
-        assert "Created field" in result.output
-
-    def test_fields_create_cli_json(
-        self, cli_runner, mock_jira_client, sample_created_field
-    ):
-        """Test CLI fields create with JSON output."""
-        mock_jira_client.post.return_value = deepcopy(sample_created_field)
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                fields,
-                [
-                    "create",
-                    "--name",
-                    "Test Field",
-                    "--type",
-                    "text",
-                    "--output",
-                    "json",
-                ],
-            )
-
-        assert result.exit_code == 0
-        assert "{" in result.output  # JSON object
-
-
-@pytest.mark.unit
-class TestFieldsCheckProjectCommand:
-    """Tests for the fields check-project CLI command."""
-
-    def test_fields_check_project_cli(
-        self, cli_runner, mock_jira_client, sample_project_classic, sample_project_meta
-    ):
-        """Test CLI fields check-project command."""
-        mock_jira_client.get.side_effect = [
-            deepcopy(sample_project_classic),
-            deepcopy(sample_project_meta),
-        ]
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(fields, ["check-project", "PROJ"])
-
-        assert result.exit_code == 0
-        assert "Project: PROJ" in result.output
-
-    def test_fields_check_project_cli_with_agile(
-        self, cli_runner, mock_jira_client, sample_project_classic, sample_project_meta
-    ):
-        """Test CLI fields check-project with --check-agile flag."""
-        mock_jira_client.get.side_effect = [
-            deepcopy(sample_project_classic),
-            deepcopy(sample_project_meta),
-        ]
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                fields, ["check-project", "PROJ", "--check-agile"]
-            )
-
-        assert result.exit_code == 0
-        assert "Agile Field Availability" in result.output
-
-
-@pytest.mark.unit
-class TestFieldsConfigureAgileCommand:
-    """Tests for the fields configure-agile CLI command."""
-
-    def test_fields_configure_agile_cli_dry_run(
-        self,
-        cli_runner,
-        mock_jira_client,
-        sample_project_classic,
-        sample_fields,
-        sample_screens,
-    ):
-        """Test CLI fields configure-agile with dry-run."""
-        mock_jira_client.get.side_effect = [
-            deepcopy(sample_project_classic),
-            deepcopy(sample_fields),
-            deepcopy(sample_project_classic),
-            {"values": []},
-            deepcopy(sample_screens),
-        ]
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(fields, ["configure-agile", "PROJ", "--dry-run"])
-
-        assert result.exit_code == 0
-        assert "[DRY RUN]" in result.output
-
-    def test_fields_configure_agile_cli_json(
-        self,
-        cli_runner,
-        mock_jira_client,
-        sample_project_classic,
-        sample_fields,
-        sample_screens,
-    ):
-        """Test CLI fields configure-agile with JSON output."""
-        mock_jira_client.get.side_effect = [
-            deepcopy(sample_project_classic),
-            deepcopy(sample_fields),
-            deepcopy(sample_project_classic),
-            {"values": []},
-            deepcopy(sample_screens),
-        ]
-
-        with patch(
-            "jira_as.cli.commands.fields_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                fields, ["configure-agile", "PROJ", "--dry-run", "--output", "json"]
-            )
-
-        assert result.exit_code == 0
-        assert "{" in result.output
+    def test_fields_list_cli_agile(self, generic_workflow, cli_runner):
+        result = cli_runner.invoke(fields, ["list", "--agile"])
+        assert result.exit_code == 0, result.output
+        assert "Story Points" in result.output and "Notes" not in result.output
+        assert generic_workflow.calls == []
 
 
 # =============================================================================
@@ -1044,3 +591,28 @@ class TestListFieldsScoping:
 
         assert len(result) == 1
         assert result[0]["issue_types"] == ["Bug", "Task"]
+
+
+@pytest.fixture
+def generic_workflow(tmp_path, monkeypatch):
+    from as_engine.simulation import JiraSimulationStore
+
+    from jira_as import engine
+    from jira_as.autocomplete_cache import InstanceFieldsCache
+
+    monkeypatch.setenv("JIRA_ALLOWED_PROJECTS", "SBX")
+    monkeypatch.setenv("JIRA_ALLOW_SITE_OPERATIONS", "true")
+    monkeypatch.setenv("JIRA_FIELDS_CACHE_DIR", str(tmp_path))
+    seed = JiraSimulationStore().snapshot()
+    seed["sprints"] = [
+        {"id": 456, "originBoardId": 1, "name": "Sprint 456", "state": "future"},
+        {"id": 457, "originBoardId": 1, "name": "Closed", "state": "closed"},
+    ]
+    seed["issues"][0]["fields"].update(
+        {"sprint": 457, "status": {"name": "Done"}, "customfield_10016": 8}
+    )
+    store = JiraSimulationStore(seed)
+    surface = engine.create_surface(transport="simulation", store=store)
+    monkeypatch.setattr(engine, "create_surface", lambda **_: surface)
+    InstanceFieldsCache(tmp_path).write(store.fields)
+    return store

@@ -58,7 +58,7 @@ change the configured Surface default or public `api` permission:
 
 | Operation | Internal allowance and prerequisite |
 |---|---|
-| `getFields` | One instance-field metadata read on story-point cache miss; no project content. |
+| `getFields` | One instance-field metadata read on story-point cache miss; no project content. The explicit `fields cache warm` affordance also permits this one metadata read and persists it under the v2 instance cache; public `api call getFields` remains refused. |
 | `getIssueLinkTypes` | Instance link-type metadata for link-types and typed link validation. |
 | `deleteIssueLink` | Only after guarded `getIssue(source, fields=issuelinks)`, one unambiguous link matches the explicit source/target keys, and both keys pass membership. The numeric ID alone grants nothing. |
 | `getCurrentUser` | Caller account ID only for `issue create --assignee self`. The update helper does not receive this allowance. |

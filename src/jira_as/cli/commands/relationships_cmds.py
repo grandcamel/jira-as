@@ -13,6 +13,15 @@ from typing import TYPE_CHECKING, Any
 
 import click
 
+from .bulk_cmds import (
+    WorkflowCheckpoint,
+    workflow_call,
+    workflow_clone,
+    workflow_link,
+    workflow_options,
+    workflow_surface,
+)
+
 if TYPE_CHECKING:
     from jira_as import JiraClient
 
@@ -1803,6 +1812,7 @@ def relationships_link_types(ctx: click.Context, filter_pattern: str, output: st
 
 
 @relationships.command(name="clone")
+@click.option("--dry-run", "-n", is_flag=True)
 @click.argument("issue_key")
 @click.option("--to-project", "-p", help="Target project key")
 @click.option("--summary", "-s", help="Custom summary for cloned issue")
@@ -1812,32 +1822,46 @@ def relationships_link_types(ctx: click.Context, filter_pattern: str, output: st
 @click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
 @click.pass_context
 @handle_jira_errors
+@workflow_options
 def relationships_clone(
-    ctx: click.Context,
-    issue_key: str,
-    to_project: str,
-    summary: str,
-    clone_links: bool,
-    clone_subtasks: bool,
-    no_link: bool,
-    output: str,
+    ctx,
+    issue_key,
+    to_project,
+    summary,
+    clone_links,
+    clone_subtasks,
+    no_link,
+    output,
+    transport,
+    checkpoint,
+    dry_run=False,
 ):
-    """Clone an issue with optional links and subtasks."""
-    client = get_client_from_context(ctx)
-    result = _clone_issue_impl(
-        issue_key=issue_key,
-        to_project=to_project,
-        summary=summary,
-        include_subtasks=clone_subtasks,
-        include_links=clone_links,
-        create_clone_link=not no_link,
-        client=client,
+    """Clone an issue with individually resumable parent, subtask and link steps."""
+    issue_key = validate_issue_key(issue_key)
+    surface = workflow_surface(transport)
+    options = {
+        "target_project": to_project,
+        "summary": summary,
+        "include_links": clone_links,
+        "include_subtasks": clone_subtasks,
+        "create_clone_link": not no_link,
+    }
+    state = WorkflowCheckpoint(
+        checkpoint, "relationships clone", {"issue": issue_key}, options
     )
-
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(_format_clone_result(result))
+    source = state.step(
+        "source",
+        lambda: workflow_call(
+            surface, "getIssue", {"issueIdOrKey": issue_key}, raw=True
+        ),
+    )
+    if dry_run:
+        click.echo(format_json({"dry_run": True, "source": issue_key, **options}))
+        return
+    result = workflow_clone(surface, state, source, **options)
+    click.echo(
+        format_json(result) if output == "json" else _format_clone_result(result)
+    )
 
 
 @relationships.command(name="bulk-link")
@@ -1855,74 +1879,104 @@ def relationships_clone(
 @click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
 @click.pass_context
 @handle_jira_errors
+@workflow_options
 def relationships_bulk_link(
-    ctx: click.Context,
-    jql: str,
-    issues: str,
-    blocks: str,
-    is_blocked_by: str,
-    relates_to: str,
-    duplicates: str,
-    clones: str,
-    link_type: str,
-    target: str,
-    dry_run: bool,
-    skip_existing: bool,
-    output: str,
+    ctx,
+    jql,
+    issues,
+    blocks,
+    is_blocked_by,
+    relates_to,
+    duplicates,
+    clones,
+    link_type,
+    target,
+    dry_run,
+    skip_existing,
+    output,
+    transport,
+    checkpoint,
 ):
-    """Link multiple issues to a target issue."""
-    if not jql and not issues:
-        raise click.UsageError("Either --jql or --issues is required")
-    if jql and issues:
-        raise click.UsageError("--jql and --issues are mutually exclusive")
-
-    link_opts = [blocks, is_blocked_by, relates_to, duplicates, clones]
-    explicit_opts = link_type and target
-    if sum(1 for opt in link_opts if opt) + (1 if explicit_opts else 0) != 1:
-        raise click.UsageError(
-            "Specify exactly one link type: --blocks, --relates-to, etc., or --type with --to"
-        )
-
-    # Determine target and link type
-    resolved_target = None
-    resolved_link_type = None
-
-    if blocks:
-        resolved_target = blocks
-        resolved_link_type = "Blocks"
-    elif is_blocked_by:
-        resolved_target = is_blocked_by
-        resolved_link_type = "Blocks"
-    elif relates_to:
-        resolved_target = relates_to
-        resolved_link_type = "Relates"
-    elif duplicates:
-        resolved_target = duplicates
-        resolved_link_type = "Duplicate"
-    elif clones:
-        resolved_target = clones
-        resolved_link_type = "Cloners"
-    elif link_type and target:
-        resolved_link_type = link_type
-        resolved_target = target
-
-    issues_list = [k.strip() for k in issues.split(",")] if issues else None
-
-    client = get_client_from_context(ctx)
-    result = _bulk_link_impl(
-        issues=issues_list,
-        jql=jql,
-        target=resolved_target,
-        link_type=resolved_link_type,
-        dry_run=dry_run,
-        skip_existing=skip_existing,
-        client=client,
+    """Link a selected set with existing-link decisions and durable checkpoints."""
+    choices = [
+        (blocks, "Blocks"),
+        (is_blocked_by, "Blocks"),
+        (relates_to, "Relates"),
+        (duplicates, "Duplicate"),
+        (clones, "Cloners"),
+    ]
+    chosen = [(key, name) for key, name in choices if key]
+    if bool(link_type) != bool(target):
+        raise click.UsageError("--type and --to must be supplied together")
+    if link_type and target:
+        chosen.append((target, link_type))
+    if len(chosen) != 1:
+        raise click.UsageError("Specify exactly one link type and target")
+    target, link_type = chosen[0]
+    target = validate_issue_key(target)
+    surface = workflow_surface(transport)
+    state = WorkflowCheckpoint(
+        checkpoint,
+        "relationships bulk-link",
+        {"jql": jql, "issues": issues},
+        {
+            "target": target,
+            "type": link_type,
+            "reverse": bool(is_blocked_by),
+            "skip_existing": skip_existing,
+        },
     )
-
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(_format_bulk_result(result))
+    selected = state.select(surface, issues, jql, 100)
+    result = {
+        "target": target,
+        "link_type": link_type,
+        "created": 0,
+        "failed": 0,
+        "skipped": 0,
+        "errors": [],
+        "dry_run": dry_run,
+        "issues": [],
+        "would_create": 0,
+    }
+    for issue in selected:
+        key = issue["key"]
+        try:
+            if f"{key}:link" in state.data["steps"]:
+                result["created"] += 1
+                continue
+            current = workflow_call(
+                surface,
+                "getIssue",
+                {"issueIdOrKey": key, "fields": ["issuelinks"]},
+                raw=True,
+            )
+            links = current.get("fields", {}).get("issuelinks", [])
+            # Jira represents an outwardIssue as the source's inward relation.
+            existing_side = "inwardIssue" if is_blocked_by else "outwardIssue"
+            existing = any(
+                link.get("type", {}).get("name", "").casefold() == link_type.casefold()
+                and link.get(existing_side, {}).get("key") == target
+                for link in links
+            )
+            if key == target or (skip_existing and existing):
+                result["skipped"] += 1
+                continue
+            result["issues"].append(key)
+            result["would_create"] += 1
+            if dry_run:
+                continue
+            inward, outward = (target, key) if is_blocked_by else (key, target)
+            state.step(
+                f"{key}:link",
+                lambda: workflow_link(surface, link_type, inward, outward),
+            )
+            result["created"] += 1
+        except click.ClickException as exc:
+            result["failed"] += 1
+            result["errors"].append(f"{key}: {exc}")
+    click.echo(format_json(result) if output == "json" else _format_bulk_result(result))
+    if result["failed"]:
+        ctx.exit(1)
 
 
 @relationships.command(name="stats")
@@ -1938,50 +1992,83 @@ def relationships_bulk_link(
 @click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
 @click.pass_context
 @handle_jira_errors
+@workflow_options
 def relationships_stats(
-    ctx: click.Context,
-    key_or_project: str,
-    project: str,
-    jql: str,
-    top: int,
-    max_results: int,
-    output: str,
+    ctx, key_or_project, project, jql, top, max_results, output, transport, checkpoint
 ):
-    """Get link statistics for an issue or project."""
-    options_set = sum(1 for opt in [key_or_project, project, jql] if opt)
-    if options_set == 0:
-        raise click.UsageError("Specify ISSUE_KEY, --project, or --jql")
-    if options_set > 1:
-        raise click.UsageError("Specify only one of: ISSUE_KEY, --project, or --jql")
+    """Aggregate graph statistics from the selected issues and their links."""
+    if sum(bool(value) for value in (key_or_project, project, jql)) != 1:
+        raise click.UsageError("Specify only one of ISSUE_KEY, --project or --jql")
+    if top < 1 or max_results < 1:
+        raise click.UsageError("--top and --max-results must be positive")
+    surface = workflow_surface(transport)
+    issue_key = key_or_project if key_or_project and "-" in key_or_project else None
+    project = project or (key_or_project if not issue_key else None)
+    if project:
+        from jira_as import validate_project_key
 
-    client = get_client_from_context(ctx)
-    if key_or_project:
-        # Determine if it's an issue key or project key
-        if "-" in key_or_project:
-            stats = _get_link_stats_impl(issue_key=key_or_project, client=client)
-            if output == "json":
-                click.echo(format_json(stats))
-            else:
-                click.echo(_format_single_issue_stats(stats))
-        else:
-            stats = _get_link_stats_impl(
-                project=key_or_project, max_results=max_results, client=client
-            )
-            if output == "json":
-                click.echo(format_json(stats))
-            else:
-                click.echo(_format_project_stats(stats, top=top))
-    elif project:
-        stats = _get_link_stats_impl(
-            project=project, max_results=max_results, client=client
+        jql = f"project = {validate_project_key(project)}"
+    state = WorkflowCheckpoint(
+        checkpoint,
+        "relationships stats",
+        {"issue": issue_key, "jql": jql, "maximum": max_results},
+        {"top": top},
+    )
+    selected = state.select(surface, issue_key, jql, max_results)
+    stats = _workflow_link_stats(surface, selected, issue_key=issue_key, jql=jql)
+    if output == "json":
+        click.echo(format_json(stats))
+    elif issue_key:
+        click.echo(_format_single_issue_stats(stats))
+    else:
+        click.echo(_format_project_stats(stats, top=top))
+
+
+def _workflow_link_stats(surface, selected, *, issue_key, jql):
+    stats: dict[str, Any] = {
+        "issue_key": issue_key,
+        "jql": jql,
+        "issues_analyzed": len(selected),
+        "total_matching": len(selected),
+        "total_links": 0,
+        "by_type": defaultdict(int),
+        "by_direction": {"inward": 0, "outward": 0},
+        "by_status": defaultdict(int),
+        "linked_issues": [],
+        "orphaned_count": 0,
+        "orphaned_issues": [],
+        "most_connected": [],
+    }
+    for selected_issue in selected:
+        key = selected_issue["key"]
+        issue = workflow_call(
+            surface,
+            "getIssue",
+            {"issueIdOrKey": key, "fields": ["issuelinks", "summary"]},
+            raw=True,
         )
-        if output == "json":
-            click.echo(format_json(stats))
+        links = issue.get("fields", {}).get("issuelinks", [])
+        summary = issue.get("fields", {}).get("summary", "")
+        stats["total_links"] += len(links)
+        if not links:
+            stats["orphaned_count"] += 1
+            stats["orphaned_issues"].append({"key": key, "summary": summary})
         else:
-            click.echo(_format_project_stats(stats, top=top))
-    elif jql:
-        stats = _get_link_stats_impl(jql=jql, max_results=max_results, client=client)
-        if output == "json":
-            click.echo(format_json(stats))
-        else:
-            click.echo(_format_project_stats(stats, top=top))
+            stats["most_connected"].append(
+                {"key": key, "summary": summary, "link_count": len(links)}
+            )
+        for link in links:
+            link_type = link["type"]["name"]
+            direction = "inward" if "outwardIssue" in link else "outward"
+            linked = link.get("outwardIssue", link.get("inwardIssue", {}))
+            status = linked.get("fields", {}).get("status", {}).get("name", "Unknown")
+            stats["by_type"][link_type] += 1
+            stats["by_direction"][direction] += 1
+            stats["by_status"][status] += 1
+            stats["linked_issues"].append(
+                {"key": linked.get("key"), "status": status, "link_type": link_type}
+            )
+    stats["most_connected"].sort(key=lambda item: item["link_count"], reverse=True)
+    stats["by_type"] = dict(stats["by_type"])
+    stats["by_status"] = dict(stats["by_status"])
+    return stats

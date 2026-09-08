@@ -1,0 +1,620 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira servicedesk legacy verb migration",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_addCustomers",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/customer/skip-permission-check\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm customer",
+            "verb": "add",
+            "invocation": "api call addCustomers --serviceDeskId SERVICE_DESK_ID --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_addRequestParticipants",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/participant\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm request",
+            "verb": "add-participant",
+            "invocation": "api call addRequestParticipants --issueIdOrKey ISSUE_KEY --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_addUsersToOrganization",
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/user\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm organization",
+            "verb": "add-customer",
+            "invocation": "api call addUsersToOrganization --organizationId ORGANIZATION_ID --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_answerApproval",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/approval/{approvalId}\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm approval",
+            "verb": "approve",
+            "invocation": "api call answerApproval --issueIdOrKey ISSUE_KEY --approvalId APPROVAL_ID --body @body.json"
+          },
+          {
+            "group": "jsm approval",
+            "verb": "decline",
+            "invocation": "api call answerApproval --issueIdOrKey ISSUE_KEY --approvalId APPROVAL_ID --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createCustomerRequest",
+      "target": "$.paths[\"/rest/servicedeskapi/request\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm request",
+            "verb": "create",
+            "invocation": "api call createCustomerRequest --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createOrganization",
+      "target": "$.paths[\"/rest/servicedeskapi/organization\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm organization",
+            "verb": "create",
+            "invocation": "api call createOrganization --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createRequestComment",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/comment\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm request",
+            "verb": "comment",
+            "invocation": "api call createRequestComment --issueIdOrKey ISSUE_KEY --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_deleteOrganization",
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm organization",
+            "verb": "delete",
+            "invocation": "api call deleteOrganization --organizationId ORGANIZATION_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getApprovals",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/approval\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm approval",
+            "verb": "list",
+            "invocation": "api call getApprovals --issueIdOrKey ISSUE_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getCustomerRequestByIdOrKey",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm request",
+            "verb": "get",
+            "invocation": "api call getCustomerRequestByIdOrKey --issueIdOrKey ISSUE_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getCustomerRequestStatus",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/status\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm request",
+            "verb": "status",
+            "invocation": "api call getCustomerRequestStatus --issueIdOrKey ISSUE_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getCustomers",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/customer\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm customer",
+            "verb": "list",
+            "invocation": "api call getCustomers --serviceDeskId SERVICE_DESK_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getIssuesInQueue",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/queue/{queueId}/issue\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm queue",
+            "verb": "issues",
+            "invocation": "api call getIssuesInQueue --serviceDeskId SERVICE_DESK_ID --queueId QUEUE_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getOrganization",
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm organization",
+            "verb": "get",
+            "invocation": "api call getOrganization --organizationId ORGANIZATION_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getOrganizations",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/organization\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm organization",
+            "verb": "list",
+            "invocation": "api call getOrganizations"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getQueue",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/queue/{queueId}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm queue",
+            "verb": "get",
+            "invocation": "api call getQueue --serviceDeskId SERVICE_DESK_ID --queueId QUEUE_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getQueues",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/queue\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm queue",
+            "verb": "list",
+            "invocation": "api call getQueues --serviceDeskId SERVICE_DESK_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getRequestComments",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/comment\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm request",
+            "verb": "comments",
+            "invocation": "api call getRequestComments --issueIdOrKey ISSUE_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getRequestParticipants",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/participant\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm request",
+            "verb": "participants",
+            "invocation": "api call getRequestParticipants --issueIdOrKey ISSUE_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getRequestTypeById",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm request-type",
+            "verb": "get",
+            "invocation": "api call getRequestTypeById --serviceDeskId SERVICE_DESK_ID --requestTypeId REQUEST_TYPE_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getRequestTypeFields",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/field\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm request-type",
+            "verb": "fields",
+            "invocation": "api call getRequestTypeFields --serviceDeskId SERVICE_DESK_ID --requestTypeId REQUEST_TYPE_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getRequestTypes",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm request-type",
+            "verb": "list",
+            "invocation": "api call getRequestTypes --serviceDeskId SERVICE_DESK_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getServiceDeskArticles",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/knowledgebase/article\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm kb",
+            "verb": "search",
+            "invocation": "api call getServiceDeskArticles --serviceDeskId SERVICE_DESK_ID --query QUERY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getServiceDeskById",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm service-desk",
+            "verb": "get",
+            "invocation": "api call getServiceDeskById --serviceDeskId SERVICE_DESK_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getServiceDesks",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm service-desk",
+            "verb": "list",
+            "invocation": "api call getServiceDesks"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getSlaInformation",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/sla\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm sla",
+            "verb": "get",
+            "invocation": "api call getSlaInformation --issueIdOrKey ISSUE_KEY"
+          },
+          {
+            "group": "jsm sla",
+            "verb": "check-breach",
+            "invocation": "api call getSlaInformation --issueIdOrKey ISSUE_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_removeCustomers",
+      "target": "$.paths[\"/rest/servicedeskapi/servicedesk/{serviceDeskId}/customer\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm customer",
+            "verb": "remove",
+            "invocation": "api call removeCustomers --serviceDeskId SERVICE_DESK_ID --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_removeRequestParticipants",
+      "target": "$.paths[\"/rest/servicedeskapi/request/{issueIdOrKey}/participant\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm request",
+            "verb": "remove-participant",
+            "invocation": "api call removeRequestParticipants --issueIdOrKey ISSUE_KEY --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_removeUsersFromOrganization",
+      "target": "$.paths[\"/rest/servicedeskapi/organization/{organizationId}/user\"].delete",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm organization",
+            "verb": "remove-customer",
+            "invocation": "api call removeUsersFromOrganization --organizationId ORGANIZATION_ID --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_viewArticle",
+      "target": "$.paths[\"/rest/servicedeskapi/knowledgebase/article/view/{pageId}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "jsm kb",
+            "verb": "get",
+            "invocation": "api call viewArticle --pageId PAGE_ID",
+            "note": "The id is the article's Confluence page id; use the indexed article view operation."
+          }
+        ]
+      }
+    }
+  ]
+}

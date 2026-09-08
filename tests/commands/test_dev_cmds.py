@@ -26,13 +26,12 @@ from jira_as.cli.commands.dev_cmds import (
     _extract_acceptance_criteria,
     _get_commits_impl,
     _get_prefix_for_issue_type,
-    _link_commit_impl,
-    _link_pr_impl,
     _parse_commit_issues_impl,
     _parse_pr_url,
     _sanitize_for_branch,
     dev,
 )
+from tests.test_utility_survivors import utility_simulation as utility_simulation
 
 # =============================================================================
 # Constants Tests
@@ -405,86 +404,9 @@ class TestParseCommitIssuesImpl:
 # =============================================================================
 
 
-@pytest.mark.unit
-class TestLinkCommitImpl:
-    """Tests for the _link_commit_impl implementation function."""
-
-    def test_link_commit_basic(self, mock_jira_client):
-        """Test linking a basic commit."""
-        mock_jira_client.post.return_value = {"id": "10001"}
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _link_commit_impl(
-                issue_key="PROJ-123",
-                commit="abc123def",
-            )
-
-        assert result["success"] is True
-        assert result["issue_key"] == "PROJ-123"
-        assert result["commit_sha"] == "abc123def"
-        mock_jira_client.post.assert_called_once()
-
-    def test_link_commit_with_repo(self, mock_jira_client):
-        """Test linking commit with repository URL."""
-        mock_jira_client.post.return_value = {"id": "10001"}
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _link_commit_impl(
-                issue_key="PROJ-123",
-                commit="abc123def",
-                repo="https://github.com/org/repo",
-            )
-
-        assert result["success"] is True
-
-
 # =============================================================================
 # Implementation Function Tests - Link PR
 # =============================================================================
-
-
-@pytest.mark.unit
-class TestLinkPrImpl:
-    """Tests for the _link_pr_impl implementation function."""
-
-    def test_link_pr_github(self, mock_jira_client):
-        """Test linking a GitHub PR."""
-        mock_jira_client.post.return_value = {"id": "10001"}
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _link_pr_impl(
-                issue_key="PROJ-123",
-                pr_url="https://github.com/org/repo/pull/456",
-            )
-
-        assert result["success"] is True
-        assert result["pr_number"] == 456
-        assert result["provider"] == "github"
-
-    def test_link_pr_gitlab(self, mock_jira_client):
-        """Test linking a GitLab MR."""
-        mock_jira_client.post.return_value = {"id": "10001"}
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _link_pr_impl(
-                issue_key="PROJ-123",
-                pr_url="https://gitlab.com/org/repo/-/merge_requests/789",
-            )
-
-        assert result["success"] is True
-        assert result["provider"] == "gitlab"
 
 
 # =============================================================================
@@ -591,45 +513,30 @@ class TestGetCommitsImpl:
 class TestBranchNameCommand:
     """Tests for the branch-name CLI command."""
 
-    def test_branch_name_cli(self, cli_runner, mock_jira_client, sample_issue):
-        """Test CLI branch-name command."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(dev, ["branch-name", "PROJ-123"])
-
-        assert result.exit_code == 0
+    def test_branch_name_cli(self, utility_simulation, cli_runner, sample_issue):
+        utility_simulation.issues = [deepcopy(sample_issue)]
+        result = cli_runner.invoke(
+            dev, ["branch-name", "PROJ-123", "--transport", "simulation"]
+        )
+        assert result.exit_code == 0, result.output
         assert "feature/" in result.output
 
-    def test_branch_name_cli_json(self, cli_runner, mock_jira_client, sample_issue):
-        """Test CLI branch-name with JSON output."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(dev, ["branch-name", "PROJ-123", "-o", "json"])
-
-        assert result.exit_code == 0
+    def test_branch_name_cli_json(self, utility_simulation, cli_runner, sample_issue):
+        utility_simulation.issues = [deepcopy(sample_issue)]
+        result = cli_runner.invoke(
+            dev, ["branch-name", "PROJ-123", "-o", "json", "--transport", "simulation"]
+        )
+        assert result.exit_code == 0, result.output
         assert "{" in result.output
 
     def test_branch_name_cli_git_output(
-        self, cli_runner, mock_jira_client, sample_issue
+        self, utility_simulation, cli_runner, sample_issue
     ):
-        """Test CLI branch-name with git output format."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(dev, ["branch-name", "PROJ-123", "-o", "git"])
-
-        assert result.exit_code == 0
+        utility_simulation.issues = [deepcopy(sample_issue)]
+        result = cli_runner.invoke(
+            dev, ["branch-name", "PROJ-123", "-o", "git", "--transport", "simulation"]
+        )
+        assert result.exit_code == 0, result.output
         assert "git checkout -b" in result.output
 
 
@@ -637,17 +544,12 @@ class TestBranchNameCommand:
 class TestPrDescriptionCommand:
     """Tests for the pr-description CLI command."""
 
-    def test_pr_description_cli(self, cli_runner, mock_jira_client, sample_issue):
-        """Test CLI pr-description command."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(dev, ["pr-description", "PROJ-123"])
-
-        assert result.exit_code == 0
+    def test_pr_description_cli(self, utility_simulation, cli_runner, sample_issue):
+        utility_simulation.issues = [deepcopy(sample_issue)]
+        result = cli_runner.invoke(
+            dev, ["pr-description", "PROJ-123", "--transport", "simulation"]
+        )
+        assert result.exit_code == 0, result.output
         assert "## Summary" in result.output
 
 
@@ -676,47 +578,6 @@ class TestParseCommitsCommand:
         result = cli_runner.invoke(dev, ["parse-commits"])
 
         assert result.exit_code != 0
-
-
-@pytest.mark.unit
-class TestLinkCommitCommand:
-    """Tests for the link-commit CLI command."""
-
-    def test_link_commit_cli(self, cli_runner, mock_jira_client):
-        """Test CLI link-commit command."""
-        mock_jira_client.post.return_value = {"id": "10001"}
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                dev, ["link-commit", "PROJ-123", "-c", "abc123def"]
-            )
-
-        assert result.exit_code == 0
-        assert "Linked commit" in result.output
-
-
-@pytest.mark.unit
-class TestLinkPrCommand:
-    """Tests for the link-pr CLI command."""
-
-    def test_link_pr_cli(self, cli_runner, mock_jira_client):
-        """Test CLI link-pr command."""
-        mock_jira_client.post.return_value = {"id": "10001"}
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                dev,
-                ["link-pr", "PROJ-123", "-p", "https://github.com/org/repo/pull/456"],
-            )
-
-        assert result.exit_code == 0
-        assert "Linked PR" in result.output
 
 
 @pytest.mark.unit

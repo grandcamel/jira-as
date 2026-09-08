@@ -1,0 +1,3208 @@
+[
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin project list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "searchProjects"
+    ],
+    "source_methods": "search_projects",
+    "replacement": "api call searchProjects",
+    "call_sequence": [],
+    "operation": "searchProjects",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin project get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getProject"
+    ],
+    "source_methods": "get_project",
+    "replacement": "api call getProject --projectIdOrKey PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "getProject",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin project create",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createProject"
+    ],
+    "source_methods": "search_users\u2192create_project\u2192update_project\u2192get_project",
+    "replacement": "api call createProject --body @body.json",
+    "call_sequence": [],
+    "operation": "createProject",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin project update",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "updateProject"
+    ],
+    "source_methods": "update_project",
+    "replacement": "api call updateProject --projectIdOrKey PROJECT_KEY --body @body.json",
+    "call_sequence": [],
+    "operation": "updateProject",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin project delete",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "deleteProject"
+    ],
+    "source_methods": "get_project\u2192delete_project",
+    "replacement": "api call deleteProject --projectIdOrKey PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "deleteProject",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin project archive",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "archiveProject"
+    ],
+    "source_methods": "archive_project",
+    "replacement": "api call archiveProject --projectIdOrKey PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "archiveProject",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin project restore",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "restore"
+    ],
+    "source_methods": "restore_project",
+    "replacement": "api call restore --projectIdOrKey PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "restore",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin config get",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getProject"
+    ],
+    "source_methods": "get_project\u2192get_project_permission_scheme\u2192get_project_notification_scheme",
+    "replacement": "api call getProject --projectIdOrKey PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "getProject",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin category list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getAllProjectCategories"
+    ],
+    "source_methods": "get_project_categories",
+    "replacement": "api call getAllProjectCategories",
+    "call_sequence": [],
+    "operation": "getAllProjectCategories",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin category create",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createProjectCategory"
+    ],
+    "source_methods": "create_project_category",
+    "replacement": "api call createProjectCategory --body @body.json",
+    "call_sequence": [],
+    "operation": "createProjectCategory",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin category assign",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "updateProject"
+    ],
+    "source_methods": "update_project",
+    "replacement": "api call updateProject --projectIdOrKey PROJECT_KEY --body @body.json",
+    "call_sequence": [],
+    "operation": "updateProject",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin user search",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "findUsers"
+    ],
+    "source_methods": "search_users or find_assignable_users",
+    "replacement": "api call findUsers",
+    "call_sequence": [],
+    "operation": "findUsers",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin user get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getUser"
+    ],
+    "source_methods": "get_user",
+    "replacement": "api call getUser",
+    "call_sequence": [],
+    "operation": "getUser",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin group list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "findGroups"
+    ],
+    "source_methods": "find_groups",
+    "replacement": "api call findGroups",
+    "call_sequence": [],
+    "operation": "findGroups",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin group members",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getUsersFromGroup"
+    ],
+    "source_methods": "get_group_members",
+    "replacement": "api call getUsersFromGroup",
+    "call_sequence": [],
+    "operation": "getUsersFromGroup",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin group create",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createGroup"
+    ],
+    "source_methods": "create_group",
+    "replacement": "api call createGroup --body @body.json",
+    "call_sequence": [],
+    "operation": "createGroup",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin group delete",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "removeGroup"
+    ],
+    "source_methods": "delete_group",
+    "replacement": "api call removeGroup",
+    "call_sequence": [],
+    "operation": "removeGroup",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin group add-user",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "addUserToGroup"
+    ],
+    "source_methods": "add_user_to_group",
+    "replacement": "api call addUserToGroup --body @body.json",
+    "call_sequence": [],
+    "operation": "addUserToGroup",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin group remove-user",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "removeUserFromGroup"
+    ],
+    "source_methods": "remove_user_from_group",
+    "replacement": "api call removeUserFromGroup --accountId ACCOUNT_ID",
+    "call_sequence": [],
+    "operation": "removeUserFromGroup",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin automation list",
+    "classification": "A",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "get_rules or search_rules",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin automation get",
+    "classification": "A",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "get_rule",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin automation search",
+    "classification": "A",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "get_rules/search_rules + client-side substring filter",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin automation enable",
+    "classification": "A",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "enable_rule",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin automation disable",
+    "classification": "A",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "disable_rule",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin automation toggle",
+    "classification": "B",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "get_rule\u2192enable_rule/disable_rule",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin automation invoke",
+    "classification": "A",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "invoke_manual_rule",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin automation-template list",
+    "classification": "A",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "get_templates",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin automation-template get",
+    "classification": "A",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "get_template",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin permission-scheme list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getAllPermissionSchemes"
+    ],
+    "source_methods": "get_permission_schemes",
+    "replacement": "api call getAllPermissionSchemes",
+    "call_sequence": [],
+    "operation": "getAllPermissionSchemes",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin permission-scheme get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getPermissionScheme"
+    ],
+    "source_methods": "get_permission_scheme",
+    "replacement": "api call getPermissionScheme --schemeId SCHEME_ID",
+    "call_sequence": [],
+    "operation": "getPermissionScheme",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin permission-scheme create",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createPermissionScheme"
+    ],
+    "source_methods": "create_permission_scheme",
+    "replacement": "api call createPermissionScheme --body @body.json",
+    "call_sequence": [],
+    "operation": "createPermissionScheme",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin permission-scheme assign",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "assignPermissionScheme"
+    ],
+    "source_methods": "assign_permission_scheme_to_project",
+    "replacement": "api call assignPermissionScheme --projectKeyOrId PROJECT_KEY_OR_ID --body @body.json",
+    "call_sequence": [],
+    "operation": "assignPermissionScheme",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin permission list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getAllPermissions"
+    ],
+    "source_methods": "get_all_permissions",
+    "replacement": "api call getAllPermissions",
+    "call_sequence": [],
+    "operation": "getAllPermissions",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin permission check",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getMyPermissions"
+    ],
+    "source_methods": "get_my_permissions",
+    "replacement": "api call getMyPermissions",
+    "call_sequence": [],
+    "operation": "getMyPermissions",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin notification-scheme list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getNotificationSchemes"
+    ],
+    "source_methods": "get_notification_schemes",
+    "replacement": "api call getNotificationSchemes --projectId PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "getNotificationSchemes",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin notification-scheme get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getNotificationScheme"
+    ],
+    "source_methods": "get_notification_scheme",
+    "replacement": "api call getNotificationScheme --id ID",
+    "call_sequence": [],
+    "operation": "getNotificationScheme",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin notification-scheme create",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createNotificationScheme"
+    ],
+    "source_methods": "create_notification_scheme",
+    "replacement": "api call createNotificationScheme --body @body.json",
+    "call_sequence": [],
+    "operation": "createNotificationScheme",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin notification add",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "addNotifications"
+    ],
+    "source_methods": "add_notification_to_scheme",
+    "replacement": "api call addNotifications --id ID --body @body.json",
+    "call_sequence": [],
+    "operation": "addNotifications",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin notification remove",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "removeNotificationFromNotificationScheme"
+    ],
+    "source_methods": "delete_notification_from_scheme",
+    "replacement": "api call removeNotificationFromNotificationScheme --notificationSchemeId NOTIFICATION_SCHEME_ID --notificationId NOTIFICATION_ID",
+    "call_sequence": [],
+    "operation": "removeNotificationFromNotificationScheme",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin screen list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getScreens"
+    ],
+    "source_methods": "get_screens",
+    "replacement": "api call getScreens",
+    "call_sequence": [],
+    "operation": "getScreens",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin screen get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getScreens"
+    ],
+    "source_methods": "GET `/rest/api/2/screens` (paginated, filtered client-side)",
+    "replacement": "api call getScreens",
+    "call_sequence": [],
+    "operation": "getScreens",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin screen tabs",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getAllScreenTabs"
+    ],
+    "source_methods": "get_screen_tabs",
+    "replacement": "api call getAllScreenTabs --screenId SCREEN_ID --projectKey PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "getAllScreenTabs",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin screen fields",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getAllScreenTabFields"
+    ],
+    "source_methods": "get_screen_tabs\u2192get_screen_tab_fields\u00d7tabs",
+    "replacement": "api call getAllScreenTabFields --screenId SCREEN_ID --tabId TAB_ID --projectKey PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "getAllScreenTabFields",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin screen add-field",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "addScreenTabField"
+    ],
+    "source_methods": "get_screen_tabs\u2192add_field_to_screen_tab",
+    "replacement": "api call addScreenTabField --screenId SCREEN_ID --tabId TAB_ID --body @body.json",
+    "call_sequence": [],
+    "operation": "addScreenTabField",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin screen remove-field",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "removeScreenTabField"
+    ],
+    "source_methods": "get_screen_tabs\u2192get_screen_tab_fields\u00d7tabs\u2192remove_field_from_screen_tab",
+    "replacement": "api call removeScreenTabField --screenId SCREEN_ID --tabId TAB_ID --id ID",
+    "call_sequence": [],
+    "operation": "removeScreenTabField",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin screen-scheme list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getScreenSchemes"
+    ],
+    "source_methods": "get_screen_schemes",
+    "replacement": "api call getScreenSchemes",
+    "call_sequence": [],
+    "operation": "getScreenSchemes",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin screen-scheme get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getScreenSchemes"
+    ],
+    "source_methods": "get_screen_scheme",
+    "replacement": "api call getScreenSchemes",
+    "call_sequence": [],
+    "operation": "getScreenSchemes",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin issue-type list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getIssueAllTypes"
+    ],
+    "source_methods": "get_issue_types",
+    "replacement": "api call getIssueAllTypes",
+    "call_sequence": [],
+    "operation": "getIssueAllTypes",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin issue-type get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getIssueType"
+    ],
+    "source_methods": "get_issue_type",
+    "replacement": "api call getIssueType --id ID",
+    "call_sequence": [],
+    "operation": "getIssueType",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin issue-type create",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createIssueType"
+    ],
+    "source_methods": "create_issue_type",
+    "replacement": "api call createIssueType --body @body.json",
+    "call_sequence": [],
+    "operation": "createIssueType",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin issue-type update",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "updateIssueType"
+    ],
+    "source_methods": "update_issue_type",
+    "replacement": "api call updateIssueType --id ID --body @body.json",
+    "call_sequence": [],
+    "operation": "updateIssueType",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin issue-type delete",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "deleteIssueType"
+    ],
+    "source_methods": "delete_issue_type",
+    "replacement": "api call deleteIssueType --id ID",
+    "call_sequence": [],
+    "operation": "deleteIssueType",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin issue-type-scheme list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getAllIssueTypeSchemes"
+    ],
+    "source_methods": "get_issue_type_schemes",
+    "replacement": "api call getAllIssueTypeSchemes",
+    "call_sequence": [],
+    "operation": "getAllIssueTypeSchemes",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin issue-type-scheme get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getAllIssueTypeSchemes"
+    ],
+    "source_methods": "get_issue_type_schemes(scheme_ids=[id])",
+    "replacement": "api call getAllIssueTypeSchemes",
+    "call_sequence": [],
+    "operation": "getAllIssueTypeSchemes",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin issue-type-scheme create",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createIssueTypeScheme"
+    ],
+    "source_methods": "create_issue_type_scheme",
+    "replacement": "api call createIssueTypeScheme --body @body.json",
+    "call_sequence": [],
+    "operation": "createIssueTypeScheme",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin issue-type-scheme assign",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "assignIssueTypeSchemeToProject"
+    ],
+    "source_methods": "assign_issue_type_scheme",
+    "replacement": "api call assignIssueTypeSchemeToProject --body @body.json --project PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "assignIssueTypeSchemeToProject",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin issue-type-scheme project",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getIssueTypeSchemeForProjects"
+    ],
+    "source_methods": "get_issue_type_scheme_for_projects",
+    "replacement": "api call getIssueTypeSchemeForProjects --projectId PROJECT_ID",
+    "call_sequence": [],
+    "operation": "getIssueTypeSchemeForProjects",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin workflow list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getWorkflowsPaginated"
+    ],
+    "source_methods": "search_workflows or get_workflows",
+    "replacement": "api call getWorkflowsPaginated",
+    "call_sequence": [],
+    "operation": "getWorkflowsPaginated",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin workflow get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getWorkflowsPaginated"
+    ],
+    "source_methods": "search_workflows(workflow_name=name)",
+    "replacement": "api call getWorkflowsPaginated",
+    "call_sequence": [],
+    "operation": "getWorkflowsPaginated",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin workflow search",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getWorkflowsPaginated"
+    ],
+    "source_methods": "search_workflows/get_workflows + client-side name filter",
+    "replacement": "api call getWorkflowsPaginated",
+    "call_sequence": [],
+    "operation": "getWorkflowsPaginated",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin workflow for-issue",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getWorkflowsPaginated"
+    ],
+    "source_methods": "get_issue\u2192get_workflow_scheme_for_project\u2192search_workflows",
+    "replacement": "api call getWorkflowsPaginated",
+    "call_sequence": [],
+    "operation": "getWorkflowsPaginated",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin workflow-scheme list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getAllWorkflowSchemes"
+    ],
+    "source_methods": "get_workflow_schemes",
+    "replacement": "api call getAllWorkflowSchemes",
+    "call_sequence": [],
+    "operation": "getAllWorkflowSchemes",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin workflow-scheme get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getWorkflowScheme"
+    ],
+    "source_methods": "get_workflow_scheme",
+    "replacement": "api call getWorkflowScheme --id ID",
+    "call_sequence": [],
+    "operation": "getWorkflowScheme",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin workflow-scheme assign",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "switchWorkflowSchemeForProject"
+    ],
+    "source_methods": "assign_workflow_scheme_to_project",
+    "replacement": "api call switchWorkflowSchemeForProject --body @body.json --project PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "switchWorkflowSchemeForProject",
+    "tier": "platform"
+  },
+  {
+    "module": "admin_cmds.py",
+    "verb": "admin status list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getStatuses"
+    ],
+    "source_methods": "get_statuses",
+    "replacement": "api call getStatuses",
+    "call_sequence": [],
+    "operation": "getStatuses",
+    "tier": "platform"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile board list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getAllBoards"
+    ],
+    "source_methods": "get_all_boards",
+    "replacement": "api call getAllBoards --projectKeyOrId PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "getAllBoards",
+    "tier": "software"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile epic create",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createIssue"
+    ],
+    "source_methods": "create_issue",
+    "replacement": "api call createIssue --body @body.json --project PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "createIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile epic get",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getIssue"
+    ],
+    "source_methods": "get_issue\u2192search_issues",
+    "replacement": "api call getIssue --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile epic add-issues",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "One indexed operation accepts the issues array; the legacy per-issue loop is unnecessary.",
+    "operationIds": [
+      "moveIssuesToEpic"
+    ],
+    "source_methods": "get_issue\u2192update_issue\u00d7issues",
+    "replacement": "api call moveIssuesToEpic --epicIdOrKey EPIC_KEY --field issues=[\"ISSUE_KEY\"]",
+    "call_sequence": [],
+    "operation": "moveIssuesToEpic",
+    "tier": "software"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile sprint list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getAllSprints"
+    ],
+    "source_methods": "get_board_sprints",
+    "replacement": "api call getAllSprints --boardId BOARD_ID",
+    "call_sequence": [],
+    "operation": "getAllSprints",
+    "tier": "software"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile sprint create",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createSprint"
+    ],
+    "source_methods": "create_sprint",
+    "replacement": "api call createSprint --body @body.json",
+    "call_sequence": [],
+    "operation": "createSprint",
+    "tier": "software"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile sprint get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getSprint"
+    ],
+    "source_methods": "get_sprint or get_board_sprints(active)",
+    "replacement": "api call getSprint --sprintId SPRINT_ID",
+    "call_sequence": [],
+    "operation": "getSprint",
+    "tier": "software"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile sprint manage",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Close mode searches incomplete issues; branch to move them; close sprint only after move succeeds; preserve start/update modes.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "moveIssuesToSprintAndRank",
+      "partiallyUpdateSprint"
+    ],
+    "source_methods": "search_issues\u2192move_issues_to_sprint\u2192update_sprint",
+    "replacement": null,
+    "call_sequence": [
+      "Close mode searches incomplete issues; branch to move them; close sprint only after move succeeds; start/update/close use partiallyUpdateSprint POST with only changed fields."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile sprint move-issues",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Select scoped issues; choose backlog/sprint; chunk and loop mutation with preview.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "moveIssuesToSprintAndRank",
+      "moveIssuesToBacklog"
+    ],
+    "source_methods": "search_issues\u2192move_issues_to_sprint/backlog",
+    "replacement": null,
+    "call_sequence": [
+      "Select scoped issues; choose backlog/sprint; chunk and loop mutation with preview."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile backlog",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Board resolution is a prerequisite; the 404 fallback is an error path.",
+    "operationIds": [
+      "getIssuesForBacklog"
+    ],
+    "source_methods": "get_all_boards\u2192get_board_backlog (fallback get_board_issues)",
+    "replacement": "api call getIssuesForBacklog --boardId BOARD_ID",
+    "call_sequence": [],
+    "operation": "getIssuesForBacklog",
+    "tier": "software"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile rank",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "rankIssues"
+    ],
+    "source_methods": "rank_issues",
+    "replacement": "api call rankIssues --body @body.json",
+    "call_sequence": [],
+    "operation": "rankIssues",
+    "tier": "software"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile estimate",
+    "classification": "B",
+    "decision": "contract",
+    "reason": "JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior.",
+    "operationIds": [
+      "getFields",
+      "editIssue"
+    ],
+    "source_methods": "search_issues\u2192update_issue\u00d7issues",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": "getFields",
+    "tier": "platform"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile estimates",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getIssuesForSprint"
+    ],
+    "source_methods": "get_all_boards\u2192get_board_sprints\u2192get_sprint_issues (or search_issues)",
+    "replacement": "api call getIssuesForSprint --sprintId SPRINT_ID",
+    "call_sequence": [],
+    "operation": "getIssuesForSprint",
+    "tier": "software"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile velocity",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Select closed sprints; loop scoped issue searches; compute velocity aggregates not covered by tags.",
+    "operationIds": [
+      "getAllSprints",
+      "searchAndReconsileIssuesUsingJql"
+    ],
+    "source_methods": "get_all_boards\u2192get_board_sprints\u2192search_issues\u00d7sprints",
+    "replacement": null,
+    "call_sequence": [
+      "Select closed sprints; loop scoped issue searches; compute velocity aggregates not covered by tags."
+    ],
+    "operation": "getAllSprints",
+    "tier": "software"
+  },
+  {
+    "module": "agile_cmds.py",
+    "verb": "agile subtask",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createIssue"
+    ],
+    "source_methods": "get_issue\u2192raw:GET `/rest/api/3/issuetype`\u2192create_issue",
+    "replacement": "api call createIssue --body @body.json --project PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "createIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "bulk_cmds.py",
+    "verb": "bulk transition",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Search scoped issues; loop issues; read transitions; fuzzy-match or report ambiguity; preview or transition; optional comment; checkpoint.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "getTransitions",
+      "doTransition",
+      "addComment"
+    ],
+    "source_methods": "get_transitions\u2192transition_issue\u2192add_comment (\u00d7issues)",
+    "replacement": null,
+    "call_sequence": [
+      "Search scoped issues; loop issues; read transitions; fuzzy-match or report ambiguity; preview or transition; optional comment; checkpoint."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "bulk_cmds.py",
+    "verb": "bulk assign",
+    "classification": "A",
+    "decision": "survivor",
+    "reason": "Rule: Search scoped issues; loop selected issues; preview or assign; checkpoint each outcome.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "assignIssue"
+    ],
+    "source_methods": "assign_issue\u00d7issues",
+    "replacement": null,
+    "call_sequence": [
+      "Search scoped issues; loop selected issues; preview or assign; checkpoint each outcome."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "bulk_cmds.py",
+    "verb": "bulk set-priority",
+    "classification": "A",
+    "decision": "survivor",
+    "reason": "Rule: Search scoped issues; loop selected issues; preview or update priority; checkpoint each outcome.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "editIssue"
+    ],
+    "source_methods": "update_issue\u00d7issues",
+    "replacement": null,
+    "call_sequence": [
+      "Search scoped issues; loop selected issues; preview or update priority; checkpoint each outcome."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "bulk_cmds.py",
+    "verb": "bulk clone",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Select issues; loop source issues; copy fields; create parent; branch into subtask and link copying; checkpoint.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "getIssue",
+      "createIssue",
+      "linkIssues"
+    ],
+    "source_methods": "get_issue/search_issues\u2192create_issue\u2192create_link (\u00d7issues)",
+    "replacement": null,
+    "call_sequence": [
+      "Select issues; loop source issues; copy fields; create parent; branch into subtask and link copying; checkpoint."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "bulk_cmds.py",
+    "verb": "bulk delete",
+    "classification": "A",
+    "decision": "survivor",
+    "reason": "Rule: Search scoped issues; preview by default; loop deletes only on explicit confirmation; checkpoint each outcome.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "deleteIssue"
+    ],
+    "source_methods": "delete_issue\u00d7issues",
+    "replacement": null,
+    "call_sequence": [
+      "Search scoped issues; preview by default; loop deletes only on explicit confirmation; checkpoint each outcome."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "collaborate_cmds.py",
+    "verb": "collaborate comment add",
+    "classification": "C",
+    "decision": "contract",
+    "reason": "JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior.",
+    "operationIds": [
+      "addComment"
+    ],
+    "source_methods": "add_comment or add_comment_with_visibility",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": "addComment",
+    "tier": "platform"
+  },
+  {
+    "module": "collaborate_cmds.py",
+    "verb": "collaborate comment list",
+    "classification": "C",
+    "decision": "contract",
+    "reason": "JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior.",
+    "operationIds": [
+      "getComments"
+    ],
+    "source_methods": "get_comments (paginated)",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": "getComments",
+    "tier": "platform"
+  },
+  {
+    "module": "collaborate_cmds.py",
+    "verb": "collaborate comment update",
+    "classification": "C",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "updateComment"
+    ],
+    "source_methods": "update_comment",
+    "replacement": "api call updateComment --issueIdOrKey ISSUE_KEY --id ID --body @body.json",
+    "call_sequence": [],
+    "operation": "updateComment",
+    "tier": "platform"
+  },
+  {
+    "module": "collaborate_cmds.py",
+    "verb": "collaborate comment delete",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "deleteComment"
+    ],
+    "source_methods": "get_comment\u2192delete_comment",
+    "replacement": "api call deleteComment --issueIdOrKey ISSUE_KEY --id ID",
+    "call_sequence": [],
+    "operation": "deleteComment",
+    "tier": "platform"
+  },
+  {
+    "module": "collaborate_cmds.py",
+    "verb": "collaborate attachment upload",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface. Jira multipart/binary enrichment remains pending JAS-65; this indexed pointer does not claim completed attachment transport.",
+    "operationIds": [
+      "addAttachment"
+    ],
+    "source_methods": "upload_file",
+    "replacement": "api call addAttachment --issueIdOrKey ISSUE_KEY --body @body.json",
+    "call_sequence": [],
+    "operation": "addAttachment",
+    "tier": "platform"
+  },
+  {
+    "module": "collaborate_cmds.py",
+    "verb": "collaborate attachment list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getIssue"
+    ],
+    "source_methods": "get_attachments",
+    "replacement": "api call getIssue --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "collaborate_cmds.py",
+    "verb": "collaborate attachment download",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface. Jira multipart/binary enrichment remains pending JAS-65; this indexed pointer does not claim completed attachment transport.",
+    "operationIds": [
+      "getAttachmentContent"
+    ],
+    "source_methods": "get_attachments\u2192download_file",
+    "replacement": "api call getAttachmentContent --id ID",
+    "call_sequence": [],
+    "operation": "getAttachmentContent",
+    "tier": "platform"
+  },
+  {
+    "module": "collaborate_cmds.py",
+    "verb": "collaborate watchers",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getIssueWatchers"
+    ],
+    "source_methods": "raw:GET/POST/DELETE `/issue/{k}/watchers`",
+    "replacement": "api call getIssueWatchers --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getIssueWatchers",
+    "tier": "platform"
+  },
+  {
+    "module": "collaborate_cmds.py",
+    "verb": "collaborate activity",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getChangeLogs"
+    ],
+    "source_methods": "get_changelog",
+    "replacement": "api call getChangeLogs --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getChangeLogs",
+    "tier": "platform"
+  },
+  {
+    "module": "collaborate_cmds.py",
+    "verb": "collaborate notify",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "notify"
+    ],
+    "source_methods": "notify_issue",
+    "replacement": "api call notify --issueIdOrKey ISSUE_KEY --body @body.json",
+    "call_sequence": [],
+    "operation": "notify",
+    "tier": "platform"
+  },
+  {
+    "module": "collaborate_cmds.py",
+    "verb": "collaborate update-fields",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "editIssue"
+    ],
+    "source_methods": "update_issue",
+    "replacement": "api call editIssue --issueIdOrKey ISSUE_KEY --body @body.json",
+    "call_sequence": [],
+    "operation": "editIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "dev_cmds.py",
+    "verb": "dev branch-name",
+    "classification": "A",
+    "decision": "survivor",
+    "reason": "Rule: Read issue; transform key/type/summary into a branch name with local naming policy; no tag expresses this.",
+    "operationIds": [
+      "getIssue"
+    ],
+    "source_methods": "get_issue",
+    "replacement": null,
+    "call_sequence": [
+      "Read issue; transform key/type/summary into a branch name with local naming policy; no tag expresses this."
+    ],
+    "operation": "getIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "dev_cmds.py",
+    "verb": "dev pr-description",
+    "classification": "C",
+    "decision": "survivor",
+    "reason": "Rule: Read issue; assemble a PR template from issue metadata; ADF conversion itself uses engine tags.",
+    "operationIds": [
+      "getIssue"
+    ],
+    "source_methods": "get_issue",
+    "replacement": null,
+    "call_sequence": [
+      "Read issue; assemble a PR template from issue metadata; ADF conversion itself uses engine tags."
+    ],
+    "operation": "getIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "dev_cmds.py",
+    "verb": "dev parse-commits",
+    "classification": "D",
+    "decision": "survivor",
+    "reason": "Rule: Local commit-message parsing workflow not expressed by an API operation or tag.",
+    "operationIds": [],
+    "source_methods": "none",
+    "replacement": null,
+    "call_sequence": [
+      "Local commit-message parsing workflow not expressed by an API operation or tag."
+    ],
+    "operation": null,
+    "tier": null
+  },
+  {
+    "module": "dev_cmds.py",
+    "verb": "dev link-commit",
+    "classification": "C",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "storeDevelopmentInformation"
+    ],
+    "source_methods": "raw:POST devinfo endpoint",
+    "replacement": "api call storeDevelopmentInformation --Authorization AUTHORIZATION --body @body.json",
+    "call_sequence": [],
+    "operation": "storeDevelopmentInformation",
+    "tier": "software"
+  },
+  {
+    "module": "dev_cmds.py",
+    "verb": "dev link-pr",
+    "classification": "C",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "storeDevelopmentInformation"
+    ],
+    "source_methods": "raw:POST devinfo endpoint",
+    "replacement": "api call storeDevelopmentInformation --Authorization AUTHORIZATION --body @body.json",
+    "call_sequence": [],
+    "operation": "storeDevelopmentInformation",
+    "tier": "software"
+  },
+  {
+    "module": "dev_cmds.py",
+    "verb": "dev get-commits",
+    "classification": "B",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "get_issue\u2192raw:GET `/rest/dev-status/latest/issue/detail`",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "fields_cmds.py",
+    "verb": "fields list",
+    "classification": "A",
+    "decision": "survivor",
+    "reason": "Rule: Instance metadata/cache affordance: read fields cache only; report cold cache; explicit fields cache warm performs bounded getFields.",
+    "operationIds": [
+      "getFields"
+    ],
+    "source_methods": "raw:GET `/rest/api/3/field`",
+    "replacement": null,
+    "call_sequence": [
+      "Instance metadata/cache affordance: read fields cache only; report cold cache; explicit fields cache warm performs bounded getFields."
+    ],
+    "operation": "getFields",
+    "tier": "platform"
+  },
+  {
+    "module": "fields_cmds.py",
+    "verb": "fields create",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createCustomField"
+    ],
+    "source_methods": "raw:POST `/rest/api/3/field`",
+    "replacement": "api call createCustomField --body @body.json",
+    "call_sequence": [],
+    "operation": "createCustomField",
+    "tier": "platform"
+  },
+  {
+    "module": "fields_cmds.py",
+    "verb": "fields check-project",
+    "classification": "E",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getCreateIssueMetaIssueTypeId"
+    ],
+    "source_methods": "get_create_issue_meta_issuetypes\u2192get_create_issue_meta_fields",
+    "replacement": "api call getCreateIssueMetaIssueTypeId --projectIdOrKey PROJECT_KEY --issueTypeId ISSUE_TYPE_ID",
+    "call_sequence": [],
+    "operation": "getCreateIssueMetaIssueTypeId",
+    "tier": "platform"
+  },
+  {
+    "module": "fields_cmds.py",
+    "verb": "fields configure-agile",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "addScreenTabField"
+    ],
+    "source_methods": "GET project\u2192discover fields\u2192discover screens\u2192add_field_to_screen_tab\u00d7N",
+    "replacement": "api call addScreenTabField --screenId SCREEN_ID --tabId TAB_ID --body @body.json",
+    "call_sequence": [],
+    "operation": "addScreenTabField",
+    "tier": "platform"
+  },
+  {
+    "module": "issue_cmds.py",
+    "verb": "issue get",
+    "classification": "C",
+    "decision": "contract",
+    "reason": "JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior.",
+    "operationIds": [
+      "getIssue",
+      "getComments"
+    ],
+    "source_methods": "get_issue",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": "getIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "issue_cmds.py",
+    "verb": "issue create",
+    "classification": "B",
+    "decision": "contract",
+    "reason": "JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior.",
+    "operationIds": [
+      "createIssue",
+      "editIssue",
+      "moveIssuesToSprintAndRank",
+      "linkIssues",
+      "getFields",
+      "getCurrentUser"
+    ],
+    "source_methods": "create_issue\u2192update_issue\u2192move_issues_to_sprint\u2192create_link\u00d7N",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": "createIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "issue_cmds.py",
+    "verb": "issue update",
+    "classification": "A",
+    "decision": "contract",
+    "reason": "JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior.",
+    "operationIds": [
+      "editIssue"
+    ],
+    "source_methods": "update_issue",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": "editIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "issue_cmds.py",
+    "verb": "issue delete",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "deleteIssue"
+    ],
+    "source_methods": "get_issue\u2192delete_issue",
+    "replacement": "api call deleteIssue --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "deleteIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "issue_cmds.py",
+    "verb": "issue transitions",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getTransitions"
+    ],
+    "source_methods": "get_transitions",
+    "replacement": "api call getTransitions --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getTransitions",
+    "tier": "platform"
+  },
+  {
+    "module": "issue_cmds.py",
+    "verb": "issue transition",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Duplicate of the preserved lifecycle transition contract verb; use its fuzzy matching workflow.",
+    "operationIds": [
+      "doTransition"
+    ],
+    "source_methods": "get_issue\u2192get_transitions\u2192transition_issue\u2192add_comment\u2192move_issues_to_sprint",
+    "replacement": "lifecycle transition ISSUE_KEY --to TRANSITION_NAME",
+    "call_sequence": [],
+    "operation": "doTransition",
+    "tier": "platform"
+  },
+  {
+    "module": "issue_cmds.py",
+    "verb": "issue comment",
+    "classification": "C",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "addComment"
+    ],
+    "source_methods": "add_comment/add_comment_with_visibility",
+    "replacement": "api call addComment --issueIdOrKey ISSUE_KEY --body @body.json",
+    "call_sequence": [],
+    "operation": "addComment",
+    "tier": "platform"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm service-desk list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getServiceDesks"
+    ],
+    "source_methods": "get_service_desks",
+    "replacement": "api call getServiceDesks",
+    "call_sequence": [],
+    "operation": "getServiceDesks",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm service-desk get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getServiceDeskById"
+    ],
+    "source_methods": "get_service_desk",
+    "replacement": "api call getServiceDeskById --serviceDeskId SERVICE_DESK_ID",
+    "call_sequence": [],
+    "operation": "getServiceDeskById",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm service-desk create",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Service desks are projects; create a service_desk project with the chosen template and lead.",
+    "operationIds": [
+      "createProject"
+    ],
+    "source_methods": "create_service_desk",
+    "replacement": "api call createProject --field key=KEY --field name=NAME --field projectTypeKey=service_desk --field projectTemplateKey=TEMPLATE --field leadAccountId=ACCOUNT_ID",
+    "call_sequence": [],
+    "operation": "createProject",
+    "tier": "platform"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm request-type list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getRequestTypes"
+    ],
+    "source_methods": "get_request_types",
+    "replacement": "api call getRequestTypes --serviceDeskId SERVICE_DESK_ID",
+    "call_sequence": [],
+    "operation": "getRequestTypes",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm request-type get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getRequestTypeById"
+    ],
+    "source_methods": "get_request_type",
+    "replacement": "api call getRequestTypeById --serviceDeskId SERVICE_DESK_ID --requestTypeId REQUEST_TYPE_ID",
+    "call_sequence": [],
+    "operation": "getRequestTypeById",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm request-type fields",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getRequestTypeFields"
+    ],
+    "source_methods": "get_request_type_fields",
+    "replacement": "api call getRequestTypeFields --serviceDeskId SERVICE_DESK_ID --requestTypeId REQUEST_TYPE_ID",
+    "call_sequence": [],
+    "operation": "getRequestTypeFields",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm request list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql"
+    ],
+    "source_methods": "search_issues",
+    "replacement": "api call searchAndReconsileIssuesUsingJql --jql PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm request create",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createCustomerRequest"
+    ],
+    "source_methods": "get_request_type_fields\u2192create_request",
+    "replacement": "api call createCustomerRequest --body @body.json",
+    "call_sequence": [],
+    "operation": "createCustomerRequest",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm request get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getCustomerRequestByIdOrKey"
+    ],
+    "source_methods": "get_request",
+    "replacement": "api call getCustomerRequestByIdOrKey --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getCustomerRequestByIdOrKey",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm request status",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getCustomerRequestStatus"
+    ],
+    "source_methods": "get_request_status",
+    "replacement": "api call getCustomerRequestStatus --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getCustomerRequestStatus",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm request transition",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Read customer transitions; select unambiguous fuzzy match; perform selected transition.",
+    "operationIds": [
+      "getCustomerTransitions",
+      "performCustomerTransition"
+    ],
+    "source_methods": "get_request_transitions\u2192transition_request",
+    "replacement": null,
+    "call_sequence": [
+      "Read customer transitions; select unambiguous fuzzy match; perform selected transition."
+    ],
+    "operation": "getCustomerTransitions",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm request comment",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createRequestComment"
+    ],
+    "source_methods": "add_request_comment",
+    "replacement": "api call createRequestComment --issueIdOrKey ISSUE_KEY --body @body.json",
+    "call_sequence": [],
+    "operation": "createRequestComment",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm request comments",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getRequestComments"
+    ],
+    "source_methods": "get_request_comments",
+    "replacement": "api call getRequestComments --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getRequestComments",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm request participants",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getRequestParticipants"
+    ],
+    "source_methods": "get_request_participants",
+    "replacement": "api call getRequestParticipants --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getRequestParticipants",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm request add-participant",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "addRequestParticipants"
+    ],
+    "source_methods": "add_request_participants",
+    "replacement": "api call addRequestParticipants --issueIdOrKey ISSUE_KEY --body @body.json",
+    "call_sequence": [],
+    "operation": "addRequestParticipants",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm request remove-participant",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "removeRequestParticipants"
+    ],
+    "source_methods": "remove_request_participants",
+    "replacement": "api call removeRequestParticipants --issueIdOrKey ISSUE_KEY --body @body.json",
+    "call_sequence": [],
+    "operation": "removeRequestParticipants",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm customer list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getCustomers"
+    ],
+    "source_methods": "get_service_desk_customers",
+    "replacement": "api call getCustomers --serviceDeskId SERVICE_DESK_ID",
+    "call_sequence": [],
+    "operation": "getCustomers",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm customer create",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Create customer; only on success and supplied service desk add returned account; report each outcome.",
+    "operationIds": [
+      "createCustomer",
+      "addCustomers"
+    ],
+    "source_methods": "create_customer\u2192add_customers_to_service_desk",
+    "replacement": null,
+    "call_sequence": [
+      "Create customer; only on success and supplied service desk add returned account; report each outcome."
+    ],
+    "operation": "createCustomer",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm customer add",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "addCustomers"
+    ],
+    "source_methods": "add_customers_to_service_desk",
+    "replacement": "api call addCustomers --serviceDeskId SERVICE_DESK_ID --body @body.json",
+    "call_sequence": [],
+    "operation": "addCustomers",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm customer remove",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "removeCustomers"
+    ],
+    "source_methods": "remove_customers_from_service_desk",
+    "replacement": "api call removeCustomers --serviceDeskId SERVICE_DESK_ID --body @body.json",
+    "call_sequence": [],
+    "operation": "removeCustomers",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm organization list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getOrganizations"
+    ],
+    "source_methods": "get_organizations",
+    "replacement": "api call getOrganizations",
+    "call_sequence": [],
+    "operation": "getOrganizations",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm organization get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getOrganization"
+    ],
+    "source_methods": "get_organization",
+    "replacement": "api call getOrganization --organizationId ORGANIZATION_ID",
+    "call_sequence": [],
+    "operation": "getOrganization",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm organization create",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createOrganization"
+    ],
+    "source_methods": "create_organization",
+    "replacement": "api call createOrganization --body @body.json",
+    "call_sequence": [],
+    "operation": "createOrganization",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm organization delete",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "deleteOrganization"
+    ],
+    "source_methods": "delete_organization",
+    "replacement": "api call deleteOrganization --organizationId ORGANIZATION_ID",
+    "call_sequence": [],
+    "operation": "deleteOrganization",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm organization add-customer",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "addUsersToOrganization"
+    ],
+    "source_methods": "add_users_to_organization",
+    "replacement": "api call addUsersToOrganization --organizationId ORGANIZATION_ID --body @body.json",
+    "call_sequence": [],
+    "operation": "addUsersToOrganization",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm organization remove-customer",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "removeUsersFromOrganization"
+    ],
+    "source_methods": "remove_users_from_organization",
+    "replacement": "api call removeUsersFromOrganization --organizationId ORGANIZATION_ID --body @body.json",
+    "call_sequence": [],
+    "operation": "removeUsersFromOrganization",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm queue list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getQueues"
+    ],
+    "source_methods": "get_service_desk_queues",
+    "replacement": "api call getQueues --serviceDeskId SERVICE_DESK_ID",
+    "call_sequence": [],
+    "operation": "getQueues",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm queue get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getQueue"
+    ],
+    "source_methods": "get_queue",
+    "replacement": "api call getQueue --serviceDeskId SERVICE_DESK_ID --queueId QUEUE_ID",
+    "call_sequence": [],
+    "operation": "getQueue",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm queue issues",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getIssuesInQueue"
+    ],
+    "source_methods": "get_queue_issues",
+    "replacement": "api call getIssuesInQueue --serviceDeskId SERVICE_DESK_ID --queueId QUEUE_ID",
+    "call_sequence": [],
+    "operation": "getIssuesInQueue",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm sla get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getSlaInformation"
+    ],
+    "source_methods": "get_request_sla or get_request_slas",
+    "replacement": "api call getSlaInformation --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getSlaInformation",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm sla check-breach",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getSlaInformation"
+    ],
+    "source_methods": "get_request_slas",
+    "replacement": "api call getSlaInformation --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getSlaInformation",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm sla report",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Search explicit project/JQL; loop keyed SLA reads; aggregate breach report.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "getSlaInformation"
+    ],
+    "source_methods": "search_issues\u2192get_service_desk\u2192get_request_slas\u00d7issues",
+    "replacement": null,
+    "call_sequence": [
+      "Search explicit project/JQL; loop keyed SLA reads; aggregate breach report."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm approval list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getApprovals"
+    ],
+    "source_methods": "get_request_approvals",
+    "replacement": "api call getApprovals --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getApprovals",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm approval pending",
+    "classification": "A",
+    "decision": "survivor",
+    "reason": "Rule: Search explicit project/JQL; loop request approval reads; retain pending decisions; no guessed SD-<id> project.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "getApprovals"
+    ],
+    "source_methods": "get_pending_approvals",
+    "replacement": null,
+    "call_sequence": [
+      "Search explicit project/JQL; loop request approval reads; retain pending decisions; no guessed SD-<id> project."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm approval approve",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "answerApproval"
+    ],
+    "source_methods": "get_request_approval\u2192answer_approval (\u00d7approval-id)",
+    "replacement": "api call answerApproval --issueIdOrKey ISSUE_KEY --approvalId APPROVAL_ID --body @body.json",
+    "call_sequence": [],
+    "operation": "answerApproval",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm approval decline",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "answerApproval"
+    ],
+    "source_methods": "get_request_approval\u2192answer_approval (\u00d7approval-id)",
+    "replacement": "api call answerApproval --issueIdOrKey ISSUE_KEY --approvalId APPROVAL_ID --body @body.json",
+    "call_sequence": [],
+    "operation": "answerApproval",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm kb search",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getServiceDeskArticles"
+    ],
+    "source_methods": "search_kb_articles",
+    "replacement": "api call getServiceDeskArticles --serviceDeskId SERVICE_DESK_ID --query QUERY",
+    "call_sequence": [],
+    "operation": "getServiceDeskArticles",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm kb get",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "The id is the article's Confluence page id; use the indexed article view operation.",
+    "operationIds": [
+      "viewArticle"
+    ],
+    "source_methods": "get_kb_article",
+    "replacement": "api call viewArticle --pageId PAGE_ID",
+    "call_sequence": [],
+    "operation": "viewArticle",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm kb suggest",
+    "classification": "A",
+    "decision": "survivor",
+    "reason": "Rule: Read keyed request; extract its service desk and summary field; choose keywords or report none; query desk articles.",
+    "operationIds": [
+      "getCustomerRequestByIdOrKey",
+      "getServiceDeskArticles"
+    ],
+    "source_methods": "suggest_kb_for_request",
+    "replacement": null,
+    "call_sequence": [
+      "Read keyed request; extract its service desk and summary field; choose keywords or report none; query desk articles."
+    ],
+    "operation": "getCustomerRequestByIdOrKey",
+    "tier": "servicedesk"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm asset list",
+    "classification": "B",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "has_assets_license probe\u2192get_object_schemas\u2192IQL search",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm asset get",
+    "classification": "B",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "has_assets_license probe\u2192get_asset",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm asset create",
+    "classification": "B",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "has_assets_license probe\u2192create_asset",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm asset update",
+    "classification": "B",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "has_assets_license probe\u2192update_asset",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm asset link",
+    "classification": "B",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "has_assets_license probe\u2192link_asset_to_request\u2192add_request_comment",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "jsm_cmds.py",
+    "verb": "jsm asset find-affected",
+    "classification": "B",
+    "decision": "deferred",
+    "reason": "Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes.",
+    "operationIds": [],
+    "source_methods": "has_assets_license probe\u2192find_affected_assets",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": null,
+    "tier": "deferred"
+  },
+  {
+    "module": "lifecycle_cmds.py",
+    "verb": "lifecycle transition",
+    "classification": "B",
+    "decision": "contract",
+    "reason": "JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior.",
+    "operationIds": [
+      "getIssue",
+      "getTransitions",
+      "doTransition",
+      "addComment",
+      "moveIssuesToSprintAndRank"
+    ],
+    "source_methods": "get_issue\u2192get_transitions\u2192transition_issue\u2192add_comment\u2192move_issues_to_sprint",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": "getIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "lifecycle_cmds.py",
+    "verb": "lifecycle transitions",
+    "classification": "A",
+    "decision": "contract",
+    "reason": "JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior.",
+    "operationIds": [
+      "getTransitions"
+    ],
+    "source_methods": "get_transitions",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": "getTransitions",
+    "tier": "platform"
+  },
+  {
+    "module": "lifecycle_cmds.py",
+    "verb": "lifecycle assign",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "assignIssue"
+    ],
+    "source_methods": "get_issue\u2192assign_issue",
+    "replacement": "api call assignIssue --issueIdOrKey ISSUE_KEY --body @body.json",
+    "call_sequence": [],
+    "operation": "assignIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "lifecycle_cmds.py",
+    "verb": "lifecycle resolve",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Read transitions; select an unambiguous resolve transition by fuzzy name; transition with resolution; optional comment.",
+    "operationIds": [
+      "getTransitions",
+      "doTransition",
+      "addComment"
+    ],
+    "source_methods": "get_transitions\u2192transition_issue",
+    "replacement": null,
+    "call_sequence": [
+      "Read transitions; select an unambiguous resolve transition by fuzzy name; transition with resolution; optional comment."
+    ],
+    "operation": "getTransitions",
+    "tier": "platform"
+  },
+  {
+    "module": "lifecycle_cmds.py",
+    "verb": "lifecycle reopen",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Read transitions; select an unambiguous reopen transition by fuzzy name; transition; optional comment.",
+    "operationIds": [
+      "getTransitions",
+      "doTransition",
+      "addComment"
+    ],
+    "source_methods": "get_transitions\u2192transition_issue",
+    "replacement": null,
+    "call_sequence": [
+      "Read transitions; select an unambiguous reopen transition by fuzzy name; transition; optional comment."
+    ],
+    "operation": "getTransitions",
+    "tier": "platform"
+  },
+  {
+    "module": "lifecycle_cmds.py",
+    "verb": "lifecycle version list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getProjectVersions"
+    ],
+    "source_methods": "get_project_versions",
+    "replacement": "api call getProjectVersions --projectIdOrKey PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "getProjectVersions",
+    "tier": "platform"
+  },
+  {
+    "module": "lifecycle_cmds.py",
+    "verb": "lifecycle version create",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createVersion"
+    ],
+    "source_methods": "create_version",
+    "replacement": "api call createVersion --body @body.json --project PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "createVersion",
+    "tier": "platform"
+  },
+  {
+    "module": "lifecycle_cmds.py",
+    "verb": "lifecycle version release",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "updateVersion"
+    ],
+    "source_methods": "get_project_versions\u2192update_version",
+    "replacement": "api call updateVersion --id ID --body @body.json --project PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "updateVersion",
+    "tier": "platform"
+  },
+  {
+    "module": "lifecycle_cmds.py",
+    "verb": "lifecycle version archive",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "updateVersion"
+    ],
+    "source_methods": "get_project_versions\u2192update_version",
+    "replacement": "api call updateVersion --id ID --body @body.json --project PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "updateVersion",
+    "tier": "platform"
+  },
+  {
+    "module": "lifecycle_cmds.py",
+    "verb": "lifecycle component list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getProjectComponents"
+    ],
+    "source_methods": "get_project_components",
+    "replacement": "api call getProjectComponents --projectIdOrKey PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "getProjectComponents",
+    "tier": "platform"
+  },
+  {
+    "module": "lifecycle_cmds.py",
+    "verb": "lifecycle component create",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createComponent"
+    ],
+    "source_methods": "create_component",
+    "replacement": "api call createComponent --body @body.json --project PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "createComponent",
+    "tier": "platform"
+  },
+  {
+    "module": "lifecycle_cmds.py",
+    "verb": "lifecycle component update",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "updateComponent"
+    ],
+    "source_methods": "update_component",
+    "replacement": "api call updateComponent --id ID --body @body.json --project PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "updateComponent",
+    "tier": "platform"
+  },
+  {
+    "module": "lifecycle_cmds.py",
+    "verb": "lifecycle component delete",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "deleteComponent"
+    ],
+    "source_methods": "get_component\u2192delete_component",
+    "replacement": "api call deleteComponent --id ID",
+    "call_sequence": [],
+    "operation": "deleteComponent",
+    "tier": "platform"
+  },
+  {
+    "module": "ops_cmds.py",
+    "verb": "ops cache-status",
+    "classification": "D",
+    "decision": "survivor",
+    "reason": "Rule: Cache affordance: inspect local cache without HTTP.",
+    "operationIds": [],
+    "source_methods": "none",
+    "replacement": null,
+    "call_sequence": [
+      "Cache affordance: inspect local cache without HTTP."
+    ],
+    "operation": null,
+    "tier": null
+  },
+  {
+    "module": "ops_cmds.py",
+    "verb": "ops cache-clear",
+    "classification": "D",
+    "decision": "survivor",
+    "reason": "Rule: Cache affordance: preview or clear local cache; preserve existing behavior and HOME chmod boundary.",
+    "operationIds": [],
+    "source_methods": "none",
+    "replacement": null,
+    "call_sequence": [
+      "Cache affordance: preview or clear local cache; preserve existing behavior and HOME chmod boundary."
+    ],
+    "operation": null,
+    "tier": null
+  },
+  {
+    "module": "ops_cmds.py",
+    "verb": "ops cache-warm",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Cache affordance: select requested metadata sets; read through Surface and persist to cache; optional per-project loop.",
+    "operationIds": [
+      "searchProjects",
+      "getFields",
+      "getIssueAllTypes",
+      "getPriorities",
+      "findAssignableUsers"
+    ],
+    "source_methods": "GET project list/fields/issue types/priorities/users",
+    "replacement": null,
+    "call_sequence": [
+      "Cache affordance: select requested metadata sets; read through Surface and persist to cache; optional per-project loop."
+    ],
+    "operation": "searchProjects",
+    "tier": "platform"
+  },
+  {
+    "module": "ops_cmds.py",
+    "verb": "ops discover-project",
+    "classification": "E",
+    "decision": "survivor",
+    "reason": "Rule: Read project metadata and sampled scoped issues; branch on available fields; aggregate context and field distributions.",
+    "operationIds": [
+      "getProject",
+      "getAllStatuses",
+      "getProjectVersions",
+      "getProjectComponents",
+      "searchAndReconsileIssuesUsingJql"
+    ],
+    "source_methods": "multiple (metadata+pattern sampling)",
+    "replacement": null,
+    "call_sequence": [
+      "Read project metadata and sampled scoped issues; branch on available fields; aggregate context and field distributions."
+    ],
+    "operation": "getProject",
+    "tier": "platform"
+  },
+  {
+    "module": "relationships_cmds.py",
+    "verb": "relationships link",
+    "classification": "B",
+    "decision": "contract",
+    "reason": "JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior.",
+    "operationIds": [
+      "getIssueLinkTypes",
+      "linkIssues"
+    ],
+    "source_methods": "get_link_types\u2192create_link",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": "getIssueLinkTypes",
+    "tier": "platform"
+  },
+  {
+    "module": "relationships_cmds.py",
+    "verb": "relationships unlink",
+    "classification": "B",
+    "decision": "contract",
+    "reason": "JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior.",
+    "operationIds": [
+      "getIssue",
+      "deleteIssueLink"
+    ],
+    "source_methods": "get_issue_links\u2192delete_link",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": "getIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "relationships_cmds.py",
+    "verb": "relationships get-links",
+    "classification": "A",
+    "decision": "contract",
+    "reason": "JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior.",
+    "operationIds": [
+      "getIssue"
+    ],
+    "source_methods": "get_issue_links",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": "getIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "relationships_cmds.py",
+    "verb": "relationships get-blockers",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getIssue"
+    ],
+    "source_methods": "get_issue_links",
+    "replacement": "api call getIssue --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "relationships_cmds.py",
+    "verb": "relationships get-dependencies",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getIssue"
+    ],
+    "source_methods": "get_issue_links",
+    "replacement": "api call getIssue --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "relationships_cmds.py",
+    "verb": "relationships link-types",
+    "classification": "A",
+    "decision": "contract",
+    "reason": "JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior.",
+    "operationIds": [
+      "getIssueLinkTypes"
+    ],
+    "source_methods": "get_link_types",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": "getIssueLinkTypes",
+    "tier": "platform"
+  },
+  {
+    "module": "relationships_cmds.py",
+    "verb": "relationships clone",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Read source; create parent; conditionally loop subtasks and links; preserve link direction and report failures.",
+    "operationIds": [
+      "getIssue",
+      "createIssue",
+      "linkIssues"
+    ],
+    "source_methods": "get_issue\u2192create_issue\u2192create_link",
+    "replacement": null,
+    "call_sequence": [
+      "Read source; create parent; conditionally loop subtasks and links; preserve link direction and report failures."
+    ],
+    "operation": "getIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "relationships_cmds.py",
+    "verb": "relationships bulk-link",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Search; per issue read existing links; skip duplicates or create links; checkpoint.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "getIssue",
+      "linkIssues"
+    ],
+    "source_methods": "search_issues\u2192get_issue_links\u2192create_link\u00d7N",
+    "replacement": null,
+    "call_sequence": [
+      "Search; per issue read existing links; skip duplicates or create links; checkpoint."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "relationships_cmds.py",
+    "verb": "relationships stats",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Search scoped issues; loop issue-link reads; aggregate graph statistics that no tag expresses.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "getIssue"
+    ],
+    "source_methods": "search_issues\u2192get_issue_links\u00d7N",
+    "replacement": null,
+    "call_sequence": [
+      "Search scoped issues; loop issue-link reads; aggregate graph statistics that no tag expresses."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search query",
+    "classification": "A",
+    "decision": "contract",
+    "reason": "JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql"
+    ],
+    "source_methods": "search_issues",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search export",
+    "classification": "C",
+    "decision": "survivor",
+    "reason": "Rule: Scoped paged search; CSV projection/file export transform not covered by generic JSON/table/markdown formats.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql"
+    ],
+    "source_methods": "search_issues",
+    "replacement": null,
+    "call_sequence": [
+      "Scoped paged search; CSV projection/file export transform not covered by generic JSON/table/markdown formats."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search validate",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "parseJqlQueries"
+    ],
+    "source_methods": "parse_jql",
+    "replacement": "api call parseJqlQueries --validation VALIDATION --body @body.json",
+    "call_sequence": [],
+    "operation": "parseJqlQueries",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search build",
+    "classification": "D",
+    "decision": "survivor",
+    "reason": "Rule: Local JQL-template assembly and quoting transform not expressed by a tag; optional indexed syntax validation.",
+    "operationIds": [
+      "parseJqlQueries"
+    ],
+    "source_methods": "none",
+    "replacement": null,
+    "call_sequence": [
+      "Local JQL-template assembly and quoting transform not expressed by a tag; optional indexed syntax validation."
+    ],
+    "operation": "parseJqlQueries",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search suggest",
+    "classification": "D",
+    "decision": "survivor",
+    "reason": "Rule: Autocomplete/cache affordance: return cached suggestions or refresh through Surface.",
+    "operationIds": [
+      "getFieldAutoCompleteForQueryString"
+    ],
+    "source_methods": "get_jql_suggestions",
+    "replacement": null,
+    "call_sequence": [
+      "Autocomplete/cache affordance: return cached suggestions or refresh through Surface."
+    ],
+    "operation": "getFieldAutoCompleteForQueryString",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search fields",
+    "classification": "D",
+    "decision": "survivor",
+    "reason": "Rule: Autocomplete/cache affordance: return cached JQL field metadata or refresh through Surface; distinct from instance getFields cache.",
+    "operationIds": [
+      "getAutoComplete"
+    ],
+    "source_methods": "get_jql_autocomplete",
+    "replacement": null,
+    "call_sequence": [
+      "Autocomplete/cache affordance: return cached JQL field metadata or refresh through Surface; distinct from instance getFields cache."
+    ],
+    "operation": "getAutoComplete",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search functions",
+    "classification": "D",
+    "decision": "survivor",
+    "reason": "Rule: Autocomplete/cache affordance: filter cached function metadata or refresh through Surface.",
+    "operationIds": [
+      "getAutoComplete"
+    ],
+    "source_methods": "get_jql_autocomplete",
+    "replacement": null,
+    "call_sequence": [
+      "Autocomplete/cache affordance: filter cached function metadata or refresh through Surface."
+    ],
+    "operation": "getAutoComplete",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search bulk-update",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Scoped search; loop per-issue updates with dry-run and checkpoints.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "editIssue"
+    ],
+    "source_methods": "search_issues\u2192update_issue\u00d7issues",
+    "replacement": null,
+    "call_sequence": [
+      "Scoped search; loop per-issue updates with dry-run and checkpoints."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search filter list",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getFiltersPaginated"
+    ],
+    "source_methods": "get_my_filters/get_favourite_filters/search_filters/get_filter",
+    "replacement": "api call getFiltersPaginated --projectId PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "getFiltersPaginated",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search filter create",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "createFilter"
+    ],
+    "source_methods": "create_filter",
+    "replacement": "api call createFilter --body @body.json",
+    "call_sequence": [],
+    "operation": "createFilter",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search filter run",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql"
+    ],
+    "source_methods": "get_filter (resolve `--filter-name`, optional)\u2192get_filter\u2192search_issues",
+    "replacement": "api call searchAndReconsileIssuesUsingJql --jql PROJECT_KEY",
+    "call_sequence": [],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search filter update",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "updateFilter"
+    ],
+    "source_methods": "update_filter",
+    "replacement": "api call updateFilter --id ID --body @body.json",
+    "call_sequence": [],
+    "operation": "updateFilter",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search filter delete",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "deleteFilter"
+    ],
+    "source_methods": "get_filter\u2192delete_filter",
+    "replacement": "api call deleteFilter --id ID",
+    "call_sequence": [],
+    "operation": "deleteFilter",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search filter share",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "addSharePermission"
+    ],
+    "source_methods": "add_filter_permission/get_filter_permissions/delete_filter_permission",
+    "replacement": "api call addSharePermission --id ID --body @body.json",
+    "call_sequence": [],
+    "operation": "addSharePermission",
+    "tier": "platform"
+  },
+  {
+    "module": "search_cmds.py",
+    "verb": "search filter favourite",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "setFavouriteForFilter"
+    ],
+    "source_methods": "add_filter_favourite or remove_filter_favourite",
+    "replacement": "api call setFavouriteForFilter --id ID",
+    "call_sequence": [],
+    "operation": "setFavouriteForFilter",
+    "tier": "platform"
+  },
+  {
+    "module": "time_cmds.py",
+    "verb": "time log",
+    "classification": "C",
+    "decision": "contract",
+    "reason": "JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior.",
+    "operationIds": [
+      "addWorklog"
+    ],
+    "source_methods": "add_worklog",
+    "replacement": null,
+    "call_sequence": [],
+    "operation": "addWorklog",
+    "tier": "platform"
+  },
+  {
+    "module": "time_cmds.py",
+    "verb": "time worklogs",
+    "classification": "C",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getIssueWorklog"
+    ],
+    "source_methods": "get_worklogs",
+    "replacement": "api call getIssueWorklog --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getIssueWorklog",
+    "tier": "platform"
+  },
+  {
+    "module": "time_cmds.py",
+    "verb": "time update-worklog",
+    "classification": "C",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "updateWorklog"
+    ],
+    "source_methods": "update_worklog",
+    "replacement": "api call updateWorklog --issueIdOrKey ISSUE_KEY --id ID --body @body.json",
+    "call_sequence": [],
+    "operation": "updateWorklog",
+    "tier": "platform"
+  },
+  {
+    "module": "time_cmds.py",
+    "verb": "time delete-worklog",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "deleteWorklog"
+    ],
+    "source_methods": "get_worklog\u2192delete_worklog",
+    "replacement": "api call deleteWorklog --issueIdOrKey ISSUE_KEY --id ID",
+    "call_sequence": [],
+    "operation": "deleteWorklog",
+    "tier": "platform"
+  },
+  {
+    "module": "time_cmds.py",
+    "verb": "time estimate",
+    "classification": "B",
+    "decision": "dropped",
+    "reason": "Read-merge-write is a prerequisite chain. Pass both originalEstimate and remainingEstimate values.",
+    "operationIds": [
+      "editIssue"
+    ],
+    "source_methods": "get_time_tracking\u2192set_time_tracking",
+    "replacement": "api call editIssue --issueIdOrKey ISSUE_KEY --field fields.timetracking.originalEstimate=VALUE --field fields.timetracking.remainingEstimate=VALUE",
+    "call_sequence": [],
+    "operation": "editIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "time_cmds.py",
+    "verb": "time tracking",
+    "classification": "A",
+    "decision": "dropped",
+    "reason": "Single indexed operation or prerequisite-only chain; use the generic surface.",
+    "operationIds": [
+      "getIssue"
+    ],
+    "source_methods": "get_time_tracking",
+    "replacement": "api call getIssue --issueIdOrKey ISSUE_KEY",
+    "call_sequence": [],
+    "operation": "getIssue",
+    "tier": "platform"
+  },
+  {
+    "module": "time_cmds.py",
+    "verb": "time report",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Search scoped issues; loop worklog reads; aggregate by requested report dimensions.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "getIssueWorklog"
+    ],
+    "source_methods": "search_issues\u2192get_worklogs\u00d7issues",
+    "replacement": null,
+    "call_sequence": [
+      "Search scoped issues; loop worklog reads; aggregate by requested report dimensions."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "time_cmds.py",
+    "verb": "time export",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Search scoped issues; loop worklog reads; transform rows to CSV file.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "getIssueWorklog"
+    ],
+    "source_methods": "search_issues\u2192get_worklogs\u00d7issues",
+    "replacement": null,
+    "call_sequence": [
+      "Search scoped issues; loop worklog reads; transform rows to CSV file."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  },
+  {
+    "module": "time_cmds.py",
+    "verb": "time bulk-log",
+    "classification": "B",
+    "decision": "survivor",
+    "reason": "Rule: Select scoped issues; loop validation and worklog mutation with dry-run and checkpoints.",
+    "operationIds": [
+      "searchAndReconsileIssuesUsingJql",
+      "getIssue",
+      "addWorklog"
+    ],
+    "source_methods": "search_issues\u2192get_issue\u00d7issues\u2192add_worklog\u00d7issues",
+    "replacement": null,
+    "call_sequence": [
+      "Select scoped issues; loop validation and worklog mutation with dry-run and checkpoints."
+    ],
+    "operation": "searchAndReconsileIssuesUsingJql",
+    "tier": "platform"
+  }
+]

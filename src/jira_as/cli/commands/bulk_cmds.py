@@ -28,7 +28,6 @@ from jira_as import (
 
 from ..cli_utils import (
     format_json,
-    get_client_from_context,
     handle_jira_errors,
     parse_comma_list,
 )
@@ -959,344 +958,534 @@ def _format_bulk_result(result: dict, operation: str) -> str:
 # =============================================================================
 
 
+# =============================================================================
+# Generic Surface workflows (legacy helpers above remain for retained callers)
+# =============================================================================
+
+
+def workflow_surface(transport: str | None):
+    """Construct the product Surface without the legacy client adapter."""
+    from jira_as import engine
+
+    return engine.create_surface(transport=transport)
+
+
+def workflow_call(surface, operation: str, parameters=None, body=None, **options):
+    """Keep every workflow request on the indexed, guarded transport path."""
+    from as_engine.errors import SurfaceError
+
+    try:
+        return surface.call(operation, parameters or {}, body, **options).body
+    except SurfaceError as exc:
+        raise click.ClickException(str(exc)) from exc
+
+
+def workflow_options(function):
+    function = click.option(
+        "--transport", type=click.Choice(["simulation", "responder", "http"])
+    )(function)
+    function = click.option(
+        "--checkpoint",
+        type=click.Path(dir_okay=False),
+        help="Resume completed steps from this bound checkpoint file.",
+    )(function)
+    return function
+
+
+class WorkflowCheckpoint:
+    """Bind a resumable selection and each successful step to one invocation.
+
+    The file is replaced atomically after each step. A checkpoint records the
+    selected issue snapshots so a status-changing JQL run resumes that selection
+    even when completed issues no longer match the original query.
+    """
+
+    def __init__(self, path, operation: str, selection: dict, options: dict):
+        import json
+        from pathlib import Path
+
+        self.path = Path(path) if path else None
+        self.binding = {
+            "operation": operation,
+            "selection": selection,
+            "options": options,
+        }
+        self.data: dict[str, Any] = {"version": 1, "binding": self.binding, "steps": {}}
+        if self.path and self.path.exists():
+            try:
+                self.data = json.loads(self.path.read_text())
+            except (OSError, ValueError) as exc:
+                raise click.ClickException("Cannot read workflow checkpoint") from exc
+            if (
+                not isinstance(self.data, dict)
+                or self.data.get("version") != 1
+                or self.data.get("binding") != self.binding
+                or not isinstance(self.data.get("steps"), dict)
+            ):
+                raise click.ClickException(
+                    "Checkpoint operation, selection or options mismatch"
+                )
+
+    def save(self):
+        import json
+        import os
+        import tempfile
+
+        if not self.path:
+            return
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        fd, temporary = tempfile.mkstemp(
+            prefix=f".{self.path.name}.", dir=self.path.parent
+        )
+        try:
+            with os.fdopen(fd, "w") as stream:
+                json.dump(self.data, stream, sort_keys=True)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(temporary, self.path)
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
+
+    def step(self, name: str, action):
+        if name in self.data["steps"]:
+            return self.data["steps"][name]
+        result = action()
+        self.data["steps"][name] = result
+        self.save()
+        return result
+
+    def select(self, surface, issues: str | None, jql: str | None, maximum: int):
+        if not issues and not jql:
+            raise click.UsageError("Either --jql or --issues is required")
+        if issues and jql:
+            raise click.UsageError("--jql and --issues are mutually exclusive")
+        if maximum < 1:
+            raise click.BadParameter("Must be positive", param_hint="--max-issues")
+        if "selected" in self.data:
+            selected = self.data["selected"]
+            if not isinstance(selected, list) or any(
+                not isinstance(item, dict) or not isinstance(item.get("key"), str)
+                for item in selected
+            ):
+                raise click.ClickException("Invalid checkpoint selection")
+            return selected
+        if issues:
+            keys = list(
+                dict.fromkeys(
+                    validate_issue_key(k) for k in parse_comma_list(issues) or []
+                )
+            )
+            selected = [
+                workflow_call(surface, "getIssue", {"issueIdOrKey": k}, raw=True)
+                for k in keys[:maximum]
+            ]
+        else:
+            selected = workflow_call(
+                surface,
+                "searchAndReconsileIssuesUsingJql",
+                {"jql": jql, "fields": ["*all"], "maxResults": min(maximum, 100)},
+                all_pages=True,
+                limit=maximum,
+                raw=True,
+            )
+        self.data["selected"] = selected
+        self.save()
+        return selected
+
+
+def workflow_transition(transitions: list[dict], targets: list[str]):
+    """Prefer exact names/statuses; refuse ambiguous fuzzy matches."""
+    for target in targets:
+        matches = [
+            t
+            for t in transitions
+            if target.casefold()
+            in {
+                str(t.get("name", "")).casefold(),
+                str(t.get("to", {}).get("name", "")).casefold(),
+            }
+        ]
+        if matches:
+            break
+    else:
+        matches = [
+            t
+            for t in transitions
+            if any(
+                target.casefold() in str(t.get("name", "")).casefold()
+                or target.casefold() in str(t.get("to", {}).get("name", "")).casefold()
+                for target in targets
+            )
+        ]
+    if len(matches) != 1:
+        reason = "Ambiguous" if matches else "No matching"
+        raise click.ClickException(f"{reason} transition for {', '.join(targets)}")
+    return matches[0]
+
+
+def workflow_link(surface, link_type: str, inward: str, outward: str):
+    return workflow_call(
+        surface,
+        "linkIssues",
+        {},
+        {
+            "type": {"name": link_type},
+            "inwardIssue": {"key": inward},
+            "outwardIssue": {"key": outward},
+        },
+        scope_argv_identity=outward.rsplit("-", 1)[0],
+    )
+
+
+def workflow_clone(
+    surface,
+    checkpoint,
+    source,
+    *,
+    target_project=None,
+    prefix=None,
+    summary=None,
+    include_subtasks=False,
+    include_links=False,
+    create_clone_link=False,
+    mapping=None,
+):
+    """Persist parent, child and link successes independently for safe resume."""
+    from copy import deepcopy
+
+    source_key = source["key"]
+    original = source.get("fields", {})
+    project = target_project or original.get("project", {}).get("key")
+    if not project:
+        raise click.ClickException(f"Source {source_key} has no project key")
+    fields = {
+        name: deepcopy(original[name]) for name in CLONE_FIELDS if name in original
+    }
+    fields["project"] = {"key": project}
+    fields["summary"] = (
+        summary or f"{prefix or '[Clone]'} {original.get('summary', '')}"
+    )
+    if original.get("issuetype", {}).get("subtask") and original.get("parent"):
+        fields["parent"] = deepcopy(original["parent"])
+    created = checkpoint.step(
+        f"{source_key}:parent",
+        lambda: workflow_call(
+            surface, "createIssue", {}, {"fields": fields}, scope_argv_identity=project
+        ),
+    )
+    clone_key = created["key"]
+    if mapping is not None:
+        mapping[source_key] = clone_key
+    result = {
+        "source": source_key,
+        "key": clone_key,
+        "original_key": source_key,
+        "clone_key": clone_key,
+        "project": project,
+        "subtasks_cloned": 0,
+        "links_copied": 0,
+        "clone_link_created": False,
+    }
+    if include_subtasks:
+        for subtask in original.get("subtasks", []):
+            child_key = subtask["key"]
+
+            def create_child(child_key=child_key):
+                child = workflow_call(
+                    surface, "getIssue", {"issueIdOrKey": child_key}, raw=True
+                )
+                child_fields = {
+                    name: deepcopy(child.get("fields", {})[name])
+                    for name in CLONE_FIELDS
+                    if name in child.get("fields", {})
+                }
+                child_fields.update(project={"key": project}, parent={"key": clone_key})
+                return workflow_call(
+                    surface,
+                    "createIssue",
+                    {},
+                    {"fields": child_fields},
+                    scope_argv_identity=project,
+                )
+
+            child = checkpoint.step(f"{source_key}:subtask:{child_key}", create_child)
+            if mapping is not None:
+                mapping[child_key] = child["key"]
+            result["subtasks_cloned"] += 1
+    if create_clone_link:
+        checkpoint.step(
+            f"{source_key}:clone-link",
+            lambda: workflow_link(surface, "Cloners", clone_key, source_key),
+        )
+        result["clone_link_created"] = True
+    if include_links:
+        for index, link in enumerate(original.get("issuelinks", [])):
+            inward, outward = clone_key, None
+            if "outwardIssue" in link:
+                outward = link["outwardIssue"]["key"]
+            elif "inwardIssue" in link:
+                inward, outward = link["inwardIssue"]["key"], clone_key
+            if outward is None:
+                continue
+            if mapping:
+                inward, outward = (
+                    mapping.get(inward, inward),
+                    mapping.get(outward, outward),
+                )
+            checkpoint.step(
+                f"{source_key}:link:{link.get('id', index)}",
+                lambda inward=inward, outward=outward, link=link: workflow_link(
+                    surface, link["type"]["name"], inward, outward
+                ),
+            )
+            result["links_copied"] += 1
+    return result
+
+
+def _run_bulk(
+    operation,
+    *,
+    jql,
+    issues,
+    dry_run,
+    max_issues,
+    yes,
+    transport,
+    checkpoint,
+    **options,
+):
+    surface = workflow_surface(transport)
+    state = WorkflowCheckpoint(
+        checkpoint,
+        f"bulk {operation}",
+        {"jql": jql, "issues": issues, "maximum": max_issues},
+        options,
+    )
+    selected = state.select(surface, issues, jql, max_issues)
+    preview = dry_run or (operation == "delete" and not yes)
+    result: dict[str, Any] = {
+        "dry_run": preview,
+        "success": 0,
+        "failed": 0,
+        "total": len(selected),
+        "errors": {},
+        "processed": [],
+        "issues": [],
+        "created_issues": [],
+        "would_process": len(selected),
+    }
+    account = None
+    if operation == "assign" and selected and not options.get("unassign"):
+        assignee = options["assignee"]
+
+        def resolve_assignee():
+            if assignee == "self":
+                return workflow_call(surface, "getCurrentUser")["accountId"]
+            if "@" in assignee:
+                users = workflow_call(
+                    surface,
+                    "findAssignableUsers",
+                    {"query": assignee, "issueKey": selected[0]["key"]},
+                )
+                exact = [
+                    u
+                    for u in users
+                    if u.get("emailAddress", "").casefold() == assignee.casefold()
+                ]
+                if len(exact) != 1:
+                    raise click.ClickException("Assignee did not resolve unambiguously")
+                return exact[0]["accountId"]
+            return assignee
+
+        account = state.step("assignee", resolve_assignee)
+    mapping: dict[str, str] = {}
+    for issue in selected:
+        key = issue["key"]
+        try:
+            if f"{key}:complete" in state.data["steps"]:
+                saved = state.data["steps"][f"{key}:complete"]
+                if operation == "clone":
+                    result["created_issues"].append(saved)
+                    mapping[key] = saved["key"]
+                result["success"] += 1
+                result["processed"].append(key)
+                continue
+            plan = {"key": key, "summary": issue.get("fields", {}).get("summary", "")}
+            if operation == "transition":
+
+                def choose():
+                    transitions = workflow_call(
+                        surface, "getTransitions", {"issueIdOrKey": key}
+                    ).get("transitions", [])
+                    return workflow_transition(transitions, [options["target_status"]])
+
+                transition = state.step(f"{key}:choice", choose)
+                plan.update(
+                    {
+                        "from": issue.get("fields", {}).get("status", {}).get("name"),
+                        "to": transition.get("to", {}).get(
+                            "name", transition.get("name")
+                        ),
+                    }
+                )
+            result["issues"].append(plan)
+            if preview:
+                continue
+            saved = None
+            if operation == "transition":
+                body = {"transition": {"id": transition["id"]}}
+                if options.get("resolution"):
+                    body["fields"] = {"resolution": {"name": options["resolution"]}}
+                state.step(
+                    f"{key}:mutation",
+                    lambda: workflow_call(
+                        surface, "doTransition", {"issueIdOrKey": key}, body
+                    ),
+                )
+                if options.get("comment"):
+                    state.step(
+                        f"{key}:comment",
+                        lambda: workflow_call(
+                            surface,
+                            "addComment",
+                            {"issueIdOrKey": key},
+                            {"body": options["comment"]},
+                        ),
+                    )
+            elif operation == "assign":
+                state.step(
+                    f"{key}:mutation",
+                    lambda: workflow_call(
+                        surface,
+                        "assignIssue",
+                        {"issueIdOrKey": key},
+                        {"accountId": account},
+                    ),
+                )
+            elif operation == "set-priority":
+                state.step(
+                    f"{key}:mutation",
+                    lambda: workflow_call(
+                        surface,
+                        "editIssue",
+                        {"issueIdOrKey": key},
+                        {"fields": {"priority": {"name": options["priority"]}}},
+                    ),
+                )
+            elif operation == "delete":
+                state.step(
+                    f"{key}:mutation",
+                    lambda: workflow_call(
+                        surface,
+                        "deleteIssue",
+                        {
+                            "issueIdOrKey": key,
+                            "deleteSubtasks": str(not options["no_subtasks"]).lower(),
+                        },
+                    ),
+                )
+            elif operation == "clone":
+                saved = workflow_clone(
+                    surface, state, issue, mapping=mapping, **options
+                )
+                result["created_issues"].append(saved)
+            state.step(f"{key}:complete", lambda: saved)
+            result["success"] += 1
+            result["processed"].append(key)
+        except click.ClickException as exc:
+            result["failed"] += 1
+            result["errors"][key] = str(exc)
+    return result
+
+
+def _bulk_options(function):
+    for decorator in (
+        click.option("--jql", "-q"),
+        click.option("--issues", "-i"),
+        click.option("--dry-run", "-n", is_flag=True),
+        click.option("--max-issues", "-m", type=click.IntRange(min=1), default=100),
+        click.option("--yes", "--confirm", "-y", is_flag=True),
+        click.option(
+            "--output", "-o", type=click.Choice(["text", "json"]), default="text"
+        ),
+        workflow_options,
+    ):
+        function = decorator(function)
+    return function
+
+
+def _emit_bulk(result, output, operation):
+    rendered = (
+        format_json(result)
+        if output == "json"
+        else _format_bulk_result(result, operation)
+    )
+    if output == "text" and result.get("dry_run"):
+        rendered = rendered.replace(
+            "Use --yes to apply changes",
+            "Use --confirm or --yes to apply deletion"
+            if operation == "delete"
+            else "Omit --dry-run to apply changes",
+        )
+    click.echo(rendered)
+    if result["failed"]:
+        raise click.exceptions.Exit(1)
+
+
 @click.group()
 def bulk():
     """Commands for bulk operations on multiple issues."""
-    pass
 
 
 @bulk.command(name="transition")
-@click.option("--jql", "-q", help="JQL query to find issues")
-@click.option("--issues", "-i", help="Comma-separated issue keys")
-@click.option("--to", "-t", "target_status", required=True, help="Target status name")
-@click.option("--comment", "-c", help="Add comment with transition")
-@click.option("--resolution", "-r", help="Resolution for Done transitions")
-@click.option("--dry-run", "-n", is_flag=True, help="Preview without making changes")
-@click.option(
-    "--max-issues", "-m", type=int, default=100, help="Maximum issues to process"
-)
-@click.option("--yes", "-y", is_flag=True, help="Skip confirmation")
-@click.option(
-    "--output",
-    "-o",
-    type=click.Choice(["text", "json"]),
-    default="text",
-    help="Output format",
-)
-@click.pass_context
+@click.option("--to", "-t", "target_status", required=True)
+@click.option("--comment", "-c")
+@click.option("--resolution", "-r")
+@_bulk_options
 @handle_jira_errors
-def bulk_transition(
-    ctx: click.Context,
-    jql,
-    issues,
-    target_status,
-    comment,
-    resolution,
-    dry_run,
-    max_issues,
-    yes,
-    output,
-):
-    """Transition multiple issues to a new status.
-
-    Specify issues using either --jql or --issues (mutually exclusive).
-
-    Examples:
-        jira-as bulk transition --jql "project=PROJ AND status=Open" --to Done
-        jira-as bulk transition --issues PROJ-1,PROJ-2 --to "In Progress"
-    """
-    if not jql and not issues:
-        raise click.UsageError("Either --jql or --issues is required")
-    if jql and issues:
-        raise click.UsageError("--jql and --issues are mutually exclusive")
-
-    client = get_client_from_context(ctx)
-    issue_keys = parse_comma_list(issues)
-
-    result = _bulk_transition_impl(
-        issue_keys=issue_keys,
-        jql=jql,
-        target_status=target_status,
-        resolution=resolution,
-        comment=comment,
-        dry_run=dry_run or not yes,
-        max_issues=max_issues,
-        client=client,
-    )
-
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(_format_bulk_result(result, f"transition to '{target_status}'"))
-
-    if result.get("failed", 0) > 0 and not result.get("dry_run"):
-        ctx.exit(1)
+def bulk_transition(output, **options):
+    """Preview with --dry-run; otherwise transition all selected issues."""
+    _emit_bulk(_run_bulk("transition", **options), output, "transition")
 
 
 @bulk.command(name="assign")
-@click.option("--jql", "-q", help="JQL query to find issues")
-@click.option("--issues", "-i", help="Comma-separated issue keys")
-@click.option("--assignee", "-a", help='User to assign (account ID, email, or "self")')
-@click.option("--unassign", is_flag=True, help="Unassign all matching issues")
-@click.option("--dry-run", "-n", is_flag=True, help="Preview without making changes")
-@click.option(
-    "--max-issues", "-m", type=int, default=100, help="Maximum issues to process"
-)
-@click.option("--yes", "-y", is_flag=True, help="Skip confirmation")
-@click.option(
-    "--output",
-    "-o",
-    type=click.Choice(["text", "json"]),
-    default="text",
-    help="Output format",
-)
-@click.pass_context
+@click.option("--assignee", "-a")
+@click.option("--unassign", is_flag=True)
+@_bulk_options
 @handle_jira_errors
-def bulk_assign(
-    ctx: click.Context,
-    jql,
-    issues,
-    assignee,
-    unassign,
-    dry_run,
-    max_issues,
-    yes,
-    output,
-):
-    """Assign or unassign multiple issues.
-
-    Specify issues using either --jql or --issues (mutually exclusive).
-    Specify target using either --assignee or --unassign.
-
-    Examples:
-        jira-as bulk assign --jql "project=PROJ AND status=Open" --assignee john.doe
-        jira-as bulk assign --jql "assignee=leaving.user" --unassign
-        jira-as bulk assign --issues PROJ-1,PROJ-2 --assignee self
-    """
-    if not jql and not issues:
-        raise click.UsageError("Either --jql or --issues is required")
-    if jql and issues:
-        raise click.UsageError("--jql and --issues are mutually exclusive")
-    if not assignee and not unassign:
-        raise click.UsageError("Either --assignee or --unassign is required")
-    if assignee and unassign:
-        raise click.UsageError("--assignee and --unassign are mutually exclusive")
-
-    client = get_client_from_context(ctx)
-    issue_keys = parse_comma_list(issues)
-
-    result = _bulk_assign_impl(
-        issue_keys=issue_keys,
-        jql=jql,
-        assignee=assignee,
-        unassign=unassign,
-        dry_run=dry_run or not yes,
-        max_issues=max_issues,
-        client=client,
-    )
-
-    action = result.get("action", "unassign" if unassign else f"assign to {assignee}")
-
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(_format_bulk_result(result, action))
-
-    if result.get("failed", 0) > 0 and not result.get("dry_run"):
-        ctx.exit(1)
+def bulk_assign(output, **options):
+    """Assign or unassign selected issues."""
+    if bool(options["assignee"]) == bool(options["unassign"]):
+        raise click.UsageError("Specify exactly one of --assignee or --unassign")
+    _emit_bulk(_run_bulk("assign", **options), output, "assign")
 
 
 @bulk.command(name="set-priority")
-@click.option("--jql", "-q", help="JQL query to find issues")
-@click.option("--issues", "-i", help="Comma-separated issue keys")
-@click.option(
-    "--priority",
-    "-p",
-    required=True,
-    help="Priority name (Highest, High, Medium, Low, Lowest)",
-)
-@click.option("--dry-run", "-n", is_flag=True, help="Preview without making changes")
-@click.option(
-    "--max-issues", "-m", type=int, default=100, help="Maximum issues to process"
-)
-@click.option("--yes", "-y", is_flag=True, help="Skip confirmation")
-@click.option(
-    "--output",
-    "-o",
-    type=click.Choice(["text", "json"]),
-    default="text",
-    help="Output format",
-)
-@click.pass_context
+@click.option("--priority", "-p", required=True)
+@_bulk_options
 @handle_jira_errors
-def bulk_set_priority(
-    ctx: click.Context, jql, issues, priority, dry_run, max_issues, yes, output
-):
-    """Set priority for multiple issues.
-
-    Specify issues using either --jql or --issues (mutually exclusive).
-
-    Examples:
-        jira-as bulk set-priority --jql "type=Bug AND labels=critical" --priority Highest
-        jira-as bulk set-priority --issues PROJ-1,PROJ-2 --priority High
-    """
-    if not jql and not issues:
-        raise click.UsageError("Either --jql or --issues is required")
-    if jql and issues:
-        raise click.UsageError("--jql and --issues are mutually exclusive")
-
-    client = get_client_from_context(ctx)
-    issue_keys = parse_comma_list(issues)
-
-    result = _bulk_set_priority_impl(
-        issue_keys=issue_keys,
-        jql=jql,
-        priority=priority,
-        dry_run=dry_run or not yes,
-        max_issues=max_issues,
-        client=client,
-    )
-
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(_format_bulk_result(result, f"set priority to '{priority}'"))
-
-    if result.get("failed", 0) > 0 and not result.get("dry_run"):
-        ctx.exit(1)
+def bulk_set_priority(output, **options):
+    """Set the priority of selected issues."""
+    _emit_bulk(_run_bulk("set-priority", **options), output, "set priority")
 
 
 @bulk.command(name="clone")
-@click.option("--jql", "-q", help="JQL query to find issues")
-@click.option("--issues", "-i", help="Comma-separated issue keys")
-@click.option("--target-project", "-t", help="Target project key for clones")
-@click.option("--prefix", "-P", help="Prefix for cloned issue summaries")
-@click.option("--include-links", "-l", is_flag=True, help="Clone issue links")
-@click.option("--include-subtasks", "-s", is_flag=True, help="Clone subtasks")
-@click.option("--dry-run", "-n", is_flag=True, help="Preview without making changes")
-@click.option(
-    "--max-issues", "-m", type=int, default=100, help="Maximum issues to process"
-)
-@click.option("--yes", "-y", is_flag=True, help="Skip confirmation")
-@click.option(
-    "--output",
-    "-o",
-    type=click.Choice(["text", "json"]),
-    default="text",
-    help="Output format",
-)
-@click.pass_context
+@click.option("--target-project", "-t")
+@click.option("--prefix", "-P")
+@click.option("--include-links", "-l", is_flag=True)
+@click.option("--include-subtasks", "-s", is_flag=True)
+@_bulk_options
 @handle_jira_errors
-def bulk_clone(
-    ctx: click.Context,
-    jql,
-    issues,
-    target_project,
-    prefix,
-    include_links,
-    include_subtasks,
-    dry_run,
-    max_issues,
-    yes,
-    output,
-):
-    """Clone multiple issues.
-
-    Specify issues using either --jql or --issues (mutually exclusive).
-
-    Examples:
-        jira-as bulk clone --jql "sprint='Sprint 42'" --include-subtasks --include-links
-        jira-as bulk clone --issues PROJ-1,PROJ-2 --target-project NEWPROJ --prefix "[Clone]"
-    """
-    if not jql and not issues:
-        raise click.UsageError("Either --jql or --issues is required")
-    if jql and issues:
-        raise click.UsageError("--jql and --issues are mutually exclusive")
-
-    client = get_client_from_context(ctx)
-    issue_keys = parse_comma_list(issues)
-
-    result = _bulk_clone_impl(
-        issue_keys=issue_keys,
-        jql=jql,
-        target_project=target_project,
-        prefix=prefix,
-        include_subtasks=include_subtasks,
-        include_links=include_links,
-        dry_run=dry_run or not yes,
-        max_issues=max_issues,
-        client=client,
-    )
-
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(_format_bulk_result(result, "clone"))
-
-    if result.get("failed", 0) > 0 and not result.get("dry_run"):
-        ctx.exit(1)
+def bulk_clone(output, **options):
+    """Clone selected issues, optionally copying subtasks and links."""
+    _emit_bulk(_run_bulk("clone", **options), output, "clone")
 
 
 @bulk.command(name="delete")
-@click.option("--jql", "-q", help="JQL query to find issues")
-@click.option("--issues", "-i", help="Comma-separated issue keys")
-@click.option("--no-subtasks", is_flag=True, help="Do NOT delete subtasks")
-@click.option(
-    "--dry-run", "-n", is_flag=True, help="Preview without deleting (RECOMMENDED)"
-)
-@click.option(
-    "--max-issues", "-m", type=int, default=100, help="Maximum issues to process"
-)
-@click.option("--yes", "-y", is_flag=True, help="Skip confirmation (use with caution)")
-@click.option(
-    "--output",
-    "-o",
-    type=click.Choice(["text", "json"]),
-    default="text",
-    help="Output format",
-)
-@click.pass_context
+@click.option("--no-subtasks", is_flag=True)
+@_bulk_options
 @handle_jira_errors
-def bulk_delete(
-    ctx: click.Context, jql, issues, no_subtasks, dry_run, max_issues, yes, output
-):
-    """Delete multiple issues permanently.
-
-    WARNING: This is a destructive operation. Deleted issues cannot be recovered.
-
-    Specify issues using either --jql or --issues (mutually exclusive).
-    Always use --dry-run first to preview what would be deleted.
-
-    Examples:
-        jira-as bulk delete --jql "project=DEMO" --dry-run
-        jira-as bulk delete --issues DEMO-1,DEMO-2 --yes
-    """
-    if not jql and not issues:
-        raise click.UsageError("Either --jql or --issues is required")
-    if jql and issues:
-        raise click.UsageError("--jql and --issues are mutually exclusive")
-
-    # Safety warning for non-dry-run
-    if not dry_run and not yes:
-        click.echo("WARNING: This will PERMANENTLY delete issues.")
-        click.echo("Consider using --dry-run first to preview.\n")
-
-    client = get_client_from_context(ctx)
-    issue_keys = parse_comma_list(issues)
-
-    result = _bulk_delete_impl(
-        issue_keys=issue_keys,
-        jql=jql,
-        dry_run=dry_run or not yes,
-        max_issues=max_issues,
-        delete_subtasks=not no_subtasks,
-        client=client,
-    )
-
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(_format_bulk_result(result, "delete"))
-
-    if result.get("failed", 0) > 0 and not result.get("dry_run"):
-        ctx.exit(1)
+def bulk_delete(output, **options):
+    """Preview permanent deletion; send only with --confirm or --yes."""
+    _emit_bulk(_run_bulk("delete", **options), output, "delete")

@@ -1,0 +1,82 @@
+[
+  {
+    "case": "tests/commands/test_agile_cmds.py::TestOtherAgileCommands::test_estimates_by_sprint",
+    "verb": "agile estimates",
+    "authority": "decision 21a"
+  },
+  {
+    "case": "tests/commands/test_agile_cmds.py::TestOtherAgileCommands::test_estimates_no_params",
+    "verb": "agile estimates",
+    "authority": "decision 21a"
+  },
+  {
+    "case": "tests/commands/test_agile_cmds.py::TestErrorHandling::test_jira_error_handled",
+    "verb": "agile epic get",
+    "authority": "decision 21a"
+  },
+  {
+    "authority": "decision 21b",
+    "table_amendments": [
+      {
+        "row": "agile sprint manage",
+        "field": "operationIds",
+        "old": [
+          "searchAndReconsileIssuesUsingJql",
+          "moveIssuesToSprintAndRank",
+          "updateSprint"
+        ],
+        "new": [
+          "searchAndReconsileIssuesUsingJql",
+          "moveIssuesToSprintAndRank",
+          "partiallyUpdateSprint"
+        ],
+        "reason": "Decision 21b: native partiallyUpdateSprint POST is the faithful single mutation; updateSprint was a full PUT."
+      },
+      {
+        "row": "agile sprint manage",
+        "field": "call_sequence",
+        "old": [
+          "Close mode searches incomplete issues; branch to move them; close sprint only after move succeeds; preserve start/update modes."
+        ],
+        "new": [
+          "Close mode searches incomplete issues; branch to move them; close sprint only after move succeeds; start/update/close use partiallyUpdateSprint POST with only changed fields."
+        ],
+        "reason": "Decision 21b: native partiallyUpdateSprint POST is the faithful single mutation; updateSprint was a full PUT."
+      }
+    ]
+  },
+  {
+    "case": "tests/commands/test_search_cmds.py::TestErrorHandling::test_jira_error_handling",
+    "verb": "search filter list --my",
+    "authority": "decision 21a"
+  },
+  {
+    "case": "tests/test_project_guard.py::test_public_cli_refuses_before_factory_in_mock_mode[args2]",
+    "verb": "admin project get",
+    "authority": "decision 21a",
+    "argv": [
+      "admin",
+      "project",
+      "get",
+      "OTHER"
+    ],
+    "reason": "Dropped-verb parameter case; retained issue get and search query guard cases unchanged."
+  },
+  {
+    "case": "tests/test_project_guard.py::test_public_cli_refuses_before_factory_in_mock_mode[args3]",
+    "verb": "admin project create",
+    "authority": "decision 21a",
+    "argv": [
+      "admin",
+      "project",
+      "create",
+      "--key",
+      "OTHER",
+      "--name",
+      "Test",
+      "--type",
+      "software"
+    ],
+    "reason": "Dropped-verb parameter case; retained issue get and search query guard cases unchanged."
+  }
+]

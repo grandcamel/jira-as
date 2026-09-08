@@ -145,6 +145,17 @@ class ConfigManager(BaseConfigManager):
 
         return url, email, api_token
 
+    def get_fields_cache_directory(self) -> str:
+        """Explicit instance cache namespace; no credential-derived metadata."""
+        value = os.environ.get("JIRA_FIELDS_CACHE_DIR")
+        if value is None:
+            value = self.config.get("jira", {}).get(
+                "fields_cache_dir", "~/.cache/jira-as/v2"
+            )
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError("JIRA_FIELDS_CACHE_DIR must name a cache directory")
+        return value
+
     def get_api_config(self) -> dict[str, Any]:
         """
         Get API configuration (timeout, retries, etc.).

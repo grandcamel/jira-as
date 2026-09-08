@@ -2181,57 +2181,49 @@ def request_status(ctx, issue_key: str, output: str):
 @click.option("--internal", is_flag=True, help="Make comment internal")
 @click.option("--show-transitions", is_flag=True, help="Show available transitions")
 @click.option("--dry-run", is_flag=True, help="Show what would be done")
+@click.option("--transport", type=click.Choice(["http", "responder", "simulation"]))
 @click.pass_context
 @handle_jira_errors
 def request_transition(
     ctx,
-    issue_key: str,
-    transition_name: str,
-    transition_id: str,
-    comment: str,
-    public: bool,
-    internal: bool,
-    show_transitions: bool,
-    dry_run: bool,
+    issue_key,
+    transition_name,
+    transition_id,
+    comment,
+    public,
+    internal,
+    show_transitions,
+    dry_run,
+    transport,
 ):
-    """Transition a request to a new status."""
-    if show_transitions:
-        transitions = _list_request_transitions_impl(issue_key)
-        click.echo(f"\nAvailable transitions for {issue_key}:")
-        click.echo(_format_transitions(transitions))
-        return
+    from .bulk_cmds import workflow_call, workflow_surface, workflow_transition
 
-    if not transition_name and not transition_id:
-        print_error("Either --to or --transition-id must be provided")
-        ctx.exit(1)
-
-    is_public = not internal
-
-    if dry_run:
-        click.echo("DRY RUN MODE - No changes will be made\n")
-        click.echo(f"Would transition request {issue_key}:")
-        if transition_name:
-            click.echo(f"  To: {transition_name}")
-        if transition_id:
-            click.echo(f"  Transition ID: {transition_id}")
-        if comment:
-            visibility = "Public" if is_public else "Internal"
-            click.echo(f"  Comment: {comment}")
-            click.echo(f"  Visibility: {visibility}")
-        return
-
-    _transition_request_impl(
-        issue_key=issue_key,
-        transition_id=transition_id,
-        transition_name=transition_name,
-        comment=comment,
-        public=is_public,
+    surface = workflow_surface(transport)
+    values = workflow_call(
+        surface, "getCustomerTransitions", {"issueIdOrKey": issue_key}, all_pages=True
     )
-
-    print_success(f"Request {issue_key} transitioned successfully!")
+    if show_transitions:
+        click.echo(json.dumps(values, indent=2))
+        return
+    if bool(transition_id) == bool(transition_name):
+        raise click.UsageError("Supply exactly one of --to or --transition-id")
+    if transition_id:
+        matches = [row for row in values if str(row.get("id")) == str(transition_id)]
+        if len(matches) != 1:
+            raise click.UsageError("Transition ID is unavailable or ambiguous")
+        chosen = matches[0]
+    else:
+        chosen = workflow_transition(values, [transition_name])
+    body = {"id": chosen["id"]}
     if comment:
-        visibility = "public" if is_public else "internal"
-        click.echo(f"Comment added ({visibility}): {comment}")
+        body["additionalComment"] = {"body": comment, "public": not internal}
+    if not dry_run:
+        workflow_call(
+            surface, "performCustomerTransition", {"issueIdOrKey": issue_key}, body
+        )
+    click.echo(
+        json.dumps({"issue": issue_key, "transition": chosen, "dry_run": dry_run})
+    )
 
 
 @request.command(name="comment")
@@ -2427,29 +2419,41 @@ def customer_list(
 @click.option("--display-name", "-n", help="Customer display name")
 @click.option("--dry-run", is_flag=True, help="Show what would be created")
 @click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
+@click.option("--transport", type=click.Choice(["http", "responder", "simulation"]))
 @click.pass_context
 @handle_jira_errors
 def customer_create(
-    ctx, service_desk_id: str, email: str, display_name: str, dry_run: bool, output: str
+    ctx, service_desk_id, email, display_name, dry_run, output, transport
 ):
-    """Create a new customer."""
+    from .bulk_cmds import workflow_call, workflow_surface
+
+    body = {"email": email, "displayName": display_name or email.split("@", 1)[0]}
     if dry_run:
-        click.echo("DRY RUN MODE - No changes will be made\n")
-        click.echo("Would create customer:")
-        click.echo(f"  Service Desk: {service_desk_id}")
-        click.echo(f"  Email: {email}")
-        if display_name:
-            click.echo(f"  Display Name: {display_name}")
+        click.echo(
+            json.dumps(
+                {"dry_run": True, "customer": body, "serviceDeskId": service_desk_id}
+            )
+        )
         return
-
-    result = _create_customer_impl(service_desk_id, email, display_name)
-
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        print_success("Customer created successfully!")
-        click.echo(f"Account ID: {result.get('accountId')}")
-        click.echo(f"Email: {result.get('emailAddress')}")
+    surface = workflow_surface(transport)
+    created = workflow_call(surface, "createCustomer", {}, body)
+    account = created.get("accountId")
+    if not account:
+        raise click.ClickException(
+            "Customer response has no accountId; not added to the desk"
+        )
+    try:
+        workflow_call(
+            surface,
+            "addCustomers",
+            {"serviceDeskId": service_desk_id},
+            {"accountIds": [account]},
+        )
+    except click.ClickException as exc:
+        raise click.ClickException(
+            f"Customer {account} was created; adding it to service desk {service_desk_id} failed: {exc}"
+        ) from exc
+    click.echo(json.dumps({**created, "serviceDeskId": service_desk_id}))
 
 
 @customer.command(name="add")
@@ -2788,36 +2792,61 @@ def sla_check_breach(ctx, issue_key: str, output: str):
 @click.option(
     "--output", "-o", type=click.Choice(["text", "csv", "json"]), default="text"
 )
+@click.option("--transport", type=click.Choice(["http", "responder", "simulation"]))
 @click.pass_context
 @handle_jira_errors
 def sla_report(
-    ctx,
-    project: str,
-    service_desk: int,
-    jql: str,
-    sla_name: str,
-    breached_only: bool,
-    output: str,
+    ctx, project, service_desk, jql, sla_name, breached_only, output, transport
 ):
-    """Generate SLA compliance report."""
-    if not any([project, service_desk, jql]):
-        print_error("Must specify --project, --service-desk, or --jql")
-        ctx.exit(1)
+    from .bulk_cmds import workflow_call, workflow_surface
 
-    result = _generate_sla_report_impl(
-        project=project,
-        service_desk_id=service_desk,
-        jql=jql,
-        sla_name=sla_name,
-        breached_only=breached_only,
+    if not project and not jql:
+        raise click.UsageError(
+            "--project or scoped --jql is required; a service desk ID does not prove project scope"
+        )
+    surface = workflow_surface(transport)
+    query = jql or f'project = "{project}"'
+    issues = workflow_call(
+        surface, "searchAndReconsileIssuesUsingJql", {"jql": query}, all_pages=True
     )
+    rows = []
+    for issue in issues:
+        if service_desk is not None:
+            details = workflow_call(
+                surface, "getCustomerRequestByIdOrKey", {"issueIdOrKey": issue["key"]}
+            )
+            if str(details.get("serviceDeskId")) != str(service_desk):
+                continue
+        values = workflow_call(
+            surface, "getSlaInformation", {"issueIdOrKey": issue["key"]}, all_pages=True
+        )
+        for sla_value in values:
+            if sla_name and sla_value.get("name") != sla_name:
+                continue
+            cycles = [
+                *sla_value.get("completedCycles", []),
+                sla_value.get("ongoingCycle", {}),
+            ]
+            breached = any(cycle.get("breached", False) for cycle in cycles)
+            if not breached_only or breached:
+                rows.append(
+                    {
+                        "issue": issue["key"],
+                        "name": sla_value.get("name"),
+                        "breached": breached,
+                    }
+                )
+    if output == "csv":
+        import csv
+        import io
 
-    if output == "json":
-        click.echo(json.dumps(result, indent=2))
-    elif output == "csv":
-        click.echo(_format_sla_report_csv(result))
+        stream = io.StringIO()
+        writer = csv.DictWriter(stream, fieldnames=["issue", "name", "breached"])
+        writer.writeheader()
+        writer.writerows(rows)
+        click.echo(stream.getvalue(), nl=False)
     else:
-        click.echo(_format_sla_report_text(result))
+        click.echo(json.dumps({"issues_checked": len(issues), "slas": rows}, indent=2))
 
 
 # -----------------------------------------------------------------------------
@@ -2849,16 +2878,40 @@ def approval_list(ctx, issue_key: str, output: str):
 @approval.command(name="pending")
 @click.option("--service-desk-id", "-s", type=int, help="Filter by service desk")
 @click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
+@click.option("--transport", type=click.Choice(["http", "responder", "simulation"]))
+@click.option("--project", "-p")
+@click.option("--jql", "-j")
 @click.pass_context
 @handle_jira_errors
-def approval_pending(ctx, service_desk_id: int, output: str):
-    """List pending approvals."""
-    result = _list_pending_approvals_impl(service_desk_id=service_desk_id)
+def approval_pending(ctx, service_desk_id, output, transport, project, jql):
+    from .bulk_cmds import workflow_call, workflow_surface
 
-    if output == "json":
-        click.echo(json.dumps(result, indent=2))
-    else:
-        click.echo(_format_pending_approvals(result))
+    if not project and not jql:
+        raise click.UsageError(
+            "--project or scoped --jql is required; no service-desk-to-project inference"
+        )
+    surface = workflow_surface(transport)
+    issues = workflow_call(
+        surface,
+        "searchAndReconsileIssuesUsingJql",
+        {"jql": jql or f'project = "{project}"'},
+        all_pages=True,
+    )
+    result = []
+    for issue in issues:
+        if service_desk_id is not None:
+            details = workflow_call(
+                surface, "getCustomerRequestByIdOrKey", {"issueIdOrKey": issue["key"]}
+            )
+            if str(details.get("serviceDeskId")) != str(service_desk_id):
+                continue
+        approvals = workflow_call(
+            surface, "getApprovals", {"issueIdOrKey": issue["key"]}, all_pages=True
+        )
+        for value in approvals:
+            if value.get("finalDecision") == "pending":
+                result.append({"issue": issue["key"], **value})
+    click.echo(json.dumps(result, indent=2))
 
 
 @approval.command(name="approve")
@@ -2997,16 +3050,42 @@ def kb_get(ctx, article_id: str, output: str):
 @click.argument("issue_key")
 @click.option("--max-results", "-m", type=int, default=5, help="Maximum suggestions")
 @click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
+@click.option("--transport", type=click.Choice(["http", "responder", "simulation"]))
 @click.pass_context
 @handle_jira_errors
-def kb_suggest(ctx, issue_key: str, max_results: int, output: str):
-    """Suggest KB articles for an issue."""
-    result = _suggest_kb_impl(issue_key, max_results)
+def kb_suggest(ctx, issue_key, max_results, output, transport):
+    from .bulk_cmds import workflow_call, workflow_surface
 
-    if output == "json":
-        click.echo(json.dumps(result, indent=2))
+    if max_results < 1:
+        raise click.UsageError("--max-results must be positive")
+    surface = workflow_surface(transport)
+    request_value = workflow_call(
+        surface, "getCustomerRequestByIdOrKey", {"issueIdOrKey": issue_key}
+    )
+    summary = next(
+        (
+            row.get("value", "")
+            for row in request_value.get("requestFieldValues", [])
+            if row.get("fieldId") == "summary"
+        ),
+        "",
+    )
+    terms = " ".join(str(summary).split()[:5])
+    desk = request_value.get("serviceDeskId")
+    if not terms or not desk:
+        result = {
+            "values": [],
+            "note": "Request has no summary keywords or service desk",
+        }
     else:
-        click.echo(_format_kb_search_results(result))
+        result = workflow_call(
+            surface,
+            "getServiceDeskArticles",
+            {"serviceDeskId": str(desk), "query": terms},
+            all_pages=True,
+            limit=max_results,
+        )
+    click.echo(json.dumps(result, indent=2))
 
 
 # -----------------------------------------------------------------------------

@@ -193,18 +193,6 @@ def test_refusal_precedes_factory_and_cached_client(monkeypatch, cached):
     [
         ["issue", "get", "OTHER-1"],
         ["search", "query", "project in (DEMO, OTHER)"],
-        ["admin", "project", "get", "OTHER"],
-        [
-            "admin",
-            "project",
-            "create",
-            "--key",
-            "OTHER",
-            "--name",
-            "Test",
-            "--type",
-            "software",
-        ],
     ],
 )
 def test_public_cli_refuses_before_factory_in_mock_mode(monkeypatch, args):

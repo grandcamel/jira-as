@@ -1,39 +1,26 @@
 """Tests for agile_cmds.py - Agile/Scrum commands."""
 
-import json
 from unittest.mock import MagicMock, patch
 
 import pytest
 from click.testing import CliRunner
 
-from jira_as import JiraError, NotFoundError, ValidationError
+from jira_as import ValidationError
 from jira_as.cli.commands.agile_cmds import (
     FIBONACCI_SEQUENCE,
     VALID_EPIC_COLORS,
     _add_to_epic_impl,
     _close_sprint_impl,
     _convert_description_to_adf,
-    _create_epic_impl,
-    _create_sprint_impl,
     _create_subtask_impl,
     _estimate_issue_impl,
-    _format_boards,
-    _format_epic_created,
     _format_epic_details,
     _format_sprint_details,
-    _format_sprint_list,
     _format_velocity,
-    _get_active_sprint_impl,
     _get_backlog_impl,
     _get_board_for_project,
     _get_board_id_for_project,
-    _get_epic_impl,
-    _get_estimates_impl,
-    _get_sprint_impl,
     _get_velocity_impl,
-    _list_boards_impl,
-    _list_sprints_impl,
-    _move_to_backlog_impl,
     _move_to_sprint_impl,
     _parse_date_safe,
     _rank_issue_impl,
@@ -329,126 +316,6 @@ class TestHelperFunctions:
 class TestEpicImplementation:
     """Tests for epic implementation functions."""
 
-    def test_create_epic_impl_success(self, mock_client, sample_epic):
-        """Test creating an epic."""
-        mock_client.create_issue.return_value = sample_epic
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_jira_client",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_fields",
-                return_value={
-                    "epic_name": "customfield_10011",
-                    "epic_color": "customfield_10012",
-                },
-            ),
-        ):
-            result = _create_epic_impl(
-                project="PROJ",
-                summary="Epic Summary",
-                epic_name="Epic Name Value",
-                color="blue",
-            )
-
-        assert result["key"] == "PROJ-100"
-        mock_client.create_issue.assert_called_once()
-        mock_client.__enter__.assert_called_once()
-        mock_client.__exit__.assert_called_once()
-
-    def test_create_epic_impl_missing_project(self):
-        """Test error when project missing."""
-        with pytest.raises(ValidationError, match="Project key is required"):
-            _create_epic_impl(project="", summary="Summary")
-
-    def test_create_epic_impl_missing_summary(self):
-        """Test error when summary missing."""
-        with pytest.raises(ValidationError, match="Summary is required"):
-            _create_epic_impl(project="PROJ", summary="")
-
-    def test_create_epic_impl_invalid_color(self):
-        """Test error when invalid color."""
-        with pytest.raises(ValidationError, match="Invalid epic color"):
-            _create_epic_impl(project="PROJ", summary="Summary", color="invalid")
-
-    def test_create_epic_impl_with_assignee_self(self, mock_client, sample_epic):
-        """Test creating epic with self assignee."""
-        mock_client.create_issue.return_value = sample_epic
-        mock_client.get_current_user_id.return_value = "account123"
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_jira_client",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_fields",
-                return_value={
-                    "epic_name": "customfield_10011",
-                    "epic_color": "customfield_10012",
-                },
-            ),
-        ):
-            _create_epic_impl(
-                project="PROJ",
-                summary="Epic Summary",
-                assignee="self",
-            )
-
-        mock_client.get_current_user_id.assert_called_once()
-        call_args = mock_client.create_issue.call_args[0][0]
-        assert call_args["assignee"]["accountId"] == "account123"
-
-    def test_get_epic_impl_basic(self, mock_client, sample_epic):
-        """Test getting epic without children."""
-        mock_client.get_issue.return_value = sample_epic
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_jira_client",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_fields",
-                return_value={"story_points": "customfield_10016"},
-            ),
-        ):
-            result = _get_epic_impl("PROJ-100")
-
-        assert result["key"] == "PROJ-100"
-        assert "children" not in result
-        mock_client.__enter__.assert_called_once()
-        mock_client.__exit__.assert_called_once()
-
-    def test_get_epic_impl_with_children(self, mock_client, sample_epic, sample_issues):
-        """Test getting epic with children."""
-        mock_client.get_issue.return_value = sample_epic
-        mock_client.search_issues.return_value = {"issues": sample_issues}
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_jira_client",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_fields",
-                return_value={"story_points": "customfield_10016"},
-            ),
-        ):
-            result = _get_epic_impl("PROJ-100", with_children=True)
-
-        assert result["key"] == "PROJ-100"
-        assert "children" in result
-        assert len(result["children"]) == 3
-        assert "progress" in result
-        assert result["progress"]["total"] == 3
-        assert result["progress"]["done"] == 1  # Only PROJ-2 is Done
-        assert "story_points" in result
-        assert result["story_points"]["total"] == 16  # 5 + 3 + 8
-        assert result["story_points"]["done"] == 3  # Only PROJ-2
-
     def test_add_to_epic_impl_success(self, mock_client, sample_epic):
         """Test adding issues to epic."""
         mock_client.get_issue.return_value = sample_epic
@@ -515,180 +382,6 @@ class TestEpicImplementation:
 
 class TestSprintImplementation:
     """Tests for sprint implementation functions."""
-
-    def test_list_sprints_impl_by_board(self, mock_client, sample_sprint):
-        """Test listing sprints by board."""
-        mock_client.get_board_sprints.return_value = {"values": [sample_sprint]}
-
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            result = _list_sprints_impl(board_id=123)
-
-        assert len(result["sprints"]) == 1
-        assert result["sprints"][0]["name"] == "Sprint 1"
-        mock_client.__enter__.assert_called_once()
-        mock_client.__exit__.assert_called_once()
-
-    def test_list_sprints_impl_by_project(
-        self, mock_client, sample_board, sample_sprint
-    ):
-        """Test listing sprints by project."""
-        mock_client.get_all_boards.return_value = {"values": [sample_board]}
-        mock_client.get_board_sprints.return_value = {"values": [sample_sprint]}
-
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            result = _list_sprints_impl(project_key="PROJ")
-
-        assert len(result["sprints"]) == 1
-        assert result["board"]["id"] == 123
-
-    def test_list_sprints_impl_no_params(self, mock_client):
-        """Test error when no params."""
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            with pytest.raises(ValidationError, match="Either board_id or project_key"):
-                _list_sprints_impl()
-
-    def test_create_sprint_impl_success(self, mock_client, sample_sprint):
-        """Test creating sprint."""
-        mock_client.create_sprint.return_value = sample_sprint
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_jira_client",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.parse_date_to_iso",
-                side_effect=lambda x: f"{x}T00:00:00.000Z",
-            ),
-        ):
-            result = _create_sprint_impl(
-                board_id=123,
-                name="Sprint 1",
-                goal="Complete feature",
-                start_date="2024-01-01",
-                end_date="2024-01-14",
-            )
-
-        assert result["name"] == "Sprint 1"
-        mock_client.create_sprint.assert_called_once()
-        mock_client.__enter__.assert_called_once()
-        mock_client.__exit__.assert_called_once()
-
-    def test_create_sprint_impl_missing_board(self):
-        """Test error when board missing."""
-        with pytest.raises(ValidationError, match="Board ID is required"):
-            _create_sprint_impl(board_id=None, name="Sprint 1")
-
-    def test_create_sprint_impl_missing_name(self):
-        """Test error when name missing."""
-        with pytest.raises(ValidationError, match="Sprint name is required"):
-            _create_sprint_impl(board_id=123, name="")
-
-    def test_create_sprint_impl_invalid_dates(self):
-        """Test error when end date before start date."""
-        with patch(
-            "jira_as.cli.commands.agile_cmds.parse_date_to_iso",
-            side_effect=lambda x: f"{x}T00:00:00.000Z",
-        ):
-            with pytest.raises(
-                ValidationError, match="End date must be after start date"
-            ):
-                _create_sprint_impl(
-                    board_id=123,
-                    name="Sprint 1",
-                    start_date="2024-01-14",
-                    end_date="2024-01-01",
-                )
-
-    def test_get_sprint_impl_basic(self, mock_client, sample_sprint):
-        """Test getting sprint without issues."""
-        mock_client.get_sprint.return_value = sample_sprint
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_jira_client",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_field",
-                return_value="customfield_10016",
-            ),
-        ):
-            result = _get_sprint_impl(456)
-
-        assert result["name"] == "Sprint 1"
-        assert "issues" not in result
-        mock_client.__enter__.assert_called_once()
-        mock_client.__exit__.assert_called_once()
-
-    def test_get_sprint_impl_with_issues(
-        self, mock_client, sample_sprint, sample_issues
-    ):
-        """Test getting sprint with issues."""
-        mock_client.get_sprint.return_value = sample_sprint
-        mock_client.get_sprint_issues.return_value = {"issues": sample_issues}
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_jira_client",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_field",
-                return_value="customfield_10016",
-            ),
-        ):
-            result = _get_sprint_impl(456, with_issues=True)
-
-        assert result["name"] == "Sprint 1"
-        assert len(result["issues"]) == 3
-        assert "progress" in result
-        assert result["progress"]["total"] == 3
-        assert result["progress"]["done"] == 1
-        assert "story_points" in result
-
-    def test_get_sprint_impl_missing_id(self, mock_client):
-        """Test error when sprint ID missing."""
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            with pytest.raises(ValidationError, match="Sprint ID is required"):
-                _get_sprint_impl(None)
-
-    def test_get_active_sprint_impl_found(self, mock_client, sample_sprint):
-        """Test getting active sprint."""
-        mock_client.get_board_sprints.return_value = {"values": [sample_sprint]}
-
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            result = _get_active_sprint_impl(123)
-
-        assert result["name"] == "Sprint 1"
-        assert result["state"] == "active"
-
-    def test_get_active_sprint_impl_not_found(self, mock_client):
-        """Test no active sprint found."""
-        mock_client.get_board_sprints.return_value = {"values": []}
-
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            result = _get_active_sprint_impl(123)
-
-        assert result is None
 
     def test_start_sprint_impl(self, mock_client, sample_sprint):
         """Test starting sprint."""
@@ -807,28 +500,6 @@ class TestSprintImplementation:
         assert result["would_move"] == 1
         mock_client.move_issues_to_sprint.assert_not_called()
 
-    def test_move_to_backlog_impl_success(self, mock_client):
-        """Test moving issues to backlog."""
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            result = _move_to_backlog_impl(issue_keys=["PROJ-1", "PROJ-2"])
-
-        assert result["moved_to_backlog"] == 2
-        mock_client.move_issues_to_backlog.assert_called_once()
-
-    def test_move_to_backlog_impl_dry_run(self, mock_client):
-        """Test dry run for moving to backlog."""
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            result = _move_to_backlog_impl(issue_keys=["PROJ-1"], dry_run=True)
-
-        assert result["would_move_to_backlog"] == 1
-        mock_client.move_issues_to_backlog.assert_not_called()
-
 
 # =============================================================================
 # Backlog/Rank Implementation Tests
@@ -863,56 +534,6 @@ class TestBacklogRankImplementation:
         assert len(result["issues"]) == 3
         mock_client.__enter__.assert_called_once()
         mock_client.__exit__.assert_called_once()
-
-    def test_get_backlog_impl_group_by_epic(self, mock_client):
-        """Test getting backlog grouped by epic."""
-        issues = [
-            {
-                "key": "PROJ-1",
-                "fields": {
-                    "summary": "Issue 1",
-                    "customfield_10014": "PROJ-100",
-                    "status": {"name": "To Do"},
-                },
-            },
-            {
-                "key": "PROJ-2",
-                "fields": {
-                    "summary": "Issue 2",
-                    "customfield_10014": "PROJ-100",
-                    "status": {"name": "To Do"},
-                },
-            },
-            {
-                "key": "PROJ-3",
-                "fields": {
-                    "summary": "Issue 3",
-                    "customfield_10014": None,
-                    "status": {"name": "To Do"},
-                },
-            },
-        ]
-        mock_client.get_board_backlog.return_value = {"issues": issues}
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_jira_client",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_fields",
-                return_value={
-                    "epic_link": "customfield_10014",
-                    "story_points": "customfield_10016",
-                },
-            ),
-        ):
-            result = _get_backlog_impl(board_id=123, group_by_epic=True)
-
-        assert "by_epic" in result
-        assert "PROJ-100" in result["by_epic"]
-        assert len(result["by_epic"]["PROJ-100"]) == 2
-        assert len(result["no_epic"]) == 1
 
     def test_rank_issue_impl_before(self, mock_client):
         """Test ranking issue before another."""
@@ -1022,46 +643,6 @@ class TestEstimationImplementation:
         call_args = mock_client.update_issue.call_args[0]
         assert call_args[1]["customfield_10016"] is None
 
-    def test_get_estimates_impl_by_sprint(self, mock_client, sample_issues):
-        """Test getting estimates by sprint."""
-        mock_client.get_sprint_issues.return_value = {"issues": sample_issues}
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_jira_client",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_fields",
-                return_value={"story_points": "customfield_10016"},
-            ),
-        ):
-            result = _get_estimates_impl(sprint_id=456)
-
-        assert result["total_points"] == 16
-        assert result["issue_count"] == 3
-        assert "by_status" in result
-        assert "by_assignee" in result
-
-    def test_get_estimates_impl_by_epic(self, mock_client, sample_issues):
-        """Test getting estimates by epic."""
-        mock_client.search_issues.return_value = {"issues": sample_issues}
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_jira_client",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_fields",
-                return_value={"story_points": "customfield_10016"},
-            ),
-        ):
-            result = _get_estimates_impl(epic_key="PROJ-100")
-
-        assert result["epic_key"] == "PROJ-100"
-        assert result["total_points"] == 16
-
     def test_get_velocity_impl_success(
         self, mock_client, sample_board, sample_velocity_sprints
     ):
@@ -1095,18 +676,6 @@ class TestEstimationImplementation:
         assert result["sprints_analyzed"] == 3
         assert result["total_points"] == 37  # 10 + 15 + 12
         assert result["average_velocity"] == round((10 + 15 + 12) / 3, 1)
-
-    def test_get_velocity_impl_no_closed_sprints(self, mock_client, sample_board):
-        """Test error when no closed sprints."""
-        mock_client.get_all_boards.return_value = {"values": [sample_board]}
-        mock_client.get_board_sprints.return_value = {"values": []}
-
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            with pytest.raises(ValidationError, match="No closed sprints"):
-                _get_velocity_impl(project_key="PROJ")
 
     def test_create_subtask_impl_success(self, mock_client):
         """Test creating subtask."""
@@ -1161,18 +730,6 @@ class TestEstimationImplementation:
 class TestFormattingFunctions:
     """Tests for formatting functions."""
 
-    def test_format_epic_created(self):
-        """Test formatting epic creation result."""
-        result = {
-            "key": "PROJ-100",
-            "self": "https://test.atlassian.net/rest/api/3/issue/10001",
-        }
-        output = _format_epic_created(result, "Epic Name")
-
-        assert "PROJ-100" in output
-        assert "Epic Name" in output
-        assert "https://test.atlassian.net/browse/PROJ-100" in output
-
     def test_format_epic_details(self, sample_epic):
         """Test formatting epic details."""
         epic_data = {
@@ -1208,33 +765,6 @@ class TestFormattingFunctions:
         assert "20/40 (50%)" in output
         assert "Children:" in output
         assert "PROJ-1" in output
-
-    def test_format_sprint_list(self, sample_sprint, sample_board):
-        """Test formatting sprint list."""
-        data = {
-            "board": sample_board,
-            "sprints": [sample_sprint],
-            "state_filter": "active",
-            "total": 1,
-        }
-        output = _format_sprint_list(data)
-
-        assert "PROJ board" in output
-        assert "Sprint 1" in output
-        assert "active" in output
-        assert "2024-01-01" in output
-
-    def test_format_sprint_list_empty(self, sample_board):
-        """Test formatting empty sprint list."""
-        data = {
-            "board": sample_board,
-            "sprints": [],
-            "state_filter": None,
-            "total": 0,
-        }
-        output = _format_sprint_list(data)
-
-        assert "No sprints found" in output
 
     def test_format_sprint_details(self, sample_sprint):
         """Test formatting sprint details."""
@@ -1297,414 +827,75 @@ class TestFormattingFunctions:
 # =============================================================================
 
 
-class TestEpicCommands:
-    """Tests for epic CLI commands."""
-
-    def test_epic_create_text(self, mock_client, sample_epic):
-        """Test epic create with text output."""
-        mock_client.create_issue.return_value = sample_epic
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_client_from_context",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_fields",
-                return_value={
-                    "epic_name": "customfield_10011",
-                    "epic_color": "customfield_10012",
-                },
-            ),
-        ):
-            runner = CliRunner()
-            result = runner.invoke(
-                agile,
-                [
-                    "epic",
-                    "create",
-                    "-p",
-                    "PROJ",
-                    "-s",
-                    "Epic Summary",
-                    "-n",
-                    "Epic Name",
-                ],
-            )
-
-        assert result.exit_code == 0
-        assert "PROJ-100" in result.output
-
-    def test_epic_create_json(self, mock_client, sample_epic):
-        """Test epic create with JSON output."""
-        mock_client.create_issue.return_value = sample_epic
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_client_from_context",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_fields",
-                return_value={
-                    "epic_name": "customfield_10011",
-                    "epic_color": "customfield_10012",
-                },
-            ),
-        ):
-            runner = CliRunner()
-            result = runner.invoke(
-                agile,
-                ["epic", "create", "-p", "PROJ", "-s", "Summary", "-o", "json"],
-            )
-
-        assert result.exit_code == 0
-        data = json.loads(result.output)
-        assert data["key"] == "PROJ-100"
-
-    def test_epic_get_text(self, mock_client, sample_epic):
-        """Test epic get with text output."""
-        mock_client.get_issue.return_value = sample_epic
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_client_from_context",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_fields",
-                return_value={"story_points": "customfield_10016"},
-            ),
-        ):
-            runner = CliRunner()
-            result = runner.invoke(agile, ["epic", "get", "PROJ-100"])
-
-        assert result.exit_code == 0
-        assert "PROJ-100" in result.output
-        assert "Epic Summary" in result.output
-
-    def test_epic_add_issues_text(self, mock_client, sample_epic):
-        """Test adding issues to epic."""
-        mock_client.get_issue.return_value = sample_epic
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_client_from_context",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_field",
-                return_value="customfield_10014",
-            ),
-        ):
-            runner = CliRunner()
-            result = runner.invoke(
-                agile,
-                ["epic", "add-issues", "-e", "PROJ-100", "-i", "PROJ-1,PROJ-2"],
-            )
-
-        assert result.exit_code == 0
-        assert "Added 2 issues" in result.output
-
-
 class TestSprintCommands:
     """Tests for sprint CLI commands."""
 
-    def test_sprint_list_text(self, mock_client, sample_board, sample_sprint):
-        """Test sprint list with text output."""
-        mock_client.get_board_sprints.return_value = {"values": [sample_sprint]}
+    def test_sprint_manage_start(self, generic_workflow):
+        result = CliRunner().invoke(
+            agile,
+            ["sprint", "manage", "-s", "456", "--start", "--transport", "simulation"],
+        )
+        assert result.exit_code == 0, result.output
+        assert generic_workflow.snapshot()["sprints"][0]["state"] == "active"
 
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(agile, ["sprint", "list", "-b", "123"])
-
-        assert result.exit_code == 0
-        assert "Sprint 1" in result.output
-
-    def test_sprint_list_no_params(self):
-        """Test sprint list without required params."""
+    def test_sprint_manage_close(self, generic_workflow):
+        before = generic_workflow.snapshot()
         runner = CliRunner()
-        result = runner.invoke(agile, ["sprint", "list"])
+        args = ["sprint", "manage", "-s", "456", "--close", "--transport", "simulation"]
+        result = runner.invoke(agile, args)
+        assert result.exit_code == 0, result.output
+        assert generic_workflow.snapshot() == before
+        result = runner.invoke(agile, [*args, "--confirm"])
+        assert result.exit_code == 0, result.output
+        assert generic_workflow.snapshot()["sprints"][0]["state"] == "closed"
 
-        assert result.exit_code != 0
-        assert "Either --board or --project is required" in result.output
+    def test_sprint_move_issues_to_sprint(self, generic_workflow):
+        result = CliRunner().invoke(
+            agile,
+            [
+                "sprint",
+                "move-issues",
+                "--issues",
+                "SBX-1",
+                "--sprint",
+                "456",
+                "--transport",
+                "simulation",
+            ],
+        )
+        assert result.exit_code == 0, result.output
+        assert generic_workflow.snapshot()["issues"][0]["fields"]["sprint"] == 456
 
-    def test_sprint_create_text(self, mock_client, sample_sprint):
-        """Test sprint create with text output."""
-        mock_client.create_sprint.return_value = sample_sprint
-
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(
-                agile,
-                ["sprint", "create", "-b", "123", "-n", "Sprint 1", "-g", "Goal"],
-            )
-
-        assert result.exit_code == 0
-        assert "Created sprint: Sprint 1" in result.output
-
-    def test_sprint_get_by_id(self, mock_client, sample_sprint):
-        """Test sprint get by ID."""
-        mock_client.get_sprint.return_value = sample_sprint
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_client_from_context",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_field",
-                return_value="customfield_10016",
-            ),
-        ):
-            runner = CliRunner()
-            result = runner.invoke(agile, ["sprint", "get", "456"])
-
-        assert result.exit_code == 0
-        assert "Sprint 1" in result.output
-
-    def test_sprint_get_active(self, mock_client, sample_sprint):
-        """Test getting active sprint."""
-        mock_client.get_board_sprints.return_value = {"values": [sample_sprint]}
-
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(agile, ["sprint", "get", "-b", "123", "--active"])
-
-        assert result.exit_code == 0
-        assert "Sprint 1" in result.output
-
-    def test_sprint_manage_start(self, mock_client, sample_sprint):
-        """Test starting sprint."""
-        mock_client.update_sprint.return_value = {**sample_sprint, "state": "active"}
-
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(
-                agile,
-                ["sprint", "manage", "-s", "456", "--start"],
-            )
-
-        assert result.exit_code == 0
-        assert "Started sprint" in result.output
-
-    def test_sprint_manage_close(self, mock_client, sample_sprint):
-        """Test closing sprint."""
-        mock_client.update_sprint.return_value = {**sample_sprint, "state": "closed"}
-
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(
-                agile,
-                ["sprint", "manage", "-s", "456", "--close"],
-            )
-
-        assert result.exit_code == 0
-        assert "Closed sprint" in result.output
-
-    def test_sprint_move_issues_to_sprint(self, mock_client):
-        """Test moving issues to sprint."""
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(
-                agile,
-                ["sprint", "move-issues", "-s", "456", "-i", "PROJ-1,PROJ-2"],
-            )
-
-        assert result.exit_code == 0
-        assert "Moved 2 issues" in result.output
-
-    def test_sprint_move_issues_to_backlog(self, mock_client):
-        """Test moving issues to backlog."""
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(
-                agile,
-                ["sprint", "move-issues", "-b", "-i", "PROJ-1"],
-            )
-
-        assert result.exit_code == 0
-        assert "Moved 1 issues to backlog" in result.output
+    def test_sprint_move_issues_to_backlog(self, generic_workflow):
+        result = CliRunner().invoke(
+            agile,
+            [
+                "sprint",
+                "move-issues",
+                "--issues",
+                "SBX-1",
+                "--backlog",
+                "--transport",
+                "simulation",
+            ],
+        )
+        assert result.exit_code == 0, result.output
+        assert generic_workflow.snapshot()["issues"][0]["fields"]["sprint"] is None
 
 
 class TestOtherAgileCommands:
     """Tests for other agile CLI commands."""
 
-    def test_backlog_text(self, mock_client, sample_issues):
-        """Test backlog command."""
-        mock_client.get_board_backlog.return_value = {
-            "issues": sample_issues,
-            "total": 3,
-        }
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_client_from_context",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_fields",
-                return_value={
-                    "epic_link": "customfield_10014",
-                    "story_points": "customfield_10016",
-                },
-            ),
-        ):
-            runner = CliRunner()
-            result = runner.invoke(agile, ["backlog", "-b", "123"])
-
-        assert result.exit_code == 0
-        assert "3/3 issues" in result.output
-
-    def test_rank_before(self, mock_client):
-        """Test ranking issue before another."""
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(agile, ["rank", "PROJ-1", "--before", "PROJ-2"])
-
-        assert result.exit_code == 0
-        assert "Ranked 1 issue" in result.output
-        assert "before PROJ-2" in result.output
-
-    def test_rank_no_position(self):
-        """Test ranking without position."""
-        runner = CliRunner()
-        result = runner.invoke(agile, ["rank", "PROJ-1"])
-
-        assert result.exit_code != 0
-        assert "Must specify one of" in result.output
-
-    def test_estimates_by_sprint(self, mock_client, sample_issues):
-        """Test estimates by sprint."""
-        mock_client.get_sprint_issues.return_value = {"issues": sample_issues}
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_client_from_context",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_fields",
-                return_value={"story_points": "customfield_10016"},
-            ),
-        ):
-            runner = CliRunner()
-            result = runner.invoke(agile, ["estimates", "-s", "456"])
-
-        assert result.exit_code == 0
-        assert "Sprint 456 Estimates" in result.output
-        assert "16 points" in result.output
-
-    def test_estimates_no_params(self):
-        """Test estimates without params."""
-        runner = CliRunner()
-        result = runner.invoke(agile, ["estimates"])
-
-        assert result.exit_code != 0
-        assert "One of --sprint, --project, or --epic is required" in result.output
-
-    def test_velocity_text(self, mock_client, sample_board, sample_velocity_sprints):
-        """Test velocity command."""
-        mock_client.get_all_boards.return_value = {"values": [sample_board]}
-        mock_client.get_board_sprints.return_value = {"values": sample_velocity_sprints}
-        mock_client.search_issues.return_value = {
-            "issues": [{"fields": {"customfield_10016": 10}}]
-        }
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_client_from_context",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_fields",
-                return_value={"story_points": "customfield_10016"},
-            ),
-        ):
-            runner = CliRunner()
-            result = runner.invoke(agile, ["velocity", "-p", "PROJ"])
-
-        assert result.exit_code == 0
-        assert "Velocity Report" in result.output
-
-    def test_subtask_text(self, mock_client):
-        """Test subtask create."""
-        mock_client.get_issue.return_value = {
-            "key": "PROJ-1",
-            "fields": {
-                "project": {"key": "PROJ"},
-                "issuetype": {"subtask": False},
-            },
-        }
-        mock_client.get.return_value = [
-            {"name": "Sub-task", "subtask": True},
-        ]
-        mock_client.create_issue.return_value = {
-            "key": "PROJ-10",
-            "self": "https://test.atlassian.net/rest/api/3/issue/10",
-        }
-
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(
-                agile,
-                ["subtask", "-p", "PROJ-1", "-s", "Subtask Summary"],
-            )
-
-        assert result.exit_code == 0
-        assert "Created subtask: PROJ-10" in result.output
-        assert "Parent: PROJ-1" in result.output
+    def test_velocity_text(self, generic_workflow):
+        result = CliRunner().invoke(
+            agile, ["velocity", "--project", "SBX", "--transport", "simulation"]
+        )
+        assert result.exit_code == 0, result.output
+        assert '"average_velocity": 8.0' in result.output
 
 
 class TestErrorHandling:
     """Tests for error handling in CLI commands."""
-
-    def test_jira_error_handled(self, mock_client):
-        """Test JIRA error is handled gracefully."""
-        mock_client.get_issue.side_effect = JiraError("API Error")
-
-        with (
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_client_from_context",
-                return_value=mock_client,
-            ),
-            patch(
-                "jira_as.cli.commands.agile_cmds.get_agile_fields",
-                return_value={"story_points": "customfield_10016"},
-            ),
-        ):
-            runner = CliRunner()
-            result = runner.invoke(agile, ["epic", "get", "PROJ-100"])
-
-        assert result.exit_code == 1
-        assert "Error" in result.output or "error" in result.output.lower()
 
     def test_validation_error_handled(self):
         """Test validation error is handled gracefully."""
@@ -1720,108 +911,6 @@ class TestErrorHandling:
 # =============================================================================
 # Board listing, multi-board resolution and backlog fallback
 # =============================================================================
-
-
-class TestListBoards:
-    """Tests for 'agile board list'."""
-
-    def test_single_page(self, mock_client):
-        """A last page ends the walk immediately."""
-        mock_client.get_all_boards.return_value = {
-            "values": [{"id": 1, "name": "B1", "type": "scrum"}],
-            "isLast": True,
-        }
-
-        result = _list_boards_impl(client=mock_client)
-
-        assert result["total"] == 1
-        assert result["is_last"] is True
-        assert mock_client.get_all_boards.call_count == 1
-
-    def test_pages_until_is_last(self, mock_client):
-        """isLast=False keeps paging with an advancing startAt."""
-        mock_client.get_all_boards.side_effect = [
-            {
-                "values": [{"id": n, "name": f"B{n}"} for n in range(50)],
-                "isLast": False,
-            },
-            {"values": [{"id": 50, "name": "B50"}], "isLast": True},
-        ]
-
-        result = _list_boards_impl(max_results=100, client=mock_client)
-
-        assert result["total"] == 51
-        assert result["is_last"] is True
-        second_call = mock_client.get_all_boards.call_args_list[1].kwargs
-        assert second_call["start_at"] == 50
-
-    def test_respects_max_results(self, mock_client):
-        """The listing stops at the requested count and reports more remain."""
-        mock_client.get_all_boards.return_value = {
-            "values": [{"id": n} for n in range(50)],
-            "isLast": False,
-        }
-
-        result = _list_boards_impl(max_results=10, client=mock_client)
-
-        assert result["total"] == 10
-        assert result["is_last"] is False
-        assert mock_client.get_all_boards.call_args.kwargs["max_results"] == 10
-
-    def test_filters_are_passed_through(self, mock_client):
-        """--project and --type reach the client."""
-        mock_client.get_all_boards.return_value = {"values": [], "isLast": True}
-
-        _list_boards_impl(project_key="PROJ", board_type="scrum", client=mock_client)
-
-        kwargs = mock_client.get_all_boards.call_args.kwargs
-        assert kwargs["project_key"] == "PROJ"
-        assert kwargs["board_type"] == "scrum"
-
-    def test_command_warns_when_unscoped(self, cli_runner, mock_client):
-        """Listing every board on the site is called out on stderr."""
-        mock_client.get_all_boards.return_value = {"values": [], "isLast": True}
-
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            result = cli_runner.invoke(agile, ["board", "list"])
-
-        assert result.exit_code == 0
-        assert "can be very large" in result.output
-
-    def test_command_does_not_warn_when_scoped(self, cli_runner, mock_client):
-        """A --project listing is bounded, so no warning."""
-        mock_client.get_all_boards.return_value = {"values": [], "isLast": True}
-
-        with patch(
-            "jira_as.cli.commands.agile_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            result = cli_runner.invoke(agile, ["board", "list", "-p", "PROJ"])
-
-        assert result.exit_code == 0
-        assert "can be very large" not in result.output
-
-    def test_format_boards_notes_truncation(self):
-        """Text output says when more boards are available."""
-        text = _format_boards(
-            {
-                "boards": [{"id": 1, "name": "B1", "type": "scrum"}],
-                "total": 1,
-                "is_last": False,
-            }
-        )
-
-        assert "[1] B1" in text
-        assert "raise --max-results" in text
-
-    def test_format_boards_empty(self):
-        """An empty listing says so plainly."""
-        assert _format_boards({"boards": [], "total": 0, "is_last": True}) == (
-            "No boards found."
-        )
 
 
 class TestBoardResolutionWarning:
@@ -1862,34 +951,30 @@ class TestBoardResolutionWarning:
         assert _get_board_for_project("PROJ", client=mock_client) is None
 
 
-class TestBacklogFallback:
-    """'agile backlog' falls back to board issues when there is no backlog."""
+@pytest.fixture
+def generic_workflow(tmp_path, monkeypatch):
+    from as_engine.simulation import JiraSimulationStore
 
-    def test_uses_backlog_endpoint_when_available(self, mock_client):
-        """The backlog endpoint is preferred."""
-        mock_client.get_board_backlog.return_value = {"issues": []}
+    from jira_as import engine
+    from jira_as.autocomplete_cache import InstanceFieldsCache
 
-        result = _get_backlog_impl(board_id=1, client=mock_client)
-
-        assert "backlog_fallback" not in result
-        mock_client.get_board_issues.assert_not_called()
-
-    def test_falls_back_on_not_found(self, mock_client):
-        """A board with no backlog endpoint uses the board's issues."""
-        mock_client.get_board_backlog.side_effect = NotFoundError("no backlog")
-        mock_client.get_board_issues.return_value = {"issues": [{"key": "PROJ-1"}]}
-
-        result = _get_backlog_impl(board_id=1, client=mock_client)
-
-        assert result["backlog_fallback"] == "board_issues"
-        assert result["issues"] == [{"key": "PROJ-1"}]
-
-    def test_fallback_preserves_the_jql_filter(self, mock_client):
-        """The filter is carried over to the fallback query."""
-        mock_client.get_board_backlog.side_effect = NotFoundError("no backlog")
-        mock_client.get_board_issues.return_value = {"issues": []}
-
-        _get_backlog_impl(board_id=1, jql_filter="labels = x", client=mock_client)
-
-        kwargs = mock_client.get_board_issues.call_args.kwargs
-        assert kwargs["jql"] == "labels = x"
+    monkeypatch.setenv("JIRA_ALLOWED_PROJECTS", "SBX")
+    monkeypatch.setenv("JIRA_ALLOW_SITE_OPERATIONS", "true")
+    monkeypatch.setenv("JIRA_FIELDS_CACHE_DIR", str(tmp_path))
+    seed = JiraSimulationStore().snapshot()
+    seed["sprints"] = [
+        {"id": 456, "originBoardId": 1, "name": "Sprint 456", "state": "future"},
+        {"id": 457, "originBoardId": 1, "name": "Closed", "state": "closed"},
+    ]
+    seed["issues"][0]["fields"].update(
+        {
+            "sprint": 457,
+            "status": {"name": "Done", "statusCategory": {"key": "done"}},
+            "customfield_10016": 8,
+        }
+    )
+    store = JiraSimulationStore(seed)
+    surface = engine.create_surface(transport="simulation", store=store)
+    monkeypatch.setattr(engine, "create_surface", lambda **_: surface)
+    InstanceFieldsCache(tmp_path).write(store.fields)
+    return store

@@ -76,7 +76,7 @@ def _call_help(operation: Any) -> str:
     """Describe enrichment flags that are available for this operation."""
     lines = [
         "Call options: --body @file|-; --field path=value (repeatable); "
-        "--project KEY; --validate-body; --format json|table|markdown.",
+        "--project KEY; --adf-field customfield_ID (repeatable); --validate-body; --format json|table|markdown.",
         "Arrays: repeat the flag or use a JSON array; booleans: true|false.",
     ]
     tags = operation.extensions
@@ -149,6 +149,8 @@ def _preview(
         index=index,
         representation=options["representation"],
         raw=options["raw"],
+        adf_fields=tuple(options.get("adf_fields", ())),
+        textarea_fields=tuple(options.get("textarea_fields", ())),
     )
     for alias in aliases:
         if target_value(context, rules[alias]["target"]) is not MISSING:
@@ -237,8 +239,31 @@ def call(
                 value["sections"].append({"text": _call_help(operation)})
             click.echo(render_help(value, help_format))
             return
+        from as_engine.transforms.richtext import custom_field_descriptors
+
+        from jira_as.autocomplete_cache import InstanceFieldsCache
+
+        options["textarea_fields"] = (
+            InstanceFieldsCache().textarea_fields()
+            if any(
+                row.get("customFields") == "textarea" and "request" in row
+                for row in operation.extensions.get("x-as-richtext", [])
+            )
+            else ()
+        )
+        if options["adf_fields"] and not custom_field_descriptors(
+            operation, options["adf_fields"]
+        ):
+            raise ValueError(
+                "--adf-field requires a declared textarea custom-field location"
+            )
         body = build_body(
-            options["body"], options["field"], sys.stdin, operation=operation
+            options["body"],
+            options["field"],
+            sys.stdin,
+            operation=operation,
+            adf_fields=options["adf_fields"],
+            textarea_fields=options["textarea_fields"],
         )
         validate_options(
             operation,
@@ -259,6 +284,8 @@ def call(
             parameters,
             body,
             scope_argv_identity=scope_project,
+            adf_fields=options["adf_fields"],
+            textarea_fields=options["textarea_fields"],
             validate_body=options["validate_body"],
             all_pages=options["all_pages"],
             limit=options["limit"],

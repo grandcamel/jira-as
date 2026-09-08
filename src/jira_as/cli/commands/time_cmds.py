@@ -23,6 +23,8 @@ from typing import TYPE_CHECKING, Any
 
 import click
 
+from .bulk_cmds import WorkflowCheckpoint, workflow_call, workflow_surface
+
 if TYPE_CHECKING:
     from jira_as import JiraClient
 
@@ -1171,6 +1173,271 @@ def _format_bulk_log_result(result: dict[str, Any]) -> str:
 # =============================================================================
 
 
+def _surface_report(
+    surface, project=None, author=None, since=None, until=None, group_by=None
+):
+    if not project:
+        raise click.UsageError("--project is required for a scoped time report")
+    from jira_as import validate_project_key
+
+    project = validate_project_key(project)
+    jql_parts = []
+    if project:
+        jql_parts.append(f"project = {project}")
+    jql_parts.append("timespent > 0")
+    jql = " AND ".join(jql_parts)
+
+    since_dt = None
+    until_dt = None
+    if since:
+        since_dt = parse_relative_date(since)
+    if until:
+        until_dt = parse_relative_date(until)
+        until_dt = until_dt.replace(hour=23, minute=59, second=59)
+
+    search_result = workflow_call(
+        surface,
+        "searchAndReconsileIssuesUsingJql",
+        {"jql": jql, "fields": ["summary"], "maxResults": 100},
+        all_pages=True,
+        raw=True,
+    )
+    issues = search_result
+
+    entries = []
+    for issue in issues:
+        issue_key = issue["key"]
+        issue_summary = issue["fields"].get("summary", "")
+
+        worklogs_result = workflow_call(
+            surface,
+            "getIssueWorklog",
+            {"issueIdOrKey": issue_key, "maxResults": 100},
+            all_pages=True,
+        )
+        worklogs = worklogs_result
+
+        for worklog in worklogs:
+            started_str = worklog.get("started", "")
+            try:
+                started_dt = datetime.fromisoformat(
+                    started_str.replace("+0000", "+00:00").replace("Z", "+00:00")
+                )
+                started_dt = started_dt.replace(tzinfo=None)
+            except (ValueError, AttributeError):
+                continue
+
+            if since_dt and started_dt.date() < since_dt.date():
+                continue
+            if until_dt and started_dt.date() > until_dt.date():
+                continue
+
+            worklog_author = worklog.get("author", {})
+            author_email = worklog_author.get("emailAddress", "")
+            author_id = worklog_author.get("accountId", "")
+
+            if author and author not in (author_email, author_id):
+                continue
+
+            entries.append(
+                {
+                    "issue_key": issue_key,
+                    "issue_summary": issue_summary,
+                    "worklog_id": worklog.get("id"),
+                    "author": worklog_author.get("displayName", author_email),
+                    "author_email": author_email,
+                    "started": started_str,
+                    "started_date": started_dt.strftime("%Y-%m-%d"),
+                    "time_spent": worklog.get("timeSpent", ""),
+                    "time_seconds": worklog.get("timeSpentSeconds", 0),
+                }
+            )
+
+    total_seconds = sum(e["time_seconds"] for e in entries)
+
+    result: dict[str, Any] = {
+        "entries": entries,
+        "entry_count": len(entries),
+        "total_seconds": total_seconds,
+        "total_formatted": format_seconds(total_seconds) if total_seconds else "0m",
+        "filters": {
+            "project": project,
+            "author": author,
+            "since": since,
+            "until": until,
+        },
+    }
+
+    if group_by:
+        result["group_by"] = group_by
+        result["grouped"] = _group_entries(entries, group_by)
+
+    return result
+
+
+def _surface_timesheets(surface, project=None, author=None, since=None, until=None):
+    if not project:
+        raise click.UsageError("--project is required for a scoped time report")
+    from jira_as import validate_project_key
+
+    project = validate_project_key(project)
+    jql_parts = []
+    if project:
+        jql_parts.append(f"project = {project}")
+    jql_parts.append("timespent > 0")
+    jql = " AND ".join(jql_parts)
+
+    since_dt = None
+    until_dt = None
+    if since:
+        since_dt = parse_relative_date(since)
+    if until:
+        until_dt = parse_relative_date(until)
+        until_dt = until_dt.replace(hour=23, minute=59, second=59)
+
+    search_result = workflow_call(
+        surface,
+        "searchAndReconsileIssuesUsingJql",
+        {"jql": jql, "fields": ["summary"], "maxResults": 100},
+        all_pages=True,
+        raw=True,
+    )
+    issues = search_result
+
+    entries = []
+    for issue in issues:
+        issue_key = issue["key"]
+        issue_summary = issue["fields"].get("summary", "")
+
+        worklogs_result = workflow_call(
+            surface,
+            "getIssueWorklog",
+            {"issueIdOrKey": issue_key, "maxResults": 100},
+            all_pages=True,
+        )
+        worklogs = worklogs_result
+
+        for worklog in worklogs:
+            started_str = worklog.get("started", "")
+            try:
+                started_dt = datetime.fromisoformat(
+                    started_str.replace("+0000", "+00:00").replace("Z", "+00:00")
+                )
+                started_dt = started_dt.replace(tzinfo=None)
+            except (ValueError, AttributeError):
+                continue
+
+            if since_dt and started_dt.date() < since_dt.date():
+                continue
+            if until_dt and started_dt.date() > until_dt.date():
+                continue
+
+            worklog_author = worklog.get("author", {})
+            author_email = worklog_author.get("emailAddress", "")
+            author_id = worklog_author.get("accountId", "")
+
+            if author and author not in (author_email, author_id):
+                continue
+
+            comment_text = worklog.get("comment") or ""
+
+            entries.append(
+                {
+                    "issue_key": issue_key,
+                    "issue_summary": issue_summary,
+                    "worklog_id": worklog.get("id"),
+                    "author": worklog_author.get("displayName", author_email),
+                    "author_email": author_email,
+                    "started": started_str,
+                    "started_date": started_dt.strftime("%Y-%m-%d"),
+                    "time_spent": worklog.get("timeSpent", ""),
+                    "time_seconds": worklog.get("timeSpentSeconds", 0),
+                    "comment": comment_text,
+                }
+            )
+
+    total_seconds = sum(e["time_seconds"] for e in entries)
+
+    return {
+        "entries": entries,
+        "entry_count": len(entries),
+        "total_seconds": total_seconds,
+        "total_formatted": format_seconds(total_seconds) if total_seconds else "0m",
+        "generated_at": datetime.now().isoformat(),
+        "filters": {
+            "project": project,
+            "author": author,
+            "since": since,
+            "until": until,
+        },
+    }
+
+
+def _surface_bulk_log(
+    surface, issues, jql, time_spent, comment, started, dry_run, checkpoint, maximum
+):
+    if not validate_time_format(time_spent):
+        raise click.BadParameter("Use a time such as 2h or 30m", param_hint="--time")
+    seconds = parse_time_string(time_spent)
+    body: dict[str, Any] = {"timeSpentSeconds": seconds}
+    if comment:
+        body["comment"] = comment
+    if started:
+        body["started"] = convert_to_jira_datetime_string(started)
+    options = {"time_spent": time_spent, "comment": comment, "started": started}
+    saved = WorkflowCheckpoint(
+        None if dry_run else checkpoint,
+        "time bulk-log",
+        {"issues": issues, "jql": jql, "maximum": maximum},
+        options,
+    )
+    selected = saved.select(surface, issues, jql, maximum)
+    if dry_run:
+        return {
+            "dry_run": True,
+            "would_log_count": len(selected),
+            "would_log_seconds": seconds * len(selected),
+            "would_log_formatted": format_seconds(seconds * len(selected)),
+            "preview": [
+                {
+                    "issue": i["key"],
+                    "summary": i.get("fields", {}).get("summary", ""),
+                    "time_to_log": time_spent,
+                }
+                for i in selected
+            ],
+        }
+    successes, failures = [], []
+    for issue in selected:
+        key = issue["key"]
+        try:
+            worklog = saved.step(
+                key,
+                lambda key=key: workflow_call(
+                    surface, "addWorklog", {"issueIdOrKey": key}, body
+                ),
+            )
+            successes.append(
+                {
+                    "issue": key,
+                    "worklog_id": worklog.get("id"),
+                    "time_spent": time_spent,
+                }
+            )
+        except click.ClickException as exc:
+            failures.append({"issue": key, "error": str(exc)})
+    total = seconds * len(successes)
+    return {
+        "success_count": len(successes),
+        "failure_count": len(failures),
+        "total_seconds": total,
+        "total_formatted": format_seconds(total),
+        "entries": successes,
+        "failures": failures,
+        "dry_run": False,
+    }
+
+
 @click.group()
 def time():
     """Commands for time tracking and worklogs."""
@@ -1484,6 +1751,7 @@ def time_tracking(ctx: click.Context, issue_key: str, output: str):
 
 
 @time.command(name="report")
+@click.option("--transport", type=click.Choice(["simulation", "responder", "http"]))
 @click.option("--project", "-p", help="Project key")
 @click.option("--user", "-u", help="User (account ID or email)")
 @click.option("--since", "-s", help="Start date (YYYY-MM-DD)")
@@ -1520,19 +1788,20 @@ def time_report(
     period: str,
     group_by: str,
     output_format: str,
+    transport,
 ):
     """Generate a time report."""
     if period:
         since, until = _resolve_period_dates(period)
 
-    client = get_client_from_context(ctx)
-    result = _generate_report_impl(
+    surface = workflow_surface(transport)
+    result = _surface_report(
+        surface,
         project=project,
         author=user,
         since=since,
         until=until,
         group_by=group_by,
-        client=client,
     )
 
     if output_format == "json":
@@ -1544,6 +1813,7 @@ def time_report(
 
 
 @time.command(name="export")
+@click.option("--transport", type=click.Choice(["simulation", "responder", "http"]))
 @click.option("--project", "-p", help="Project key")
 @click.option("--user", "-u", help="User (account ID or email)")
 @click.option("--since", "-s", help="Start date (YYYY-MM-DD)")
@@ -1572,18 +1842,19 @@ def time_export(
     period: str,
     output_format: str,
     output_file: str,
+    transport,
 ):
     """Export timesheets to CSV or JSON."""
     if period:
         since, until = _resolve_period_dates(period)
 
-    client = get_client_from_context(ctx)
-    data = _export_timesheets_impl(
+    surface = workflow_surface(transport)
+    data = _surface_timesheets(
+        surface,
         project=project,
         author=user,
         since=since,
         until=until,
-        client=client,
     )
 
     if output_file:
@@ -1605,6 +1876,9 @@ def time_export(
 
 
 @time.command(name="bulk-log")
+@click.option("--transport", type=click.Choice(["simulation", "responder", "http"]))
+@click.option("--checkpoint", type=click.Path(dir_okay=False))
+@click.option("--max-issues", type=click.IntRange(min=1), default=100)
 @click.option("--jql", "-j", help="JQL query to find issues")
 @click.option("--issues", "-i", help="Comma-separated issue keys (e.g., PROJ-1,PROJ-2)")
 @click.option(
@@ -1637,6 +1911,9 @@ def time_bulk_log(
     dry_run: bool,
     yes: bool,
     output: str,
+    transport,
+    checkpoint,
+    max_issues,
 ):
     """Log time on multiple issues.
 
@@ -1658,18 +1935,22 @@ def time_bulk_log(
             for key in issue_list:
                 validate_issue_key(key)
 
-    client = get_client_from_context(ctx)
-    result = _bulk_log_time_impl(
-        issues=issue_list,
+    surface = workflow_surface(transport)
+    result = _surface_bulk_log(
+        surface,
+        issues=issues,
         jql=jql,
         time_spent=time_spent,
         comment=comment,
         started=started,
         dry_run=dry_run,
-        client=client,
+        checkpoint=checkpoint,
+        maximum=max_issues,
     )
 
     if output == "json":
         click.echo(format_json(result))
     else:
         click.echo(_format_bulk_log_result(result))
+    if result.get("failure_count"):
+        ctx.exit(1)

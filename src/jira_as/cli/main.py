@@ -1,5 +1,6 @@
 import os
 from importlib import import_module
+from pathlib import Path
 
 import click
 from as_engine.help import render_help
@@ -35,21 +36,48 @@ class LazyGroups(HelpGroup):
         "help": ("help_cmds", "help_command"),
     }
 
+    migration_groups = {
+        "admin",
+        "agile",
+        "collaborate",
+        "fields",
+        "issue",
+        "jsm",
+        "lifecycle",
+        "relationships",
+        "search",
+        "time",
+    }
+
     def list_commands(self, ctx):
-        return sorted(set(self.modules) | set(self.commands))
+        return sorted(set(self.modules) | self.migration_groups | set(self.commands))
 
     def get_command(self, ctx, name):
         if name in self.commands:
             return self.commands[name]
-        if name not in self.modules:
+        if name not in self.modules and name not in self.migration_groups:
             return None
-        module_name, symbol = self.modules[name]
-        module = import_module("jira_as.cli.commands." + module_name)
-        command = getattr(module, symbol)
-        if name == "collaborate":
-            command.add_command(module.comment, name="comments")
-        elif name == "search":
-            command.add_command(module.search_query, name="jql")
+        if name in self.modules:
+            module_name, symbol = self.modules[name]
+            module = import_module("jira_as.cli.commands." + module_name)
+            command = getattr(module, symbol)
+            if name == "collaborate":
+                command.add_command(module.comment, name="comments")
+            elif name == "search":
+                command.add_command(module.search_query, name="jql")
+        else:
+            from jira_as.cli.legacy import MigrationGroup
+
+            command = MigrationGroup(name, help="Legacy migration hints.")
+        if name not in {"api", "help"}:
+            from as_engine.index import ProductIndexes
+
+            from jira_as.cli.legacy import records, register
+
+            indexes = ProductIndexes(Path(__file__).parents[1] / "_generated")
+            register(
+                command, records(index for _, index in indexes.primary()), prefix=name
+            )
         self.add_command(command, name)
         return command
 

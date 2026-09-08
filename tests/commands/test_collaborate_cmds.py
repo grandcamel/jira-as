@@ -19,16 +19,9 @@ import pytest
 from jira_as.cli.commands.collaborate_cmds import (
     _add_comment_impl,
     _add_watcher_impl,
-    _delete_comment_impl,
-    _get_activity_impl,
     _get_comments_impl,
-    _list_attachments_impl,
     _list_watchers_impl,
-    _parse_changelog,
-    _remove_watcher_impl,
     _send_notification_impl,
-    _update_comment_impl,
-    _update_custom_fields_impl,
     collaborate,
 )
 
@@ -111,87 +104,9 @@ class TestGetCommentsImpl:
         mock_jira_client.get_comment.assert_called_once_with("PROJ-123", "10001")
 
 
-@pytest.mark.unit
-class TestUpdateCommentImpl:
-    """Tests for the _update_comment_impl implementation function."""
-
-    def test_update_comment(self, mock_jira_client, sample_comment):
-        """Test updating a comment."""
-        mock_jira_client.update_comment.return_value = deepcopy(sample_comment)
-
-        with patch(
-            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _update_comment_impl(
-                issue_key="PROJ-123",
-                comment_id="10001",
-                body="Updated comment",
-            )
-
-        assert result["id"] == "10001"
-        mock_jira_client.update_comment.assert_called_once()
-
-
-@pytest.mark.unit
-class TestDeleteCommentImpl:
-    """Tests for the _delete_comment_impl implementation function."""
-
-    def test_delete_comment_force(self, mock_jira_client):
-        """Test deleting a comment with force."""
-        with patch(
-            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _delete_comment_impl(
-                issue_key="PROJ-123",
-                comment_id="10001",
-                force=True,
-            )
-
-        assert result is None
-        mock_jira_client.delete_comment.assert_called_once()
-
-    def test_delete_comment_dry_run(self, mock_jira_client, sample_comment):
-        """Test dry-run mode returns comment info."""
-        mock_jira_client.get_comment.return_value = deepcopy(sample_comment)
-
-        with patch(
-            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _delete_comment_impl(
-                issue_key="PROJ-123",
-                comment_id="10001",
-                dry_run=True,
-            )
-
-        assert result["dry_run"] is True
-        assert result["id"] == "10001"
-        mock_jira_client.delete_comment.assert_not_called()
-
-
 # =============================================================================
 # Attachment Implementation Tests
 # =============================================================================
-
-
-@pytest.mark.unit
-class TestListAttachmentsImpl:
-    """Tests for the _list_attachments_impl implementation function."""
-
-    def test_list_attachments(self, mock_jira_client, sample_attachments):
-        """Test listing attachments."""
-        mock_jira_client.get_attachments.return_value = deepcopy(sample_attachments)
-
-        with patch(
-            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _list_attachments_impl(issue_key="PROJ-123")
-
-        assert len(result) == 2
-        mock_jira_client.get_attachments.assert_called_once()
 
 
 # =============================================================================
@@ -232,59 +147,10 @@ class TestWatchersImpl:
 
         mock_jira_client.post.assert_called_once()
 
-    def test_remove_watcher(self, mock_jira_client):
-        """Test removing a watcher."""
-        with (
-            patch(
-                "jira_as.cli.commands.collaborate_cmds.get_jira_client",
-                return_value=mock_jira_client,
-            ),
-            patch(
-                "jira_as.cli.commands.collaborate_cmds.resolve_user_to_account_id",
-                return_value="user-123",
-            ),
-        ):
-            _remove_watcher_impl(issue_key="PROJ-123", user="user@example.com")
-
-        mock_jira_client.delete.assert_called_once()
-
 
 # =============================================================================
 # Activity Implementation Tests
 # =============================================================================
-
-
-@pytest.mark.unit
-class TestActivityImpl:
-    """Tests for activity implementation functions."""
-
-    def test_get_activity(self, mock_jira_client, sample_changelog):
-        """Test getting activity."""
-        mock_jira_client.get_changelog.return_value = deepcopy(sample_changelog)
-
-        with patch(
-            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _get_activity_impl(issue_key="PROJ-123")
-
-        assert "values" in result
-        mock_jira_client.get_changelog.assert_called_once()
-
-    def test_parse_changelog(self, sample_changelog):
-        """Test parsing changelog."""
-        changes = _parse_changelog(sample_changelog)
-
-        assert len(changes) == 2
-        assert changes[0]["field"] == "status"
-        assert changes[1]["field"] == "assignee"
-
-    def test_parse_changelog_with_filter(self, sample_changelog):
-        """Test parsing changelog with field filter."""
-        changes = _parse_changelog(sample_changelog, field_filter=["status"])
-
-        assert len(changes) == 1
-        assert changes[0]["field"] == "status"
 
 
 # =============================================================================
@@ -334,39 +200,6 @@ class TestNotificationImpl:
 # =============================================================================
 # Custom Fields Implementation Tests
 # =============================================================================
-
-
-@pytest.mark.unit
-class TestUpdateCustomFieldsImpl:
-    """Tests for update custom fields implementation."""
-
-    def test_update_custom_fields_json(self, mock_jira_client):
-        """Test updating custom fields with JSON."""
-        with patch(
-            "jira_as.cli.commands.collaborate_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            _update_custom_fields_impl(
-                issue_key="PROJ-123",
-                fields_json='{"customfield_10001": "value1"}',
-            )
-
-        mock_jira_client.update_issue.assert_called_once()
-        call_args = mock_jira_client.update_issue.call_args
-        assert "customfield_10001" in call_args[0][1]
-
-    def test_update_custom_fields_no_fields_raises_error(self, mock_jira_client):
-        """Test that no fields raises error."""
-        from jira_as import ValidationError
-
-        with (
-            patch(
-                "jira_as.cli.commands.collaborate_cmds.get_jira_client",
-                return_value=mock_jira_client,
-            ),
-            pytest.raises(ValidationError, match="Either --field"),
-        ):
-            _update_custom_fields_impl(issue_key="PROJ-123")
 
 
 # =============================================================================
@@ -542,40 +375,6 @@ class TestCommentCommands:
         assert result.exit_code == 0, result.output
         assert mock_method.call_args.args[body_arg_index] == expected_body
 
-    def test_comment_update_reads_multiline_markdown_from_stdin(
-        self, cli_runner, mock_jira_client, sample_comment
-    ):
-        """Update accepts multiline Markdown from standard input."""
-        mock_jira_client.update_comment.return_value = deepcopy(sample_comment)
-
-        with patch(
-            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                collaborate,
-                [
-                    "comment",
-                    "update",
-                    "PROJ-123",
-                    "--id",
-                    "10001",
-                    "--format",
-                    "markdown",
-                    "--body-stdin",
-                ],
-                input="## Updated\n\n1. Kept **formatting**\n",
-            )
-
-        assert result.exit_code == 0, result.output
-        adf = mock_jira_client.update_comment.call_args.args[2]
-        assert [node["type"] for node in adf["content"]] == [
-            "heading",
-            "orderedList",
-        ]
-        formatted_text = adf["content"][1]["content"][0]["content"][0]["content"]
-        assert formatted_text[1]["marks"] == [{"type": "strong"}]
-
 
 @pytest.mark.unit
 class TestWatchersCommand:
@@ -595,53 +394,3 @@ class TestWatchersCommand:
             )
 
         assert result.exit_code == 0
-
-
-@pytest.mark.unit
-class TestActivityCommand:
-    """Tests for activity CLI command."""
-
-    def test_activity_cli(self, cli_runner, mock_jira_client, sample_changelog):
-        """Test CLI activity command."""
-        mock_jira_client.get_changelog.return_value = deepcopy(sample_changelog)
-
-        with patch(
-            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                collaborate,
-                ["activity", "PROJ-123"],
-            )
-
-        assert result.exit_code == 0
-        assert "Activity for PROJ-123" in result.output
-
-
-@pytest.mark.unit
-class TestNotifyCommand:
-    """Tests for notify CLI command."""
-
-    def test_notify_cli_dry_run(self, cli_runner, mock_jira_client):
-        """Test CLI notify command with dry-run."""
-        with patch(
-            "jira_as.cli.commands.collaborate_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                collaborate,
-                ["notify", "PROJ-123", "--watchers", "--dry-run"],
-            )
-
-        assert result.exit_code == 0
-        assert "[DRY RUN]" in result.output
-
-    def test_notify_cli_no_recipients_error(self, cli_runner, mock_jira_client):
-        """Test CLI notify command fails without recipients."""
-        result = cli_runner.invoke(
-            collaborate,
-            ["notify", "PROJ-123"],
-        )
-
-        assert result.exit_code != 0
-        assert "Must specify at least one recipient" in result.output

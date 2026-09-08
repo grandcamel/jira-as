@@ -24,10 +24,7 @@ from jira_as.cli.commands.search_cmds import (
     JQL_TEMPLATES,
     _build_jql_impl,
     _bulk_update_impl,
-    _create_filter_impl,
-    _delete_filter_impl,
     _export_results_impl,
-    _favourite_filter_impl,
     _format_fields,
     _format_filter_detail,
     _format_filters,
@@ -41,14 +38,11 @@ from jira_as.cli.commands.search_cmds import (
     _get_functions_impl,
     _get_return_type,
     _get_suggestions_impl,
-    _run_filter_impl,
     _search_issues_impl,
-    _share_filter_impl,
     _suggest_correction,
-    _update_filter_impl,
-    _validate_jql_impl,
     search,
 )
+from tests.test_utility_survivors import utility_simulation as utility_simulation
 
 # =============================================================================
 # Fixtures
@@ -510,20 +504,14 @@ class TestSearchImplementation:
             assert json.load(f) == {"issues": [], "total": 0}
 
     def test_export_command_exits_zero_on_no_results(
-        self, cli_runner, mock_client, tmp_path
+        self, utility_simulation, cli_runner, tmp_path
     ):
-        """'search export' with no matches exits 0 instead of raising KeyError."""
-        mock_client.search_issues.return_value = {"issues": []}
+        utility_simulation.issues = []
         output_file = str(tmp_path / "export.csv")
-
-        with patch(
-            "jira_as.cli.commands.search_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            result = cli_runner.invoke(
-                search, ["export", "project = EMPTY", "-o", output_file]
-            )
-
+        result = cli_runner.invoke(
+            search,
+            ["export", "project = SBX", "-o", output_file, "--transport", "simulation"],
+        )
         assert result.exit_code == 0, result.output
         assert "Exported 0 issues" in result.output
 
@@ -599,61 +587,6 @@ class TestSearchImplementation:
         assert row["labels"] == "a, b"
         # Parseable JSON, not "{'start': '2024-01-01'}".
         assert json.loads(row["customfield_1"]) == {"start": "2024-01-01"}
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_validate_jql_valid(self, mock_get_client, mock_client):
-        """Test validating valid JQL."""
-        mock_get_client.return_value = mock_client
-        mock_client.parse_jql.return_value = {
-            "queries": [{"query": "project = TEST", "errors": []}]
-        }
-
-        results = _validate_jql_impl(["project = TEST"])
-
-        assert len(results) == 1
-        assert results[0]["valid"] is True
-        assert results[0]["errors"] == []
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_validate_jql_invalid(self, mock_get_client, mock_client):
-        """Test validating invalid JQL."""
-        mock_get_client.return_value = mock_client
-        mock_client.parse_jql.return_value = {
-            "queries": [
-                {
-                    "query": "porject = TEST",
-                    "errors": ["Field 'porject' does not exist"],
-                }
-            ]
-        }
-
-        results = _validate_jql_impl(["porject = TEST"])
-
-        assert len(results) == 1
-        assert results[0]["valid"] is False
-        assert len(results[0]["errors"]) > 0
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_validate_jql_multiple(self, mock_get_client, mock_client):
-        """Test validating multiple queries."""
-        mock_get_client.return_value = mock_client
-        mock_client.parse_jql.return_value = {
-            "queries": [
-                {"query": "project = A", "errors": []},
-                {"query": "invalid", "errors": ["Parse error"]},
-            ]
-        }
-
-        results = _validate_jql_impl(["project = A", "invalid"])
-
-        assert len(results) == 2
-        assert results[0]["valid"] is True
-        assert results[1]["valid"] is False
-
-    def test_validate_jql_empty(self):
-        """Test validation fails with empty list."""
-        with pytest.raises(ValidationError, match="At least one query"):
-            _validate_jql_impl([])
 
     def test_build_jql_from_clauses(self):
         """Test building JQL from clauses."""
@@ -915,19 +848,6 @@ class TestFilterImplementation:
         assert len(result["filters"]) == 3
 
     @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_get_filters_favourites(self, mock_get_client, mock_client, sample_filters):
-        """Test getting favourite filters."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_favourite_filters.return_value = [
-            f for f in sample_filters if f["favourite"]
-        ]
-
-        result = _get_filters_impl(favourites=True)
-
-        assert result["type"] == "favourites"
-        assert len(result["filters"]) == 2
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
     def test_get_filters_by_id(self, mock_get_client, mock_client, sample_filter):
         """Test getting filter by ID."""
         mock_get_client.return_value = mock_client
@@ -955,265 +875,6 @@ class TestFilterImplementation:
         mock_get_client.return_value = mock_client
         with pytest.raises(ValidationError, match="Specify"):
             _get_filters_impl()
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_create_filter_basic(self, mock_get_client, mock_client):
-        """Test creating a basic filter."""
-        mock_get_client.return_value = mock_client
-        mock_client.create_filter.return_value = {
-            "id": "10010",
-            "name": "New Filter",
-            "jql": "project = TEST",
-        }
-
-        result = _create_filter_impl(
-            name="New Filter",
-            jql="project = TEST",
-        )
-
-        assert result["id"] == "10010"
-        mock_client.create_filter.assert_called_once()
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_create_filter_with_share(self, mock_get_client, mock_client):
-        """Test creating filter with sharing."""
-        mock_get_client.return_value = mock_client
-        mock_client.create_filter.return_value = {
-            "id": "10010",
-            "name": "New Filter",
-        }
-
-        result = _create_filter_impl(
-            name="New Filter",
-            jql="project = TEST",
-            share_global=True,
-        )
-
-        assert result["id"] == "10010"
-        call_args = mock_client.create_filter.call_args
-        assert call_args[1]["share_permissions"] is not None
-
-    def test_create_filter_no_name(self):
-        """Test creating filter without name fails."""
-        with pytest.raises(ValidationError, match="name is required"):
-            _create_filter_impl(name="", jql="project = TEST")
-
-    def test_create_filter_no_jql(self):
-        """Test creating filter without JQL fails."""
-        with pytest.raises(ValidationError, match="JQL query is required"):
-            _create_filter_impl(name="Test", jql="")
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_run_filter_by_id(
-        self, mock_get_client, mock_client, sample_issues, sample_filter
-    ):
-        """Test running filter by ID."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_filter.return_value = sample_filter
-        mock_client.search_issues.return_value = {"issues": sample_issues, "total": 3}
-
-        result = _run_filter_impl(filter_id="10001")
-
-        assert result["total"] == 3
-        assert result["_filter"]["name"] == "My Open Issues"
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_run_filter_by_name(
-        self, mock_get_client, mock_client, sample_issues, sample_filter
-    ):
-        """Test running filter by name."""
-        mock_get_client.return_value = mock_client
-        mock_client.get.return_value = [sample_filter]
-        mock_client.get_filter.return_value = sample_filter
-        mock_client.search_issues.return_value = {"issues": sample_issues, "total": 3}
-
-        result = _run_filter_impl(filter_name="My Open Issues")
-
-        assert result["total"] == 3
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_run_filter_not_found(self, mock_get_client, mock_client):
-        """Test running filter that doesn't exist."""
-        mock_get_client.return_value = mock_client
-        mock_client.get.return_value = []
-
-        with pytest.raises(ValidationError, match="not found"):
-            _run_filter_impl(filter_name="Nonexistent")
-
-    def test_run_filter_no_id_or_name(self):
-        """Test running filter without ID or name."""
-        with pytest.raises(ValidationError, match="Either filter_id or filter_name"):
-            _run_filter_impl()
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_update_filter(self, mock_get_client, mock_client):
-        """Test updating a filter."""
-        mock_get_client.return_value = mock_client
-        mock_client.update_filter.return_value = {
-            "id": "10001",
-            "name": "Updated Name",
-            "jql": "project = TEST",
-        }
-
-        result = _update_filter_impl(
-            filter_id="10001",
-            name="Updated Name",
-        )
-
-        assert result["name"] == "Updated Name"
-
-    def test_update_filter_no_changes(self):
-        """Test updating filter with no changes."""
-        with pytest.raises(ValidationError, match="At least one"):
-            _update_filter_impl(filter_id="10001")
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_delete_filter_dry_run(self, mock_get_client, mock_client, sample_filter):
-        """Test deleting filter with dry run."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_filter.return_value = sample_filter
-
-        result = _delete_filter_impl("10001", dry_run=True)
-
-        assert result["would_delete"] is True
-        assert result["filter_name"] == "My Open Issues"
-        mock_client.delete_filter.assert_not_called()
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_delete_filter_execute(self, mock_get_client, mock_client, sample_filter):
-        """Test deleting filter."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_filter.return_value = sample_filter
-
-        result = _delete_filter_impl("10001", dry_run=False)
-
-        assert result["deleted"] is True
-        mock_client.delete_filter.assert_called_with("10001")
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_share_filter_list(self, mock_get_client, mock_client):
-        """Test listing filter permissions."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_filter_permissions.return_value = [
-            {"id": "1", "type": "project"},
-        ]
-
-        result = _share_filter_impl("10001", list_permissions=True)
-
-        assert result["action"] == "list"
-        assert len(result["permissions"]) == 1
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_share_filter_with_project(self, mock_get_client, mock_client):
-        """Test sharing filter with project."""
-        mock_get_client.return_value = mock_client
-        mock_client.add_filter_permission.return_value = {"id": "5", "type": "project"}
-
-        result = _share_filter_impl("10001", project="TEST")
-
-        assert result["action"] == "shared"
-        assert result["type"] == "project"
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_share_filter_with_role(self, mock_get_client, mock_client):
-        """Test sharing filter with project role."""
-        mock_get_client.return_value = mock_client
-        mock_client.get.return_value = {
-            "Developers": "https://jira/role/10002",
-            "Users": "https://jira/role/10003",
-        }
-        mock_client.add_filter_permission.return_value = {
-            "id": "5",
-            "type": "projectRole",
-        }
-
-        result = _share_filter_impl("10001", project="TEST", role="Developers")
-
-        assert result["action"] == "shared"
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_share_filter_role_not_found(self, mock_get_client, mock_client):
-        """Test sharing with non-existent role."""
-        mock_get_client.return_value = mock_client
-        mock_client.get.return_value = {
-            "Users": "https://jira/role/10003",
-        }
-
-        with pytest.raises(ValidationError, match="not found"):
-            _share_filter_impl("10001", project="TEST", role="NonexistentRole")
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_share_filter_global(self, mock_get_client, mock_client):
-        """Test sharing filter globally."""
-        mock_get_client.return_value = mock_client
-        mock_client.add_filter_permission.return_value = {"id": "5", "type": "global"}
-
-        result = _share_filter_impl("10001", share_global=True)
-
-        assert result["action"] == "shared"
-        assert result["type"] == "global"
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_share_filter_unshare(self, mock_get_client, mock_client):
-        """Test removing filter permission."""
-        mock_get_client.return_value = mock_client
-
-        result = _share_filter_impl("10001", unshare="5")
-
-        assert result["action"] == "removed"
-        mock_client.delete_filter_permission.assert_called_with("10001", "5")
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_share_filter_no_option(self, mock_get_client, mock_client):
-        """Test share filter with no options."""
-        mock_get_client.return_value = mock_client
-        with pytest.raises(ValidationError, match="Specify"):
-            _share_filter_impl("10001")
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_favourite_filter_add(self, mock_get_client, mock_client, sample_filter):
-        """Test adding filter to favourites."""
-        mock_get_client.return_value = mock_client
-        mock_client.add_filter_favourite.return_value = sample_filter
-
-        result = _favourite_filter_impl("10001", add=True)
-
-        assert result["action"] == "added"
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_favourite_filter_remove(self, mock_get_client, mock_client, sample_filter):
-        """Test removing filter from favourites."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_filter.return_value = sample_filter
-
-        result = _favourite_filter_impl("10001", remove=True)
-
-        assert result["action"] == "removed"
-        mock_client.remove_filter_favourite.assert_called_with("10001")
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_favourite_filter_toggle_add(self, mock_get_client, mock_client):
-        """Test toggling favourite adds when not favourite."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_filter.return_value = {"id": "10001", "favourite": False}
-        mock_client.add_filter_favourite.return_value = {
-            "id": "10001",
-            "favourite": True,
-        }
-
-        result = _favourite_filter_impl("10001")
-
-        assert result["action"] == "added"
-
-    @patch("jira_as.cli.commands.search_cmds.get_jira_client")
-    def test_favourite_filter_toggle_remove(self, mock_get_client, mock_client):
-        """Test toggling favourite removes when favourite."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_filter.return_value = {"id": "10001", "favourite": True}
-
-        result = _favourite_filter_impl("10001")
-
-        assert result["action"] == "removed"
 
 
 # =============================================================================
@@ -1431,32 +1092,6 @@ class TestSearchCLICommands:
         assert result.exit_code != 0
         assert "required" in result.output.lower()
 
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_validate_command_valid(self, mock_get_client, runner, mock_client):
-        """Test validate command with valid JQL."""
-        mock_get_client.return_value = mock_client
-        mock_client.parse_jql.return_value = {
-            "queries": [{"query": "project = TEST", "errors": []}]
-        }
-
-        result = runner.invoke(search, ["validate", "project = TEST"])
-
-        assert result.exit_code == 0
-        assert "Valid JQL" in result.output
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_validate_command_invalid(self, mock_get_client, runner, mock_client):
-        """Test validate command with invalid JQL."""
-        mock_get_client.return_value = mock_client
-        mock_client.parse_jql.return_value = {
-            "queries": [{"query": "invalid", "errors": ["Parse error"]}]
-        }
-
-        result = runner.invoke(search, ["validate", "invalid"])
-
-        assert result.exit_code == 1
-        assert "Invalid JQL" in result.output
-
     def test_build_command_list_templates(self, runner):
         """Test build command listing templates."""
         result = runner.invoke(search, ["build", "--list-templates"])
@@ -1488,77 +1123,43 @@ class TestSearchCLICommands:
         assert result.exit_code == 0
         assert "assignee = currentUser()" in result.output
 
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    @patch("jira_as.cli.commands.search_cmds.get_autocomplete_cache")
-    def test_suggest_command(
-        self, mock_cache, mock_get_client, runner, mock_client, sample_suggestions
-    ):
-        """Test suggest command."""
-        mock_get_client.return_value = mock_client
-        cache = MagicMock()
-        cache.get_suggestions.return_value = sample_suggestions
-        mock_cache.return_value = cache
+    def test_suggest_command(self, utility_simulation, runner):
+        result = runner.invoke(
+            search, ["suggest", "-f", "project", "--transport", "simulation"]
+        )
+        assert result.exit_code == 0, result.output
+        assert "Sandbox" in result.output
+        assert utility_simulation.calls[0][0] == "getFieldAutoCompleteForQueryString"
 
-        result = runner.invoke(search, ["suggest", "-f", "priority"])
-
-        assert result.exit_code == 0
-        assert "High" in result.output
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    @patch("jira_as.cli.commands.search_cmds.get_autocomplete_cache")
-    def test_fields_command(
-        self, mock_cache, mock_get_client, runner, mock_client, sample_fields
-    ):
-        """Test fields command."""
-        mock_get_client.return_value = mock_client
-        cache = MagicMock()
-        cache.get_fields.return_value = sample_fields
-        mock_cache.return_value = cache
-
-        result = runner.invoke(search, ["fields"])
-
-        assert result.exit_code == 0
+    def test_fields_command(self, utility_simulation, runner, sample_fields):
+        utility_simulation.fields = sample_fields
+        result = runner.invoke(search, ["fields", "--transport", "simulation"])
+        assert result.exit_code == 0, result.output
         assert "project" in result.output
         assert "JQL Fields:" in result.output
 
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_functions_command(
-        self, mock_get_client, runner, mock_client, sample_functions
-    ):
-        """Test functions command."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_jql_autocomplete.return_value = {
-            "visibleFunctionNames": sample_functions
-        }
-
-        result = runner.invoke(search, ["functions"])
-
-        assert result.exit_code == 0
+    def test_functions_command(self, utility_simulation, runner):
+        result = runner.invoke(search, ["functions", "--transport", "simulation"])
+        assert result.exit_code == 0, result.output
         assert "currentUser()" in result.output
 
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    @patch("jira_as.cli.commands.search_cmds.validate_jql")
-    def test_bulk_update_dry_run(
-        self, mock_validate, mock_get_client, runner, mock_client, sample_issues
-    ):
-        """Test bulk-update command dry run."""
-        mock_get_client.return_value = mock_client
-        mock_validate.return_value = "project = TEST"
-        mock_client.search_issues.return_value = {"issues": sample_issues, "total": 3}
-
+    def test_bulk_update_dry_run(self, utility_simulation, runner):
+        before = utility_simulation.snapshot()
         result = runner.invoke(
             search,
             [
                 "bulk-update",
-                "project = TEST",
+                "project = SBX",
                 "--add-labels",
                 "newlabel",
                 "--dry-run",
+                "--transport",
+                "simulation",
             ],
         )
-
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
         assert "Would update" in result.output
+        assert utility_simulation.snapshot() == before
 
 
 class TestFilterCLICommands:
@@ -1568,198 +1169,6 @@ class TestFilterCLICommands:
     def runner(self):
         """Create CLI runner."""
         return CliRunner()
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_filter_list_my(self, mock_get_client, runner, mock_client, sample_filters):
-        """Test filter list --my command."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_my_filters.return_value = sample_filters
-
-        result = runner.invoke(search, ["filter", "list", "--my"])
-
-        assert result.exit_code == 0
-        assert "My Open Issues" in result.output
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_filter_list_favourites(
-        self, mock_get_client, runner, mock_client, sample_filters
-    ):
-        """Test filter list --favourites command."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_favourite_filters.return_value = [
-            f for f in sample_filters if f["favourite"]
-        ]
-
-        result = runner.invoke(search, ["filter", "list", "--favourites"])
-
-        assert result.exit_code == 0
-        assert "My Open Issues" in result.output
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_filter_list_by_id(
-        self, mock_get_client, runner, mock_client, sample_filter
-    ):
-        """Test filter list --id command."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_filter.return_value = sample_filter
-
-        result = runner.invoke(search, ["filter", "list", "--id", "10001"])
-
-        assert result.exit_code == 0
-        assert "My Open Issues" in result.output
-        assert "Filter Details:" in result.output
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_filter_create(self, mock_get_client, runner, mock_client):
-        """Test filter create command."""
-        mock_get_client.return_value = mock_client
-        mock_client.create_filter.return_value = {
-            "id": "10010",
-            "name": "New Filter",
-            "jql": "project = TEST",
-        }
-
-        result = runner.invoke(
-            search,
-            [
-                "filter",
-                "create",
-                "-n",
-                "New Filter",
-                "-j",
-                "project = TEST",
-            ],
-        )
-
-        assert result.exit_code == 0
-        assert "Filter created" in result.output
-        assert "10010" in result.output
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_filter_run(
-        self, mock_get_client, runner, mock_client, sample_issues, sample_filter
-    ):
-        """Test filter run command."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_filter.return_value = sample_filter
-        mock_client.search_issues.return_value = {"issues": sample_issues, "total": 3}
-
-        result = runner.invoke(search, ["filter", "run", "-i", "10001"])
-
-        assert result.exit_code == 0
-        assert "Found 3" in result.output
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_filter_update(self, mock_get_client, runner, mock_client):
-        """Test filter update command."""
-        mock_get_client.return_value = mock_client
-        mock_client.update_filter.return_value = {
-            "id": "10001",
-            "name": "Updated Name",
-            "jql": "project = TEST",
-        }
-
-        result = runner.invoke(
-            search,
-            [
-                "filter",
-                "update",
-                "10001",
-                "-n",
-                "Updated Name",
-            ],
-        )
-
-        assert result.exit_code == 0
-        assert "Filter updated" in result.output
-        assert "Updated Name" in result.output
-
-    def test_filter_update_no_changes(self, runner):
-        """Test filter update requires at least one change."""
-        result = runner.invoke(search, ["filter", "update", "10001"])
-
-        assert result.exit_code != 0
-        assert "required" in result.output.lower()
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_filter_delete_dry_run(
-        self, mock_get_client, runner, mock_client, sample_filter
-    ):
-        """Test filter delete dry run."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_filter.return_value = sample_filter
-
-        result = runner.invoke(search, ["filter", "delete", "10001", "--dry-run"])
-
-        assert result.exit_code == 0
-        assert "Would delete" in result.output
-        mock_client.delete_filter.assert_not_called()
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_filter_delete_confirmed(
-        self, mock_get_client, runner, mock_client, sample_filter
-    ):
-        """Test filter delete with confirmation."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_filter.return_value = sample_filter
-
-        result = runner.invoke(search, ["filter", "delete", "10001", "--yes"])
-
-        assert result.exit_code == 0
-        assert "deleted" in result.output
-        mock_client.delete_filter.assert_called_once()
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_filter_share_list(self, mock_get_client, runner, mock_client):
-        """Test filter share --list command."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_filter_permissions.return_value = [
-            {"id": "1", "type": "project"},
-        ]
-
-        result = runner.invoke(search, ["filter", "share", "10001", "--list"])
-
-        assert result.exit_code == 0
-        assert "permissions" in result.output.lower()
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_filter_share_project(self, mock_get_client, runner, mock_client):
-        """Test filter share --project command."""
-        mock_get_client.return_value = mock_client
-        mock_client.add_filter_permission.return_value = {"id": "5", "type": "project"}
-
-        result = runner.invoke(
-            search, ["filter", "share", "10001", "--project", "TEST"]
-        )
-
-        assert result.exit_code == 0
-        assert "shared" in result.output.lower()
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_filter_favourite_add(
-        self, mock_get_client, runner, mock_client, sample_filter
-    ):
-        """Test filter favourite --add command."""
-        mock_get_client.return_value = mock_client
-        mock_client.add_filter_favourite.return_value = sample_filter
-
-        result = runner.invoke(search, ["filter", "favourite", "10001", "--add"])
-
-        assert result.exit_code == 0
-        assert "added" in result.output.lower()
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_filter_favourite_remove(
-        self, mock_get_client, runner, mock_client, sample_filter
-    ):
-        """Test filter favourite --remove command."""
-        mock_get_client.return_value = mock_client
-        mock_client.get_filter.return_value = sample_filter
-
-        result = runner.invoke(search, ["filter", "favourite", "10001", "--remove"])
-
-        assert result.exit_code == 0
-        assert "removed" in result.output.lower()
 
 
 # =============================================================================
@@ -1774,20 +1183,6 @@ class TestErrorHandling:
     def runner(self):
         """Create CLI runner."""
         return CliRunner()
-
-    @patch("jira_as.cli.commands.search_cmds.get_client_from_context")
-    def test_jira_error_handling(self, mock_get_client, runner):
-        """Test JiraError is handled properly."""
-        mock_client = MagicMock()
-        mock_client.__enter__ = MagicMock(return_value=mock_client)
-        mock_client.__exit__ = MagicMock(return_value=False)
-        mock_get_client.return_value = mock_client
-        mock_client.get_my_filters.side_effect = JiraError("API Error")
-
-        result = runner.invoke(search, ["filter", "list", "--my"])
-
-        assert result.exit_code == 1
-        assert "API Error" in result.output or "error" in result.output.lower()
 
     @patch("jira_as.cli.commands.search_cmds.get_jira_client")
     @patch("jira_as.cli.commands.search_cmds.validate_jql")

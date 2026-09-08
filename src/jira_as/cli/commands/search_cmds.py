@@ -31,6 +31,8 @@ from typing import TYPE_CHECKING, Any
 
 import click
 
+from .bulk_cmds import WorkflowCheckpoint, workflow_call, workflow_surface
+
 if TYPE_CHECKING:
     from jira_as import JiraClient
 
@@ -1191,6 +1193,164 @@ def _format_filter_detail(filter_data: dict) -> str:
 # =============================================================================
 
 
+def _surface_search(surface, jql: str, fields: list[str], maximum: int):
+    if maximum < 1:
+        raise click.BadParameter("Must be positive", param_hint="--max-results")
+    return workflow_call(
+        surface,
+        "searchAndReconsileIssuesUsingJql",
+        {"jql": validate_jql(jql), "fields": fields, "maxResults": min(maximum, 100)},
+        all_pages=True,
+        limit=maximum,
+        raw=True,
+    )
+
+
+def _surface_export(surface, jql, output_file, format_type, fields, max_results):
+    fields = fields or [
+        "key",
+        "summary",
+        "status",
+        "priority",
+        "issuetype",
+        "assignee",
+        "reporter",
+        "created",
+        "updated",
+    ]
+    issues = _surface_search(surface, jql, fields, max_results)
+    columns = ["key"] + [f for f in fields if f != "key"]
+    rows = [
+        {
+            "key": issue["key"],
+            **{
+                field: _serialize_export_value(
+                    issue.get("fields", {}).get(field, ""), format_type == "csv"
+                )
+                for field in columns
+                if field != "key"
+            },
+        }
+        for issue in issues
+    ]
+    with open(output_file, "w", newline="", encoding="utf-8") as stream:
+        if format_type == "csv":
+            writer = csv.DictWriter(stream, fieldnames=columns)
+            writer.writeheader()
+            writer.writerows(rows)
+        else:
+            json.dump({"issues": rows, "total": len(rows)}, stream, indent=2)
+    return {"exported": len(rows), "output_file": output_file, "format": format_type}
+
+
+def _surface_build(
+    clauses, template, operator, order_by, order_desc, validate, transport
+):
+    if template:
+        if template not in JQL_TEMPLATES:
+            raise click.BadParameter(f"Unknown template: {template}")
+        jql = JQL_TEMPLATES[template]
+    elif clauses:
+        jql = f" {operator} ".join(clauses)
+        if order_by:
+            jql += f" ORDER BY {order_by} {'DESC' if order_desc else 'ASC'}"
+    else:
+        raise click.UsageError("Provide --clause or --template")
+    result: dict[str, Any] = {"jql": jql}
+    if validate:
+        parsed = workflow_call(
+            workflow_surface(transport),
+            "parseJqlQueries",
+            {"validation": "strict"},
+            body={"queries": [jql]},
+        )
+        errors = parsed.get("queries", [{}])[0].get("errors", [])
+        result.update(valid=not errors, errors=errors)
+    return result
+
+
+def _surface_autocomplete(transport, no_cache=False, refresh=False):
+    cache = get_autocomplete_cache() if not no_cache else None
+    data = (
+        None
+        if cache is None or refresh
+        else cache._cache.get(cache.KEY_AUTOCOMPLETE_DATA, category="field")
+    )
+    if data is None:
+        data = workflow_call(workflow_surface(transport), "getAutoComplete")
+        if cache is not None:
+            cache.set_autocomplete_data(data)
+    return data
+
+
+def _surface_suggestions(transport, field, prefix, no_cache, refresh):
+    cache = get_autocomplete_cache() if not no_cache else None
+    key = f"jql:suggest:{field}:{prefix}"
+    suggestions = (
+        None if cache is None or refresh else cache._cache.get(key, category="search")
+    )
+    if suggestions is None:
+        suggestions = workflow_call(
+            workflow_surface(transport),
+            "getFieldAutoCompleteForQueryString",
+            {"fieldName": field, "fieldValue": prefix},
+        ).get("results", [])
+        if cache is not None:
+            cache._cache.set(
+                key, suggestions, category="search", ttl=cache.TTL_SUGGESTIONS
+            )
+    return suggestions
+
+
+def _surface_bulk_update(
+    surface, jql, add_labels, remove_labels, priority, maximum, dry_run, checkpoint
+):
+    changes = {
+        "add_labels": add_labels,
+        "remove_labels": remove_labels,
+        "priority": priority,
+    }
+    saved = WorkflowCheckpoint(
+        None if dry_run else checkpoint,
+        "search bulk-update",
+        {"jql": jql, "maximum": maximum},
+        changes,
+    )
+    issues = saved.select(surface, None, jql, maximum)
+    if dry_run:
+        return {
+            "would_update": len(issues),
+            "issues": [i["key"] for i in issues],
+            "changes": changes,
+        }
+    failures = []
+    updated = 0
+    for issue in issues:
+        key = issue["key"]
+        fields: dict[str, Any] = {}
+        if add_labels or remove_labels:
+            fields["labels"] = sorted(
+                (set(issue.get("fields", {}).get("labels", [])) | set(add_labels or []))
+                - set(remove_labels or [])
+            )
+        if priority:
+            fields["priority"] = {"name": priority}
+        try:
+            saved.step(
+                key,
+                lambda key=key, fields=fields: workflow_call(
+                    surface,
+                    "editIssue",
+                    {"issueIdOrKey": key, "notifyUsers": False},
+                    {"fields": fields},
+                ),
+            )
+            updated += 1
+        except click.ClickException as exc:
+            failures.append({"issue": key, "error": str(exc)})
+    return {"updated": updated, "failed": len(failures), "failures": failures}
+
+
 @click.group()
 def search():
     """Commands for searching Jira issues with JQL."""
@@ -1263,6 +1423,7 @@ def search_query(
 
 
 @search.command(name="export")
+@click.option("--transport", type=click.Choice(["simulation", "responder", "http"]))
 @click.argument("jql")
 @click.option(
     "--format",
@@ -1279,18 +1440,18 @@ def search_query(
 )
 @click.pass_context
 @handle_jira_errors
-def search_export(ctx, jql, output_format, output_file, fields, max_results):
+def search_export(ctx, jql, output_format, output_file, fields, max_results, transport):
     """Export search results to CSV or JSON."""
     field_list = parse_comma_list(fields)
-    client = get_client_from_context(ctx)
+    surface = workflow_surface(transport)
 
-    result = _export_results_impl(
+    result = _surface_export(
+        surface,
         jql=jql,
         output_file=output_file,
         format_type=output_format,
         fields=field_list,
         max_results=max_results,
-        client=client,
     )
 
     click.echo(f"Exported {result['exported']} issues to {result['output_file']}")
@@ -1330,6 +1491,7 @@ def search_validate(ctx, jql, show_structure, output):
 
 
 @search.command(name="build")
+@click.option("--transport", type=click.Choice(["simulation", "responder", "http"]))
 @click.option("--clause", "-c", multiple=True, help="JQL clause (can be repeated)")
 @click.option("--template", "-t", help="Use predefined template")
 @click.option(
@@ -1352,7 +1514,16 @@ def search_validate(ctx, jql, show_structure, output):
 @click.pass_context
 @handle_jira_errors
 def search_build(
-    ctx, clause, template, operator, order_by, desc, validate, list_templates, output
+    ctx,
+    clause,
+    template,
+    operator,
+    order_by,
+    desc,
+    validate,
+    list_templates,
+    output,
+    transport,
 ):
     """Build a JQL query from components."""
     if list_templates:
@@ -1367,16 +1538,15 @@ def search_build(
     if not clause and not template:
         raise click.UsageError("Provide --clause or --template to build a query")
 
-    # Only get client when validation is requested
-    client = get_client_from_context(ctx) if validate else None
-    result = _build_jql_impl(
+    # Local assembly needs no Surface until validation is requested.
+    result = _surface_build(
         clauses=list(clause) if clause else None,
         template=template,
         operator=operator,
         order_by=order_by,
         order_desc=desc,
         validate=validate,
-        client=client,
+        transport=transport,
     )
 
     if output == "json":
@@ -1395,9 +1565,12 @@ def search_build(
                 ctx.exit(1)
         else:
             click.echo("Use --validate to check syntax against JIRA")
+    if validate and not result.get("valid"):
+        ctx.exit(1)
 
 
 @search.command(name="suggest")
+@click.option("--transport", type=click.Choice(["simulation", "responder", "http"]))
 @click.option("--field", "-f", required=True, help="Field name to get suggestions for")
 @click.option("--prefix", "-x", default="", help="Filter suggestions by prefix")
 @click.option("--no-cache", is_flag=True, help="Bypass cache and fetch from API")
@@ -1411,16 +1584,9 @@ def search_build(
 )
 @click.pass_context
 @handle_jira_errors
-def search_suggest(ctx, field, prefix, no_cache, refresh, output):
+def search_suggest(ctx, field, prefix, no_cache, refresh, output, transport):
     """Get JQL field value suggestions for autocomplete."""
-    client = get_client_from_context(ctx)
-    suggestions = _get_suggestions_impl(
-        field_name=field,
-        prefix=prefix,
-        use_cache=not no_cache,
-        refresh_cache=refresh,
-        client=client,
-    )
+    suggestions = _surface_suggestions(transport, field, prefix, no_cache, refresh)
 
     if output == "json":
         click.echo(format_json(suggestions))
@@ -1429,6 +1595,7 @@ def search_suggest(ctx, field, prefix, no_cache, refresh, output):
 
 
 @search.command(name="fields")
+@click.option("--transport", type=click.Choice(["simulation", "responder", "http"]))
 @click.option("--filter", "-f", "name_filter", help="Filter fields by name")
 @click.option("--custom-only", is_flag=True, help="Show only custom fields")
 @click.option("--system-only", is_flag=True, help="Show only system fields")
@@ -1444,21 +1611,28 @@ def search_suggest(ctx, field, prefix, no_cache, refresh, output):
 @click.pass_context
 @handle_jira_errors
 def search_fields(
-    ctx, name_filter, custom_only, system_only, no_cache, refresh, output
+    ctx, name_filter, custom_only, system_only, no_cache, refresh, output, transport
 ):
     """List available JQL fields and operators."""
     if custom_only and system_only:
         raise click.UsageError("--custom-only and --system-only are mutually exclusive")
 
-    client = get_client_from_context(ctx)
-    fields = _get_fields_impl(
-        name_filter=name_filter,
-        custom_only=custom_only,
-        system_only=system_only,
-        use_cache=not no_cache,
-        refresh_cache=refresh,
-        client=client,
+    fields = _surface_autocomplete(transport, no_cache, refresh).get(
+        "visibleFieldNames", []
     )
+    if name_filter:
+        fields = [
+            f
+            for f in fields
+            if any(
+                name_filter.lower() in str(f.get(k, "")).lower()
+                for k in ("value", "displayName")
+            )
+        ]
+    if custom_only:
+        fields = [f for f in fields if f.get("cfid") is not None]
+    if system_only:
+        fields = [f for f in fields if f.get("cfid") is None]
 
     if output == "json":
         click.echo(format_json(fields))
@@ -1467,6 +1641,9 @@ def search_fields(
 
 
 @search.command(name="functions")
+@click.option("--transport", type=click.Choice(["simulation", "responder", "http"]))
+@click.option("--no-cache", is_flag=True)
+@click.option("--refresh", is_flag=True)
 @click.option("--filter", "-f", "name_filter", help="Filter functions by name")
 @click.option("--list-only", is_flag=True, help="Show only functions returning lists")
 @click.option("--type", "-t", "type_filter", help="Filter by return type")
@@ -1480,15 +1657,38 @@ def search_fields(
 )
 @click.pass_context
 @handle_jira_errors
-def search_functions(ctx, name_filter, list_only, type_filter, with_examples, output):
+def search_functions(
+    ctx,
+    name_filter,
+    list_only,
+    type_filter,
+    with_examples,
+    output,
+    transport,
+    no_cache,
+    refresh,
+):
     """List available JQL functions."""
-    client = get_client_from_context(ctx)
-    functions = _get_functions_impl(
-        name_filter=name_filter,
-        list_only=list_only,
-        type_filter=type_filter,
-        client=client,
+    functions = _surface_autocomplete(transport, no_cache, refresh).get(
+        "visibleFunctionNames", []
     )
+    if name_filter:
+        functions = [
+            f
+            for f in functions
+            if any(
+                name_filter.lower() in str(f.get(k, "")).lower()
+                for k in ("value", "displayName")
+            )
+        ]
+    if list_only:
+        functions = [f for f in functions if f.get("isList") == "true"]
+    if type_filter:
+        functions = [
+            f
+            for f in functions
+            if any(type_filter.lower() in str(t).lower() for t in f.get("types", []))
+        ]
 
     if output == "json":
         click.echo(format_json(functions))
@@ -1497,13 +1697,17 @@ def search_functions(ctx, name_filter, list_only, type_filter, with_examples, ou
 
 
 @search.command(name="bulk-update")
+@click.option("--transport", type=click.Choice(["simulation", "responder", "http"]))
+@click.option("--checkpoint", type=click.Path(dir_okay=False))
 @click.argument("jql")
 @click.option("--add-labels", help="Comma-separated labels to add")
 @click.option("--remove-labels", help="Comma-separated labels to remove")
 @click.option("--priority", help="Priority to set")
 @click.option("--max-issues", type=int, default=100, help="Maximum issues to update")
 @click.option("--dry-run", "-n", is_flag=True, help="Preview without making changes")
-@click.option("--yes", "-y", is_flag=True, help="Skip confirmation")
+@click.option(
+    "--confirm", "--yes", "-y", "yes", is_flag=True, help="Apply the previewed changes"
+)
 @click.option(
     "--output",
     "-o",
@@ -1514,7 +1718,17 @@ def search_functions(ctx, name_filter, list_only, type_filter, with_examples, ou
 @click.pass_context
 @handle_jira_errors
 def search_bulk_update(
-    ctx, jql, add_labels, remove_labels, priority, max_issues, dry_run, yes, output
+    ctx,
+    jql,
+    add_labels,
+    remove_labels,
+    priority,
+    max_issues,
+    dry_run,
+    yes,
+    output,
+    transport,
+    checkpoint,
 ):
     """Bulk update issues from JQL search results."""
     if not add_labels and not remove_labels and not priority:
@@ -1524,16 +1738,17 @@ def search_bulk_update(
 
     add_list = parse_comma_list(add_labels)
     remove_list = parse_comma_list(remove_labels)
-    client = get_client_from_context(ctx)
+    surface = workflow_surface(transport)
 
-    result = _bulk_update_impl(
+    result = _surface_bulk_update(
+        surface,
         jql=jql,
         add_labels=add_list,
         remove_labels=remove_list,
         priority=priority,
-        max_issues=max_issues,
+        maximum=max_issues,
         dry_run=dry_run or not yes,  # Require --yes for actual updates
-        client=client,
+        checkpoint=checkpoint,
     )
 
     if output == "json":
@@ -1549,6 +1764,8 @@ def search_bulk_update(
         click.echo(f"Updated {result['updated']} issue(s)")
         if result["failed"] > 0:
             click.echo(f"Failed: {result['failed']}")
+    if result.get("failed"):
+        ctx.exit(1)
 
 
 # --- Filter Subgroup ---

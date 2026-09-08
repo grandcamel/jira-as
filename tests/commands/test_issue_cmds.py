@@ -15,7 +15,6 @@ import pytest
 
 from jira_as.cli.commands.issue_cmds import (
     _create_issue_impl,
-    _delete_issue_impl,
     _get_issue_impl,
     _update_issue_impl,
     issue,
@@ -319,48 +318,6 @@ class TestUpdateIssueImpl:
 # =============================================================================
 
 
-@pytest.mark.unit
-class TestDeleteIssueImpl:
-    """Tests for the _delete_issue_impl implementation function."""
-
-    def test_delete_issue_force(self, mock_jira_client):
-        """Test force deleting an issue."""
-        with patch(
-            "jira_as.cli.commands.issue_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _delete_issue_impl(issue_key="PROJ-123", force=True)
-
-        mock_jira_client.delete_issue.assert_called_once_with("PROJ-123")
-        assert result is None
-
-    def test_delete_issue_no_force_returns_info(self, mock_jira_client, sample_issue):
-        """Test deleting without force returns issue info for confirmation."""
-        mock_jira_client.get_issue.return_value = deepcopy(sample_issue)
-
-        with patch(
-            "jira_as.cli.commands.issue_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            result = _delete_issue_impl(issue_key="PROJ-123", force=False)
-
-        mock_jira_client.delete_issue.assert_not_called()
-        assert result is not None
-        assert result["key"] == "PROJ-123"
-        assert result["summary"] == "Test Issue Summary"
-
-    def test_delete_issue_uses_context_manager(self, mock_jira_client):
-        """Test that client is used as context manager."""
-        with patch(
-            "jira_as.cli.commands.issue_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            _delete_issue_impl(issue_key="PROJ-123", force=True)
-
-        mock_jira_client.__enter__.assert_called_once()
-        mock_jira_client.__exit__.assert_called_once()
-
-
 # =============================================================================
 # Tests for CLI Commands
 # =============================================================================
@@ -379,26 +336,6 @@ class TestCreateIssueCommand:
 @pytest.mark.unit
 class TestUpdateIssueCommand:
     """Tests for the update_issue Click command."""
-
-
-@pytest.mark.unit
-class TestDeleteIssueCommand:
-    """Tests for the delete_issue Click command."""
-
-    def test_delete_issue_cli_force(self, cli_runner, mock_jira_client):
-        """Test CLI delete issue command with force flag."""
-        with patch(
-            "jira_as.cli.commands.issue_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(
-                issue,
-                ["delete", "PROJ-123", "--force"],
-            )
-
-        assert result.exit_code == 0
-        assert "Deleted" in result.output
-        mock_jira_client.delete_issue.assert_called_once()
 
 
 # =============================================================================
@@ -608,57 +545,6 @@ class TestUpdateIssueParentAndAdf:
 class TestIssueGroupAliases:
     """The issue group exposes transition, transitions and comment aliases."""
 
-    def test_transitions_alias_is_read_only(self, cli_runner, mock_jira_client):
-        """'issue transitions' lists transitions without performing one."""
-        with (
-            patch(
-                "jira_as.cli.commands.issue_cmds.get_client_from_context",
-                return_value=mock_jira_client,
-            ),
-            patch(
-                "jira_as.cli.commands.lifecycle_cmds._get_transitions_impl",
-                return_value=[{"id": "31", "name": "Done", "to": {"name": "Done"}}],
-            ) as mock_impl,
-        ):
-            result = cli_runner.invoke(issue, ["transitions", "PROJ-123"])
-
-        assert result.exit_code == 0
-        mock_impl.assert_called_once()
-        mock_jira_client.transition_issue.assert_not_called()
-
-    def test_transition_alias_delegates_to_lifecycle(
-        self, cli_runner, mock_jira_client
-    ):
-        """'issue transition' reuses the lifecycle implementation."""
-        with (
-            patch(
-                "jira_as.cli.commands.issue_cmds.get_client_from_context",
-                return_value=mock_jira_client,
-            ),
-            patch(
-                "jira_as.cli.commands.lifecycle_cmds._transition_issue_impl"
-            ) as mock_impl,
-        ):
-            result = cli_runner.invoke(
-                issue,
-                [
-                    "transition",
-                    "PROJ-123",
-                    "--to",
-                    "Done",
-                    "--resolution",
-                    "Fixed",
-                    "--comment",
-                    "done",
-                ],
-            )
-
-        assert result.exit_code == 0
-        kwargs = mock_impl.call_args.kwargs
-        assert kwargs["transition_name"] == "Done"
-        assert kwargs["resolution"] == "Fixed"
-        assert kwargs["comment"] == "done"
-
     def test_transition_alias_requires_a_target(self, cli_runner, mock_jira_client):
         """Neither --to nor --id is a usage error, as in the lifecycle group."""
         with patch(
@@ -668,60 +554,3 @@ class TestIssueGroupAliases:
             result = cli_runner.invoke(issue, ["transition", "PROJ-123"])
 
         assert result.exit_code != 0
-
-    def test_comment_alias_delegates_to_collaborate(self, cli_runner, mock_jira_client):
-        """'issue comment' reuses the collaborate implementation."""
-        with (
-            patch(
-                "jira_as.cli.commands.issue_cmds.get_client_from_context",
-                return_value=mock_jira_client,
-            ),
-            patch(
-                "jira_as.cli.commands.collaborate_cmds._add_comment_impl",
-                return_value={"id": "10500"},
-            ) as mock_impl,
-        ):
-            result = cli_runner.invoke(
-                issue,
-                ["comment", "PROJ-123", "--body", "**hi**", "--format", "markdown"],
-            )
-
-        assert result.exit_code == 0
-        kwargs = mock_impl.call_args.kwargs
-        assert kwargs["body"] == "**hi**"
-        assert kwargs["body_format"] == "markdown"
-        assert "10500" in result.output
-
-    def test_comment_alias_reads_body_file_before_delegating(
-        self, cli_runner, mock_jira_client, tmp_path
-    ):
-        """The issue alias supports the collaboration command's file source."""
-        body_file = tmp_path / "comment.md"
-        body_file.write_bytes(b"## Result\n\nEverything passed.\n")
-
-        with (
-            patch(
-                "jira_as.cli.commands.issue_cmds.get_client_from_context",
-                return_value=mock_jira_client,
-            ),
-            patch(
-                "jira_as.cli.commands.collaborate_cmds._add_comment_impl",
-                return_value={"id": "10500"},
-            ) as mock_impl,
-        ):
-            result = cli_runner.invoke(
-                issue,
-                [
-                    "comment",
-                    "PROJ-123",
-                    "--format",
-                    "markdown",
-                    "--body-file",
-                    str(body_file),
-                ],
-            )
-
-        assert result.exit_code == 0, result.output
-        assert mock_impl.call_args.kwargs["body"] == (
-            "## Result\n\nEverything passed.\n"
-        )

@@ -16,7 +16,7 @@ from as_engine.transport import HTTPTransport, Response, Transport
 
 if TYPE_CHECKING:
     from as_engine.cassette import Recorder
-    from as_engine.simulation import SimulationStore
+    from as_engine.simulation import JiraSimulationStore
 
 
 class _ConfiguredSurface(Surface):
@@ -33,6 +33,36 @@ class _ConfiguredSurface(Surface):
             if overrides is not None:
                 overrides.add(name)
         super().__setattr__(name, value)
+
+    def describe(self, name: str, *, full: bool = False) -> dict[str, Any]:
+        value = super().describe(name, full=full)
+        _, _, operation = self.resolve(name)
+        descriptors = operation.extensions.get("x-as-richtext", [])
+        textarea = any(row.get("customFields") == "textarea" for row in descriptors)
+        instance_parameter = any(
+            parameter["name"].casefold()
+            in {"fieldid", "fieldids", "fieldkey", "customfieldid"}
+            for parameter in operation.parameters
+        )
+        if textarea or instance_parameter:
+            note = "Instance fields: use fields list; fields cache warm refreshes metadata. "
+            note += (
+                "Cache is cold when metadata is missing, stale, or invalid; "
+                "fields list reports the current cache state. "
+            )
+            if textarea:
+                note += (
+                    "With a cold cache, automatic textarea conversion is inactive. "
+                    "A warm cache converts textarea fields from Markdown to ADF. "
+                )
+                note += "--adf-field customfield_ID explicitly selects a textarea field per call."
+            value["extensions"] = {
+                **value["extensions"],
+                "x-as-note": " ".join(
+                    x for x in (value["extensions"].get("x-as-note"), note) if x
+                ),
+            }
+        return value
 
     def call(self, *args: Any, **kwargs: Any) -> Response:
         if not self._scope_loaded:
@@ -53,6 +83,16 @@ class _ConfiguredSurface(Surface):
                     setattr(self, name, value)
             self._scope_loaded = True
         try:
+            if "textarea_fields" not in kwargs:
+                from jira_as.autocomplete_cache import InstanceFieldsCache
+
+                name = args[0] if args else kwargs["name"]
+                _, _, operation = self.resolve(name)
+                if any(
+                    row.get("customFields") == "textarea" and "request" in row
+                    for row in operation.extensions.get("x-as-richtext", [])
+                ):
+                    kwargs["textarea_fields"] = InstanceFieldsCache().textarea_fields()
             return super().call(*args, **kwargs)
         except SurfaceError as exc:
             if exc.code == 4 and any(
@@ -72,7 +112,7 @@ def create_surface(
     *,
     transport: str | None = None,
     respond_with: int = 200,
-    store: SimulationStore | None = None,
+    store: JiraSimulationStore | None = None,
 ) -> Surface:
     """Keep discovery and responder mode credential-free; configure HTTP at call time."""
     mode = transport or os.environ.get("JIRA_AS_TRANSPORT", "http")
@@ -100,16 +140,16 @@ def create_surface(
     indexes = ProductIndexes(Path(__file__).parent / "_generated")
     simulation_store = store
     if mode == "simulation" and simulation_store is None:
-        from as_engine.simulation import SimulationStore
+        from as_engine.simulation import JiraSimulationStore
 
         if seed_path:
             try:
                 seed = json.loads(Path(seed_path).read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError) as exc:
                 raise ValueError("unable to load JIRA_AS_SIMULATION_SEED") from exc
-            simulation_store = SimulationStore(seed)
+            simulation_store = JiraSimulationStore(seed)
         else:
-            simulation_store = SimulationStore()
+            simulation_store = JiraSimulationStore()
 
     recorder: Recorder | None = None
 
@@ -126,9 +166,9 @@ def create_surface(
         if mode == "simulation":
             if simulation_store is None:
                 raise AssertionError("simulation store was not initialized")
-            from as_engine.simulation import Simulation
+            from as_engine.simulation import JiraSimulation
 
-            return Simulation(simulation_store)
+            return JiraSimulation(simulation_store)
         from jira_as.config_manager import ConfigManager
         from jira_as.error_handler import handle_jira_error
 

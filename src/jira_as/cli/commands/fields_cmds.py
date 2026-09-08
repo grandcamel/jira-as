@@ -724,30 +724,79 @@ def fields_list(
     issue_type: str,
     output: str,
 ):
-    """List available fields.
+    """Read cached instance fields; use fields cache warm to fetch metadata."""
+    from jira_as.autocomplete_cache import InstanceFieldsCache
 
-    Without --project this lists the whole instance field catalogue. With
-    --project (and optionally --issue-type) it lists only the fields you can
-    actually set when creating an issue there.
-
-    Examples:
-        jira-as fields list --project PROJ
-        jira-as fields list --project PROJ --issue-type Bug
-    """
-    client = get_client_from_context(ctx)
-    result = _list_fields_impl(
-        filter_pattern=filter_pattern,
-        agile_only=agile,
-        custom_only=not show_all,
-        project=project,
-        issue_type=issue_type,
-        client=client,
-    )
-
+    if project or issue_type:
+        raise click.UsageError(
+            "The instance cache has no create-screen scope; use api call "
+            "getCreateIssueMetaIssueTypes and getCreateIssueMetaIssueTypeId."
+        )
+    rows = InstanceFieldsCache().read()
+    if rows is None:
+        click.echo("Fields cache is cold; run fields cache warm.", err=True)
+        rows = []
+    result = [
+        row
+        for row in rows
+        if (show_all or row.get("custom", False))
+        and (not filter_pattern or filter_pattern.lower() in row["name"].lower())
+        and (not agile or any(word in row["name"].lower() for word in AGILE_PATTERNS))
+    ]
+    result.sort(key=lambda row: row["name"].lower())
     if output == "json":
         click.echo(format_json(result))
     else:
-        click.echo(_format_fields_list(result))
+        click.echo(
+            _format_fields_list(
+                [
+                    {**row, "type": row.get("schema", {}).get("type", "unknown")}
+                    for row in result
+                ]
+            )
+        )
+
+
+@fields.command("get")
+@click.argument("field_id")
+def fields_get(field_id: str) -> None:
+    """Read a single cached instance field without fetching metadata."""
+    from jira_as.autocomplete_cache import InstanceFieldsCache
+
+    rows = InstanceFieldsCache().read()
+    if rows is None:
+        raise click.ClickException("Fields cache is cold; run fields cache warm.")
+    matches = [row for row in rows if row["id"] == field_id]
+    if not matches:
+        raise click.ClickException(f"Field {field_id} is absent from the cache.")
+    click.echo(format_json(matches[0]))
+
+
+@fields.group("cache")
+def fields_cache() -> None:
+    """Manage the v2 instance fields cache."""
+
+
+@fields_cache.command("warm")
+@click.option("--transport", type=click.Choice(["http", "responder", "simulation"]))
+def fields_cache_warm(transport: str | None) -> None:
+    """Explicitly fetch field metadata using the bounded site allowance."""
+    from as_engine.errors import SurfaceError
+
+    from jira_as import engine
+    from jira_as.autocomplete_cache import InstanceFieldsCache
+
+    try:
+        response = engine.create_surface(transport=transport).call(
+            "getFields", {}, scope_allow_site=True
+        )
+        rows = InstanceFieldsCache().write(response.body)
+    except SurfaceError as exc:
+        click.echo(format_json(exc.as_dict()), err=True)
+        raise click.exceptions.Exit(exc.code) from exc
+    except (ValueError, OSError) as exc:
+        raise click.ClickException(str(exc)) from exc
+    click.echo(format_json({"cached": len(rows), "fields": rows}))
 
 
 @fields.command(name="create")

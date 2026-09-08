@@ -1,0 +1,194 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Jira software legacy verb migration",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_createSprint",
+      "target": "$.paths[\"/rest/agile/1.0/sprint\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "agile sprint",
+            "verb": "create",
+            "invocation": "api call createSprint --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getAllBoards",
+      "target": "$.paths[\"/rest/agile/1.0/board\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "agile board",
+            "verb": "list",
+            "invocation": "api call getAllBoards --projectKeyOrId PROJECT_KEY"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getAllSprints",
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/sprint\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "agile sprint",
+            "verb": "list",
+            "invocation": "api call getAllSprints --boardId BOARD_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getIssuesForBacklog",
+      "target": "$.paths[\"/rest/agile/1.0/board/{boardId}/backlog\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "agile",
+            "verb": "backlog",
+            "invocation": "api call getIssuesForBacklog --boardId BOARD_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getIssuesForSprint",
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}/issue\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "agile",
+            "verb": "estimates",
+            "invocation": "api call getIssuesForSprint --sprintId SPRINT_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_getSprint",
+      "target": "$.paths[\"/rest/agile/1.0/sprint/{sprintId}\"].get",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "agile sprint",
+            "verb": "get",
+            "invocation": "api call getSprint --sprintId SPRINT_ID"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_moveIssuesToEpic",
+      "target": "$.paths[\"/rest/agile/1.0/epic/{epicIdOrKey}/issue\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "agile epic",
+            "verb": "add-issues",
+            "invocation": "api call moveIssuesToEpic --epicIdOrKey EPIC_KEY --field issues=[\"ISSUE_KEY\"]"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_rankIssues",
+      "target": "$.paths[\"/rest/agile/1.0/issue/rank\"].put",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "agile",
+            "verb": "rank",
+            "invocation": "api call rankIssues --body @body.json"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Removed legacy wrapper verb; use the indexed generic replacement.",
+      "x-as-reason": "Decision 21 wrapper-rule cut: indexed operation or prerequisite-only chain.",
+      "x-as-evidence": {
+        "url": "https://developer.atlassian.com/cloud/jira/",
+        "date": "2026-09-07"
+      },
+      "x-as-origin": "JAS-49",
+      "x-as-test": "legacy_storeDevelopmentInformation",
+      "target": "$.paths[\"/rest/devinfo/0.10/bulk\"].post",
+      "update": {
+        "x-as-legacy-verbs": [
+          {
+            "group": "dev",
+            "verb": "link-commit",
+            "invocation": "api call storeDevelopmentInformation --Authorization AUTHORIZATION --body @body.json"
+          },
+          {
+            "group": "dev",
+            "verb": "link-pr",
+            "invocation": "api call storeDevelopmentInformation --Authorization AUTHORIZATION --body @body.json"
+          }
+        ]
+      }
+    }
+  ]
+}

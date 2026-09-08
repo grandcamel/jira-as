@@ -18,6 +18,7 @@
         "platform.richtext.overlay.json",
         "platform.overlay.json",
         "platform.compat.overlay.json",
+        "platform.rename.overlay.json",
         "platform.help.overlay.json"
       ],
       "strip_extensions": [
@@ -39,6 +40,7 @@
         "software.scope.overlay.json",
         "software.scope-override.overlay.json",
         "software.overlay.json",
+        "software.rename.overlay.json",
         "software.help.overlay.json"
       ],
       "strip_extensions": [
@@ -60,6 +62,7 @@
         "servicedesk.scope.overlay.json",
         "servicedesk.scope-override.overlay.json",
         "servicedesk.overlay.json",
+        "servicedesk.rename.overlay.json",
         "servicedesk.help.overlay.json"
       ],
       "strip_extensions": [

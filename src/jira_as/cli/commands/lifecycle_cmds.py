@@ -19,6 +19,14 @@ from typing import TYPE_CHECKING, Any
 
 import click
 
+from .bulk_cmds import (
+    WorkflowCheckpoint,
+    workflow_call,
+    workflow_options,
+    workflow_surface,
+    workflow_transition,
+)
+
 if TYPE_CHECKING:
     from jira_as import JiraClient
 
@@ -1074,17 +1082,55 @@ def lifecycle_assign(
             print_success(f"Assigned {issue_key} to {user}")
 
 
+def _workflow_finish(issue_key, resolution, comment, transport, checkpoint, *, reopen):
+    issue_key = validate_issue_key(issue_key)
+    surface = workflow_surface(transport)
+    state = WorkflowCheckpoint(
+        checkpoint,
+        "lifecycle reopen" if reopen else "lifecycle resolve",
+        {"issue": issue_key},
+        {"resolution": resolution, "comment": comment},
+    )
+    targets = REOPEN_KEYWORDS if reopen else RESOLVE_KEYWORDS
+
+    def choose():
+        transitions = workflow_call(
+            surface, "getTransitions", {"issueIdOrKey": issue_key}
+        ).get("transitions", [])
+        return workflow_transition(transitions, targets)
+
+    transition = state.step("choice", choose)
+    body = {"transition": {"id": transition["id"]}}
+    if resolution:
+        body["fields"] = {"resolution": {"name": resolution}}
+    state.step(
+        "transition",
+        lambda: workflow_call(
+            surface, "doTransition", {"issueIdOrKey": issue_key}, body
+        ),
+    )
+    if comment:
+        state.step(
+            "comment",
+            lambda: workflow_call(
+                surface, "addComment", {"issueIdOrKey": issue_key}, {"body": comment}
+            ),
+        )
+
+
 @lifecycle.command(name="resolve")
 @click.argument("issue_key")
 @click.option("--resolution", "-r", default="Done", help="Resolution type")
 @click.option("--comment", "-c", help="Resolution comment")
 @click.pass_context
 @handle_jira_errors
-def lifecycle_resolve(ctx, issue_key: str, resolution: str, comment: str):
-    """Resolve an issue."""
-    client = get_client_from_context(ctx)
-    _resolve_issue_impl(
-        issue_key=issue_key, resolution=resolution, comment=comment, client=client
+@workflow_options
+def lifecycle_resolve(
+    ctx, issue_key: str, resolution: str, comment: str, transport, checkpoint
+):
+    """Resolve using an unambiguous workflow transition."""
+    _workflow_finish(
+        issue_key, resolution, comment, transport, checkpoint, reopen=False
     )
     print_success(f"Resolved {issue_key} as {resolution}")
 
@@ -1094,10 +1140,10 @@ def lifecycle_resolve(ctx, issue_key: str, resolution: str, comment: str):
 @click.option("--comment", "-c", help="Reopen comment")
 @click.pass_context
 @handle_jira_errors
-def lifecycle_reopen(ctx, issue_key: str, comment: str):
-    """Reopen a resolved issue."""
-    client = get_client_from_context(ctx)
-    _reopen_issue_impl(issue_key=issue_key, comment=comment, client=client)
+@workflow_options
+def lifecycle_reopen(ctx, issue_key: str, comment: str, transport, checkpoint):
+    """Reopen using an unambiguous workflow transition."""
+    _workflow_finish(issue_key, None, comment, transport, checkpoint, reopen=True)
     print_success(f"Reopened {issue_key}")
 
 

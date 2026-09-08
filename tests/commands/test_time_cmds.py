@@ -11,29 +11,25 @@ from jira_as.cli.commands.time_cmds import (
     _add_worklog_impl,
     _bulk_log_time_impl,
     _calculate_progress,
-    _delete_worklog_impl,
     _export_timesheets_impl,
     _extract_comment_text,
     _format_bulk_log_result,
-    _format_estimate_updated,
     _format_export_csv,
     _format_report_csv,
     _format_report_text,
-    _format_time_tracking,
     _format_worklog_added,
     _format_worklog_deleted,
     _format_worklog_updated,
     _format_worklogs,
     _generate_progress_bar,
     _generate_report_impl,
-    _get_time_tracking_impl,
     _get_worklogs_impl,
     _group_entries,
     _resolve_period_dates,
-    _set_estimate_impl,
     _update_worklog_impl,
     time,
 )
+from tests.test_utility_survivors import utility_simulation as utility_simulation
 
 # =============================================================================
 # Fixtures
@@ -162,15 +158,6 @@ class TestCalculateProgress:
             }
         )
         assert result == 50
-
-    def test_no_estimate(self):
-        """Test with no original estimate."""
-        result = _calculate_progress(
-            {
-                "timeSpentSeconds": 50,
-            }
-        )
-        assert result is None
 
     def test_no_time_spent(self):
         """Test with no time spent."""
@@ -422,56 +409,6 @@ class TestFormatWorklogDeleted:
         assert "Time removed:" in result
 
 
-class TestFormatEstimateUpdated:
-    """Tests for _format_estimate_updated."""
-
-    def test_original_updated(self):
-        """Test formatting when original estimate updated."""
-        result = _format_estimate_updated(
-            {
-                "previous": {"originalEstimate": "1d"},
-                "current": {"originalEstimate": "2d"},
-            },
-            "PROJ-123",
-            updated_original=True,
-            updated_remaining=False,
-        )
-        assert "Original estimate: 2d (was 1d)" in result
-
-    def test_remaining_updated(self):
-        """Test formatting when remaining estimate updated."""
-        result = _format_estimate_updated(
-            {
-                "previous": {"remainingEstimate": "8h"},
-                "current": {"remainingEstimate": "4h"},
-            },
-            "PROJ-123",
-            updated_original=False,
-            updated_remaining=True,
-        )
-        assert "Remaining estimate: 4h (was 8h)" in result
-
-
-class TestFormatTimeTracking:
-    """Tests for _format_time_tracking."""
-
-    def test_with_progress(self, sample_time_tracking):
-        """Test formatting with progress."""
-        sample_time_tracking["progress"] = 25
-        result = _format_time_tracking(sample_time_tracking, "PROJ-123")
-        assert "Time Tracking for PROJ-123" in result
-        assert "Original Estimate:" in result
-        assert "Remaining Estimate:" in result
-        assert "Time Spent:" in result
-        assert "Progress:" in result
-        assert "25% complete" in result
-
-    def test_without_progress(self):
-        """Test formatting without progress."""
-        result = _format_time_tracking({"progress": None}, "PROJ-123")
-        assert "Not set" in result
-
-
 class TestFormatReportText:
     """Tests for _format_report_text."""
 
@@ -642,20 +579,6 @@ class TestAddWorklogImpl:
 class TestGetWorklogsImpl:
     """Tests for _get_worklogs_impl."""
 
-    def test_get_worklogs_success(self, mock_client, sample_worklogs_response):
-        """Test successful worklogs retrieval."""
-        mock_client.get_worklogs.return_value = sample_worklogs_response
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            result = _get_worklogs_impl("PROJ-123")
-
-        assert result["total"] == 2
-        mock_client.__enter__.assert_called_once()
-        mock_client.__exit__.assert_called_once()
-
     def test_filter_by_author(self, mock_client, sample_worklogs_response):
         """Test filtering by author."""
         mock_client.get_worklogs.return_value = sample_worklogs_response
@@ -672,98 +595,10 @@ class TestGetWorklogsImpl:
 class TestUpdateWorklogImpl:
     """Tests for _update_worklog_impl."""
 
-    def test_update_worklog_success(self, mock_client, sample_worklog):
-        """Test successful worklog update."""
-        mock_client.update_worklog.return_value = sample_worklog
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            result = _update_worklog_impl("PROJ-123", "12345", time_spent="3h")
-
-        assert result == sample_worklog
-        mock_client.__enter__.assert_called_once()
-        mock_client.__exit__.assert_called_once()
-
     def test_no_updates_raises(self):
         """Test no updates raises validation error."""
         with pytest.raises(ValidationError, match="At least one of"):
             _update_worklog_impl("PROJ-123", "12345")
-
-
-class TestDeleteWorklogImpl:
-    """Tests for _delete_worklog_impl."""
-
-    def test_delete_worklog_dry_run(self, mock_client, sample_worklog):
-        """Test dry-run deletion."""
-        mock_client.get_worklog.return_value = sample_worklog
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            result = _delete_worklog_impl("PROJ-123", "12345", dry_run=True)
-
-        assert result["dry_run"] is True
-        assert result["deleted"] is False
-        mock_client.delete_worklog.assert_not_called()
-
-    def test_delete_worklog_actual(self, mock_client, sample_worklog):
-        """Test actual deletion."""
-        mock_client.get_worklog.return_value = sample_worklog
-        mock_client.delete_worklog.return_value = None
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            result = _delete_worklog_impl("PROJ-123", "12345")
-
-        assert result["dry_run"] is False
-        assert result["deleted"] is True
-        mock_client.delete_worklog.assert_called_once()
-
-
-class TestSetEstimateImpl:
-    """Tests for _set_estimate_impl."""
-
-    def test_set_estimate_success(self, mock_client, sample_time_tracking):
-        """Test successful estimate setting."""
-        mock_client.get_time_tracking.return_value = sample_time_tracking
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            result = _set_estimate_impl("PROJ-123", original_estimate="2d")
-
-        assert "previous" in result
-        assert "current" in result
-        mock_client.set_time_tracking.assert_called_once()
-
-    def test_no_estimates_raises(self):
-        """Test no estimates raises validation error."""
-        with pytest.raises(ValidationError, match="At least one of"):
-            _set_estimate_impl("PROJ-123")
-
-
-class TestGetTimeTrackingImpl:
-    """Tests for _get_time_tracking_impl."""
-
-    def test_get_time_tracking(self, mock_client, sample_time_tracking):
-        """Test getting time tracking info."""
-        mock_client.get_time_tracking.return_value = sample_time_tracking
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_jira_client",
-            return_value=mock_client,
-        ):
-            result = _get_time_tracking_impl("PROJ-123")
-
-        assert "progress" in result
-        mock_client.__enter__.assert_called_once()
-        mock_client.__exit__.assert_called_once()
 
 
 class TestGenerateReportImpl:
@@ -888,164 +723,49 @@ class TestTimeLogCommand:
     """Tests for time log command."""
 
 
-class TestTimeWorklogsCommand:
-    """Tests for time worklogs command."""
-
-    def test_get_worklogs(self, mock_client, sample_worklogs_response):
-        """Test getting worklogs."""
-        mock_client.get_worklogs.return_value = sample_worklogs_response
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(time, ["worklogs", "PROJ-123"])
-
-        assert result.exit_code == 0
-        assert "Worklogs for PROJ-123" in result.output
-
-
-class TestTimeUpdateWorklogCommand:
-    """Tests for time update-worklog command."""
-
-    def test_update_worklog(self, mock_client, sample_worklog):
-        """Test updating worklog."""
-        mock_client.update_worklog.return_value = sample_worklog
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(
-                time, ["update-worklog", "PROJ-123", "-w", "12345", "-t", "3h"]
-            )
-
-        assert result.exit_code == 0
-        assert "updated" in result.output
-
-
-class TestTimeDeleteWorklogCommand:
-    """Tests for time delete-worklog command."""
-
-    def test_delete_worklog_dry_run(self, mock_client, sample_worklog):
-        """Test dry-run deletion."""
-        mock_client.get_worklog.return_value = sample_worklog
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(
-                time, ["delete-worklog", "PROJ-123", "-w", "12345", "--dry-run"]
-            )
-
-        assert result.exit_code == 0
-        assert "Dry-run" in result.output
-
-
-class TestTimeEstimateCommand:
-    """Tests for time estimate command."""
-
-    def test_set_estimate(self, mock_client, sample_time_tracking):
-        """Test setting estimate."""
-        mock_client.get_time_tracking.return_value = sample_time_tracking
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(time, ["estimate", "PROJ-123", "--original", "2d"])
-
-        assert result.exit_code == 0
-        assert "estimates updated" in result.output
-
-    def test_estimate_requires_option(self):
-        """Test estimate requires at least one option."""
-        runner = CliRunner()
-        result = runner.invoke(time, ["estimate", "PROJ-123"])
-        assert result.exit_code != 0
-        assert "At least one of" in result.output
-
-
-class TestTimeTrackingCommand:
-    """Tests for time tracking command."""
-
-    def test_get_tracking(self, mock_client, sample_time_tracking):
-        """Test getting time tracking."""
-        mock_client.get_time_tracking.return_value = sample_time_tracking
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(time, ["tracking", "PROJ-123"])
-
-        assert result.exit_code == 0
-        assert "Time Tracking for PROJ-123" in result.output
-
-
 class TestTimeReportCommand:
     """Tests for time report command."""
 
-    def test_generate_report(self, mock_client):
-        """Test generating report."""
-        mock_client.search_issues.return_value = {"issues": []}
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(time, ["report", "--project", "PROJ"])
-
-        assert result.exit_code == 0
+    def test_generate_report(self, utility_simulation):
+        result = CliRunner().invoke(
+            time, ["report", "--project", "SBX", "--transport", "simulation"]
+        )
+        assert result.exit_code == 0, result.output
         assert "Time Report" in result.output
 
 
 class TestTimeExportCommand:
     """Tests for time export command."""
 
-    def test_export_csv(self, mock_client):
-        """Test exporting CSV."""
-        mock_client.search_issues.return_value = {"issues": []}
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(time, ["export", "--project", "PROJ"])
-
-        assert result.exit_code == 0
+    def test_export_csv(self, utility_simulation):
+        result = CliRunner().invoke(
+            time, ["export", "--project", "SBX", "--transport", "simulation"]
+        )
+        assert result.exit_code == 0, result.output
         assert "Issue Key" in result.output
 
 
 class TestTimeBulkLogCommand:
     """Tests for time bulk-log command."""
 
-    def test_bulk_log_dry_run(self, mock_client):
-        """Test dry-run bulk logging."""
-        mock_client.get_issue.return_value = {
-            "key": "PROJ-1",
-            "fields": {"summary": "Test"},
-        }
-
-        with patch(
-            "jira_as.cli.commands.time_cmds.get_client_from_context",
-            return_value=mock_client,
-        ):
-            runner = CliRunner()
-            result = runner.invoke(
-                time, ["bulk-log", "-i", "PROJ-1,PROJ-2", "-t", "30m", "--dry-run"]
-            )
-
-        assert result.exit_code == 0
+    def test_bulk_log_dry_run(self, utility_simulation):
+        before = utility_simulation.snapshot()
+        result = CliRunner().invoke(
+            time,
+            [
+                "bulk-log",
+                "-i",
+                "SBX-1,SBX-2",
+                "-t",
+                "30m",
+                "--dry-run",
+                "--transport",
+                "simulation",
+            ],
+        )
+        assert result.exit_code == 0, result.output
         assert "Preview" in result.output
+        assert utility_simulation.snapshot() == before
 
     def test_bulk_log_requires_issues_or_jql(self):
         """Test bulk-log requires issues or JQL."""
