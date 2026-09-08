@@ -73,6 +73,8 @@ an empty label search. The 404 probe uses an issue created and deleted by the
 same run. Comments, worklogs and links belong only to these disposable issues.
 A failure exits nonzero and prints the retained SBX key ledger and run label
 for supervisor cleanup; partial files are not accepted fixtures.
+Failed steps print their case, gated argv, exit and captured output/stderr before
+cleanup; a cleanup error is reported separately and preserves the original failure.
 
 Before adopting a host recording:
 

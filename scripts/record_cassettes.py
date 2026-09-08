@@ -91,6 +91,12 @@ def record_session(path: Path, session: SbxSession) -> dict[str, Any]:
                     for step in case["steps"]:
                         outcome = session.invoke(step["argv"])
                         if outcome.exit_code != step.get("exit", 0):
+                            print(
+                                f"Failed case {case['id']}: argv={json.dumps(step['argv'])} exit={outcome.exit_code}\n"
+                                f"Captured output:\n{outcome.output}\n"
+                                f"Captured stderr:\n{outcome.stderr}",
+                                file=sys.stderr,
+                            )
                             raise RuntimeError(
                                 f"recording failed: {case['id']} exited {outcome.exit_code}"
                             )
@@ -105,15 +111,18 @@ def record_session(path: Path, session: SbxSession) -> dict[str, Any]:
         with sidecar.open("x", encoding="utf-8") as stream:
             stream.write(json.dumps(payload, indent=2, sort_keys=True) + "\n")
         return payload
-    except BaseException:
+    except BaseException as error:
         failure = True
+        print(str(error), file=sys.stderr)
         raise
     finally:
         try:
             print(session.cleanup())
-        except BaseException:
-            failure = True
-            raise
+        except BaseException as error:
+            if not failure:
+                failure = True
+                raise
+            print(f"SBX cleanup also failed: {error}", file=sys.stderr)
         finally:
             if failure:
                 print(

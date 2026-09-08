@@ -107,8 +107,6 @@ def test_owned_delete_preview_then_confirm(sbx_session, tmp_path):
 
 
 def test_survivor_bulk_update_dry_run(sbx_session, tmp_path):
-    if os.environ.get("JIRA_AS_TRANSPORT") == "simulation":
-        pytest.skip("simulation lacks labels-filtered JQL for bulk dry-run")
     case = {
         "id": "survivor",
         "host_op": "survivor",
@@ -116,12 +114,12 @@ def test_survivor_bulk_update_dry_run(sbx_session, tmp_path):
         "steps": [],
         "setup": {"issue": True},
     }
-    sbx_session.prepare(case, tmp_path)
+    issue = sbx_session.prepare(case, tmp_path)["key"]
     dry_run = sbx_session.invoke(
         [
             "search",
             "bulk-update",
-            f'project = SBX AND labels = "{sbx_session.run_label}"',
+            f"project = SBX AND key = {issue}",
             "--add-labels",
             "dry-run-probe",
             "--dry-run",
@@ -130,7 +128,15 @@ def test_survivor_bulk_update_dry_run(sbx_session, tmp_path):
         ]
     )
     assert dry_run.exit_code == 0, dry_run.output
-    assert json.loads(dry_run.output)["dry_run"] is True
+    assert json.loads(dry_run.stdout) == {
+        "would_update": 1,
+        "issues": [issue],
+        "changes": {
+            "add_labels": ["dry-run-probe"],
+            "remove_labels": None,
+            "priority": None,
+        },
+    }
 
 
 def test_survivor_fields_cache_warm(sbx_session):

@@ -436,6 +436,297 @@ def test_recorder_refuses_existing_output_before_setup(tmp_path):
     assert target.read_text() == "do not replace"
 
 
+@pytest.mark.parametrize("cleanup_fails", [False, True])
+def test_recorder_preserves_failed_step_before_cleanup(
+    tmp_path, monkeypatch, capsys, cleanup_fails
+):
+    from contextlib import nullcontext
+
+    from scripts import record_cassettes as recorder
+
+    argv = ["issue", "get", "SBX-9"]
+    case = {"id": "contract:read:0", "steps": [{"argv": argv, "exit": 0}]}
+    cleaned = []
+
+    def cleanup():
+        captured = capsys.readouterr().err
+        assert "contract:read:0" in captured
+        assert json.dumps(argv) in captured
+        assert "exit=1" in captured
+        assert "captured stdout detail" in captured
+        assert "captured stderr detail" in captured
+        assert "recording failed: contract:read:0 exited 1" in captured
+        cleaned.append(True)
+        if cleanup_fails:
+            raise RuntimeError("cleanup probe failure")
+        return "SBX cleanup verified: remaining=0"
+
+    session = SimpleNamespace(
+        prepare=lambda case: case,
+        activate=lambda case: None,
+        use_surface=lambda surface: nullcontext(),
+        invoke=lambda argv: SimpleNamespace(
+            exit_code=1,
+            output="captured stdout detail\ncaptured stderr detail",
+            stderr="captured stderr detail",
+        ),
+        cleanup=cleanup,
+        ledger=lambda: "SBX ledger: keys=SBX-9",
+    )
+    monkeypatch.setattr(recorder, "CASES", [case])
+    monkeypatch.setattr(recorder, "create_surface", lambda: None)
+    target = tmp_path / "failed.json"
+    with pytest.raises(
+        RuntimeError, match="^recording failed: contract:read:0 exited 1$"
+    ):
+        recorder.record_session(target, session)
+    assert cleaned == [True]
+    captured = capsys.readouterr().err
+    assert (
+        "SBX cleanup also failed: cleanup probe failure" in captured
+    ) == cleanup_fails
+    assert "SBX ledger: keys=SBX-9" in captured
+    assert not recorder.sidecar_path(target).exists()
+
+
+def test_recorder_cleanup_failure_still_fails_successful_recording(
+    tmp_path, monkeypatch, capsys
+):
+    from contextlib import nullcontext
+
+    from scripts import record_cassettes as recorder
+
+    error = RuntimeError("cleanup probe failure")
+
+    def cleanup():
+        raise error
+
+    session = SimpleNamespace(
+        use_surface=lambda surface: nullcontext(),
+        cleanup=cleanup,
+        ledger=lambda: "SBX ledger: keys=SBX-9",
+    )
+    monkeypatch.setattr(recorder, "CASES", [])
+    monkeypatch.setattr(recorder, "create_surface", lambda: None)
+    with pytest.raises(RuntimeError) as caught:
+        recorder.record_session(tmp_path / "recorded.json", session)
+    assert caught.value is error
+    assert "SBX ledger: keys=SBX-9" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("count_stream", ["stderr", "stdout-before", "stdout-after"])
+def test_cleanup_accepts_empty_search_with_paging_count(monkeypatch, count_stream):
+    import click
+
+    session = SbxSession(prefix="safe", transport="http")
+    searches = []
+
+    @click.command()
+    def empty_search():
+        if count_stream != "stdout-after":
+            click.echo("count=0", err=count_stream == "stderr")
+        click.echo("[]")
+        if count_stream == "stdout-after":
+            click.echo("count=0")
+
+    def invoke(argv):
+        assert argv[:3] == ["api", "call", "searchAndReconsileIssuesUsingJql"]
+        assert "--all" in argv
+        searches.append(argv)
+        result = session.runner.invoke(empty_search)
+        assert "count=0" in result.output
+        return result
+
+    monkeypatch.setattr(session, "invoke", invoke)
+    assert "remaining=0" in session.cleanup()
+    assert len(searches) == 2  # Recovery and final label verification both run.
+
+
+@pytest.mark.parametrize(
+    "stdout",
+    ["count=0\nnot-json", 'count=0\n{"issues": []}', 'count=1\n[{"key": "OTHER-1"}]'],
+)
+def test_cleanup_count_filter_still_rejects_invalid_recovery(monkeypatch, stdout):
+    session = SbxSession(prefix="safe", transport="http")
+    monkeypatch.setattr(
+        session, "invoke", lambda argv: SimpleNamespace(exit_code=0, stdout=stdout)
+    )
+    with pytest.raises(RuntimeError, match="label-recovery.*label-verification"):
+        session.cleanup()
+
+
+@pytest.fixture
+def cleanup_runner(monkeypatch):
+    """Exercise the profile's real invocation path with a scripted Click runner."""
+    from contextlib import nullcontext
+
+    from tests.live import sbx_profile
+
+    waits = []
+    monkeypatch.setattr(sbx_profile.time, "sleep", waits.append)
+
+    def make(searches, *, tracked=True, get_status=404, error_at=None, max_created=40):
+        session = SbxSession(prefix="safe", transport="http", max_created=max_created)
+        if tracked:
+            session.created_keys.add("SBX-9")
+            session.create_attempts = 1
+        commands = []
+
+        def invoke(_cli, argv, **_):
+            operation = argv[2]
+            commands.append(operation)
+            if operation == "searchAndReconsileIssuesUsingJql":
+                response = searches.pop(0) if len(searches) > 1 else searches[0]
+                if isinstance(response, Exception):
+                    raise response
+                if isinstance(response, SimpleNamespace):
+                    return response
+                return SimpleNamespace(
+                    exit_code=0, stdout=json.dumps(response), stderr=""
+                )
+            if operation == error_at:
+                raise RuntimeError(f"{operation} wire unavailable")
+            if operation == "deleteIssue":
+                return SimpleNamespace(exit_code=0, stdout="null", stderr="")
+            assert operation == "getIssue"
+            if get_status == 200:
+                return SimpleNamespace(
+                    exit_code=0, stdout='{"key": "SBX-9"}', stderr=""
+                )
+            return SimpleNamespace(
+                exit_code=5,
+                stdout="",
+                stderr=json.dumps({"status": get_status, "message": "probe detail"}),
+            )
+
+        monkeypatch.setattr(session, "_ensure_surface", lambda: None)
+        monkeypatch.setattr(session, "use_surface", lambda surface: nullcontext())
+        monkeypatch.setattr(session.runner, "invoke", invoke)
+        return session, commands, waits
+
+    return make
+
+
+def test_cleanup_empty_recovery_still_deletes_known_keys(cleanup_runner):
+    session, commands, waits = cleanup_runner([[], []])
+    assert "remaining=0" in session.cleanup()
+    assert commands == [
+        "searchAndReconsileIssuesUsingJql",
+        "deleteIssue",
+        "getIssue",
+        "searchAndReconsileIssuesUsingJql",
+    ]
+    assert not waits
+    assert session.ledger() == "SBX ledger: keys=SBX-9 deleted=SBX-9 run_label=safe"
+
+
+@pytest.mark.parametrize(
+    "failure",
+    [
+        RuntimeError("index unavailable"),
+        OSError("index timeout"),
+        SimpleNamespace(exit_code=5, stdout="", stderr="index query rejected"),
+    ],
+)
+def test_cleanup_recovery_search_failure_is_advisory(cleanup_runner, failure):
+    session, commands, waits = cleanup_runner([failure, []])
+    summary = session.cleanup()
+    assert "remaining=0" in summary
+    assert "label-recovery:" in summary
+    assert (
+        failure.stderr if isinstance(failure, SimpleNamespace) else str(failure)
+    ) in summary
+    assert "deleteIssue" in commands and "getIssue" in commands
+    assert not waits
+
+
+def test_cleanup_persistent_index_lag_defers_to_404(cleanup_runner):
+    session, commands, waits = cleanup_runner([[], [{"key": "SBX-9"}]])
+    summary = session.cleanup()
+    assert "remaining=0" in summary
+    assert "label-lag: SBX-9" in summary
+    assert commands.count("searchAndReconsileIssuesUsingJql") == 6
+    assert commands.count("getIssue") == 2
+    assert waits == [3] * 4
+    assert sum(waits) < 20
+
+
+@pytest.mark.parametrize(
+    "intermediate", [[{"key": "SBX-9"}], RuntimeError("index busy")]
+)
+def test_cleanup_verification_retries_until_index_clears(cleanup_runner, intermediate):
+    session, commands, waits = cleanup_runner([[], intermediate, []])
+    summary = session.cleanup()
+    assert "remaining=0" in summary
+    assert "label-lag" not in summary
+    assert commands.count("getIssue") == 1
+    assert commands.count("searchAndReconsileIssuesUsingJql") == 3
+    assert waits == [3]
+
+
+def test_cleanup_indexed_live_key_is_a_leak(cleanup_runner):
+    session, commands, waits = cleanup_runner(
+        [[], [{"key": "SBX-9"}]],
+        tracked=False,
+        get_status=200,
+    )
+    with pytest.raises(RuntimeError, match="label-leak: SBX-9") as caught:
+        session.cleanup()
+    assert "exit=0" in str(caught.value)
+    assert commands.count("getIssue") == 1
+    assert waits == [3] * 4
+
+
+def test_cleanup_indexed_unknown_status_is_not_lag(cleanup_runner):
+    session, _, _ = cleanup_runner(
+        [[], [{"key": "SBX-9"}]],
+        tracked=False,
+        get_status=500,
+    )
+    with pytest.raises(RuntimeError, match="label-verification:SBX-9") as caught:
+        session.cleanup()
+    assert "probe detail" in str(caught.value)
+    assert "500" in str(caught.value)
+    assert "label-lag" not in str(caught.value)
+
+
+@pytest.mark.parametrize("operation", ["deleteIssue", "getIssue"])
+def test_cleanup_keeps_operation_exception_text(cleanup_runner, operation):
+    session, commands, _ = cleanup_runner([[], []], error_at=operation)
+    with pytest.raises(RuntimeError, match=f"{operation} wire unavailable"):
+        session.cleanup()
+    assert commands[-1] == "searchAndReconsileIssuesUsingJql"
+
+
+def test_cleanup_verification_search_error_surfaces_after_retries(cleanup_runner):
+    session, commands, waits = cleanup_runner([[], RuntimeError("index unavailable")])
+    with pytest.raises(RuntimeError, match="label-verification: index unavailable"):
+        session.cleanup()
+    assert commands.count("searchAndReconsileIssuesUsingJql") == 6
+    assert waits == [3] * 4
+
+
+def test_cleanup_recovery_cap_remains_a_real_refusal(cleanup_runner):
+    session, commands, waits = cleanup_runner(
+        [[{"key": "SBX-9"}]],
+        tracked=False,
+        max_created=0,
+    )
+    with pytest.raises(RuntimeError, match="label-recovery: .*creation cap"):
+        session.cleanup()
+    assert "deleteIssue" not in commands
+    assert not waits
+
+
+def test_cleanup_empty_index_does_not_hide_unresolved_creation(cleanup_runner):
+    session, _, _ = cleanup_runner([[]], tracked=False)
+    session.create_attempts = 1
+    with pytest.raises(
+        RuntimeError, match="unresolved-create-response: attempts=1 tracked=0"
+    ):
+        session.cleanup()
+
+
 def test_profile_refuses_mismatched_allowlist_before_invocation(monkeypatch):
     monkeypatch.setenv("JIRA_DEFAULT_PROJECT", "SBX")
     monkeypatch.setattr(
@@ -473,6 +764,73 @@ def test_cleanup_recovers_lost_response_key_and_requires_404(monkeypatch):
     monkeypatch.setattr(session, "invoke", invoke)
     assert "remaining=0" in session.cleanup()
     assert session.created_keys == deleted == {"SBX-9"}
+
+
+@pytest.mark.parametrize("generic", [False, True])
+def test_profile_reowns_recreated_key_and_cleans_it_up(monkeypatch, tmp_path, generic):
+    from contextlib import nullcontext
+
+    session = SbxSession(prefix="safe", transport="simulation")
+    session.created_keys.add("SBX-9")
+    session.deleted_keys.add("SBX-9")
+    session.create_attempts = 1
+    session._active_directory = tmp_path
+    commands = []
+    present = False
+
+    def invoke(_cli, argv, **_):
+        nonlocal present
+        commands.append(argv)
+        if argv[:2] == ["issue", "create"] or argv[:3] == [
+            "api",
+            "call",
+            "createIssue",
+        ]:
+            present = True
+            stdout = '{"key": "SBX-9"}' if generic else "✓ Created issue: SBX-9\n"
+            return SimpleNamespace(exit_code=0, stdout=stdout, stderr="")
+        if argv[:3] == ["api", "call", "deleteIssue"]:
+            assert present
+            present = False
+            return SimpleNamespace(exit_code=0, stdout="null", stderr="")
+        assert argv[:3] == ["api", "call", "getIssue"]
+        assert not present
+        return SimpleNamespace(exit_code=5, stdout="", stderr='{"status": 404}')
+
+    monkeypatch.setattr(session, "_ensure_surface", lambda: None)
+    monkeypatch.setattr(session, "use_surface", lambda surface: nullcontext())
+    monkeypatch.setattr(session.runner, "invoke", invoke)
+    if generic:
+        (tmp_path / "create.json").write_text(
+            json.dumps(
+                {
+                    "fields": {
+                        "project": {"key": "SBX"},
+                        "summary": "safe recreated",
+                        "labels": ["safe"],
+                    }
+                }
+            )
+        )
+        argv = ["api", "call", "createIssue", "--body", "@create.json"]
+    else:
+        argv = [
+            "issue",
+            "create",
+            "--project",
+            "SBX",
+            "--summary",
+            "safe recreated",
+            "--labels",
+            "safe",
+        ]
+    assert session.invoke(argv).exit_code == 0
+    assert session.created_keys == {"SBX-9"}
+    assert not session.deleted_keys
+    assert session.create_attempts == 2
+    assert "remaining=0" in session.cleanup()
+    assert session.deleted_keys == {"SBX-9"}
+    assert [argv[2] for argv in commands[1:]] == ["deleteIssue", "getIssue"]
 
 
 def test_cleanup_rejects_non404_verification(monkeypatch):

@@ -7,6 +7,7 @@ import json
 import os
 import re
 import sys
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterator
@@ -202,6 +203,9 @@ class SbxSession:
                 if not isinstance(key, str) or not _SBX_KEY.fullmatch(key):
                     raise RuntimeError("SBX create returned a malformed or non-SBX key")
                 self.created_keys.add(key)
+                # A newly created identity is owned again, even if a transport
+                # reuses a key that this session previously deleted (JAS-69).
+                self.deleted_keys.discard(key)
             return result
         finally:
             os.chdir(previous)
@@ -366,10 +370,19 @@ class SbxSession:
             ]
         )
         if result.exit_code:
-            raise RuntimeError("SBX cleanup label search failed")
-        payload = json.loads(result.stdout)
+            raise RuntimeError(
+                f"SBX cleanup label search failed: {self._result_detail(result)}"
+            )
+        # Older/mixed capture paths can place the paging count in stdout.
+        # Remove only that exact diagnostic; malformed JSON still fails closed.
+        stdout = "\n".join(
+            line
+            for line in result.stdout.splitlines()
+            if not re.fullmatch(r"count=[0-9]+", line)
+        )
+        payload = json.loads(stdout)
         if not isinstance(payload, list):
-            raise RuntimeError("SBX cleanup label search returned a malformed envelope")
+            raise ValueError("SBX cleanup label search returned a malformed envelope")
         recovered = set()
         for item in payload:
             if (
@@ -377,68 +390,109 @@ class SbxSession:
                 or not isinstance(item.get("key"), str)
                 or not _SBX_KEY.fullmatch(item["key"])
             ):
-                raise RuntimeError("SBX cleanup label search returned a non-SBX key")
+                raise ValueError("SBX cleanup label search returned a non-SBX key")
             recovered.add(item["key"])
         if len(recovered | self.created_keys) > self.max_created:
-            raise RuntimeError("SBX cleanup recovery exceeded the creation cap")
+            raise ValueError("SBX cleanup recovery exceeded the creation cap")
         return recovered
+
+    @staticmethod
+    def _result_detail(result: Result) -> str:
+        return (
+            f"exit={result.exit_code} stdout={result.stdout.strip()!r} "
+            f"stderr={result.stderr.strip()!r}"
+        )
+
+    def _get_issue(self, key: str) -> Result:
+        return self.invoke(
+            ["api", "call", "getIssue", "--issueIdOrKey", key, "--format", "json"]
+        )
 
     def cleanup(self) -> str:
         """Recover lost responses, delete owned keys, then prove exact absence."""
         errors: list[str] = []
+        notes: list[str] = []
         simulation = (
             self.transport or os.environ.get("JIRA_AS_TRANSPORT")
         ) == "simulation"
         if not simulation:
             try:
                 self.created_keys.update(self._recover_labeled())
-            except (ValueError, RuntimeError):
-                errors.append("label-recovery")
+            except ValueError as exc:
+                errors.append(f"label-recovery: {exc}")
+            except (OSError, RuntimeError) as exc:
+                notes.append(f"label-recovery: {exc}")
         for key in sorted(self.created_keys - self.deleted_keys):
-            result = self.invoke(
-                [
-                    "api",
-                    "call",
-                    "deleteIssue",
-                    "--issueIdOrKey",
-                    key,
-                    "--confirm",
-                    "--format",
-                    "json",
-                ]
-            )
+            try:
+                result = self.invoke(
+                    [
+                        "api",
+                        "call",
+                        "deleteIssue",
+                        "--issueIdOrKey",
+                        key,
+                        "--confirm",
+                        "--format",
+                        "json",
+                    ]
+                )
+            except (OSError, ValueError, RuntimeError) as exc:
+                errors.append(f"delete:{key}: {exc}")
+                continue
             if result.exit_code == 0 or self._missing(result):
                 self.deleted_keys.add(key)
             else:
-                errors.append(f"delete:{key}")
+                errors.append(f"delete:{key}: {self._result_detail(result)}")
         for key in sorted(self.created_keys):
-            result = self.invoke(
-                [
-                    "api",
-                    "call",
-                    "getIssue",
-                    "--issueIdOrKey",
-                    key,
-                    "--format",
-                    "json",
-                ]
-            )
-            if not self._missing(result):
-                errors.append(f"not-404:{key}")
-        if not simulation:
             try:
-                if self._recover_labeled():
-                    errors.append("labeled-survivor")
-            except (ValueError, RuntimeError):
-                errors.append("label-verification")
+                result = self._get_issue(key)
+            except (OSError, ValueError, RuntimeError) as exc:
+                errors.append(f"not-404:{key}: {exc}")
+                continue
+            if not self._missing(result):
+                errors.append(f"not-404:{key}: {self._result_detail(result)}")
+        if not simulation:
+            labeled: set[str] = set()
+            for attempt in range(5):
+                try:
+                    labeled = self._recover_labeled()
+                except ValueError as exc:
+                    errors.append(f"label-verification: {exc}")
+                    break
+                except (OSError, RuntimeError) as exc:
+                    if attempt == 4:
+                        errors.append(f"label-verification: {exc}")
+                else:
+                    if not labeled:
+                        break
+                if attempt < 4:
+                    time.sleep(3)
+            for key in sorted(labeled):
+                try:
+                    result = self._get_issue(key)
+                except (OSError, ValueError, RuntimeError) as exc:
+                    errors.append(f"label-verification:{key}: {exc}")
+                    continue
+                if self._missing(result):
+                    notes.append(f"label-lag: {key}")
+                elif result.exit_code == 0:
+                    errors.append(f"label-leak: {key}: {self._result_detail(result)}")
+                else:
+                    errors.append(
+                        f"label-verification:{key}: {self._result_detail(result)}"
+                    )
         if not simulation and self.create_attempts != len(self.created_keys):
-            errors.append("unresolved-create-response")
+            errors.append(
+                f"unresolved-create-response: attempts={self.create_attempts} "
+                f"tracked={len(self.created_keys)}"
+            )
         if errors:
             print(self.ledger(), file=sys.stderr)
-            raise RuntimeError("SBX cleanup failed: " + ",".join(errors))
+            raise RuntimeError("SBX cleanup failed: " + "; ".join(errors + notes))
         if simulation:
             return f"SBX simulation cleanup: tracked={len(self.created_keys)} remaining=0 verified-by-key; label recovery unsupported run_label={self.run_label}"
-        return f"SBX cleanup verified: tracked={len(self.created_keys)} remaining=0 run_label={self.run_label}"
+        summary = f"SBX cleanup verified: tracked={len(self.created_keys)} remaining=0 run_label={self.run_label}"
+        return summary + ("; " + "; ".join(notes) if notes else "")
 
     def __enter__(self) -> "SbxSession":
         self._ensure_surface()
