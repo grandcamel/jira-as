@@ -229,18 +229,19 @@ class GenericClient:
             self._field_ids[project] = configured
             return configured
         cached = get_autocomplete_cache().get_fields()
-        field = self._story_field(cached)
+        field = self._story_field(cached, project)
         if field is None:
             # Decision 20: one internal metadata GET; this does not change the
             # Surface default or expose a user-facing site-permission switch.
-            field = self._story_field(self.call("getFields", {}, scope_allow_site=True))
+            field = self._story_field(
+                self.call("getFields", {}, scope_allow_site=True), project
+            )
         if field is None:
             raise ValidationError("Story points field not found in instance metadata")
         self._field_ids[project] = field
         return field
 
-    @staticmethod
-    def _story_field(fields: Any) -> str | None:
+    def _story_field(self, fields: Any, project: str) -> str | None:
         if not isinstance(fields, list):
             return None
         matches = []
@@ -252,13 +253,28 @@ class GenericClient:
                 continue
             field_id = field.get("id", field.get("value"))
             if isinstance(field_id, str) and field_id.startswith("customfield_"):
-                matches.append(field_id)
-        unique = set(matches)
+                matches.append((name, field_id))
+        unique = {field_id for _, field_id in matches}
         if len(unique) > 1:
+            # Management style is project metadata, not projectTypeKey (which
+            # distinguishes software/business/service-desk projects).
+            metadata = self.call("getProject", {"projectIdOrKey": project})
+            names = set()
+            if isinstance(metadata, dict):
+                simplified = metadata.get("simplified")
+                style = metadata.get("style")
+                if simplified is True or style == "next-gen":
+                    names.add("story point estimate")
+                if simplified is False or style == "classic":
+                    names.add("story points")
+            if len(names) == 1:
+                selected = {field_id for name, field_id in matches if name in names}
+                if len(selected) == 1:
+                    return selected.pop()
             raise ValidationError(
                 "Multiple story points fields; configure the project's field ID"
             )
-        return matches[0] if matches else None
+        return matches[0][1] if matches else None
 
     def get_link_types(self) -> list[dict[str, Any]]:
         # Decision 20a: instance metadata, no issue/project content.

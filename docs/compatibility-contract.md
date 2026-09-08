@@ -36,8 +36,16 @@ nodes. The rebuilt paths do not use the legacy adf_helper converter.
 
 Create sends `issuetype.name` as in 1.x; the free-map create body does not require
 an issue-type ID lookup. Story points first consults configured project metadata
-or the existing field cache; on a miss it makes one generic `getFields` call and
-requires an unambiguous instance field ID. It does not guess a hardcoded ID.
+or the existing field cache; on a miss it makes one generic `getFields` call.
+A single candidate needs no project read. With several distinct candidate IDs,
+one guarded `getProject` read selects "Story point estimate" for a team-managed
+project (`simplified: true` / `style: next-gen`) or "Story Points" for a
+company-managed project (`simplified: false` / `style: classic`). Unknown or
+conflicting management type, or multiple IDs for the selected name, retains the
+ambiguity refusal. `projectTypeKey` alone does not identify management type.
+Explicit per-project configuration overrides discovery, and successful resolution
+is cached per project on the client, so later estimates need no metadata reads.
+It does not guess a hardcoded ID.
 Transition retains the issue context read, name/ID selection, and bounded
 comment/resolution screen-rejection retry. A transport observer retains only
 sanitized field rejection diagnostics for that existing decision. Surface still
@@ -59,6 +67,7 @@ change the configured Surface default or public `api` permission:
 | Operation | Internal allowance and prerequisite |
 |---|---|
 | `getFields` | One instance-field metadata read on story-point cache miss; no project content. The explicit `fields cache warm` affordance also permits this one metadata read and persists it under the v2 instance cache; public `api call getFields` remains refused. |
+| `getProject` | One project-type read only for multiple story-point candidate IDs; the bound project key passes the ordinary project guard, with no site allowance. Successful resolution is cached per project. |
 | `getIssueLinkTypes` | Instance link-type metadata for link-types and typed link validation. |
 | `deleteIssueLink` | Only after guarded `getIssue(source, fields=issuelinks)`, one unambiguous link matches the explicit source/target keys, and both keys pass membership. The numeric ID alone grants nothing. |
 | `getCurrentUser` | Caller account ID only for `issue create --assignee self`. The update helper does not receive this allowance. |

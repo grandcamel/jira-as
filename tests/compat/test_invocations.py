@@ -495,6 +495,172 @@ def test_story_point_cached_or_configured_field_skips_metadata(
     assert tuple(operation for operation, _, _ in responder_wire) == ("editIssue",)
 
 
+@pytest.fixture
+def story_point_metadata(monkeypatch):
+    original_response = _response
+
+    def configure(project_metadata, *, source="metadata", fields=None):
+        if fields is None:
+            fields = [
+                {"id": "customfield_10016", "name": "Story Points"},
+                {"id": "customfield_10028", "name": "Story point estimate"},
+            ]
+
+        class Cache:
+            @staticmethod
+            def get_fields():
+                return fields if source == "cache" else []
+
+        def response(operation_id, parameters, body):
+            if operation_id == "getFields":
+                return fields
+            if operation_id == "getProject":
+                return project_metadata
+            return original_response(operation_id, parameters, body)
+
+        monkeypatch.setattr(
+            "jira_as.project_context.get_project_agile_fields", lambda _project: {}
+        )
+        monkeypatch.setattr(
+            "jira_as.autocomplete_cache.get_autocomplete_cache", lambda: Cache()
+        )
+        monkeypatch.setattr(f"{__name__}._response", response)
+
+    return configure
+
+
+@pytest.mark.parametrize("source", ["cache", "metadata"])
+@pytest.mark.parametrize(
+    ("project_metadata", "field_id"),
+    [
+        ({"simplified": True}, "customfield_10028"),
+        ({"style": "next-gen"}, "customfield_10028"),
+        ({"simplified": True, "style": "next-gen"}, "customfield_10028"),
+        ({"simplified": False}, "customfield_10016"),
+        ({"style": "classic"}, "customfield_10016"),
+        ({"simplified": False, "style": "classic"}, "customfield_10016"),
+    ],
+)
+def test_story_point_project_type_resolves_and_caches(
+    responder_wire, story_point_metadata, source, project_metadata, field_id
+):
+    from jira_as.compat.client import GenericClient
+
+    story_point_metadata(project_metadata, source=source)
+    client = GenericClient()
+    for key in ("SBX-17", "SBX-18"):
+        result = CliRunner().invoke(
+            cli,
+            ["agile", "estimate", key, "--points", "5"],
+            obj={"_compat_client": client},
+        )
+        assert result.exit_code == 0, result.output
+        assert responder_wire[-1][2] == {"fields": {field_id: 5.0}}
+    expected = (() if source == "cache" else ("getFields",)) + (
+        "getProject",
+        "editIssue",
+        "editIssue",
+    )
+    assert tuple(operation for operation, _, _ in responder_wire) == expected
+    project_read = next(item for item in responder_wire if item[0] == "getProject")
+    assert project_read[1] == {"projectIdOrKey": "SBX"}
+
+
+@pytest.mark.parametrize("simplified", [True, False])
+def test_story_point_configuration_overrides_multiple_candidates(
+    responder_wire, story_point_metadata, monkeypatch, simplified
+):
+    story_point_metadata({"simplified": simplified}, source="cache")
+    monkeypatch.setattr(
+        "jira_as.project_context.get_project_agile_fields",
+        lambda _project: {"story_points": "customfield_12345"},
+    )
+    result = CliRunner().invoke(cli, ["agile", "estimate", "SBX-17", "--points", "5"])
+    assert result.exit_code == 0, result.output
+    assert tuple(operation for operation, _, _ in responder_wire) == ("editIssue",)
+    assert responder_wire[-1][2] == {"fields": {"customfield_12345": 5.0}}
+
+
+@pytest.mark.parametrize("source", ["cache", "metadata"])
+def test_story_point_single_distinct_candidate_needs_no_project_read(
+    responder_wire, story_point_metadata, source
+):
+    story_point_metadata(
+        {},
+        source=source,
+        fields=[
+            {"id": "customfield_10016", "name": "Story Points"},
+            {"value": "customfield_10016", "displayName": "STORY POINTS"},
+        ],
+    )
+    result = CliRunner().invoke(cli, ["agile", "estimate", "SBX-17", "--points", "5"])
+    assert result.exit_code == 0, result.output
+    expected = (() if source == "cache" else ("getFields",)) + ("editIssue",)
+    assert tuple(operation for operation, _, _ in responder_wire) == expected
+
+
+@pytest.mark.parametrize(
+    "project_metadata",
+    [
+        {},
+        {"projectTypeKey": "software"},
+        {"style": "unknown", "simplified": "false"},
+        {"simplified": True, "style": "classic"},
+        {"simplified": False, "style": "next-gen"},
+    ],
+)
+def test_story_point_unknown_or_conflicting_project_type_refuses(
+    responder_wire, story_point_metadata, project_metadata
+):
+    story_point_metadata(project_metadata)
+    result = CliRunner().invoke(cli, ["agile", "estimate", "SBX-17", "--points", "5"])
+    assert result.exit_code == 1, result.output
+    assert (
+        "Multiple story points fields; configure the project's field ID"
+        in result.output
+    )
+    assert tuple(operation for operation, _, _ in responder_wire) == (
+        "getFields",
+        "getProject",
+    )
+
+
+@pytest.mark.parametrize("simplified", [True, False])
+def test_story_point_project_type_still_requires_one_matching_id(
+    responder_wire, story_point_metadata, simplified
+):
+    name = "Story point estimate" if simplified else "Story Points"
+    story_point_metadata(
+        {"simplified": simplified},
+        fields=[
+            {"id": "customfield_10016", "name": name},
+            {"id": "customfield_10028", "name": name},
+        ],
+    )
+    result = CliRunner().invoke(cli, ["agile", "estimate", "SBX-17", "--points", "5"])
+    assert result.exit_code == 1, result.output
+    assert (
+        "Multiple story points fields; configure the project's field ID"
+        in result.output
+    )
+    assert tuple(operation for operation, _, _ in responder_wire) == (
+        "getFields",
+        "getProject",
+    )
+
+
+def test_story_point_project_read_retains_scope_guard(
+    responder_wire, story_point_metadata
+):
+    from jira_as.compat.client import GenericClient
+    from jira_as.error_handler import JiraError
+
+    story_point_metadata({"simplified": True}, source="cache")
+    with pytest.raises(JiraError, match="GC"):
+        GenericClient().story_points_field("GC")
+    assert responder_wire == []
+
+
 def test_markdown_description_uses_the_generic_rich_text_path(responder_wire):
     result = CliRunner().invoke(
         cli,
