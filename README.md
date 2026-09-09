@@ -320,6 +320,9 @@ operations to a JSON preview with zero requests (exit 0); add `--confirm` to sen
 the request through the normal scope guard. Inspect the level with `api describe
 OPERATION`, and browse irreversible operations with `help risk`.
 
+For the 2.0.0rc1 upgrade, see the [release migration notes](CHANGELOG.md#migration-from-120)
+and the complete [1.2.0 client method mapping](docs/client-method-mapping.md).
+
 ### Instance fields cache
 
 `fields cache warm` fetches instance metadata into

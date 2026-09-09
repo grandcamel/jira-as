@@ -37,7 +37,11 @@ def test_version_uses_package_even_with_stale_distribution(monkeypatch):
     assert result.exit_code == 0
     assert result.output.startswith(f"jira-as, version {__version__} (")
     # doctor's check_command extracts the first dotted number.
-    assert re.search(r"[0-9]+(?:\.[0-9]+){1,3}", result.output)[0] == __version__
+    assert re.search(r"version ([^ ]+)", result.output)[1] == __version__
+    assert (
+        re.search(r"[0-9]+(?:\.[0-9]+){1,3}", result.output)[0]
+        == (__version__.split("rc", 1)[0])
+    )
 
 
 def test_real_worktree_identity_does_not_follow_cwd(tmp_path, monkeypatch):

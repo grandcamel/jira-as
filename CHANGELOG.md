@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0] - Unreleased
+## [Unreleased]
+
+## [2.0.0rc1] - 2026-09-09
 
 Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.x line land on branch `1.x`.
 
@@ -27,8 +29,8 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
   page until an empty page; four post-slice user searches refuse `--all`;
   `getAllUsers` maxResults capped at 1000). Ported
   `scripts/generate_paging_tags.py` and `scripts/refresh_base_documents.py`.
-  Legacy verbs, the client and the mock are untouched (JAS-49 applies the
-  wrapper rule).
+  The final wrapper inventory and retained legacy dependencies are recorded
+  below under Removed verbs.
 - Added generated project-scope metadata for all three Jira API documents,
   first-call project allowlist enforcement, matching --project for body
   identities, conservative bounded JQL, and explicit site-operation opt-in on
@@ -38,7 +40,7 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
   comment and worklog fields, including bulk issue input and raw reads;
   corrected four invalid enum defaults and two search examples, named the
   removed-search replacements, and seeded source-backed help notes and topics.
-  Custom-field resolution remains deferred to JAS-49 (JAS-47). (JAS-47)
+  Custom-field resolution follows the JAS-49 instance-field cache below. (JAS-47)
 - Recorded the fourteen-operation jira-host Compatibility Contract and
   migrated its legacy commands to the generic Surface while preserving output
   and legacy exit codes; added responder compatibility coverage, normalized
@@ -58,7 +60,7 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
   cache (`JIRA_FIELDS_CACHE_DIR`, 24 h TTL); cached textarea custom fields
   auto-resolve markdown to ADF on `api call`, and repeatable `--adf-field`
   overrides per call. ADF helpers no longer emit empty text nodes (JAS-27).
-  Attachment transport and risk-tag enrichment follow in JAS-65. (JAS-49)
+  Attachment transport and risk-tag enrichment are included in JAS-65 below. (JAS-49)
 - Risk enrichment (JAS-65): every DELETE operation in the three pinned Jira
   documents (platform 89, software 24, servicedesk 10) and 24 destructive
   bulk, move, archive and removal operations carry `x-as-risk` (`destructive`
@@ -73,7 +75,8 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
   (scripts/record_cassettes.py), a cleanup-tracked live suite under tests/live
   for the dev wrapper, generated dev-wrapper argv checks, and a three-document
   Base Document drift job (scripts/check_base_document_drift.py, drift
-  workflow). Live SBX recording and the live run remain host steps. (JAS-50)
+  workflow). Host recording and live SBX validation are supervisor-run release
+  acceptance steps. (JAS-50)
 - Cassette recorder keeps and reports its original failed step when cleanup
   also fails; the SBX live-suite cleanup tolerates the JQL index's lag with
   per-key leak checks and detailed errors; recreated SBX keys are owned again;
@@ -94,11 +97,302 @@ Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.
 
 ### Removed verbs
 
-- (filled by the Wrapper Verb ticket: every single-call verb dropped in favour of the Generic Surface, except the Compatibility Contract set)
+The frozen [wrapper decision table](docs/wrapper-verbs.md) classifies all 208
+1.x verbs: **143 dropped, 14 Compatibility Contract verbs kept, 35 survivors
+kept, and 16 deferred on the legacy client pending JAS-64**. Dropped invocations
+are migration shims: they send no requests, print the replacement and exit 2;
+`--help` still exits 0. Parameter names and bodies now follow `api describe`.
+
+| Removed 1.x verb | Generic Surface replacement |
+|---|---|
+| `admin project list` | `api call searchProjects` |
+| `admin project get` | `api call getProject --projectIdOrKey PROJECT_KEY` |
+| `admin project create` | `api call createProject --body @body.json` |
+| `admin project update` | `api call updateProject --projectIdOrKey PROJECT_KEY --body @body.json` |
+| `admin project delete` | `api call deleteProject --projectIdOrKey PROJECT_KEY` |
+| `admin project archive` | `api call archiveProject --projectIdOrKey PROJECT_KEY` |
+| `admin project restore` | `api call restore --projectIdOrKey PROJECT_KEY` |
+| `admin config get` | `api call getProject --projectIdOrKey PROJECT_KEY` |
+| `admin category list` | `api call getAllProjectCategories` |
+| `admin category create` | `api call createProjectCategory --body @body.json` |
+| `admin category assign` | `api call updateProject --projectIdOrKey PROJECT_KEY --body @body.json` |
+| `admin user search` | `api call findUsers` |
+| `admin user get` | `api call getUser` |
+| `admin group list` | `api call findGroups` |
+| `admin group members` | `api call getUsersFromGroup` |
+| `admin group create` | `api call createGroup --body @body.json` |
+| `admin group delete` | `api call removeGroup` |
+| `admin group add-user` | `api call addUserToGroup --body @body.json` |
+| `admin group remove-user` | `api call removeUserFromGroup --accountId ACCOUNT_ID` |
+| `admin permission-scheme list` | `api call getAllPermissionSchemes` |
+| `admin permission-scheme get` | `api call getPermissionScheme --schemeId SCHEME_ID` |
+| `admin permission-scheme create` | `api call createPermissionScheme --body @body.json` |
+| `admin permission-scheme assign` | `api call assignPermissionScheme --projectKeyOrId PROJECT_KEY_OR_ID --body @body.json` |
+| `admin permission list` | `api call getAllPermissions` |
+| `admin permission check` | `api call getMyPermissions` |
+| `admin notification-scheme list` | `api call getNotificationSchemes --projectId PROJECT_KEY` |
+| `admin notification-scheme get` | `api call getNotificationScheme --id ID` |
+| `admin notification-scheme create` | `api call createNotificationScheme --body @body.json` |
+| `admin notification add` | `api call addNotifications --id ID --body @body.json` |
+| `admin notification remove` | `api call removeNotificationFromNotificationScheme --notificationSchemeId NOTIFICATION_SCHEME_ID --notificationId NOTIFICATION_ID` |
+| `admin screen list` | `api call getScreens` |
+| `admin screen get` | `api call getScreens` |
+| `admin screen tabs` | `api call getAllScreenTabs --screenId SCREEN_ID --projectKey PROJECT_KEY` |
+| `admin screen fields` | `api call getAllScreenTabFields --screenId SCREEN_ID --tabId TAB_ID --projectKey PROJECT_KEY` |
+| `admin screen add-field` | `api call addScreenTabField --screenId SCREEN_ID --tabId TAB_ID --body @body.json` |
+| `admin screen remove-field` | `api call removeScreenTabField --screenId SCREEN_ID --tabId TAB_ID --id ID` |
+| `admin screen-scheme list` | `api call getScreenSchemes` |
+| `admin screen-scheme get` | `api call getScreenSchemes` |
+| `admin issue-type list` | `api call getIssueAllTypes` |
+| `admin issue-type get` | `api call getIssueType --id ID` |
+| `admin issue-type create` | `api call createIssueType --body @body.json` |
+| `admin issue-type update` | `api call updateIssueType --id ID --body @body.json` |
+| `admin issue-type delete` | `api call deleteIssueType --id ID` |
+| `admin issue-type-scheme list` | `api call getAllIssueTypeSchemes` |
+| `admin issue-type-scheme get` | `api call getAllIssueTypeSchemes` |
+| `admin issue-type-scheme create` | `api call createIssueTypeScheme --body @body.json` |
+| `admin issue-type-scheme assign` | `api call assignIssueTypeSchemeToProject --body @body.json --project PROJECT_KEY` |
+| `admin issue-type-scheme project` | `api call getIssueTypeSchemeForProjects --projectId PROJECT_ID` |
+| `admin workflow list` | `api call getWorkflowsPaginated` |
+| `admin workflow get` | `api call getWorkflowsPaginated` |
+| `admin workflow search` | `api call getWorkflowsPaginated` |
+| `admin workflow for-issue` | `api call getWorkflowsPaginated` |
+| `admin workflow-scheme list` | `api call getAllWorkflowSchemes` |
+| `admin workflow-scheme get` | `api call getWorkflowScheme --id ID` |
+| `admin workflow-scheme assign` | `api call switchWorkflowSchemeForProject --body @body.json --project PROJECT_KEY` |
+| `admin status list` | `api call getStatuses` |
+| `agile board list` | `api call getAllBoards --projectKeyOrId PROJECT_KEY` |
+| `agile epic create` | `api call createIssue --body @body.json --project PROJECT_KEY` |
+| `agile epic get` | `api call getIssue --issueIdOrKey ISSUE_KEY` |
+| `agile epic add-issues` | `api call moveIssuesToEpic --epicIdOrKey EPIC_KEY --field issues=["ISSUE_KEY"]` |
+| `agile sprint list` | `api call getAllSprints --boardId BOARD_ID` |
+| `agile sprint create` | `api call createSprint --body @body.json` |
+| `agile sprint get` | `api call getSprint --sprintId SPRINT_ID` |
+| `agile backlog` | `api call getIssuesForBacklog --boardId BOARD_ID` |
+| `agile rank` | `api call rankIssues --body @body.json` |
+| `agile estimates` | `api call getIssuesForSprint --sprintId SPRINT_ID` |
+| `agile subtask` | `api call createIssue --body @body.json --project PROJECT_KEY` |
+| `collaborate comment update` | `api call updateComment --issueIdOrKey ISSUE_KEY --id ID --body @body.json` |
+| `collaborate comment delete` | `api call deleteComment --issueIdOrKey ISSUE_KEY --id ID` |
+| `collaborate attachment upload` | `api call addAttachment --issueIdOrKey ISSUE_KEY --body @body.json` |
+| `collaborate attachment list` | `api call getIssue --issueIdOrKey ISSUE_KEY` |
+| `collaborate attachment download` | `api call getAttachmentContent --id ID` |
+| `collaborate watchers` | `api call getIssueWatchers --issueIdOrKey ISSUE_KEY` |
+| `collaborate activity` | `api call getChangeLogs --issueIdOrKey ISSUE_KEY` |
+| `collaborate notify` | `api call notify --issueIdOrKey ISSUE_KEY --body @body.json` |
+| `collaborate update-fields` | `api call editIssue --issueIdOrKey ISSUE_KEY --body @body.json` |
+| `dev link-commit` | `api call storeDevelopmentInformation --Authorization AUTHORIZATION --body @body.json` |
+| `dev link-pr` | `api call storeDevelopmentInformation --Authorization AUTHORIZATION --body @body.json` |
+| `fields create` | `api call createCustomField --body @body.json` |
+| `fields check-project` | `api call getCreateIssueMetaIssueTypeId --projectIdOrKey PROJECT_KEY --issueTypeId ISSUE_TYPE_ID` |
+| `fields configure-agile` | `api call addScreenTabField --screenId SCREEN_ID --tabId TAB_ID --body @body.json` |
+| `issue delete` | `api call deleteIssue --issueIdOrKey ISSUE_KEY` |
+| `issue transitions` | `api call getTransitions --issueIdOrKey ISSUE_KEY` |
+| `issue transition` | `lifecycle transition ISSUE_KEY --to TRANSITION_NAME` |
+| `issue comment` | `api call addComment --issueIdOrKey ISSUE_KEY --body @body.json` |
+| `jsm service-desk list` | `api call getServiceDesks` |
+| `jsm service-desk get` | `api call getServiceDeskById --serviceDeskId SERVICE_DESK_ID` |
+| `jsm service-desk create` | `api call createProject --field key=KEY --field name=NAME --field projectTypeKey=service_desk --field projectTemplateKey=TEMPLATE --field leadAccountId=ACCOUNT_ID` |
+| `jsm request-type list` | `api call getRequestTypes --serviceDeskId SERVICE_DESK_ID` |
+| `jsm request-type get` | `api call getRequestTypeById --serviceDeskId SERVICE_DESK_ID --requestTypeId REQUEST_TYPE_ID` |
+| `jsm request-type fields` | `api call getRequestTypeFields --serviceDeskId SERVICE_DESK_ID --requestTypeId REQUEST_TYPE_ID` |
+| `jsm request list` | `api call searchAndReconsileIssuesUsingJql --jql PROJECT_KEY` |
+| `jsm request create` | `api call createCustomerRequest --body @body.json` |
+| `jsm request get` | `api call getCustomerRequestByIdOrKey --issueIdOrKey ISSUE_KEY` |
+| `jsm request status` | `api call getCustomerRequestStatus --issueIdOrKey ISSUE_KEY` |
+| `jsm request comment` | `api call createRequestComment --issueIdOrKey ISSUE_KEY --body @body.json` |
+| `jsm request comments` | `api call getRequestComments --issueIdOrKey ISSUE_KEY` |
+| `jsm request participants` | `api call getRequestParticipants --issueIdOrKey ISSUE_KEY` |
+| `jsm request add-participant` | `api call addRequestParticipants --issueIdOrKey ISSUE_KEY --body @body.json` |
+| `jsm request remove-participant` | `api call removeRequestParticipants --issueIdOrKey ISSUE_KEY --body @body.json` |
+| `jsm customer list` | `api call getCustomers --serviceDeskId SERVICE_DESK_ID` |
+| `jsm customer add` | `api call addCustomers --serviceDeskId SERVICE_DESK_ID --body @body.json` |
+| `jsm customer remove` | `api call removeCustomers --serviceDeskId SERVICE_DESK_ID --body @body.json` |
+| `jsm organization list` | `api call getOrganizations` |
+| `jsm organization get` | `api call getOrganization --organizationId ORGANIZATION_ID` |
+| `jsm organization create` | `api call createOrganization --body @body.json` |
+| `jsm organization delete` | `api call deleteOrganization --organizationId ORGANIZATION_ID` |
+| `jsm organization add-customer` | `api call addUsersToOrganization --organizationId ORGANIZATION_ID --body @body.json` |
+| `jsm organization remove-customer` | `api call removeUsersFromOrganization --organizationId ORGANIZATION_ID --body @body.json` |
+| `jsm queue list` | `api call getQueues --serviceDeskId SERVICE_DESK_ID` |
+| `jsm queue get` | `api call getQueue --serviceDeskId SERVICE_DESK_ID --queueId QUEUE_ID` |
+| `jsm queue issues` | `api call getIssuesInQueue --serviceDeskId SERVICE_DESK_ID --queueId QUEUE_ID` |
+| `jsm sla get` | `api call getSlaInformation --issueIdOrKey ISSUE_KEY` |
+| `jsm sla check-breach` | `api call getSlaInformation --issueIdOrKey ISSUE_KEY` |
+| `jsm approval list` | `api call getApprovals --issueIdOrKey ISSUE_KEY` |
+| `jsm approval approve` | `api call answerApproval --issueIdOrKey ISSUE_KEY --approvalId APPROVAL_ID --body @body.json` |
+| `jsm approval decline` | `api call answerApproval --issueIdOrKey ISSUE_KEY --approvalId APPROVAL_ID --body @body.json` |
+| `jsm kb search` | `api call getServiceDeskArticles --serviceDeskId SERVICE_DESK_ID --query QUERY` |
+| `jsm kb get` | `api call viewArticle --pageId PAGE_ID` |
+| `lifecycle assign` | `api call assignIssue --issueIdOrKey ISSUE_KEY --body @body.json` |
+| `lifecycle version list` | `api call getProjectVersions --projectIdOrKey PROJECT_KEY` |
+| `lifecycle version create` | `api call createVersion --body @body.json --project PROJECT_KEY` |
+| `lifecycle version release` | `api call updateVersion --id ID --body @body.json --project PROJECT_KEY` |
+| `lifecycle version archive` | `api call updateVersion --id ID --body @body.json --project PROJECT_KEY` |
+| `lifecycle component list` | `api call getProjectComponents --projectIdOrKey PROJECT_KEY` |
+| `lifecycle component create` | `api call createComponent --body @body.json --project PROJECT_KEY` |
+| `lifecycle component update` | `api call updateComponent --id ID --body @body.json --project PROJECT_KEY` |
+| `lifecycle component delete` | `api call deleteComponent --id ID` |
+| `relationships get-blockers` | `api call getIssue --issueIdOrKey ISSUE_KEY` |
+| `relationships get-dependencies` | `api call getIssue --issueIdOrKey ISSUE_KEY` |
+| `search validate` | `api call parseJqlQueries --validation VALIDATION --body @body.json` |
+| `search filter list` | `api call getFiltersPaginated --projectId PROJECT_KEY` |
+| `search filter create` | `api call createFilter --body @body.json` |
+| `search filter run` | `api call searchAndReconsileIssuesUsingJql --jql PROJECT_KEY` |
+| `search filter update` | `api call updateFilter --id ID --body @body.json` |
+| `search filter delete` | `api call deleteFilter --id ID` |
+| `search filter share` | `api call addSharePermission --id ID --body @body.json` |
+| `search filter favourite` | `api call setFavouriteForFilter --id ID` |
+| `time worklogs` | `api call getIssueWorklog --issueIdOrKey ISSUE_KEY` |
+| `time update-worklog` | `api call updateWorklog --issueIdOrKey ISSUE_KEY --id ID --body @body.json` |
+| `time delete-worklog` | `api call deleteWorklog --issueIdOrKey ISSUE_KEY --id ID` |
+| `time estimate` | `api call editIssue --issueIdOrKey ISSUE_KEY --field fields.timetracking.originalEstimate=VALUE --field fields.timetracking.remainingEstimate=VALUE` |
+| `time tracking` | `api call getIssue --issueIdOrKey ISSUE_KEY` |
+
+#### Compatibility Contract verbs kept (14)
+
+- `agile estimate`
+- `collaborate comment add`
+- `collaborate comment list`
+- `issue get`
+- `issue create`
+- `issue update`
+- `lifecycle transition`
+- `lifecycle transitions`
+- `relationships link`
+- `relationships unlink`
+- `relationships get-links`
+- `relationships link-types`
+- `search query`
+- `time log`
+
+#### Surviving Wrapper Verbs kept (35)
+
+- `agile sprint manage`
+- `agile sprint move-issues`
+- `agile velocity`
+- `bulk transition`
+- `bulk assign`
+- `bulk set-priority`
+- `bulk clone`
+- `bulk delete`
+- `dev branch-name`
+- `dev pr-description`
+- `dev parse-commits`
+- `fields list`
+- `jsm request transition`
+- `jsm customer create`
+- `jsm sla report`
+- `jsm approval pending`
+- `jsm kb suggest`
+- `lifecycle resolve`
+- `lifecycle reopen`
+- `ops cache-status`
+- `ops cache-clear`
+- `ops cache-warm`
+- `ops discover-project`
+- `relationships clone`
+- `relationships bulk-link`
+- `relationships stats`
+- `search export`
+- `search build`
+- `search suggest`
+- `search fields`
+- `search functions`
+- `search bulk-update`
+- `time report`
+- `time export`
+- `time bulk-log`
+
+#### Deferred on the legacy client pending JAS-64 (16)
+
+- `admin automation list`
+- `admin automation get`
+- `admin automation search`
+- `admin automation enable`
+- `admin automation disable`
+- `admin automation toggle`
+- `admin automation invoke`
+- `admin automation-template list`
+- `admin automation-template get`
+- `dev get-commits`
+- `jsm asset list`
+- `jsm asset get`
+- `jsm asset create`
+- `jsm asset update`
+- `jsm asset link`
+- `jsm asset find-affected`
+
+Decision 31 ships the rc with these 16 deferred verbs; JAS-64 is required
+before 2.0.0 final. The legacy client and mock remain whole because existing
+configuration, exports, helpers and tests still import them. Their retention
+supports the deferred CLI path and compatibility dependencies; it does not
+reintroduce the 143 removed verbs.
 
 ### Rename table
 
-- (filled by the Wrapper Verb ticket: old verb -> `api call <operationId>`)
+These 20 identity-overlay renames disambiguate published operationIds across
+and within the three Base Documents. The document and route identify the old
+operation unambiguously; use the new name with `api call`. They are distinct
+from the removed-verb replacements above.
+
+| Document | Published operationId | Route | Indexed operationId |
+|---|---|---|---|
+| servicedesk | `createCustomer` | `POST /rest/servicedeskapi/customer/skip-permission-check` | `createCustomerWithoutPermissionCheck` |
+| servicedesk | `getPropertiesKeys` | `GET /rest/servicedeskapi/organization/{organizationId}/property` | `getOrganizationPropertyKeys` |
+| servicedesk | `deleteProperty` | `DELETE /rest/servicedeskapi/organization/{organizationId}/property/{propertyKey}` | `deleteOrganizationProperty` |
+| servicedesk | `getProperty` | `GET /rest/servicedeskapi/organization/{organizationId}/property/{propertyKey}` | `getOrganizationProperty` |
+| servicedesk | `setProperty` | `PUT /rest/servicedeskapi/organization/{organizationId}/property/{propertyKey}` | `setOrganizationProperty` |
+| servicedesk | `getAttachmentContent` | `GET /rest/servicedeskapi/request/{issueIdOrKey}/attachment/{attachmentId}` | `getRequestAttachmentContent` |
+| servicedesk | `getAttachmentThumbnail` | `GET /rest/servicedeskapi/request/{issueIdOrKey}/attachment/{attachmentId}/thumbnail` | `getRequestAttachmentThumbnail` |
+| servicedesk | `addCustomers` | `POST /rest/servicedeskapi/servicedesk/{serviceDeskId}/customer/skip-permission-check` | `addCustomersWithoutPermissionCheck` |
+| servicedesk | `getArticles` | `GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/knowledgebase/article` | `getServiceDeskArticles` |
+| servicedesk | `getOrganizations` | `GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/organization` | `getServiceDeskOrganizations` |
+| servicedesk | `getPropertiesKeys` | `GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property` | `getRequestTypePropertyKeys` |
+| servicedesk | `deleteProperty` | `DELETE /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey}` | `deleteRequestTypeProperty` |
+| servicedesk | `getProperty` | `GET /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey}` | `getRequestTypeProperty` |
+| servicedesk | `setProperty` | `PUT /rest/servicedeskapi/servicedesk/{serviceDeskId}/requesttype/{requestTypeId}/property/{propertyKey}` | `setRequestTypeProperty` |
+| software | `getConfiguration` | `GET /rest/agile/1.0/board/{boardId}/configuration` | `getBoardConfiguration` |
+| software | `getIssue` | `GET /rest/agile/1.0/issue/{issueIdOrKey}` | `getSoftwareIssue` |
+| software | `getPropertiesKeys` | `GET /rest/agile/1.0/sprint/{sprintId}/properties` | `getSprintPropertyKeys` |
+| software | `deleteProperty` | `DELETE /rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey}` | `deleteSprintProperty` |
+| software | `getProperty` | `GET /rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey}` | `getSprintProperty` |
+| software | `setProperty` | `PUT /rest/agile/1.0/sprint/{sprintId}/properties/{propertyKey}` | `setSprintProperty` |
+
+### Migration from 1.2.0
+
+- The configuration chain and existing names remain unchanged: environment
+  variables override Keychain, `settings.local.json`, `settings.json` and
+  defaults. Continue using `JIRA_SITE_URL`, `JIRA_EMAIL` and `JIRA_API_TOKEN`.
+  No credential migration is needed.
+- New instance-field metadata uses `~/.cache/jira-as/v2/instance-fields.json`
+  with a 24-hour TTL. `JIRA_FIELDS_CACHE_DIR` or `jira.fields_cache_dir` chooses
+  its directory. This cache does not import 1.x cache contents; run `fields
+  cache warm` explicitly. Existing legacy cache affordances remain available.
+- Replace removed wrappers with `jira-as api call <operationId>`. Use `api
+  search` and `api describe` to discover operations, exact parameter names,
+  required schemas and help. Supply JSON via `--body @file`, `--body -` or
+  repeated `--field path=value`; attachment file parts use `@path`, and
+  binary responses use `--output PATH`. `--all` pages supported operations;
+  `--limit` caps the total. Parameter/body and output shapes follow the spec,
+  so wrapper flags are not automatically interchangeable with API parameters.
+- Set `JIRA_ALLOWED_PROJECTS` (or `jira.allowed_projects`) explicitly. Keyed
+  identities must be allowed; body-only identities require a matching
+  `--project KEY`. An absent allowlist refuses project calls. Site-wide
+  operations additionally require `JIRA_ALLOW_SITE_OPERATIONS=true`; that
+  opt-in does not waive project checks. These guards also run offline.
+- Generic errors are JSON on stderr: usage/validation 2, authentication 3,
+  permission/scope 4, not found 5, server/transport 6 and conflict 7; success
+  is 0. The fourteen [Compatibility Contract](docs/compatibility-contract.md)
+  verbs keep their output and legacy exits (success 0, operational failure 1,
+  Click usage 2). Destructive generic operations return a zero-request preview
+  until `--confirm` is supplied.
+- The complete [1.2.0 public client method mapping](docs/client-method-mapping.md)
+  covers 259/259 JiraClient methods and 21/21 AutomationClient public members.
+  It distinguishes operation targets, surviving workflows, deferred Assets and
+  Automation, local helpers, and APIs without an indexed replacement. Python
+  consumers must migrate signatures and result handling deliberately; a listed
+  operation is not a drop-in replacement for a legacy method.
 
 ### Fixed
 - JAS-62: `test_real_worktree_identity_does_not_follow_cwd` skips outside a git checkout (a `git archive` export, as the Promotion dry run builds); cherry-picked from 1.2.1.

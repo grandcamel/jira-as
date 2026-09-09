@@ -1,6 +1,6 @@
 """Jira library exports, loaded on first access for fast offline discovery."""
 
-__version__ = "2.0.0"
+__version__ = "2.0.0rc1"
 
 from importlib import import_module
 from typing import TYPE_CHECKING, Any

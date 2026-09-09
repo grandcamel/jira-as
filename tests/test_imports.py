@@ -9,14 +9,14 @@ class TestPackageImports:
     """Test that all public exports are importable."""
 
     def test_version(self):
-        """Test version is accessible and follows semver."""
+        """Test version is accessible and follows the package release grammar."""
         import re
 
         from jira_as import __version__
 
-        # Version should be a valid semver string
+        # Match the package release grammar, including prerelease suffixes.
         message = f"Invalid version: {__version__}"
-        assert re.match(r"^\d+\.\d+\.\d+$", __version__), message
+        assert re.fullmatch(r"\d+\.\d+\.\d+(?:(?:a|b|rc)\d+)?", __version__), message
 
     def test_client_imports(self):
         """Test client classes are importable."""
