@@ -406,3 +406,67 @@ Generic Surface with networking disabled. The SBX live suite is gated by
 `--live`, supports an offline simulation rehearsal, and creates and cleans up
 its own disposable issues. See [recording, replay and drift checks](docs/testing-cassettes.md)
 for the supervisor's host commands and fixture review process.
+
+## Split Mode
+
+Run this same jira-as build in two places: the host serves calls and holds its
+normal ConfigManager credentials; the container runs a credential-free client.
+Use the same package version/build on both sides (`jira-as --version` and
+`jira-as serve --version` report the same identity). There is no separate sidecar
+package, install, or pin.
+
+On the host, with the usual Jira credentials configured:
+
+```sh
+mkdir -m 700 -p /tmp/jira-sidecar
+JIRA_ALLOWED_PROJECTS=SBX jira-as serve \
+  --socket /tmp/jira-sidecar/jira.sock \
+  --binding /path/to/seat-home \
+  --call-log /tmp/jira-sidecar/calls.jsonl
+```
+
+`--binding` reads `jira-binding.json` in the existing ADR 0014 form:
+`{"schema_version":1,"primary":"SBX","permitted":["SBX"]}`. A supplied binding
+must be valid even when an environment override is set. The effective allowlist
+is `JIRA_ALLOWED_PROJECTS` (including an empty value), otherwise the binding's
+`permitted`, otherwise configured `allowed_projects`, otherwise empty. Startup
+prints the source and count on stderr. `--allow-site`/`--no-allow-site` overrides
+`JIRA_ALLOW_SITE_OPERATIONS` or the configured site policy.
+
+With that same build already present in your client image, mount the socket
+directory and run the client as the socket owner's UID (the socket is 0600):
+
+```sh
+docker run --rm --user "$(id -u):$(id -g)" \
+  --mount type=bind,src=/tmp/jira-sidecar,dst=/run/jira-sidecar,readonly \
+  -e JIRA_AS_TRANSPORT=socket -e JIRA_AS_SOCKET=/run/jira-sidecar/jira.sock \
+  -e JIRA_ALLOWED_PROJECTS=SBX YOUR_IMAGE_WITH_THIS_JIRA_AS_BUILD \
+  jira-as api call getIssue --issue-id-or-key SBX-1
+```
+
+Do not include Jira credentials in that image or pass them into the client. The
+client validates locally; the server validates again against its own indexes,
+derives project identity from the call, and enforces its own allowlist through
+the same guard. Each received call is recorded once with a timestamp, operation,
+method/path template, parameter names, safe project/issue identity and outcome.
+The call log omits bodies and arbitrary parameter values and is created 0600.
+
+`--socket` defaults to `$XDG_RUNTIME_DIR/jira-as.sock`, or
+`/tmp/jira-as-<uid>.sock`. Serve stays in the foreground, stops on SIGINT/SIGTERM,
+and removes its own socket. Existing paths are refused. Keep the socket's parent
+directory private; an old socket must be checked and removed by its owner before
+restart.
+
+For clients sharing the host network namespace, optional loopback TCP uses
+`jira-as serve --tcp 127.0.0.1:8765 --token-file /private/session-token --call-log
+/private/calls.jsonl`. The owned regular token file must be 0600 and contain one
+printable ASCII session token (an optional final newline is accepted). Configure
+the client with `JIRA_AS_SERVE_TCP=127.0.0.1:8765` and `JIRA_AS_SERVE_TOKEN` instead
+of `JIRA_AS_SOCKET`. Ordinary container loopback does not reach host loopback;
+the Unix socket mount is the default container path.
+
+Split Mode currently refuses `--output`, binary downloads and multipart uploads;
+local host file references are never an upload protocol. Frames are limited to
+8 MiB, connection/frame timeouts default to 30 seconds, and calls are not retried
+by the socket client. Engine tests can use `as_engine.serve.fake_sidecar` with a
+Responder Surface through this exact socket seam, without credentials or HTTP.

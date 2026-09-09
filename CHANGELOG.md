@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- JAS-52: Split Mode adds same-build `jira-as serve` and credential-free socket clients, authoritative validation/scope binding and private call logs; engine `fake_sidecar` tests use the same Responder seam. Binary downloads/output and multipart uploads are explicitly unsupported.
+
 ## [2.0.0rc1] - 2026-09-09
 
 Main is the 2.0 line (spec JAS-31; wayfinder map JAS-6). Fixes for the pinned 1.x line land on branch `1.x`.

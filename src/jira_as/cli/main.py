@@ -33,6 +33,7 @@ class LazyGroups(HelpGroup):
         "search": ("search_cmds", "search"),
         "time": ("time_cmds", "time"),
         "api": ("api_cmds", "api"),
+        "serve": ("serve_cmds", "serve"),
         "help": ("help_cmds", "help_command"),
     }
 

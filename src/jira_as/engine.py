@@ -116,9 +116,9 @@ def create_surface(
 ) -> Surface:
     """Keep discovery and responder mode credential-free; configure HTTP at call time."""
     mode = transport or os.environ.get("JIRA_AS_TRANSPORT", "http")
-    if mode not in ("http", "responder", "cassette", "simulation"):
+    if mode not in ("http", "responder", "cassette", "simulation", "socket"):
         raise ValueError(
-            "JIRA_AS_TRANSPORT must be http, responder, cassette or simulation"
+            "JIRA_AS_TRANSPORT must be http, responder, cassette, simulation or socket"
         )
     cassette_path = os.environ.get("JIRA_AS_CASSETTE")
     record_path = os.environ.get("JIRA_AS_RECORD")
@@ -151,10 +151,46 @@ def create_surface(
         else:
             simulation_store = JiraSimulationStore()
 
+    socket_endpoint: str | tuple[str, int, str] | None = None
+    if mode == "socket":
+        from as_engine.serve import tcp_address, token_prelude
+
+        path = os.environ.get("JIRA_AS_SOCKET")
+        tcp = os.environ.get("JIRA_AS_SERVE_TCP")
+        token = os.environ.get("JIRA_AS_SERVE_TOKEN")
+        if path is not None:
+            if not path or tcp is not None or token is not None:
+                raise ValueError(
+                    "JIRA_AS_SOCKET requires a path and cannot be combined with TCP/token"
+                )
+            socket_endpoint = path
+        else:
+            if not tcp or not token:
+                raise ValueError(
+                    "socket transport requires JIRA_AS_SOCKET or JIRA_AS_SERVE_TCP + JIRA_AS_SERVE_TOKEN"
+                )
+            try:
+                host, port_text = tcp.rsplit(":", 1)
+                host, port = tcp_address((host.strip("[]"), int(port_text)))
+                if port == 0:
+                    raise ValueError("port must be positive")
+                token_prelude(token)
+            except ValueError:
+                raise ValueError(
+                    "Invalid loopback TCP address or session token for socket transport"
+                ) from None
+            socket_endpoint = (host, port, token)
+
     recorder: Recorder | None = None
 
     def factory(document: str, index: OperationIndex) -> Transport:
         nonlocal recorder
+        if mode == "socket":
+            from as_engine.socket_transport import SocketTransport
+
+            if socket_endpoint is None:
+                raise AssertionError("socket endpoint was not initialized")
+            return SocketTransport(socket_endpoint, document=document)
         if mode == "cassette":
             if cassette_path is None:
                 raise ValueError("cassette transport requires JIRA_AS_CASSETTE")
