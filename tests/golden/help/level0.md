@@ -9,10 +9,8 @@ API: `api search WORDS`, `api describe OPERATION [--full|--examples]`,
 
 Survivor groups: bulk, lifecycle, fields, ops, relationships, search, time,
 dev, agile and jsm. Compatibility groups: issue and collaborate.
-Migration hints: `help migration`, or invoke an old group or verb. 143 wrappers
-are dropped; 14 compatibility verbs remain. Deferred legacy client commands:
-admin automation and automation-template, dev get-commits, and jsm assets
-(16 total; JAS-64).
+Migration hints: `help migration`, or invoke an old group or verb. 159 wrappers
+are dropped; 14 compatibility verbs remain.
 
 Topics: adf, paging, search, agile, fields, project-types, permissions, rate-limits,
 representations, sandbox, auth, scope, risk, errors, migration.

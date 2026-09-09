@@ -1,6 +1,7 @@
 """Credential-free Generic Surface clients through the real Split Mode seam."""
 
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -88,6 +89,13 @@ def test_click_runner_without_credentials(socket_config, monkeypatch, server):
 
 
 def test_subprocess_scrubbed_environment(server, tmp_path):
+    binary = Path(sys.executable).parent / "jira-as"
+    if not binary.is_file():
+        fallback = shutil.which("jira-as")
+        if fallback is None:
+            pytest.skip(f"jira-as not found at {binary} or via shutil.which('jira-as')")
+        binary = Path(fallback)
+
     # Build an allowlisted environment from scratch, never inherit credentials.
     settings = tmp_path / "settings.json"
     settings.write_text("{}")
@@ -103,7 +111,7 @@ def test_subprocess_scrubbed_environment(server, tmp_path):
     }
     result = subprocess.run(
         [
-            str(ROOT / ".venv/bin/jira-as"),
+            str(binary),
             "api",
             "call",
             "getIssue",

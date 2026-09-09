@@ -61,13 +61,15 @@ def _stub(entry: dict[str, Any]) -> click.Command:
     def fail(ctx: click.Context, **_: Any) -> None:
         invocation = entry["invocation"]
         positional = next((arg for arg in ctx.args if not arg.startswith("-")), None)
-        if positional is not None:
+        if invocation is not None and positional is not None:
             invocation = invocation.replace("ISSUE_KEY", positional)
         click.echo(
             json.dumps(
                 {
                     "status": None,
-                    "messages": [f"Use {invocation}"],
+                    "messages": [
+                        f"Use {invocation}" if invocation is not None else entry["note"]
+                    ],
                     "operation": entry["operation"],
                     "note": entry["note"],
                 },
@@ -77,11 +79,16 @@ def _stub(entry: dict[str, Any]) -> click.Command:
         )
         raise click.exceptions.Exit(2)
 
+    hint = (
+        f"Use {entry['invocation']}"
+        if entry["invocation"] is not None
+        else entry["note"]
+    )
     return click.Command(
         entry["verb"],
         callback=fail,
-        help=f"Removed legacy verb. Use {entry['invocation']}",
-        short_help=f"Use {entry['invocation']}",
+        help=f"Removed legacy verb. {hint}",
+        short_help=hint,
         context_settings={"ignore_unknown_options": True, "allow_extra_args": True},
     )
 
@@ -108,3 +115,20 @@ def register(
         if entry["verb"] in parent.commands:
             parent.commands.pop(entry["verb"])
         parent.add_command(_stub(entry))
+
+
+def register_retired(root: click.Group, paths: Iterable[str], message: str) -> None:
+    """Install migration stubs for verbs with no indexed replacement."""
+    entries = []
+    for path in paths:
+        group, _, verb = path.rpartition(" ")
+        entries.append(
+            {
+                "group": " ".join(part for part in (root.name, group) if part),
+                "verb": verb,
+                "invocation": None,
+                "operation": None,
+                "note": message,
+            }
+        )
+    register(root, entries, prefix=root.name or "")

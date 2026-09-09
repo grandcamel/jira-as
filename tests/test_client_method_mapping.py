@@ -60,7 +60,7 @@ def test_mapping_targets_exist_in_indexes_or_frozen_survivors():
         assert target
         if target.startswith("verb: "):
             assert target[6:] in survivors
-        elif target.startswith("note: ") or target == GENERATOR["DEFERRED"]:
+        elif target.startswith("note: "):
             continue
         else:
             assert set(target.split(", ")) <= operations

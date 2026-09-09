@@ -18,13 +18,13 @@ from jira_as import (
     ConfigManager,
     ValidationError,
     adf_to_text,
-    format_table,
     get_jira_client,
     validate_issue_key,
     wiki_markup_to_adf,
 )
 
 from ..cli_utils import format_json, get_client_from_context, handle_jira_errors
+from ..legacy import register_retired
 from .bulk_cmds import workflow_call, workflow_surface
 
 if TYPE_CHECKING:
@@ -665,86 +665,6 @@ def _link_pr_impl(
         return _do_link(c)
 
 
-def _get_commits_impl(
-    issue_key: str,
-    detailed: bool = False,
-    repo_filter: str | None = None,
-    client: JiraClient | None = None,
-) -> list[dict[str, Any]]:
-    """
-    Get commits linked to a JIRA issue via Development Information API.
-
-    Args:
-        issue_key: JIRA issue key
-        detailed: Include commit message and author details
-        repo_filter: Only return commits from this repository
-        client: Optional JiraClient instance. If None, creates one internally.
-
-    Returns:
-        List of commit dictionaries
-    """
-    issue_key = validate_issue_key(issue_key)
-
-    def _do_get(c: JiraClient) -> list[dict[str, Any]]:
-        issue = c.get_issue(issue_key, fields=["id"])
-        issue_id = issue.get("id")
-
-        dev_info = c.get(
-            "/rest/dev-status/latest/issue/detail",
-            params={
-                "issueId": issue_id,
-                "applicationType": "stash",
-                "dataType": "repository",
-            },
-            operation=f"get development info for {issue_key}",
-        )
-
-        commits: list[dict[str, Any]] = []
-        detail = dev_info.get("detail", [])
-
-        for detail_item in detail:
-            repositories = detail_item.get("repositories", [])
-
-            for repo in repositories:
-                repo_name = repo.get("name", "")
-
-                if repo_filter and repo_filter.lower() not in repo_name.lower():
-                    continue
-
-                repo_commits = repo.get("commits", [])
-
-                for commit in repo_commits:
-                    commit_data: dict[str, Any] = {
-                        "id": commit.get("id", ""),
-                        "sha": commit.get("id", ""),
-                        "display_id": commit.get("displayId", commit.get("id", "")[:7]),
-                        "repository": repo_name,
-                        "url": commit.get("url", ""),
-                    }
-
-                    if detailed:
-                        commit_data.update(
-                            {
-                                "message": commit.get("message", ""),
-                                "author": commit.get("author", {}).get("name", ""),
-                                "author_email": commit.get("author", {}).get(
-                                    "email", ""
-                                ),
-                                "timestamp": commit.get("authorTimestamp", ""),
-                            }
-                        )
-
-                    commits.append(commit_data)
-
-        return commits
-
-    if client is not None:
-        return _do_get(client)
-
-    with get_jira_client() as c:
-        return _do_get(c)
-
-
 # =============================================================================
 # Formatting Functions
 # =============================================================================
@@ -756,44 +676,6 @@ def _format_branch_name(result: dict, output: str) -> str:
         return result["git_command"]
     else:
         return result["branch_name"]
-
-
-def _format_commits(commits: list[dict], output: str, detailed: bool) -> str:
-    """Format commits for text output."""
-    if not commits:
-        return "No commits linked to this issue"
-
-    if output == "table":
-        if detailed:
-            columns = ["display_id", "message", "author", "repository"]
-            headers = ["SHA", "Message", "Author", "Repository"]
-        else:
-            columns = ["display_id", "repository", "url"]
-            headers = ["SHA", "Repository", "URL"]
-        return format_table(commits, columns=columns, headers=headers)
-
-    lines = [f"Found {len(commits)} commit(s):", ""]
-
-    for commit in commits:
-        sha = commit.get("display_id", commit.get("id", "")[:7])
-        repo = commit.get("repository", "")
-        url = commit.get("url", "")
-
-        if detailed:
-            message = commit.get("message", "").split("\n")[0][:60]
-            author = commit.get("author", "")
-            lines.append(f"  {sha} - {message}")
-            lines.append(f"    Author: {author}")
-            lines.append(f"    Repo: {repo}")
-            if url:
-                lines.append(f"    URL: {url}")
-            lines.append("")
-        else:
-            lines.append(f"  {sha} ({repo})")
-            if url:
-                lines.append(f"    {url}")
-
-    return "\n".join(lines)
 
 
 def _surface_branch(surface, issue_key, prefix=None, auto_prefix=False):
@@ -1190,34 +1072,8 @@ def dev_link_pr(
         click.echo(f"Linked {pr_type} #{result['pr_number']} to {result['issue_key']}")
 
 
-@dev.command(name="get-commits")
-@click.argument("issue_key")
-@click.option(
-    "--detailed", "-d", is_flag=True, help="Include commit message and author details"
+register_retired(
+    dev,
+    ["get-commits"],
+    "retired at 2.0.0; no indexed replacement — JAS-64, decision 34",
 )
-@click.option("--repo", "-r", help="Filter by repository name")
-@click.option(
-    "--output",
-    "-o",
-    type=click.Choice(["text", "json", "table"]),
-    default="text",
-    help="Output format (default: text)",
-)
-@click.pass_context
-@handle_jira_errors
-def dev_get_commits(
-    ctx: click.Context, issue_key: str, detailed: bool, repo: str, output: str
-):
-    """Get commits linked to an issue."""
-    client = get_client_from_context(ctx)
-    commits = _get_commits_impl(
-        issue_key=issue_key,
-        detailed=detailed,
-        repo_filter=repo,
-        client=client,
-    )
-
-    if output == "json":
-        click.echo(format_json({"commits": commits, "count": len(commits)}))
-    else:
-        click.echo(_format_commits(commits, output, detailed))

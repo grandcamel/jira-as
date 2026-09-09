@@ -7,7 +7,6 @@ Tests cover:
 - parse-commits: Parse JIRA issue keys from commit messages
 - link-commit: Link commits to issues
 - link-pr: Link pull requests to issues
-- get-commits: Get commits linked to issues
 """
 
 from copy import deepcopy
@@ -24,7 +23,6 @@ from jira_as.cli.commands.dev_cmds import (
     _create_pr_description_impl,
     _detect_repo_type,
     _extract_acceptance_criteria,
-    _get_commits_impl,
     _get_prefix_for_issue_type,
     _parse_commit_issues_impl,
     _parse_pr_url,
@@ -414,96 +412,6 @@ class TestParseCommitIssuesImpl:
 # =============================================================================
 
 
-@pytest.mark.unit
-class TestGetCommitsImpl:
-    """Tests for the _get_commits_impl implementation function."""
-
-    def test_get_commits_basic(self, mock_jira_client, sample_issue):
-        """Test getting commits linked to an issue."""
-        mock_jira_client.get_issue.return_value = {"id": "10001"}
-        mock_jira_client.get.return_value = {
-            "detail": [
-                {
-                    "repositories": [
-                        {
-                            "name": "org/repo",
-                            "commits": [
-                                {
-                                    "id": "abc123def456",
-                                    "displayId": "abc123d",
-                                    "url": "https://github.com/org/repo/commit/abc123def456",
-                                    "message": "Fix bug",
-                                    "author": {
-                                        "name": "John Doe",
-                                        "email": "john@example.com",
-                                    },
-                                }
-                            ],
-                        }
-                    ]
-                }
-            ]
-        }
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            commits = _get_commits_impl(issue_key="PROJ-123")
-
-        assert len(commits) == 1
-        assert commits[0]["display_id"] == "abc123d"
-        assert commits[0]["repository"] == "org/repo"
-
-    def test_get_commits_detailed(self, mock_jira_client):
-        """Test getting detailed commits."""
-        mock_jira_client.get_issue.return_value = {"id": "10001"}
-        mock_jira_client.get.return_value = {
-            "detail": [
-                {
-                    "repositories": [
-                        {
-                            "name": "org/repo",
-                            "commits": [
-                                {
-                                    "id": "abc123",
-                                    "message": "Fix bug",
-                                    "author": {
-                                        "name": "John Doe",
-                                        "email": "john@example.com",
-                                    },
-                                    "authorTimestamp": "2025-01-15T10:30:00Z",
-                                }
-                            ],
-                        }
-                    ]
-                }
-            ]
-        }
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            commits = _get_commits_impl(issue_key="PROJ-123", detailed=True)
-
-        assert commits[0]["message"] == "Fix bug"
-        assert commits[0]["author"] == "John Doe"
-
-    def test_get_commits_no_results(self, mock_jira_client):
-        """Test getting commits when none linked."""
-        mock_jira_client.get_issue.return_value = {"id": "10001"}
-        mock_jira_client.get.return_value = {"detail": []}
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_jira_client",
-            return_value=mock_jira_client,
-        ):
-            commits = _get_commits_impl(issue_key="PROJ-123")
-
-        assert commits == []
-
-
 # =============================================================================
 # CLI Command Tests
 # =============================================================================
@@ -578,49 +486,3 @@ class TestParseCommitsCommand:
         result = cli_runner.invoke(dev, ["parse-commits"])
 
         assert result.exit_code != 0
-
-
-@pytest.mark.unit
-class TestGetCommitsCommand:
-    """Tests for the get-commits CLI command."""
-
-    def test_get_commits_cli(self, cli_runner, mock_jira_client):
-        """Test CLI get-commits command."""
-        mock_jira_client.get_issue.return_value = {"id": "10001"}
-        mock_jira_client.get.return_value = {"detail": []}
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(dev, ["get-commits", "PROJ-123"])
-
-        assert result.exit_code == 0
-        assert "No commits" in result.output
-
-    def test_get_commits_cli_with_commits(self, cli_runner, mock_jira_client):
-        """Test CLI get-commits with commits found."""
-        mock_jira_client.get_issue.return_value = {"id": "10001"}
-        mock_jira_client.get.return_value = {
-            "detail": [
-                {
-                    "repositories": [
-                        {
-                            "name": "org/repo",
-                            "commits": [
-                                {"id": "abc123", "displayId": "abc123d", "url": ""}
-                            ],
-                        }
-                    ]
-                }
-            ]
-        }
-
-        with patch(
-            "jira_as.cli.commands.dev_cmds.get_client_from_context",
-            return_value=mock_jira_client,
-        ):
-            result = cli_runner.invoke(dev, ["get-commits", "PROJ-123"])
-
-        assert result.exit_code == 0
-        assert "Found 1 commit" in result.output

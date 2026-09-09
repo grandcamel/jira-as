@@ -8,7 +8,7 @@ Provides CLI commands for JIRA administration including:
 - Screen management
 - Issue types and schemes
 - Workflow management
-- Automation rules
+- Migration hints for retired Automation rules
 """
 
 from __future__ import annotations
@@ -25,7 +25,6 @@ from jira_as import (
     ValidationError,
     format_json,
     format_table,
-    get_automation_client,
     get_jira_client,
     validate_project_key,
     validate_project_name,
@@ -34,6 +33,7 @@ from jira_as import (
 )
 
 from ..cli_utils import get_client_from_context, handle_jira_errors
+from ..legacy import register_retired
 
 # =============================================================================
 # Helper Functions
@@ -621,119 +621,6 @@ def _remove_user_from_group_impl(
 
     with get_jira_client() as c:
         return _do_work(c)
-
-
-# =============================================================================
-# Automation Implementation Functions
-# =============================================================================
-
-
-def _list_automation_rules_impl(
-    project: str | None = None,
-    state: str | None = None,
-    limit: int = 50,
-    fetch_all: bool = False,
-) -> list[dict[str, Any]]:
-    """List automation rules."""
-    client = get_automation_client()
-    all_rules = []
-    cursor = None
-    use_search = project is not None or state is not None
-
-    while True:
-        if use_search:
-            scope = None
-            if project:
-                scope = (
-                    f"ari:cloud:jira:*:project/{project}"
-                    if not project.startswith("ari:")
-                    else project
-                )
-
-            response = client.search_rules(
-                state=state.upper() if state else None,
-                scope=scope,
-                limit=limit,
-                cursor=cursor,
-            )
-        else:
-            response = client.get_rules(limit=limit, cursor=cursor)
-
-        rules = response.get("values", [])
-        all_rules.extend(rules)
-
-        if not fetch_all or not response.get("hasMore", False):
-            break
-
-        links = response.get("links", {})
-        next_link = links.get("next", "")
-        if "?cursor=" in next_link:
-            cursor = next_link.split("?cursor=")[-1]
-        else:
-            break
-
-    return all_rules
-
-
-def _get_automation_rule_impl(rule_id: str) -> dict[str, Any]:
-    """Get automation rule details."""
-    client = get_automation_client()
-    return client.get_rule(rule_id)
-
-
-def _search_automation_rules_impl(
-    query: str, project: str | None = None
-) -> list[dict[str, Any]]:
-    """Search automation rules."""
-    rules = _list_automation_rules_impl(project=project, fetch_all=True)
-    query_lower = query.lower()
-    return [r for r in rules if query_lower in r.get("name", "").lower()]
-
-
-def _enable_automation_rule_impl(rule_id: str) -> dict[str, Any]:
-    """Enable an automation rule."""
-    client = get_automation_client()
-    return client.enable_rule(rule_id)
-
-
-def _disable_automation_rule_impl(rule_id: str) -> dict[str, Any]:
-    """Disable an automation rule."""
-    client = get_automation_client()
-    return client.disable_rule(rule_id)
-
-
-def _toggle_automation_rule_impl(rule_id: str) -> dict[str, Any]:
-    """Toggle an automation rule's state."""
-    client = get_automation_client()
-    rule = client.get_rule(rule_id)
-    current_state = rule.get("state", "").upper()
-    if current_state == "ENABLED":
-        return client.disable_rule(rule_id)
-    else:
-        return client.enable_rule(rule_id)
-
-
-def _invoke_manual_rule_impl(
-    rule_id: str, issue_key: str | None = None
-) -> dict[str, Any]:
-    """Invoke a manual automation rule."""
-    client = get_automation_client()
-    context: dict[str, Any] = {}
-    if issue_key:
-        context["issue"] = {"key": issue_key}
-    return client.invoke_manual_rule(rule_id, context)
-
-
-def _list_automation_templates_impl() -> dict[str, Any]:
-    """List automation templates."""
-    client = get_automation_client()
-    return client.get_templates()
-
-
-def _get_automation_template_impl(template_id: str) -> dict[str, Any]:
-    """Get automation template details."""
-    client = get_automation_client()
-    return client.get_template(template_id)
 
 
 # =============================================================================
@@ -1872,43 +1759,6 @@ def _format_group_members(result: dict[str, Any], group_name: str) -> str:
     return output
 
 
-def _format_automation_rules(rules: list[dict[str, Any]]) -> str:
-    """Format automation rules for display."""
-    if not rules:
-        return "No automation rules found."
-
-    data = []
-    for rule in rules:
-        scope_resources = rule.get("ruleScope", {}).get("resources", [])
-        scope = "Global" if not scope_resources else "Project"
-
-        trigger = rule.get("trigger", {})
-        trigger_type = trigger.get("type", "Unknown")
-        if ":" in trigger_type:
-            trigger_display = trigger_type.split(":")[-1]
-        else:
-            trigger_display = trigger_type
-
-        rule_id = rule.get("id", "")
-        if len(rule_id) > 20:
-            rule_id = rule_id[:20] + "..."
-
-        data.append(
-            {
-                "ID": rule_id,
-                "Name": rule.get("name", "Unnamed"),
-                "State": rule.get("state", "UNKNOWN"),
-                "Scope": scope,
-                "Trigger": trigger_display,
-            }
-        )
-
-    output = f"Automation Rules ({len(rules)} found)\n"
-    output += "=" * 60 + "\n\n"
-    output += format_table(data, columns=["ID", "Name", "State", "Scope", "Trigger"])
-    return output
-
-
 def _format_permission_schemes(
     schemes: list[dict[str, Any]], show_grants: bool = False
 ) -> str:
@@ -2600,167 +2450,6 @@ def group_remove_user(ctx, group_name, user, confirm, output):
         click.echo(format_json(result))
     else:
         click.echo(f"User removed from group '{group_name}'.")
-
-
-# =============================================================================
-# Automation Rules Commands
-# =============================================================================
-
-
-@admin.group(name="automation")
-def automation_group():
-    """Automation rule commands."""
-    pass
-
-
-@automation_group.command(name="list")
-@click.option("--project", "-p", help="Filter by project key")
-@click.option(
-    "--state", "-s", type=click.Choice(["enabled", "disabled"]), help="Filter by state"
-)
-@click.option("--all", "fetch_all", is_flag=True, help="Fetch all pages")
-@click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
-@click.pass_context
-@handle_jira_errors
-def automation_list(ctx, project, state, fetch_all, output):
-    """List automation rules."""
-    result = _list_automation_rules_impl(
-        project=project, state=state, fetch_all=fetch_all
-    )
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(_format_automation_rules(result))
-
-
-@automation_group.command(name="get")
-@click.argument("rule_id")
-@click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
-@click.pass_context
-@handle_jira_errors
-def automation_get(ctx, rule_id, output):
-    """Get automation rule details."""
-    result = _get_automation_rule_impl(rule_id)
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(f"Rule: {result.get('name', 'N/A')}")
-        click.echo(f"State: {result.get('state', 'N/A')}")
-        click.echo(f"ID: {result.get('id', 'N/A')}")
-
-
-@automation_group.command(name="search")
-@click.option("--query", "-q", required=True, help="Search query")
-@click.option("--project", "-p", help="Filter by project")
-@click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
-@click.pass_context
-@handle_jira_errors
-def automation_search(ctx, query, project, output):
-    """Search automation rules."""
-    result = _search_automation_rules_impl(query, project=project)
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(_format_automation_rules(result))
-
-
-@automation_group.command(name="enable")
-@click.argument("rule_id")
-@click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
-@click.pass_context
-@handle_jira_errors
-def automation_enable(ctx, rule_id, output):
-    """Enable an automation rule."""
-    result = _enable_automation_rule_impl(rule_id)
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(f"Rule {rule_id} enabled.")
-
-
-@automation_group.command(name="disable")
-@click.argument("rule_id")
-@click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
-@click.pass_context
-@handle_jira_errors
-def automation_disable(ctx, rule_id, output):
-    """Disable an automation rule."""
-    result = _disable_automation_rule_impl(rule_id)
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(f"Rule {rule_id} disabled.")
-
-
-@automation_group.command(name="toggle")
-@click.argument("rule_id")
-@click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
-@click.pass_context
-@handle_jira_errors
-def automation_toggle(ctx, rule_id, output):
-    """Toggle an automation rule's enabled state."""
-    result = _toggle_automation_rule_impl(rule_id)
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        new_state = result.get("state", "unknown")
-        click.echo(f"Rule {rule_id} toggled to {new_state}.")
-
-
-@automation_group.command(name="invoke")
-@click.argument("rule_id")
-@click.option("--issue", "-i", help="Issue key to run rule against")
-@click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
-@click.pass_context
-@handle_jira_errors
-def automation_invoke(ctx, rule_id, issue, output):
-    """Invoke a manual automation rule."""
-    result = _invoke_manual_rule_impl(rule_id, issue_key=issue)
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(f"Rule {rule_id} invoked.")
-
-
-@admin.group(name="automation-template")
-def automation_template_group():
-    """Automation rule template commands."""
-    pass
-
-
-@automation_template_group.command(name="list")
-@click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
-@click.pass_context
-@handle_jira_errors
-def automation_template_list(ctx, output):
-    """List available automation templates."""
-    result = _list_automation_templates_impl()
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        if not result:
-            click.echo("No automation templates found.")
-        else:
-            for template in result:
-                click.echo(
-                    f"- {template.get('name', 'N/A')} ({template.get('id', 'N/A')})"
-                )
-
-
-@automation_template_group.command(name="get")
-@click.argument("template_id")
-@click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
-@click.pass_context
-@handle_jira_errors
-def automation_template_get(ctx, template_id, output):
-    """Get automation template details."""
-    result = _get_automation_template_impl(template_id)
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(f"Template: {result.get('name', 'N/A')}")
-        click.echo(f"ID: {result.get('id', 'N/A')}")
-        click.echo(f"Description: {result.get('description', 'N/A')}")
 
 
 # =============================================================================
@@ -3609,3 +3298,20 @@ def status_list(ctx, output):
     else:
         click.echo(_format_statuses(result))
         click.echo(f"\nTotal: {len(result)} status(es)")
+
+
+register_retired(
+    admin,
+    [
+        "automation list",
+        "automation get",
+        "automation search",
+        "automation enable",
+        "automation disable",
+        "automation toggle",
+        "automation invoke",
+        "automation-template list",
+        "automation-template get",
+    ],
+    "retired at 2.0.0; no indexed replacement — JAS-64, decision 34",
+)

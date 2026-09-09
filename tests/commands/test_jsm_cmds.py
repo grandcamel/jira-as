@@ -1,14 +1,12 @@
 """Tests for JSM CLI commands."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from click.testing import CliRunner
 
 from jira_as.cli.commands.jsm_cmds import (
     _format_approvals,  # Approval impl; Asset impl; Customer impl; KB impl; Organization impl; Participant impl; Queue impl; Request impl; SLA impl; Request Type impl; Helper functions; CLI commands
-    _format_asset,
-    _format_assets,
     _format_customers,
     _format_datetime,
     _format_kb_article,
@@ -31,7 +29,6 @@ from jira_as.cli.commands.jsm_cmds import (
     _get_approvals_impl,
     _get_request_comments_impl,
     _is_sla_breached,
-    _parse_attributes,
     _parse_comma_list,
     _remove_participant_impl,
     _suggest_kb_impl,
@@ -225,35 +222,6 @@ def sample_kb_articles():
     ]
 
 
-@pytest.fixture
-def sample_assets():
-    """Sample assets data."""
-    return [
-        {
-            "objectKey": "SRV-001",
-            "label": "Web Server 1",
-            "objectType": {"name": "Server"},
-            "attributes": [
-                {
-                    "objectTypeAttribute": {"name": "IP Address"},
-                    "objectAttributeValues": [{"value": "192.168.1.100"}],
-                },
-            ],
-        },
-        {
-            "objectKey": "SRV-002",
-            "label": "Database Server",
-            "objectType": {"name": "Server"},
-            "attributes": [
-                {
-                    "objectTypeAttribute": {"name": "IP Address"},
-                    "objectAttributeValues": [{"value": "192.168.1.101"}],
-                },
-            ],
-        },
-    ]
-
-
 # =============================================================================
 # Helper Function Tests
 # =============================================================================
@@ -286,35 +254,6 @@ class TestParseCommaList:
         """Test parsing list with empty values."""
         result = _parse_comma_list("a,,b, ,c")
         assert result == ["a", "b", "c"]
-
-
-class TestParseAttributes:
-    """Tests for _parse_attributes."""
-
-    def test_parse_single_attribute(self):
-        """Test parsing single attribute."""
-        result = _parse_attributes(["name=value"])
-        assert result == {"name": "value"}
-
-    def test_parse_multiple_attributes(self):
-        """Test parsing multiple attributes."""
-        result = _parse_attributes(["name=John", "age=30"])
-        assert result == {"name": "John", "age": "30"}
-
-    def test_parse_attribute_with_spaces(self):
-        """Test parsing attribute with spaces in value."""
-        result = _parse_attributes(["name = John Doe"])
-        assert result == {"name": "John Doe"}
-
-    def test_parse_attribute_with_equals_in_value(self):
-        """Test parsing attribute with equals sign in value."""
-        result = _parse_attributes(["formula=a=b+c"])
-        assert result == {"formula": "a=b+c"}
-
-    def test_parse_invalid_format_raises(self):
-        """Test invalid format raises ValueError."""
-        with pytest.raises(ValueError, match="Invalid attribute format"):
-            _parse_attributes(["invalid_no_equals"])
 
 
 class TestFormatDatetime:
@@ -747,34 +686,6 @@ class TestFormatKbArticle:
 # =============================================================================
 
 
-class TestFormatAssets:
-    """Tests for _format_assets."""
-
-    def test_format_assets(self, sample_assets):
-        """Test formatting assets."""
-        result = _format_assets(sample_assets)
-        assert "Assets (2 total):" in result
-        assert "SRV-001" in result
-        assert "Web Server 1" in result
-        assert "192.168.1.100" in result
-
-    def test_format_empty_assets(self):
-        """Test formatting empty assets."""
-        result = _format_assets([])
-        assert "No assets found" in result
-
-
-class TestFormatAsset:
-    """Tests for _format_asset."""
-
-    def test_format_asset(self, sample_assets):
-        """Test formatting single asset."""
-        result = _format_asset(sample_assets[0])
-        assert "Asset: SRV-001" in result
-        assert "Object Type: Server" in result
-        assert "IP Address: 192.168.1.100" in result
-
-
 # =============================================================================
 # Participant Formatting Tests
 # =============================================================================
@@ -834,55 +745,6 @@ class TestSlaReportCommand:
         assert result.exit_code == 1
         assert "--project or scoped --jql is required" in result.output
         assert generic_workflow.calls == []
-
-
-class TestAssetListCommand:
-    """Tests for asset list command."""
-
-    @patch("jira_as.cli.commands.jsm_cmds.get_jira_client")
-    def test_list_assets(self, mock_get_client, runner, mock_client, sample_assets):
-        """Test listing assets."""
-        mock_get_client.return_value.__enter__.return_value = mock_client
-        mock_get_client.return_value.__exit__.return_value = None
-        mock_client.has_assets_license.return_value = True
-        mock_client.list_assets.return_value = sample_assets
-
-        result = runner.invoke(jsm, ["asset", "list"])
-        assert result.exit_code == 0
-        assert "SRV-001" in result.output
-
-
-class TestAssetCreateCommand:
-    """Tests for asset create command."""
-
-    def test_create_asset_dry_run(self, runner):
-        """Test creating asset with dry run."""
-        result = runner.invoke(
-            jsm,
-            [
-                "asset",
-                "create",
-                "--type-id",
-                "5",
-                "--attr",
-                "Name=Server1",
-                "--attr",
-                "IP=192.168.1.1",
-                "--dry-run",
-            ],
-        )
-        assert result.exit_code == 0
-        assert "DRY RUN" in result.output
-        assert "Server1" in result.output
-
-    def test_create_asset_invalid_type_id(self, runner):
-        """Test creating asset with invalid type ID."""
-        result = runner.invoke(
-            jsm,
-            ["asset", "create", "--type-id", "0", "--attr", "Name=Test"],
-        )
-        assert result.exit_code == 1
-        assert "must be a positive integer" in result.output
 
 
 # =============================================================================

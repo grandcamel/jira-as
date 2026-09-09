@@ -21,6 +21,9 @@ from jira_as.cli.main import cli
 ROOT = Path(__file__).resolve().parents[1]
 ROWS = json.loads((ROOT / "tests/wrapper_verbs.json").read_text())
 DROPPED = [row for row in ROWS if row["decision"] == "dropped"]
+RETIRED = [row for row in DROPPED if row["operation"] is None]
+INDEXED_DROPPED = [row for row in DROPPED if row["operation"] is not None]
+RETIREMENT_MESSAGE = "retired at 2.0.0; no indexed replacement — JAS-64, decision 34"
 NOTED = {
     "collaborate attachment upload",
     "collaborate attachment download",
@@ -174,12 +177,14 @@ def test_frozen_table_counts_compiled_records_and_command_paths_agree():
         decision: sum(row["decision"] == decision for row in ROWS)
         for decision in {row["decision"] for row in ROWS}
     }
-    assert counts == {"survivor": 35, "dropped": 143, "contract": 14, "deferred": 16}
+    assert counts == {"survivor": 35, "dropped": 159, "contract": 14}
+    assert len(INDEXED_DROPPED) == 143
+    assert len(RETIRED) == 16
     assert len(ROWS) == len({row["verb"] for row in ROWS}) == 208
 
     compiled = _compiled_by_path()
-    assert set(compiled) == {row["verb"] for row in DROPPED}
-    for row in DROPPED:
+    assert set(compiled) == {row["verb"] for row in INDEXED_DROPPED}
+    for row in INDEXED_DROPPED:
         path = row["verb"]
         assert isinstance(path, str)
         assert compiled[path]["invocation"] == _replacement(row)
@@ -229,7 +234,7 @@ def test_survivor_callbacks_reach_only_the_generic_transport_path():
             assert surface_call, path
 
 
-@pytest.mark.parametrize("row", DROPPED, ids=lambda row: row["verb"])
+@pytest.mark.parametrize("row", INDEXED_DROPPED, ids=lambda row: row["verb"])
 def test_every_dropped_verb_is_a_zero_transport_migration_hint(row, monkeypatch):
     def forbidden(*_args, **_kwargs):
         pytest.fail("migration stub attempted a transport call")
@@ -249,6 +254,36 @@ def test_every_dropped_verb_is_a_zero_transport_migration_hint(row, monkeypatch)
     }
     help_result = runner.invoke(cli, [*path.split(), "--help"])
     assert help_result.exit_code == 0, (path, help_result.output, help_result.exception)
+
+
+@pytest.mark.parametrize("row", RETIRED, ids=lambda row: row["verb"])
+def test_retired_verb_has_no_replacement_and_sends_nothing(row, monkeypatch):
+    from jira_as import AutomationClient, JiraClient
+
+    def forbidden(*_args, **_kwargs):
+        pytest.fail("retirement shim attempted to create a client or send a request")
+
+    monkeypatch.setattr(Surface, "call", forbidden)
+    monkeypatch.setattr(JiraClient, "__init__", forbidden)
+    monkeypatch.setattr(AutomationClient, "__init__", forbidden)
+    assert row["replacement"] == f"note: {RETIREMENT_MESSAGE}"
+    assert row["reason"] == RETIREMENT_MESSAGE
+    assert row["tier"] == "dropped"
+    assert row["operationIds"] == row["call_sequence"] == []
+    assert row["verb"] not in _compiled_by_path()
+    runner = CliRunner()
+    for extra in ([], ["SBX-1"], ["--project", "SBX", "--legacy-flag"]):
+        result = runner.invoke(cli, [*row["verb"].split(), *extra])
+        assert result.exit_code == 2, (row["verb"], result.output, result.exception)
+        assert json.loads(result.output) == {
+            "status": None,
+            "messages": [RETIREMENT_MESSAGE],
+            "operation": None,
+            "note": RETIREMENT_MESSAGE,
+        }
+    result = runner.invoke(cli, [*row["verb"].split(), "--help"])
+    assert result.exit_code == 0, (row["verb"], result.output, result.exception)
+    assert RETIREMENT_MESSAGE in " ".join(result.output.split())
 
 
 def test_issue_delete_does_not_treat_an_option_as_its_positional_key():

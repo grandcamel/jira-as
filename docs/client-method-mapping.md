@@ -20,10 +20,10 @@ Scope still applies: set an explicit project allowlist, provide matching
 where needed. Destructive operations preview until `--confirm`. Indexed
 operations with unsupported request media remain unavailable through api call.
 
-The rc retains legacy modules for the 16 deferred CLI verbs pending JAS-64
-and their existing helper/export/test dependencies. Assets and Automation
-remain on that legacy path. Low-level transport helpers and two absent API
-capabilities have explicit notes rather than fabricated operation targets.
+JAS-64 decision 34 retires the sixteen Automation, Assets and dev-status CLI
+verbs at 2.0.0 with no indexed replacement. Legacy Python modules remain
+for existing helper/export/test dependencies; their retention does not make
+the retired CLI verbs available. Absent capabilities have explicit notes.
 
 See [the wrapper decision table](wrapper-verbs.md) and
 [the Compatibility Contract](compatibility-contract.md) for the supported CLI guarantees.
@@ -55,7 +55,7 @@ See [the wrapper decision table](wrapper-verbs.md) and
 | `attach_article_as_solution` | `createRequestComment` | Write a public solution comment; no native KB relationship is implied. |
 | `clone_issue` | `relationships clone` (surviving verb) |  |
 | `close` | Local transport lifecycle; use HTTPTransport.close() or its context manager, no HTTP operation. |  |
-| `create_asset` | legacy client (deferred, JAS-64) |  |
+| `create_asset` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
 | `create_component` | `createComponent` |  |
 | `create_customer` | `createCustomer` |  |
 | `create_filter` | `createFilter` |  |
@@ -77,7 +77,7 @@ See [the wrapper decision table](wrapper-verbs.md) and
 | `create_sprint` | `createSprint` |  |
 | `create_version` | `createVersion` |  |
 | `delete` | Use api call <operationId> for an indexed DELETE; risk preview requires --confirm to send. |  |
-| `delete_asset` | legacy client (deferred, JAS-64) |  |
+| `delete_asset` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
 | `delete_attachment` | `removeAttachment` |  |
 | `delete_board` | `deleteBoard` |  |
 | `delete_comment` | `deleteComment` |  |
@@ -103,8 +103,8 @@ See [the wrapper decision table](wrapper-verbs.md) and
 | `delete_version` | `deleteVersion` |  |
 | `delete_worklog` | `deleteWorklog` |  |
 | `download_file` | `getAttachmentContent`, `getAttachmentThumbnail` | Attachment use: --output PATH; arbitrary URL downloads are not indexed. |
-| `find_affected_assets` | legacy client (deferred, JAS-64) |  |
-| `find_assets_by_criteria` | legacy client (deferred, JAS-64) |  |
+| `find_affected_assets` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
+| `find_assets_by_criteria` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
 | `find_assignable_users` | `findAssignableUsers` |  |
 | `find_groups` | `findGroups` |  |
 | `get` | Use api call <operationId> for an indexed GET; no arbitrary-URL CLI equivalent. |  |
@@ -112,7 +112,7 @@ See [the wrapper decision table](wrapper-verbs.md) and
 | `get_all_permissions` | `getAllPermissions` |  |
 | `get_all_statuses` | `getStatuses` |  |
 | `get_all_users` | `getAllUsers` |  |
-| `get_asset` | legacy client (deferred, JAS-64) |  |
+| `get_asset` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
 | `get_attachments` | `getIssue` | Select fields=attachment on getIssue. |
 | `get_board` | `getBoard` |  |
 | `get_board_backlog` | `getIssuesForBacklog` |  |
@@ -133,7 +133,7 @@ See [the wrapper decision table](wrapper-verbs.md) and
 | `get_group` | `getGroup` |  |
 | `get_group_members` | `getUsersFromGroup` |  |
 | `get_issue` | `getIssue` |  |
-| `get_issue_assets` | legacy client (deferred, JAS-64) |  |
+| `get_issue_assets` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
 | `get_issue_links` | `getIssue` | Select fields=issuelinks on getIssue. |
 | `get_issue_type` | `getIssueType` |  |
 | `get_issue_type_alternatives` | `getAlternativeIssueTypes` |  |
@@ -158,10 +158,10 @@ See [the wrapper decision table](wrapper-verbs.md) and
 | `get_notification_scheme` | `getNotificationScheme` |  |
 | `get_notification_scheme_projects` | `getNotificationSchemeToProjectMappings` |  |
 | `get_notification_schemes` | `getNotificationSchemes` |  |
-| `get_object_schema` | legacy client (deferred, JAS-64) |  |
-| `get_object_schemas` | legacy client (deferred, JAS-64) |  |
-| `get_object_type_attributes` | legacy client (deferred, JAS-64) |  |
-| `get_object_types` | legacy client (deferred, JAS-64) |  |
+| `get_object_schema` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
+| `get_object_schemas` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
+| `get_object_type_attributes` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
+| `get_object_types` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
 | `get_organization` | `getOrganization` |  |
 | `get_organization_users` | `getUsersInOrganization` |  |
 | `get_organizations` | `getOrganizations` |  |
@@ -236,11 +236,11 @@ See [the wrapper decision table](wrapper-verbs.md) and
 | `get_workflows` | `getWorkflowsPaginated` |  |
 | `get_worklog` | `getWorklog` |  |
 | `get_worklogs` | `getIssueWorklog` |  |
-| `has_assets_license` | legacy client (deferred, JAS-64) |  |
-| `link_asset_to_issue` | legacy client (deferred, JAS-64) |  |
-| `link_asset_to_request` | legacy client (deferred, JAS-64) |  |
+| `has_assets_license` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
+| `link_asset_to_issue` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
+| `link_asset_to_request` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
 | `link_knowledge_base_article` | `createRequestComment` | Write a public link comment; no native KB relationship is implied. |
-| `list_assets` | legacy client (deferred, JAS-64) |  |
+| `list_assets` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
 | `lookup_notification_scheme_by_name` | `getNotificationSchemes` | Page schemes, then match name. |
 | `lookup_service_desk_by_project_key` | `getServiceDesks` | Page service desks, then match projectKey. |
 | `move_issues_to_backlog` | `moveIssuesToBacklog` |  |
@@ -260,7 +260,7 @@ See [the wrapper decision table](wrapper-verbs.md) and
 | `remove_users_from_organization` | `removeUsersFromOrganization` |  |
 | `reorder_issue_types_in_scheme` | `reorderIssueTypesInIssueTypeScheme` |  |
 | `restore_project` | `restore` |  |
-| `search_assets` | legacy client (deferred, JAS-64) |  |
+| `search_assets` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
 | `search_filters` | `getFiltersPaginated` |  |
 | `search_issues` | `searchAndReconsileIssuesUsingJql` |  |
 | `search_kb_articles` | `getServiceDeskArticles` |  |
@@ -274,7 +274,7 @@ See [the wrapper decision table](wrapper-verbs.md) and
 | `suggest_kb_for_request` | `jsm kb suggest` (surviving verb) |  |
 | `transition_issue` | `doTransition` |  |
 | `transition_request` | `performCustomerTransition` |  |
-| `update_asset` | legacy client (deferred, JAS-64) |  |
+| `update_asset` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |  |
 | `update_comment` | `updateComment` |  |
 | `update_component` | `updateComponent` |  |
 | `update_filter` | `updateFilter` |  |
@@ -296,24 +296,24 @@ See [the wrapper decision table](wrapper-verbs.md) and
 
 | 1.2.0 public member | Migration disposition |
 |---|---|
-| `base_url` | legacy client (deferred, JAS-64) |
-| `close` | legacy client (deferred, JAS-64) |
-| `cloud_id` | legacy client (deferred, JAS-64) |
-| `create_rule` | legacy client (deferred, JAS-64) |
-| `create_rule_from_template` | legacy client (deferred, JAS-64) |
-| `delete` | legacy client (deferred, JAS-64) |
-| `disable_rule` | legacy client (deferred, JAS-64) |
-| `enable_rule` | legacy client (deferred, JAS-64) |
-| `get` | legacy client (deferred, JAS-64) |
-| `get_manual_rules` | legacy client (deferred, JAS-64) |
-| `get_rule` | legacy client (deferred, JAS-64) |
-| `get_rules` | legacy client (deferred, JAS-64) |
-| `get_template` | legacy client (deferred, JAS-64) |
-| `get_templates` | legacy client (deferred, JAS-64) |
-| `invoke_manual_rule` | legacy client (deferred, JAS-64) |
-| `post` | legacy client (deferred, JAS-64) |
-| `put` | legacy client (deferred, JAS-64) |
-| `search_rules` | legacy client (deferred, JAS-64) |
-| `update_rule` | legacy client (deferred, JAS-64) |
-| `update_rule_scope` | legacy client (deferred, JAS-64) |
-| `update_rule_state` | legacy client (deferred, JAS-64) |
+| `base_url` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `close` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `cloud_id` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `create_rule` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `create_rule_from_template` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `delete` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `disable_rule` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `enable_rule` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `get` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `get_manual_rules` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `get_rule` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `get_rules` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `get_template` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `get_templates` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `invoke_manual_rule` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `post` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `put` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `search_rules` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `update_rule` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `update_rule_scope` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| `update_rule_state` | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |

@@ -16,9 +16,6 @@ from click.testing import CliRunner
 from jira_as import JiraError, ValidationError
 from jira_as.cli.commands.admin_cmds import (
     SYSTEM_GROUPS,  # Formatting functions; Automation implementation functions; Group implementation functions; Notification scheme implementation functions; Permission scheme implementation functions; Screen implementation functions; Helper functions; Click commands
-    _disable_automation_rule_impl,
-    _enable_automation_rule_impl,
-    _format_automation_rules,
     _format_categories,
     _format_groups,
     _format_issue_types,
@@ -27,11 +24,8 @@ from jira_as.cli.commands.admin_cmds import (
     _format_statuses,
     _format_users,
     _format_workflows,
-    _get_automation_rule_impl,
     _is_system_group,
-    _list_automation_rules_impl,
     _parse_comma_list,
-    _toggle_automation_rule_impl,
     admin,
 )
 
@@ -48,14 +42,6 @@ def mock_client():
     # Support context manager pattern: with get_jira_client() as client:
     client.__enter__ = MagicMock(return_value=client)
     client.__exit__ = MagicMock(return_value=None)
-    return client
-
-
-@pytest.fixture
-def mock_automation_client():
-    """Create mock automation client."""
-    client = MagicMock()
-    client.close = MagicMock()
     return client
 
 
@@ -131,27 +117,6 @@ def sample_groups():
         {"name": "developers", "groupId": "group2"},
         {"name": "jira-users", "groupId": "group3"},
         {"name": "qa-team", "groupId": "group4"},
-    ]
-
-
-@pytest.fixture
-def sample_automation_rules():
-    """Sample automation rules for testing."""
-    return [
-        {
-            "id": "1",
-            "name": "Auto-assign bugs",
-            "state": "ENABLED",
-            "projects": [{"projectId": "10001", "projectName": "Test Project"}],
-            "trigger": {"type": "issue.created"},
-        },
-        {
-            "id": "2",
-            "name": "Close stale issues",
-            "state": "DISABLED",
-            "projects": [],
-            "trigger": {"type": "scheduled"},
-        },
     ]
 
 
@@ -336,75 +301,6 @@ class TestHelperFunctions:
 # =============================================================================
 
 
-class TestAutomationImplementation:
-    """Tests for automation implementation functions."""
-
-    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
-    def test_list_automation_rules_impl(
-        self, mock_get_client, mock_automation_client, sample_automation_rules
-    ):
-        """Test listing automation rules."""
-        mock_get_client.return_value = mock_automation_client
-        mock_automation_client.get_rules.return_value = {
-            "values": sample_automation_rules,
-            "hasMore": False,
-        }
-
-        result = _list_automation_rules_impl()
-
-        assert len(result) == 2
-        # Note: automation client doesn't call close()
-
-    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
-    def test_get_automation_rule_impl(self, mock_get_client, mock_automation_client):
-        """Test getting an automation rule."""
-        mock_get_client.return_value = mock_automation_client
-        rule = {"id": "1", "name": "Test Rule"}
-        mock_automation_client.get_rule.return_value = rule
-
-        result = _get_automation_rule_impl("1")
-
-        assert result == rule
-
-    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
-    def test_enable_automation_rule_impl(self, mock_get_client, mock_automation_client):
-        """Test enabling an automation rule."""
-        mock_get_client.return_value = mock_automation_client
-        rule = {"id": "1", "state": "ENABLED"}
-        mock_automation_client.enable_rule.return_value = rule
-
-        result = _enable_automation_rule_impl("1")
-
-        assert result == rule
-
-    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
-    def test_disable_automation_rule_impl(
-        self, mock_get_client, mock_automation_client
-    ):
-        """Test disabling an automation rule."""
-        mock_get_client.return_value = mock_automation_client
-        rule = {"id": "1", "state": "DISABLED"}
-        mock_automation_client.disable_rule.return_value = rule
-
-        result = _disable_automation_rule_impl("1")
-
-        assert result == rule
-
-    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
-    def test_toggle_automation_rule_impl(self, mock_get_client, mock_automation_client):
-        """Test toggling an automation rule."""
-        mock_get_client.return_value = mock_automation_client
-        mock_automation_client.get_rule.return_value = {"id": "1", "state": "ENABLED"}
-        mock_automation_client.disable_rule.return_value = {
-            "id": "1",
-            "state": "DISABLED",
-        }
-
-        _toggle_automation_rule_impl("1")
-
-        mock_automation_client.disable_rule.assert_called_once()
-
-
 # =============================================================================
 # Test Permission Scheme Implementation Functions
 # =============================================================================
@@ -478,13 +374,6 @@ class TestFormattingFunctions:
         assert "jira-administrators" in result
         assert "jira-users" in result
 
-    def test_format_automation_rules(self, sample_automation_rules):
-        """Test formatting automation rules."""
-        result = _format_automation_rules(sample_automation_rules)
-
-        assert "Auto-assign bugs" in result
-        assert "ENABLED" in result or "enabled" in result.lower()
-
     def test_format_permission_schemes(self, sample_permission_schemes):
         """Test formatting permission schemes."""
         result = _format_permission_schemes(sample_permission_schemes)
@@ -541,45 +430,6 @@ class TestFormattingFunctions:
 # =============================================================================
 # Test CLI Commands - Automation
 # =============================================================================
-
-
-class TestAutomationCLI:
-    """Tests for automation CLI commands."""
-
-    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
-    def test_automation_list_command(
-        self,
-        mock_get_client,
-        mock_automation_client,
-        sample_automation_rules,
-        cli_runner,
-    ):
-        """Test automation list command."""
-        mock_get_client.return_value = mock_automation_client
-        mock_automation_client.get_rules.return_value = {
-            "values": sample_automation_rules,
-            "hasMore": False,
-        }
-
-        result = cli_runner.invoke(admin, ["automation", "list"])
-
-        assert result.exit_code == 0
-        assert "Auto-assign bugs" in result.output
-
-    @patch("jira_as.cli.commands.admin_cmds.get_automation_client")
-    def test_automation_enable_command(
-        self, mock_get_client, mock_automation_client, cli_runner
-    ):
-        """Test automation enable command."""
-        mock_get_client.return_value = mock_automation_client
-        mock_automation_client.enable_rule.return_value = {
-            "id": "1",
-            "state": "ENABLED",
-        }
-
-        result = cli_runner.invoke(admin, ["automation", "enable", "1"])
-
-        assert result.exit_code == 0
 
 
 # =============================================================================

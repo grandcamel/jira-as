@@ -9,14 +9,13 @@ This module provides CLI commands for JSM operations including:
 - SLA tracking and reporting
 - Approval workflows
 - Knowledge Base articles
-- Asset/CMDB management (requires JSM Premium)
+- Migration hints for retired Asset/CMDB commands
 """
 
 from __future__ import annotations
 
 import csv
 import json
-import sys
 from datetime import datetime
 from io import StringIO
 from typing import TYPE_CHECKING, Any
@@ -38,6 +37,7 @@ from jira_as import (
 )
 
 from ..cli_utils import handle_jira_errors
+from ..legacy import register_retired
 
 # =============================================================================
 # Helper Functions
@@ -47,19 +47,6 @@ from ..cli_utils import handle_jira_errors
 def _parse_comma_list(value: str) -> list[str]:
     """Parse comma-separated values into a list."""
     return [v.strip() for v in value.split(",") if v.strip()]
-
-
-def _parse_attributes(attr_list: list[str]) -> dict[str, str]:
-    """Parse attribute list (name=value format) into dict."""
-    attributes = {}
-    for attr_str in attr_list:
-        if "=" not in attr_str:
-            raise ValueError(
-                f"Invalid attribute format: {attr_str}. Expected: name=value"
-            )
-        name, value = attr_str.split("=", 1)
-        attributes[name.strip()] = value.strip()
-    return attributes
 
 
 def _format_datetime(dt_str: str) -> str:
@@ -1640,191 +1627,6 @@ def _format_kb_article(article: dict[str, Any]) -> str:
 
 
 # =============================================================================
-# Asset Implementation Functions (JSM Premium)
-# =============================================================================
-
-
-def _check_assets_license(client) -> None:
-    """Check if Assets license is available."""
-    if not client.has_assets_license():
-        click.echo(
-            "ERROR: Assets/Insight not available. Requires JSM Premium license.",
-            err=True,
-        )
-        sys.exit(1)
-
-
-def _list_assets_impl(
-    object_type: str | None = None,
-    iql: str | None = None,
-    max_results: int = 100,
-    client: "JiraClient | None" = None,
-) -> list[dict[str, Any]]:
-    """List assets with optional filtering."""
-
-    def _do_work(c: "JiraClient") -> list[dict[str, Any]]:
-        _check_assets_license(c)
-        return c.list_assets(object_type, iql, max_results)
-
-    if client is not None:
-        return _do_work(client)
-
-    with get_jira_client() as c:
-        return _do_work(c)
-
-
-def _get_asset_impl(
-    asset_id: int,
-    client: "JiraClient | None" = None,
-) -> dict[str, Any]:
-    """Get asset details."""
-
-    def _do_work(c: "JiraClient") -> dict[str, Any]:
-        _check_assets_license(c)
-        return c.get_asset(asset_id)
-
-    if client is not None:
-        return _do_work(client)
-
-    with get_jira_client() as c:
-        return _do_work(c)
-
-
-def _create_asset_impl(
-    object_type_id: int,
-    attributes: dict[str, str],
-    dry_run: bool = False,
-    client: "JiraClient | None" = None,
-) -> dict[str, Any] | None:
-    """Create a new asset."""
-
-    def _do_work(c: "JiraClient") -> dict[str, Any] | None:
-        _check_assets_license(c)
-
-        if dry_run:
-            return None
-
-        return c.create_asset(object_type_id, attributes)
-
-    if client is not None:
-        return _do_work(client)
-
-    with get_jira_client() as c:
-        return _do_work(c)
-
-
-def _update_asset_impl(
-    asset_id: int,
-    attributes: dict[str, str],
-    client: "JiraClient | None" = None,
-) -> dict[str, Any]:
-    """Update an asset."""
-
-    def _do_work(c: "JiraClient") -> dict[str, Any]:
-        _check_assets_license(c)
-        return c.update_asset(asset_id, attributes)
-
-    if client is not None:
-        return _do_work(client)
-
-    with get_jira_client() as c:
-        return _do_work(c)
-
-
-def _link_asset_impl(
-    asset_id: int,
-    issue_key: str,
-    comment: str | None = None,
-    client: "JiraClient | None" = None,
-) -> None:
-    """Link an asset to an issue."""
-
-    def _do_work(c: "JiraClient") -> None:
-        _check_assets_license(c)
-        c.link_asset_to_request(asset_id, issue_key)
-
-        if comment:
-            c.add_request_comment(issue_key, comment, public=False)
-
-    if client is not None:
-        _do_work(client)
-        return
-
-    with get_jira_client() as c:
-        _do_work(c)
-
-
-def _find_affected_assets_impl(
-    issue_key: str,
-    client: "JiraClient | None" = None,
-) -> list[dict[str, Any]]:
-    """Find assets affected by an issue."""
-
-    def _do_work(c: "JiraClient") -> list[dict[str, Any]]:
-        _check_assets_license(c)
-        response = c.find_affected_assets(issue_key)
-        return response.get("values", [])
-
-    if client is not None:
-        return _do_work(client)
-
-    with get_jira_client() as c:
-        return _do_work(c)
-
-
-def _format_assets(assets: list[dict[str, Any]]) -> str:
-    """Format assets as text."""
-    if not assets:
-        return "No assets found matching criteria."
-
-    lines = [f"Assets ({len(assets)} total):", ""]
-
-    for asset in assets:
-        lines.append(f"Key: {asset.get('objectKey', 'N/A')}")
-        lines.append(f"Label: {asset.get('label', 'N/A')}")
-
-        if "objectType" in asset:
-            lines.append(f"Type: {asset['objectType'].get('name', 'N/A')}")
-
-        if "attributes" in asset:
-            for attr in asset["attributes"][:3]:
-                attr_name = attr.get("objectTypeAttribute", {}).get("name", "Unknown")
-                values = attr.get("objectAttributeValues", [])
-                if values:
-                    attr_value = values[0].get("value", "N/A")
-                    lines.append(f"  {attr_name}: {attr_value}")
-
-        lines.append("")
-
-    return "\n".join(lines)
-
-
-def _format_asset(asset: dict[str, Any]) -> str:
-    """Format a single asset as text."""
-    lines = [
-        f"Asset: {asset.get('objectKey', 'N/A')} ({asset.get('label', 'N/A')})",
-        "",
-    ]
-
-    if "objectType" in asset:
-        lines.append(f"Object Type: {asset['objectType'].get('name', 'N/A')}")
-
-    if "attributes" in asset:
-        lines.append("\nAttributes:")
-        for attr in asset["attributes"]:
-            attr_name = attr.get("objectTypeAttribute", {}).get("name", "Unknown")
-            values = attr.get("objectAttributeValues", [])
-            if values:
-                attr_value = values[0].get("value", "N/A")
-                lines.append(f"  {attr_name}: {attr_value}")
-
-    if "_links" in asset and "self" in asset["_links"]:
-        lines.append(f"\nURL: {asset['_links']['self']}")
-
-    return "\n".join(lines)
-
-
-# =============================================================================
 # CLI Commands
 # =============================================================================
 
@@ -3089,142 +2891,19 @@ def kb_suggest(ctx, issue_key, max_results, output, transport):
 
 
 # -----------------------------------------------------------------------------
-# Asset Commands (JSM Premium)
+# Retired Asset Commands
 # -----------------------------------------------------------------------------
 
 
-@jsm.group()
-def asset():
-    """Manage Assets/CMDB (requires JSM Premium)."""
-    pass
-
-
-@asset.command(name="list")
-@click.option("--type", "-t", "object_type", help="Object type name filter")
-@click.option("--iql", "-i", help="IQL query string for filtering")
-@click.option("--max-results", "-m", type=int, default=100, help="Maximum results")
-@click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
-@click.pass_context
-@handle_jira_errors
-def asset_list(ctx, object_type: str, iql: str, max_results: int, output: str):
-    """List assets."""
-    result = _list_assets_impl(object_type, iql, max_results)
-
-    if output == "json":
-        click.echo(json.dumps(result, indent=2))
-    else:
-        click.echo(_format_assets(result))
-
-
-@asset.command(name="get")
-@click.option("--id", "asset_id", type=int, required=True, help="Asset object ID")
-@click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
-@click.pass_context
-@handle_jira_errors
-def asset_get(ctx, asset_id: int, output: str):
-    """Get asset details."""
-    result = _get_asset_impl(asset_id)
-
-    if output == "json":
-        click.echo(format_json(result))
-    else:
-        click.echo(_format_asset(result))
-
-
-@asset.command(name="create")
-@click.option("--type-id", type=int, required=True, help="Object type ID")
-@click.option(
-    "--attr",
-    multiple=True,
-    required=True,
-    help="Attribute in format name=value (can use multiple times)",
+register_retired(
+    jsm,
+    [
+        "asset list",
+        "asset get",
+        "asset create",
+        "asset update",
+        "asset link",
+        "asset find-affected",
+    ],
+    "retired at 2.0.0; no indexed replacement — JAS-64, decision 34",
 )
-@click.option("--dry-run", is_flag=True, help="Show what would be created")
-@click.pass_context
-@handle_jira_errors
-def asset_create(ctx, type_id: int, attr: tuple, dry_run: bool):
-    """Create a new asset."""
-    if type_id <= 0:
-        print_error(f"--type-id must be a positive integer, got {type_id}")
-        ctx.exit(1)
-
-    try:
-        attributes = _parse_attributes(list(attr))
-    except ValueError as e:
-        print_error(str(e))
-        ctx.exit(1)
-
-    if dry_run:
-        click.echo("DRY RUN: Would create asset with:")
-        click.echo(f"  Object Type ID: {type_id}")
-        click.echo(f"  Attributes: {json.dumps(attributes, indent=4)}")
-        return
-
-    result = _create_asset_impl(type_id, attributes)
-
-    if result:
-        print_success("Asset created successfully!")
-        click.echo(f"Asset ID: {result.get('id')}")
-        click.echo(f"Asset Key: {result.get('objectKey')}")
-
-
-@asset.command(name="update")
-@click.argument("asset_id", type=int)
-@click.option(
-    "--attr",
-    multiple=True,
-    required=True,
-    help="Attribute in format name=value (can use multiple times)",
-)
-@click.option("--dry-run", is_flag=True, help="Show what would be updated")
-@click.pass_context
-@handle_jira_errors
-def asset_update(ctx, asset_id: int, attr: tuple, dry_run: bool):
-    """Update an asset."""
-    try:
-        attributes = _parse_attributes(list(attr))
-    except ValueError as e:
-        print_error(str(e))
-        ctx.exit(1)
-
-    if dry_run:
-        click.echo("DRY RUN: Would update asset with:")
-        click.echo(f"  Asset ID: {asset_id}")
-        click.echo(f"  Attributes: {json.dumps(attributes, indent=4)}")
-        return
-
-    result = _update_asset_impl(asset_id, attributes)
-
-    print_success("Asset updated successfully!")
-    click.echo(f"Asset Key: {result.get('objectKey')}")
-
-
-@asset.command(name="link")
-@click.option("--request", "-r", required=True, help="Request issue key")
-@click.option("--asset-id", type=int, required=True, help="Asset object ID")
-@click.option("--comment", "-c", help="Optional comment about the link")
-@click.pass_context
-@handle_jira_errors
-def asset_link(ctx, request: str, asset_id: int, comment: str):
-    """Link an asset to a request."""
-    _link_asset_impl(asset_id, request, comment)
-    print_success(f"Asset {asset_id} linked to {request} successfully!")
-
-
-@asset.command(name="find-affected")
-@click.argument("issue_key")
-@click.option("--output", "-o", type=click.Choice(["text", "json"]), default="text")
-@click.pass_context
-@handle_jira_errors
-def asset_find_affected(ctx, issue_key: str, output: str):
-    """Find assets affected by an issue."""
-    result = _find_affected_assets_impl(issue_key)
-
-    if output == "json":
-        click.echo(json.dumps(result, indent=2))
-    else:
-        if not result:
-            click.echo(f"No assets found affected by {issue_key}")
-        else:
-            click.echo(f"Assets affected by {issue_key}:\n")
-            click.echo(_format_assets(result))

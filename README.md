@@ -296,8 +296,9 @@ settings-free. See [project scope details](docs/allowed-projects.md#generic-surf
 
 JAS-49 retains 35 wrappers that need a workflow, local transform, cache, or
 autocomplete affordance; 14 compatibility verbs retain their 1.x names. The
-remaining 143 wrappers are migration hints: invoking one performs no transport,
-prints the indexed replacement, and exits 2; `--help` exits 0. Use `help
+remaining 159 wrappers are migration hints: invoking one performs no transport
+and exits 2; `--help` exits 0. Of these, 143 name an indexed replacement and
+16 report retirement with no indexed replacement (JAS-64, decision 34). Use `help
 migration` or [the wrapper table](docs/wrapper-verbs.md) for the complete map.
 
 The survivor groups are bulk, lifecycle, fields, ops, relationships, search,
@@ -307,8 +308,8 @@ explicitly converts Markdown to ADF; a warm textarea-field cache enables the
 same conversion automatically. Stateful simulation exercises supported survivor
 workflows without HTTP.
 
-Sixteen commands remain on the legacy client pending JAS-64: admin automation
-and automation-template, `dev get-commits`, and JSM asset commands. Jira
+At 2.0.0, JAS-64 decision 34 retires admin automation and automation-template,
+`dev get-commits`, and JSM asset commands; no commands remain deferred. Jira
 attachment multipart/binary transport and generic risk enrichment remain pending
 JAS-65; their migration hints do not claim those capabilities are available.
 

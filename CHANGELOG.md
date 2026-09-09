@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- JAS-77: resolve the socket subprocess test's `jira-as` binary beside the running interpreter or on PATH, skipping with a clear reason when neither location provides it.
+
+### Removed
+
+- JAS-76 / JAS-64, decision 34: retire the sixteen Automation, Assets and
+  dev-status verbs at 2.0.0. Each remains a request-free migration shim that
+  exits 2; `--help` exits 0. There is no indexed replacement.
+
+| Retired verb | Migration disposition |
+|---|---|
+| `admin automation list` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `admin automation get` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `admin automation search` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `admin automation enable` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `admin automation disable` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `admin automation toggle` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `admin automation invoke` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `admin automation-template list` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `admin automation-template get` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `dev get-commits` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `jsm asset list` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `jsm asset get` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `jsm asset create` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `jsm asset update` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `jsm asset link` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+| `jsm asset find-affected` | `note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34` |
+
 ### Added
 
 - JAS-52: Split Mode adds same-build `jira-as serve` and credential-free socket clients, authoritative validation/scope binding and private call logs; engine `fake_sidecar` tests use the same Responder seam. Binary downloads/output and multipart uploads are explicitly unsupported.

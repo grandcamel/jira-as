@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/client-methods-1.2.0.json"
 OUTPUT = ROOT / "docs/client-method-mapping.md"
-DEFERRED = "legacy client (deferred, JAS-64)"
+RETIRED = "note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34"
 
 # Indexed operationIds, surviving verbs, or an explicit absence/lifecycle note.
 TARGETS: dict[str, str] = {
@@ -154,13 +154,13 @@ TARGETS: dict[str, str] = {
     "search_kb_articles": "getServiceDeskArticles",
     "get_kb_article": "viewArticle",
     "suggest_kb_for_request": "verb: jsm kb suggest",
-    "has_assets_license": "legacy client (deferred, JAS-64)",
-    "list_assets": "legacy client (deferred, JAS-64)",
-    "get_asset": "legacy client (deferred, JAS-64)",
-    "create_asset": "legacy client (deferred, JAS-64)",
-    "update_asset": "legacy client (deferred, JAS-64)",
-    "link_asset_to_request": "legacy client (deferred, JAS-64)",
-    "find_assets_by_criteria": "legacy client (deferred, JAS-64)",
+    "has_assets_license": RETIRED,
+    "list_assets": RETIRED,
+    "get_asset": RETIRED,
+    "create_asset": RETIRED,
+    "update_asset": RETIRED,
+    "link_asset_to_request": RETIRED,
+    "find_assets_by_criteria": RETIRED,
     "get_service_desk_organizations": "getServiceDeskOrganizations",
     "add_organization_to_service_desk": "addOrganization",
     "remove_organization_from_service_desk": "removeOrganization",
@@ -175,15 +175,15 @@ TARGETS: dict[str, str] = {
     "get_knowledge_base_spaces": "note: No indexed equivalent for the legacy knowledgebase/category route; no replacement verb.",
     "link_knowledge_base_article": "createRequestComment",
     "attach_article_as_solution": "createRequestComment",
-    "get_object_schemas": "legacy client (deferred, JAS-64)",
-    "get_object_schema": "legacy client (deferred, JAS-64)",
-    "get_object_types": "legacy client (deferred, JAS-64)",
-    "get_object_type_attributes": "legacy client (deferred, JAS-64)",
-    "search_assets": "legacy client (deferred, JAS-64)",
-    "delete_asset": "legacy client (deferred, JAS-64)",
-    "get_issue_assets": "legacy client (deferred, JAS-64)",
-    "link_asset_to_issue": "legacy client (deferred, JAS-64)",
-    "find_affected_assets": "legacy client (deferred, JAS-64)",
+    "get_object_schemas": RETIRED,
+    "get_object_schema": RETIRED,
+    "get_object_types": RETIRED,
+    "get_object_type_attributes": RETIRED,
+    "search_assets": RETIRED,
+    "delete_asset": RETIRED,
+    "get_issue_assets": RETIRED,
+    "link_asset_to_issue": RETIRED,
+    "find_affected_assets": RETIRED,
     "get_workflows": "getWorkflowsPaginated",
     "search_workflows": "getWorkflowsPaginated",
     "get_workflow_bulk": "readWorkflows",
@@ -369,10 +369,10 @@ def render(inventory: dict) -> str:
         "where needed. Destructive operations preview until `--confirm`. Indexed",
         "operations with unsupported request media remain unavailable through api call.",
         "",
-        "The rc retains legacy modules for the 16 deferred CLI verbs pending JAS-64",
-        "and their existing helper/export/test dependencies. Assets and Automation",
-        "remain on that legacy path. Low-level transport helpers and two absent API",
-        "capabilities have explicit notes rather than fabricated operation targets.",
+        "JAS-64 decision 34 retires the sixteen Automation, Assets and dev-status CLI",
+        "verbs at 2.0.0 with no indexed replacement. Legacy Python modules remain",
+        "for existing helper/export/test dependencies; their retention does not make",
+        "the retired CLI verbs available. Absent capabilities have explicit notes.",
         "",
         "See [the wrapper decision table](wrapper-verbs.md) and",
         "[the Compatibility Contract](compatibility-contract.md) for the supported CLI guarantees.",
@@ -388,7 +388,7 @@ def render(inventory: dict) -> str:
             target = f"`{target[6:]}` (surviving verb)"
         elif target.startswith("note: "):
             target = target[6:]
-        elif target != DEFERRED:
+        else:
             target = ", ".join(f"`{op.strip()}`" for op in target.split(","))
         lines.append(f"| `{name}` | {target} | {NOTES.get(name, '')} |")
     lines.extend(
@@ -400,7 +400,9 @@ def render(inventory: dict) -> str:
             "|---|---|",
         ]
     )
-    lines.extend(f"| `{name}` | {DEFERRED} |" for name in inventory["AutomationClient"])
+    lines.extend(
+        f"| `{name}` | {RETIRED[6:]} |" for name in inventory["AutomationClient"]
+    )
     return "\n".join(lines) + "\n"
 
 

@@ -1,6 +1,6 @@
 # Wrapper verbs and migration
 
-Decision 21 accepts 208 original verbs: **35 survivors, 143 dropped, 14 contract, 16 deferred**. Source: `tests/wrapper_verbs.json`. Deferred legacy commands and their guards remain unchanged pending JAS-64. Jira attachment transport and generic risk enrichment remain pending JAS-65.
+Decisions 21 and 34 classify 208 original verbs: **35 survivors, 159 dropped, 14 contract, 0 deferred**. Source: `tests/wrapper_verbs.json`. JAS-64 decision 34 retires the sixteen Automation, Assets and dev-status verbs at 2.0.0 with no indexed replacement. Jira attachment transport and generic risk enrichment remain pending JAS-65.
 
 | Verb | Class | Decision | Reason | Replacement / operations |
 |---|---|---|---|---|
@@ -23,15 +23,15 @@ Decision 21 accepts 208 original verbs: **35 survivors, 143 dropped, 14 contract
 | admin group delete | A | dropped | Single indexed operation or prerequisite-only chain; use the generic surface. | api call removeGroup |
 | admin group add-user | A | dropped | Single indexed operation or prerequisite-only chain; use the generic surface. | api call addUserToGroup --body @body.json |
 | admin group remove-user | A | dropped | Single indexed operation or prerequisite-only chain; use the generic surface. | api call removeUserFromGroup --accountId ACCOUNT_ID |
-| admin automation list | A | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
-| admin automation get | A | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
-| admin automation search | A | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
-| admin automation enable | A | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
-| admin automation disable | A | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
-| admin automation toggle | B | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
-| admin automation invoke | A | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
-| admin automation-template list | A | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
-| admin automation-template get | A | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
+| admin automation list | A | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| admin automation get | A | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| admin automation search | A | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| admin automation enable | A | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| admin automation disable | A | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| admin automation toggle | B | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| admin automation invoke | A | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| admin automation-template list | A | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| admin automation-template get | A | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
 | admin permission-scheme list | A | dropped | Single indexed operation or prerequisite-only chain; use the generic surface. | api call getAllPermissionSchemes |
 | admin permission-scheme get | A | dropped | Single indexed operation or prerequisite-only chain; use the generic surface. | api call getPermissionScheme --schemeId SCHEME_ID |
 | admin permission-scheme create | A | dropped | Single indexed operation or prerequisite-only chain; use the generic surface. | api call createPermissionScheme --body @body.json |
@@ -105,7 +105,7 @@ Decision 21 accepts 208 original verbs: **35 survivors, 143 dropped, 14 contract
 | dev parse-commits | D | survivor | Rule: Local commit-message parsing workflow not expressed by an API operation or tag. | Local-only / deferred |
 | dev link-commit | C | dropped | Single indexed operation or prerequisite-only chain; use the generic surface. | api call storeDevelopmentInformation --Authorization AUTHORIZATION --body @body.json |
 | dev link-pr | C | dropped | Single indexed operation or prerequisite-only chain; use the generic surface. | api call storeDevelopmentInformation --Authorization AUTHORIZATION --body @body.json |
-| dev get-commits | B | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
+| dev get-commits | B | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
 | fields list | A | survivor | Rule: Instance metadata/cache affordance: read fields cache only; report cold cache; explicit fields cache warm performs bounded getFields. | getFields |
 | fields create | A | dropped | Single indexed operation or prerequisite-only chain; use the generic surface. | api call createCustomField --body @body.json |
 | fields check-project | E | dropped | Single indexed operation or prerequisite-only chain; use the generic surface. | api call getCreateIssueMetaIssueTypeId --projectIdOrKey PROJECT_KEY --issueTypeId ISSUE_TYPE_ID |
@@ -156,12 +156,12 @@ Decision 21 accepts 208 original verbs: **35 survivors, 143 dropped, 14 contract
 | jsm kb search | A | dropped | Single indexed operation or prerequisite-only chain; use the generic surface. | api call getServiceDeskArticles --serviceDeskId SERVICE_DESK_ID --query QUERY |
 | jsm kb get | A | dropped | The id is the article's Confluence page id; use the indexed article view operation. | api call viewArticle --pageId PAGE_ID |
 | jsm kb suggest | A | survivor | Rule: Read keyed request; extract its service desk and summary field; choose keywords or report none; query desk articles. | getCustomerRequestByIdOrKey, getServiceDeskArticles |
-| jsm asset list | B | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
-| jsm asset get | B | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
-| jsm asset create | B | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
-| jsm asset update | B | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
-| jsm asset link | B | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
-| jsm asset find-affected | B | deferred | Deferred pending JAS-64. Retain the legacy command/client/1.x guard and tests unchanged; no matching operation in the pinned indexes. | Local-only / deferred |
+| jsm asset list | B | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| jsm asset get | B | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| jsm asset create | B | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| jsm asset update | B | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| jsm asset link | B | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
+| jsm asset find-affected | B | dropped | retired at 2.0.0; no indexed replacement — JAS-64, decision 34 | note: retired at 2.0.0; no indexed replacement — JAS-64, decision 34 |
 | lifecycle transition | B | contract | JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior. | getIssue, getTransitions, doTransition, addComment, moveIssuesToSprintAndRank |
 | lifecycle transitions | A | contract | JAS-48 immutable compatibility verb; keep its callback, flags, output, and generic adapter behavior. | getTransitions |
 | lifecycle assign | B | dropped | Single indexed operation or prerequisite-only chain; use the generic surface. | api call assignIssue --issueIdOrKey ISSUE_KEY --body @body.json |
