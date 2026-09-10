@@ -29,3 +29,5 @@ survivor workflows. Cassette uses `JIRA_AS_CASSETTE`.
 
 Risk-tagged calls preview by default; `--confirm` sends. Attachment transport and
 generic risk enrichment remain pending JAS-65.
+
+Workflows (jira-as 2.0.0rc1, catalog r1, indexed-read-v1): Start: workflows search "task" --format json; workflows describe ID includes a run example.

@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "product": "jira-as",
+  "product_version": "2.0.0rc1",
+  "revision": 1,
+  "workflows": [
+    {
+      "id": "list-projects",
+      "revision": 1,
+      "requires": ["indexed-read-v1"],
+      "title": "List visible Jira projects",
+      "purpose": "Find project IDs, keys and names visible to the current account, one bounded page at a time.",
+      "search_terms": ["projects", "available", "containers", "see", "access"],
+      "inputs": {
+        "limit": {"type": "integer", "default": 25, "minimum": 1, "maximum": 100},
+        "offset": {"type": "integer", "default": 0, "minimum": 0, "maximum": 9223372036854775807}
+      },
+      "prerequisites": ["Current credentials and site-operation permission; a project allowlist alone does not permit this site read."],
+      "binding": {
+        "kind": "indexed-read",
+        "document": "platform",
+        "operation_id": "searchProjects",
+        "method": "GET",
+        "path": "/rest/api/3/project/search",
+        "fixed_parameters": {"orderBy": "key", "action": "view"},
+        "input_parameters": {"limit": "maxResults", "offset": "startAt"},
+        "parameter_schemas": {
+          "startAt": {"in": "query", "schema": {"default": 0, "format": "int64", "type": "integer"}},
+          "maxResults": {"in": "query", "schema": {"default": 50, "format": "int32", "maximum": 100, "type": "integer"}},
+          "orderBy": {
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["category", "-category", "+category", "key", "-key", "+key", "name", "-name", "+name", "owner", "-owner", "+owner", "issueCount", "-issueCount", "+issueCount", "lastIssueUpdatedDate", "-lastIssueUpdatedDate", "+lastIssueUpdatedDate", "archivedDate", "+archivedDate", "-archivedDate", "deletedDate", "+deletedDate", "-deletedDate"]
+            }
+          },
+          "action": {"in": "query", "schema": {"type": "string", "enum": ["view", "browse", "edit", "create"]}}
+        },
+        "scope": {"in": "site"}
+      },
+      "projection": {
+        "id": "/id",
+        "key": "/key",
+        "name": "/name",
+        "canonical_url": {"pointer": "/self", "path": "/rest/api/3/project/{identity}"}
+      },
+      "paging": {
+        "tag": {
+          "style": "offset/limit",
+          "itemsPath": "/values",
+          "request": {
+            "offset": {"in": "query", "name": "startAt"},
+            "limit": {"in": "query", "name": "maxResults"}
+          },
+          "response": {"totalPath": "/total"}
+        },
+        "evidence": {"offset": "/startAt", "limit": "/maxResults", "total": "/total", "is_last": "/isLast"}
+      },
+      "examples": [
+        {"kind": "invocation", "value": "jira-as workflows run list-projects"},
+        {"kind": "invocation", "value": "jira-as workflows run list-projects --limit 2 --offset 0 --format json"},
+        {"kind": "json", "value": "{\"limit\":25,\"offset\":0}"}
+      ]
+    }
+  ]
+}

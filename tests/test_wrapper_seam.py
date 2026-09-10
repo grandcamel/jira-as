@@ -38,7 +38,17 @@ ALIASES = {
     "collaborate comments update": "collaborate comment update",
     "search jql": "search query",
 }
-NON_LEGACY_COMMANDS = {"api call", "api describe", "api search", "api topics", "help"}
+NON_LEGACY_COMMANDS = {
+    "api call",
+    "api describe",
+    "api search",
+    "api topics",
+    "help",
+    "workflows list",
+    "workflows search",
+    "workflows describe",
+    "workflows run",
+}
 NEW_COMMANDS = {"fields get", "fields cache warm"}
 LOCAL_SURVIVORS = {
     "dev parse-commits",

@@ -21,8 +21,14 @@ from as_engine.index import OperationIndex
 
 
 def surface_map() -> dict[str, Any]:
+    from jira_as.cli.commands.workflows_cmds import workflow_hint
+
     template = Path(__file__).parents[2] / "help_level0.md"
-    return level0(template.read_text(encoding="utf-8"))
+    value = level0(template.read_text(encoding="utf-8"))
+    hint = workflow_hint()
+    if hint is not None:
+        value["sections"].append({"text": hint})
+    return value
 
 
 def _groups(
@@ -67,6 +73,44 @@ def help_command(
         subject = "api"
     if subject is None:
         value = surface_map()
+    elif subject == "workflows":
+        from jira_as.cli.commands.workflows_cmds import workflow_hint
+
+        root = ctx.find_root().command
+        assert isinstance(root, click.Group)
+        sections: list[dict[str, Any]] = [
+            {
+                "text": workflow_hint()
+                or "Workflow capability unavailable; workflows list reports package compatibility."
+            }
+        ]
+        if examples:
+            sections.append(
+                {
+                    "examples": [
+                        {"kind": "invocation", "value": "jira-as workflows list"},
+                        {
+                            "kind": "invocation",
+                            "value": 'jira-as workflows search "What Jira projects can I see?"',
+                        },
+                    ]
+                }
+            )
+        else:
+            sections.append(
+                {
+                    "items": [
+                        f"`{name}`: {summary}"
+                        for name, summary in _groups(root, ctx, subject)[subject]
+                    ]
+                }
+            )
+        sections.append(
+            {
+                "text": "Use workflows describe WORKFLOW --examples for installed task examples. Discovery does not check account availability."
+            }
+        )
+        value = document(3 if examples else 1, "workflows", sections)
     else:
         from jira_as.engine import create_surface
 
@@ -157,10 +201,11 @@ class HelpGroup(click.Group):
     """Resolve wrapper help before running any configuration or command callbacks."""
 
     def parse_args(self, ctx: click.Context, args: list[str]) -> list[str]:
-        # API owns its dynamic operation flags. Standard root/group help stays Click.
+        # API and workflows own their help/example flags. Other wrappers use
+        # the common help document interception below.
         if (
             args
-            and args[0] not in {"api", "help"}
+            and args[0] not in {"api", "help", "workflows"}
             and ("--help" in args or "--examples" in args)
         ):
             command: click.Command = self

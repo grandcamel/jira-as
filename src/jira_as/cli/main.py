@@ -35,6 +35,7 @@ class LazyGroups(HelpGroup):
         "api": ("api_cmds", "api"),
         "serve": ("serve_cmds", "serve"),
         "help": ("help_cmds", "help_command"),
+        "workflows": ("workflows_cmds", "workflows"),
     }
 
     migration_groups = {
@@ -53,6 +54,21 @@ class LazyGroups(HelpGroup):
     def list_commands(self, ctx):
         return sorted(set(self.modules) | self.migration_groups | set(self.commands))
 
+    def format_help_text(self, ctx, formatter):
+        from jira_as.cli.commands.workflows_cmds import workflow_hint
+
+        super().format_help_text(ctx, formatter)
+        hint = workflow_hint()
+        if hint is not None:
+            formatter.write_paragraph()
+            formatter.write_text(
+                "For user tasks, first check supported workflows. "
+                "Search your request below, then describe a matching ID "
+                "for its run command."
+            )
+            formatter.write_paragraph()
+            formatter.write_text(hint)
+
     def get_command(self, ctx, name):
         if name in self.commands:
             return self.commands[name]
@@ -70,7 +86,7 @@ class LazyGroups(HelpGroup):
             from jira_as.cli.legacy import MigrationGroup
 
             command = MigrationGroup(name, help="Legacy migration hints.")
-        if name not in {"api", "help"}:
+        if name not in {"api", "help", "workflows"}:
             from as_engine.index import ProductIndexes
 
             from jira_as.cli.legacy import records, register
