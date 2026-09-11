@@ -57,6 +57,7 @@ keyring = [
 dev = [
     "oas-patch>=0.6.0,<0.7",  # Independent Overlay applier cross-check (tests only)
     "jsonschema>=4.18",  # Enrichment example validation (tests only)
+    "mcp==2.2.0",  # Required workflow MCP tests
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "responses>=0.24.0",
