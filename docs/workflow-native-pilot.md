@@ -5,28 +5,100 @@ script. Only `list-projects` can execute, through the existing CLI parser,
 configuration manager, indexed GET binding and Surface guards. Search and describe
 help select that task; they do not authorize access or execute examples.
 
-**Native activation is blocked.** As of the 2026-09-11 source charge, no approved
-current route delivers the required account identity, explicit project policy and
-site-read permission to this adapter. The existing Grand Camel development broker
-is SBX-scoped and is not an authorization route for account-visible project
-listing. No successful fixture test grants access or removes this prerequisite.
+**Native activation is blocked.** The core adapter and Jira integration have
+passed local source, package and both-checkout validation. The Principal approved
+the separate six-file host-route implementation and offline tests on 2026-09-11
+(Decision A). The amended host source passed independent source review and its
+named offline selection: 56 host tests passed in a fresh run; 118 broker checks
+were explicitly reused with unchanged inputs. The successful host run completed
+its canonical wrapper and released its reservation with source/artifact/runtime
+parity. Prior failed runs remain recorded. Earlier installed Python 3.10 and 3.11
+nine-case receipts remain historical evidence with unchanged dependency reviews.
+Full-repository acceptance and both-checkout landing for this host tranche,
+actual private configuration/OS routing, root custody and personal-client/tunnel
+acceptance remain separate. The host route is not installed or activated.
+The existing normal development broker remains SBX-scoped. Its usual commands do
+not authorize account-visible project listing.
+
+Decision A permits source work and fake-credential/offline tests only. Root permit
+installation, real credential/settings inspection, authenticated identity requests,
+Jira site reads and tunnel binding require the later operator decisions. Approval
+of source work must not be represented as a runtime grant.
 
 The target is the user's personal ChatGPT workspace. A user-supplied existing
 tunnel is recorded in the supervisor's `jas83-evidence/tunnel-binding.json`; its
 workspace/Platform-organization association is unverified. Use that operator
 record to identify it. This document contains no tunnel credential and does not
-authorize tunnel creation, configuration or startup, account changes, broker
-edits, `.env` sourcing, publication, or public hosting.
+authorize tunnel creation, configuration or startup, account changes, `.env`
+sourcing, publication, or public hosting. Broker source edits are limited to the
+separate approved Decision A claim.
 
 ## Acceptance boundaries
 
-The supervisor accepted the preceding shared-scenario extraction with exact
-ordered parity for 126 existing CLI cases and a full run of that CLI workflow
-file. That result applies to the preceding source snapshot only.
+The frozen core implementation passed 882 engine tests in each checkout and
+4,267 Jira tests with 47 skipped in each checkout. The 126 original CLI cases
+retain exact ordered collection parity; the combined CLI/MCP target passed all
+204 cases. Fresh noneditable Python 3.10 and 3.11 installs each passed five selected
+CLI/MCP/stdio checks. These results cover the core implementation, not the new
+host guard. The supervisor's `jas83-evidence/LOCAL-ACCEPTANCE.md` records the exact
+source, artifacts and remaining gates; completed runs are not automatically replayed.
 
-The new `tests/test_workflow_mcp.py` is source-authored and **NOT RUN** at this
-phase boundary. It requires the MCP SDK at collection; absence is a failure,
-not a skip. The tests use public SDK initialization, tools/list and tools/call
+The host-source results cover its five-file isolated candidate and the supplied
+fake-credential, stub-HTTP and owned-process fixtures. Its guard cases include
+slow-child disconnect, expiry, forced adapter exit with an independently owned
+survivor, late spawn, identity cancellation, receipt failure and adapter stderr
+overflow before response or during shutdown. A shaped-frame fixture is not proof
+of the installed SDK serializer. None of these results grants real identity,
+project access, root setup or tunnel activation. The operator must use the final
+source manifest and later acceptance receipts, not infer readiness from counts.
+
+The preceding schema1 host-route suite passed with these historical component receipts:
+
+| Component | Result | Evidence reuse |
+| --- | --- | --- |
+| Broker regression battery | 116 checks passed | Unchanged run3 receipt reused with matching inputs. |
+| Complete host guard selector | 36 tests passed | Fresh run after the selector/test-file change. |
+| Installed Python 3.10 group | 9 named tests passed | Fresh corrected-input run; the earlier 8-pass/1-fail attempt remains preserved. |
+| Installed Python 3.11 group | 9 named tests passed | Fresh run on the same corrected source. |
+
+Every new run completed its canonical wrapper, released its reservation and
+preserved accepted runtime/artifact/source parity. Shell checks, named tests and
+matrix rows are not added into one artificial total. The supervisor's
+`COMPONENT-UNION.json` and `FINAL-OFFLINE-REPORT.md` under
+`jas83-native-implementation/installed-gates` identify the exact inputs and receipts.
+
+The amended schema2 host selection is recorded separately in
+`jas83-native-implementation/manifest-amendment/SOURCE4-OFFLINE-RESULT.json`:
+56 host tests passed with direct/wrapper exit 0, and unchanged broker118/0 is
+explicitly reused from run2. Run1 and run2 overall RED verdicts remain preserved.
+The owned 4,468-file, 74,562,144-byte fixture scanned in 7.409 seconds with four
+validator descriptors at peak; all four scanner interruption cases retained zero
+descriptors. These are fixture measurements, not production timing or live proof.
+
+These groups exercised the actual SDK writer and real configuration,
+HTTPTransport and Requests path, substituting responses only at HTTPAdapter.send.
+A typed 4,194,304-byte result with the maximum admitted ID produced a
+4,194,468-byte frame; one byte over was refused. The listed-tool model serialized
+by the SDK writer with the maximum ID occupied 131,616 bytes. That is a fixture
+writer measurement, not a personal client's live frame.
+
+The zero-retry matrix observed one send-seam attempt for every declared response
+or exception row. The positive retry control produced three; native/CLI pairs
+produced two, while discovery produced zero. Synthetic missing/malformed local
+configuration and OS-proxy controls exposed fallback retries and routing changes.
+These counterexamples prevent a fixture from always claiming zero retries or a
+direct route. Reuse an unchanged component's matching receipt; changed inputs
+need fresh checks.
+
+Counts at a stubbed send boundary are attempted dispatch counts, not observed
+physical transmissions, socket retries or host routing. Actual private settings,
+OS proxies, root custody, authenticated identity and personal-client/tunnel
+behavior still need their separately authorized operator evidence. This selection
+is specific to the host-route change; it does not claim a repository-wide replay
+of unrelated historical fixtures or another product-suite run.
+
+`tests/test_workflow_mcp.py` requires the MCP SDK at collection; absence is a
+failure, not a skip. It uses public SDK initialization, tools/list and tools/call
 over an in-memory connection and an SDK stdio connection. A test-owned fixed
 launcher executes the current installed console script with `runpy`, controlling
 only local configuration sources and HTTP transport construction. Real product
@@ -55,11 +127,13 @@ refusal against real installed metadata; it never forges a passing catalog.
 The supervisor owns this sequence after the source review and required test
 Clearance. Do not run these steps from the dispatched source-only worker.
 
-1. Run the complete engine and Jira suites, required static checks and builds
-   under the canonical validation reservation. Keep the original CLI suite and
-   its parameterizations; do not narrow collection to obtain a green result.
-   Verify the mandatory MCP tests on Python 3.10 and 3.11. Full suites must pass
-   before committing; landing and any publication remain separately authorized.
+1. Verify the source/full-suite/static/build receipts for the selected core
+   artifacts. Reuse completed evidence when its inputs match; changed inputs need
+   the required fresh checks. The new host extension needs its own broker
+   regressions and offline refusal/lifecycle tests under the canonical reservation.
+   Preserve suite selections and parameterizations. Verify the mandatory MCP
+   checks on Python 3.10 and 3.11. Required full suites precede any later commit;
+   Decision A does not authorize committing or publication.
 2. Build and freeze the exact candidate engine and Jira wheels. In a separate
    noneditable environment, install those local artifacts and the engine's
    optional `mcp` extra: `mcp==2.2.0` and `jsonschema>=4.18`. The ordinary engine
@@ -99,7 +173,8 @@ a canonical absolute path as a regular nonsymlink file owned by the launching
 account, mode 0600. The profile is read once; each validated instance snapshots
 the admitted environment. Later ambient changes do not silently change that
 instance's identity or scope. A new approved context requires a new profile/server
-lifetime with normal ownership cleanup first.
+lifetime with normal ownership cleanup first. A new native lifetime also requires
+a fresh authorized permit; recreating a profile never resets a spent budget.
 
 | Profile field | Required operator evidence |
 | --- | --- |
@@ -143,17 +218,19 @@ bare credential aliases, arbitrary JIRA settings and Python path overrides are
 not passed to the product child. No `.env` or Keychain lookup is performed by
 the adapter; product fallback behavior still needs host acceptance.
 
-Once every gate is satisfied, the operator's fixed adapter command is:
+The following is the guard-owned internal adapter invocation, never a standalone
+native-pilot entry point. Operators use the permit-gated `check`/`serve` route and
+credential-free `attach` relay described below; the guard starts and owns this
+process only after its admission gates succeed:
 
 ```text
 <adapter-venv>/bin/python -I -m as_engine.workflow_mcp --profile <absolute-private-profile.json>
 ```
 
-The profile path is an operator launch argument. No tool accepts an environment,
+The guard binds this profile path from the approved permit. No tool accepts an environment,
 command, executable, file, credential, site, account, permission or transport.
 Before activation, an unavailable approved context remains a blocker; do not
-replace it with the test fixture's values or change a broker to make admission
-appear successful.
+replace it with the test fixture's values or bypass the permit gate.
 
 ## Four tools and interpretation
 
@@ -242,6 +319,209 @@ Client cancellation may suppress its response; orderly server shutdown and a
 quiet task are not hard-death containment proof. The actual fixed HTTP CLI and
 tunnel child/descendant behavior must be assessed before native use.
 
+## Permit-gated host route: approved for implementation
+
+The reviewed v2 design assigns credential acquisition to the existing development
+broker and session control to `jira-native-pilot-host`. The adapter remains a
+receiver of approved context. Normal broker modes and `PUBLIC_ENV` keep their
+existing behavior. The session guard must not copy the credential reader, accept
+arbitrary commands, or grant authority from an editable workspace profile.
+
+The following command names match the draft host interface. They are not
+commands to run before host-source acceptance and operator setup:
+
+```text
+<frozen-broker>/jira-dev-host --native-read-pilot check --permit <permit-id>
+<frozen-broker>/jira-dev-host --native-read-pilot serve --permit <permit-id>
+<frozen-guard>/jira-native-pilot-host attach --permit <permit-id>
+```
+
+`check` validates nonsecret permit/profile/install/configuration evidence and
+reports `checked; execution not consumed` without retrieving credentials, consuming the session, contacting
+Jira or starting a tunnel. `serve` claims the permit's single session before the
+broker retrieves its one credential snapshot. Any failed or ambiguous start spends
+the session; it is not restartable. The credential-free `attach` relay admits one
+private local attachment to the ready guard. Its socket is private to the permitted
+UID, and it forwards bounded MCP traffic only. Final syntax and behavior must match
+the implemented, reviewed host bundle before this route is accepted.
+
+The future permit is root-owned and read-only under
+`/private/etc/grand-camel/native-jira-pilot/<permit-id>.json`, with verified ancestors.
+Runtime uses the ordinary approved UID. A document or profile saying `approved`
+is not authority. The permit binds the fixed bundle, wheels/dependencies, interpreter,
+console script, profile/configuration, account/site, time window, budgets and
+independent identity evidence. No credential or credential-derived fingerprint
+belongs in it. Installing this permit is outside Decision A.
+
+### Draft permit and proof contract
+
+**The format correction passed source review and named offline validation.** The recorded
+Python 3.11 inventory contains 4,468 regular files; its digests alone exceed the
+old 64KiB inline permit. The amended contract keeps the permit at 64KiB and binds
+a separate bounded runtime manifest. It preserves full file/directory custody,
+coverage and drift checks. Final source4 and its fresh host56/0 receipt establish
+the named offline result; full-repository and both-checkout acceptance remain open.
+
+The amended schema below is the implementation contract, not an activated route.
+Missing or extra fields refuse admission. Permit/proof schema1 drafts will be
+rejected before credentials or process launch, without automatic migration.
+Adapter profiles remain schema1. Decision A does not authorize installing a permit.
+
+| Permit fields | Binding |
+| --- | --- |
+| `schema`, `id`, `uid` | Permit schema 2, fixed permit ID and the permitted nonroot launching UID. |
+| `not_before`, `expires` | Integer wall-clock bounds, with a window no longer than 900 seconds. |
+| `decisions` | Explicit nonempty references for `source`, `identity` and `activation`. |
+| `site`, `email`, `expected_account_id` | Canonical HTTPS site, configured account and independently expected authenticated account ID. |
+| `scope` | Exactly named/default SBX plus explicitly authorized site-read permission. |
+| `budgets` | Exactly `native: 1`, `control: 1`, `identity: 1`, `search_http: 2`. |
+| `bundle` | Fixed `broker`, `guard`, `python`, `cli` paths plus root-custodied `manifest` and `manifest_sha256`. |
+| `profile`, `profile_sha256` | The exact private approved-env-v1 adapter profile. |
+| `proof`, `proof_sha256` | The sealed nonsecret configuration/transport/protocol evidence manifest. |
+| `runtime`, `evidence` | Fixed private mode-0700 directories for spent claims and sanitized receipts. |
+| `tunnel_reference` | The approved existing association reference; it is not authentication evidence by itself. |
+
+For this host route, the profile must include its `limits` object and use the
+fixed native defaults: execution 180 seconds, discovery 10 seconds, 1MiB per CLI
+stream, and cleanup graces 2/2/1 seconds. The adapter's general configurable ranges
+above do not permit overriding these values in this sealed pilot.
+
+Runtime manifest schema1 has `schema`, `trees`, `platform_files`, `files` and
+`total_bytes`. It contains the inventory once: 1–8 disjoint code roots, up to 32
+standalone platform files, 4–10,000 regular files and at most 1GiB total payload.
+Each file is at most 128MiB; traversal admits at most 10,000 directories, including
+empty ones. Paths are canonical absolute UTF-8, at most 512 bytes, with components
+at most 255 bytes; aliases, links, control characters and normalized-away spelling
+are refused. The manifest is canonical sorted compact UTF-8 JSON plus LF, capped
+at 6MiB by an explicit encoding bound. An out-of-bounds real closure needs a reviewed
+amendment, not automatic cap growth or omitted dependencies.
+
+The guard must enumerate every named code tree, validate directory/file custody,
+stream every file hash and check actual sizes and exact membership. It rechecks
+membership and bindings for drift. Manifest, proof, permit and private mutable
+state stay outside code trees to avoid self-reference. Hashing the manifest alone
+is not file verification. Enumeration proves the chosen trees, not that the
+operator selected every import, base-runtime or OS provider.
+
+Proof schema2 has `schema`, `runtime_manifest_sha256`, `profile_sha256`,
+`config_files`, `absent_paths`, `checks`, `schemas`, `message_budget` and `closure`.
+It binds the same manifest digest without copying the inventory. `closure` has
+`basis`, `platform_basis`, exact `trees`/`platform_files`, and
+`entrypoint_interpreters` for `broker`, `guard`, `adapter` and `cli`. All declared
+interpreters and entrypoints must be inventory members. Broker/guard use their
+fixed system interpreter; adapter/CLI use the pinned bundle interpreter, and the
+CLI's direct shebang must match it. Operator evidence must establish the actual
+complete production/base/platform closure; a reference string alone is not proof.
+
+Configuration hashes and absence facts remain checked. The message budget stays
+4–64, and native/control schemas remain bound without creating another catalog.
+Non-client check references cover retry, TLS, redirect, routing, hidden-HTTP,
+configuration, identity, framing, shutdown and descendant evidence.
+`checks.prior_client_capability` is a closed object with phase
+`prior-client-capability`, `basis`, `basis_version`, `observed_at` and
+`tunnel_reference`. It must describe applicable prior evidence observed no later
+than permit `not_before`, with the same tunnel reference. The current session's
+future attachment or a pending reference cannot satisfy this prerequisite.
+
+The broker imports only the colocated guard with root custody and the guard hash
+pinned in the broker source. The guard separately verifies the permit and bundle.
+There are no public test flags or environment overrides. The draft requires a
+combined B-and-C permit with `identity: 1`; B-only operation and reuse of a prior
+identity receipt are not implemented shortcuts. Without those later approvals,
+source/offline work is the only authorized activity.
+
+The private receipt is `<permit-id>.receipt.json`, schema2, with `permit`,
+`runtime_manifest_sha256`, `category`, `state` and `facts`. It is separate from relay stdout. Spent claims
+remain consumed after failures or restarts; retaining a receipt does not itself
+prove cleanup or native acceptance. Adapter stream-limit failures retain
+`adapter_output_limit` and observed `adapter_stderr_bytes` in receipt facts.
+Resolved cleanup cannot turn an output-limit failure into success; unresolved
+ownership still produces an unresolved receipt. These are counts and categories,
+not retained stderr contents. Its closed `same_session_attachment` fact records
+`local_peer_admitted` and nullable `admitted_at`, initially false/null. Only successful
+peer UID/custody checks and the one-use attachment claim set them. Local peer
+admission is not personal-workspace identity, SDK initialization or native success.
+
+### Read and identity budget
+
+The proposed activation permits one native `list-projects` run and one matching
+CLI comparison, each effective limit 25, offset 0. Named project policy is explicitly
+SBX/default SBX; separately authorized site-read permission allows account-visible
+project metadata outside SBX. No automatic next page, extra workflow or write is
+included. Invalid native run arguments consume the single run attempt, as do
+cancellation, disconnect, timeout or uncertain outcomes.
+
+The private configuration must prove effective zero retries, no redirects and
+one HTTP send per workflow invocation using the installed configuration/transport
+path. Only then is the project-search ceiling two HTTP requests. The normal
+three-retry default can produce four sends per invocation; a timeout alone cannot
+establish the two-request ceiling. Routing and configuration ambiguity block
+activation rather than silently changing global settings or production transport.
+
+The current draft requires Decision B to permit one host-owned GET
+`/rest/api/3/myself`, with no retry/redirect, to match an
+independently supplied expected account ID. It is not an adapter tool. The draft
+requires Decisions B and C together in one permit, with project reads and attachment
+disabled until the same-session identity result matches. The same in-memory broker
+snapshot then supplies identity, native and CLI phases. A later process must not
+reuse that identity receipt to authorize a newly retrieved credential snapshot.
+
+### Validation timing and cancellation
+
+The amended validator has a 60-second maximum per full pass, additionally bounded
+by remaining permit/session time. It streams in 64KiB steps, checks deadlines
+around I/O and yields cooperatively during active-session validation so protocol
+traffic, cancellation, disconnect and cleanup can continue. It owns and closes
+its descriptors; no unowned worker thread or metadata-only shortcut substitutes
+for validation. A stalled kernel call cannot be claimed to be forcibly preempted.
+
+A native attempt and its request ID are reserved before the first yield. Cancellation
+can match that ID before forwarding; late validation success never restores a spent
+slot or starts a cancelled command. Recheck expiry and the full remaining
+execution/cleanup budget after validation, immediately before dispatch. Validation
+time is additional to the 180-second execution budget. Repeated full passes may
+read the entire declared runtime; actual performance and responsiveness need fresh
+offline fixtures and later operator evidence.
+
+### Connection, output and shutdown bounds
+
+The proposed guard admits incoming frames up to 65,536 bytes including LF. IDs
+are unescaped ASCII strings of 1–128 characters from `[A-Za-z0-9_.:-]`, or strict
+integers in the inclusive range ±9,007,199,254,740,991. The largest serialized ID
+is 130 bytes. With the compact response wrapper's 34 bytes and the adapter's
+4,194,304-byte result budget, the outgoing frame ceiling is 4,194,468 bytes.
+Actual SDK serialization and native-client compatibility must prove this bound;
+the guard forwards validated frames unchanged. Input limits must not be applied
+to the larger tools/list response. Duplicate keys, batches, invalid encoding and
+unsupported envelopes/methods are refused before forwarding.
+
+The execution budget is 180 seconds per native/CLI invocation, within a nonrenewing
+15-minute admission session. Cleanup has separate deadlines. The guard first closes
+admission and uses supported cancellation/EOF so the adapter can reap its Jira
+child. It allows a proposed 15-second cooperative interval for the adapter's
+11-second inner shutdown budget, then may apply a separate outer 2-second terminate,
+2-second kill and 1-second drain sequence to its own adapter handle. Forced adapter
+exit leaves Jira-child ownership unresolved. It does not establish clean shutdown
+or authorize release of the validation reservation. No borrowed PID or group signal
+is part of this route; the exact budgets require offline timing/ownership proof.
+
+After forwarding a successful native result, the guard keeps the MCP attachment
+open during the fixed CLI comparison. Only bounded nonexecution protocol traffic
+continues. Unexpected peer loss aborts the control through its owned handle; a
+planned close is recorded before normal EOF after the control settles. CLI output
+never enters MCP stdout. A successful transport write is not proof that ChatGPT
+rendered the response. Actual client behavior must be verified before activation.
+
+Evidence is private and schema-allowlisted: permitted comparison fields and fixed
+status, byte/count, timing and cleanup facts. Validate and sanitize before retention.
+Do not retain raw wire/stdout/stderr, exception text, credentials, headers or token
+hashes. Unknown output or cleanup remains an explicit failure, not a successful
+comparison. Permit changes are rechecked at admission boundaries; there is no
+continuous revocation watcher. To establish termination, explicitly cancel the
+exact owned session and attachment through retained handles and verify cleanup.
+Do not delete the shared tunnel, alter global Jira credentials, reset spent markers
+or disturb other work. Ambiguous cleanup needs a custody-based recovery decision.
+
 ## Native gate and bounded comparison
 
 The supervisor/operator must complete all of these before configuring or starting
@@ -251,8 +531,9 @@ the existing tunnel:
    checks, frozen-wheel discovery, denied-run smoke and both-root landing.
 2. Establish an explicitly approved account-visible `searchProjects` site-read
    scope and an existing authorized way to deliver the exact adapter context.
-   This route is currently missing. If no route exists, obtain a separately
-   scoped decision; no broker edits are included here.
+   Decision A covers implementing the route above, but operator installation and
+   real identity/site-read authority remain separate. Accept the host regressions,
+   refusal/race fixtures and installed zero-retry/routing proof before setup.
 3. Verify authenticated account/site identity, explicit project/default/site
    policy, installed configuration precedence and immutable package/profile
    identity. Confirm the fixed HTTP child does not spawn unmanaged descendants
@@ -269,18 +550,19 @@ the existing tunnel:
    supplied tunnel ID is not a successful connection test.
 
 Only after those proofs and activation approval, bind the existing tunnel to the
-fixed adapter command, keep its client running, inspect all four discovered tool
+fixed credential-free attach command for the ready permitted guard, keep its
+client running, inspect all four discovered tool
 schemas, and use a fresh personal ChatGPT conversation. Ask for the supported
 project-listing task, inspect its description, then approve exactly one
 `workflows_run` call with `{"workflow":"list-projects","inputs":{"limit":25,"offset":0}}`.
-Record actual arguments and the complete result/error.
+Record actual arguments and validated, sanitized result/error evidence.
 
-Compare it in the same account, approved scope and bounded time window with the
-unmodified fixed CLI's `workflows run --limit=25 --offset=0 --format=json -- list-projects`.
+The guard performs the one comparison in the same account, approved scope and
+bounded time window through the unmodified fixed CLI's `workflows run --limit=25 --offset=0 --format=json -- list-projects`.
 Compare provenance, status/reason/exit, identity/order of items, range,
-received/omitted counts, completeness and continuation. Preserve full envelopes
-as private evidence and explain observed provider drift rather than fabricating
-parity. An incomplete first page is a valid bounded result, not permission for an
+received/omitted counts, completeness and continuation. Retain only validated
+comparison fields and sanitized diagnostics as private evidence, and explain
+observed provider drift rather than fabricating parity. An incomplete first page is a valid bounded result, not permission for an
 unbounded traversal. No write, extra workflow, account provisioning or public
 service is part of the comparison.
 
