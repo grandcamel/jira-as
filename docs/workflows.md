@@ -125,7 +125,7 @@ is declared in the current indexed paging tag; no overlay change is implied.
 Execution-semantic changes require supported schema/capability and definition
 revisions. Descriptive additions belong in the contract's `annotations` namespace.
 
-Installed distribution metadata supplies the base product version (`2.0.0rc1`),
+Installed distribution metadata supplies the base product version (`2.0.0`),
 without the CLI's appended Python build identifier. The definition digest is
 separate because that build identifier does not hash JSON resources. No release
 version or published rc1 artifact is changed by this slice.

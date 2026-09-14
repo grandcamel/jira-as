@@ -23,7 +23,7 @@ from as_engine.help import render_help
 from as_engine.transport import Response
 from click.testing import CliRunner
 
-from jira_as import config_manager, engine
+from jira_as import __version__, config_manager, engine
 from jira_as.cli.main import cli
 
 from . import workflow_scenarios as scenarios
@@ -226,7 +226,7 @@ def test_cold_root_help_is_credential_free_in_isolated_process(tmp_path):
 def test_installed_resource_provenance_and_whitespace_digest(monkeypatch, tmp_path):
     raw = resources.files("jira_as").joinpath("workflows.json").read_bytes()
     before, _ = invoke("describe", "list-projects")
-    assert before["product_version"] == metadata.version("jira-as") == "2.0.0rc1"
+    assert before["product_version"] == metadata.version("jira-as") == __version__
     assert before["engine_version"] == metadata.version("as-engine")
     assert before["definition_digest"] == hashlib.sha256(raw).hexdigest()
     assert (
