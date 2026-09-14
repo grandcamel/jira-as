@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-09-14
+
+Final 2.0.0: the 2.0.0rc1 line plus the entries below. The discoverable workflow CLI (JAS-82) follows in 2.1.
+
 ### Fixed
 
 - JAS-77: resolve the socket subprocess test's `jira-as` binary beside the running interpreter or on PATH, skipping with a clear reason when neither location provides it.

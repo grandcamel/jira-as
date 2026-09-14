@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import pytest
 from click.testing import CliRunner
 
+from jira_as import __version__
 from jira_as.cli.commands import serve_cmds
 from jira_as.cli.main import cli
 from jira_as.config_manager import ConfigManager
@@ -181,7 +182,7 @@ def test_version_matches_client():
     )
     assert client.exit_code == server.exit_code == 0
     assert client.stdout == server.stdout
-    assert "2.0.0rc1" in server.stdout
+    assert __version__ in server.stdout
     assert "git " in server.stdout or "build " in server.stdout
 
 
