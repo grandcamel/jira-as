@@ -55,6 +55,7 @@ keyring = [
     "keyring>=24.0.0",
 ]
 dev = [
+    "hatchling",  # tests/test_spec_build.py builds the wheel and sdist in-process; promote-tool criterion 1 installs only the dev extra
     "oas-patch>=0.6.0,<0.7",  # Independent Overlay applier cross-check (tests only)
     "jsonschema>=4.18",  # Enrichment example validation (tests only)
     "mcp==2.2.0",  # Required workflow MCP tests

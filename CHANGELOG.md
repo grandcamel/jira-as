@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The dev extra declares `hatchling`: `tests/test_spec_build.py` builds the wheel and sdist in-process, and the Promotion dry run (promote-tool criterion 1) installs only the product, its dev extra and pytest into a scratch venv, where the three build tests errored on v2.0.0 until hatchling was added by hand.
+
 ## [2.0.0] - 2026-09-14
 
 Final 2.0.0: the 2.0.0rc1 line plus the entries below. The discoverable workflow CLI (JAS-82) follows in 2.1.
