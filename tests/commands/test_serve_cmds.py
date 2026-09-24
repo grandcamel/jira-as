@@ -4,6 +4,7 @@ import json
 from types import SimpleNamespace
 
 import pytest
+from as_engine.errors import SurfaceError
 from click.testing import CliRunner
 
 from jira_as import __version__
@@ -172,6 +173,28 @@ def test_invalid_endpoint_options(startup, tmp_path, args):
     )
     assert result.exit_code == 2
     assert startup[1] == []
+
+
+def test_scope_opt_out_never_reaches_serve(startup, monkeypatch, tmp_path):
+    # The startup config double has no get_scope_enforcement: reading it fails.
+    config, _ = startup
+    config.config["jira"]["scope_enforcement"] = "permissive"
+    monkeypatch.setenv("JIRA_SCOPE_ENFORCEMENT", "permissive")
+    monkeypatch.setenv("JIRA_ALLOWED_PROJECTS", "SBX")
+    surfaces = []
+    monkeypatch.setattr(
+        serve_cmds, "run_server", lambda factory, **_: surfaces.append(factory())
+    )
+    result = CliRunner().invoke(cli, ["serve", "--call-log", str(tmp_path / "calls")])
+    assert result.exit_code == 0, result.output
+    assert result.stderr == "serve: allowlist source=JIRA_ALLOWED_PROJECTS; count=1\n"
+    (surface,) = surfaces
+    assert surface.scope_enforcement == "enforcing"
+    with pytest.raises(SurfaceError) as caught:
+        surface.call(
+            "searchAndReconsileIssuesUsingJql", {"jql": "project = SBX OR project = GC"}
+        )
+    assert caught.value.code == 4
 
 
 def test_version_matches_client():

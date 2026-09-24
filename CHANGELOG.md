@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `JIRA_SCOPE_ENFORCEMENT=permissive` (or `jira.scope_enforcement: "permissive"`) turns off the Generic Surface `x-as-scope` guard for trusted interactive use, so a fully privileged token can run OR-joined or project-less JQL and site operations. The default stays `enforcing`, so a sandbox that sets nothing behaves exactly as before. Permissive mode prints one stderr warning per Generic Surface. Generic Surface paths refuse a configured project allowlist (exit 2 for `api call` and `workflows run`; compatibility verbs retain exit 1) or an as-engine without `scope_enforcement` support. Hand-written `JiraClient` verbs keep their legacy scan, including when permissive mode and an allowlist are both configured. `jira-as serve` never reads the setting and always enforces. Requires the matching as-engine change.
+
+### Changed
+
+- `docs/allowed-projects.md` now describes 2.x scope enforcement as the engine guard, which is on regardless of the allowlist. The legacy verbs' argv pre-check moves to a short final section, dropping its stale per-module call-site table.
+
 ### Fixed
 
 - The dev extra declares `hatchling`: `tests/test_spec_build.py` builds the wheel and sdist in-process, and the Promotion dry run (promote-tool criterion 1) installs only the product, its dev extra and pytest into a scratch venv, where the three build tests errored on v2.0.0 until hatchling was added by hand.

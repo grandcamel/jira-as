@@ -408,6 +408,20 @@ def test_discovery_cannot_grant_site_access_and_each_run_rechecks(
     assert os.environ["JIRA_ALLOW_SITE_OPERATIONS"] == "false"
 
 
+def test_permissive_run_skips_site_scope_and_warns(monkeypatch, transport):
+    monkeypatch.delenv("JIRA_ALLOWED_PROJECTS")
+    monkeypatch.setenv("JIRA_ALLOW_SITE_OPERATIONS", "false")
+    monkeypatch.setenv("JIRA_SCOPE_ENFORCEMENT", "permissive")
+    transport["responses"] = [Response(200, scenarios.ORDINARY.payload())]
+    result = CliRunner().invoke(
+        cli, ["workflows", "run", "list-projects", "--format", "json"]
+    )
+    assert result.exit_code == 0, (result.output, result.exception)
+    assert json.loads(result.stdout)["status"] == "completed-read"
+    assert result.stderr.count("Warning: scope enforcement is permissive") == 1
+    assert len(transport["calls"]) == 1
+
+
 @pytest.mark.parametrize("missing", ["JIRA_SITE_URL", "JIRA_EMAIL", "JIRA_API_TOKEN"])
 def test_missing_credentials_are_blocked_before_http_construction(monkeypatch, missing):
     monkeypatch.delenv(missing)

@@ -51,8 +51,9 @@ validated and guarded path. The binding fixes `orderBy=key` and `action=view`,
 maps offset to `startAt` and limit to `maxResults`, and sends no body. One logical
 read may have multiple wire attempts under the existing transport retry policy.
 
-This operation has site scope. A project allowlist alone does not grant site
-permission, and discovering the task never changes `JIRA_ALLOW_SITE_OPERATIONS`.
+This operation has site scope. In enforcing mode, a project allowlist alone
+does not grant site permission; permissive mode skips the scope check.
+Discovering the task never changes `JIRA_ALLOW_SITE_OPERATIONS`.
 Configuration and scope are checked at execution; credential resolution stays
 inside the existing product factory. Missing credentials are blocked before HTTP
 construction. The adapter preserves local credential-validation errors as exit 2,

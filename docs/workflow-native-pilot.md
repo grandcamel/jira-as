@@ -212,7 +212,9 @@ successful discovery supplies none of these proofs.
 Execution supports direct HTTP only: `JIRA_AS_TRANSPORT` must be absent or
 literal `http`. Selected proxy/CA routing, alternate transports and unsupported
 configuration refuse admission. The child environment starts empty, then adds
-fixed execution directories/locale/PATH and only admitted Jira values for runs.
+fixed execution directories/locale/PATH and only admitted Jira values for runs,
+plus `JIRA_SCOPE_ENFORCEMENT=enforcing` so a settings file cannot switch the
+product guard off.
 Discovery receives no Jira credentials or policy. Platform/tunnel credentials,
 bare credential aliases, arbitrary JIRA settings and Python path overrides are
 not passed to the product child. No `.env` or Keychain lookup is performed by
