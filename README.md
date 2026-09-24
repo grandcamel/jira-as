@@ -283,14 +283,18 @@ routes for search. Platform IDs are unchanged. Other examples include
 
 ### Project scope
 
-The Generic Surface checks generated scope tags against `JIRA_ALLOWED_PROJECTS`
-before sending. An absent allowlist is unrestricted; an empty value denies scoped
-calls. Body-only identity requires matching `--project KEY`, including bodies
-read from files. Keyed updates also check any project change hidden in the body.
-JQL requires a complete project restriction and supports literal AND predicates.
-Site-level calls (including numeric board, sprint and service-desk routes) require
+The Generic Surface checks generated scope tags before sending, whether or not an
+allowlist is configured; `JIRA_ALLOWED_PROJECTS` only narrows it. An absent
+allowlist is unrestricted; an empty value denies scoped calls. Body-only identity
+requires matching `--project KEY`, including bodies read from files. Keyed updates
+also check any project change hidden in the body. JQL requires a complete project
+restriction and supports literal AND predicates. Site-level calls (including
+numeric board, sprint and service-desk routes) require
 `JIRA_ALLOW_SITE_OPERATIONS=true`; the default is false. Discovery and help stay
-settings-free. See [project scope details](docs/allowed-projects.md#generic-surface-project-scope-20).
+settings-free. For trusted interactive use, `JIRA_SCOPE_ENFORCEMENT=permissive`
+skips the guard with a warning on Generic Surface paths. Those paths refuse
+permissive mode with an allowlist. `jira-as serve` always enforces. See
+[project scope details](docs/allowed-projects.md).
 
 ### Wrapper migration
 
@@ -432,7 +436,8 @@ must be valid even when an environment override is set. The effective allowlist
 is `JIRA_ALLOWED_PROJECTS` (including an empty value), otherwise the binding's
 `permitted`, otherwise configured `allowed_projects`, otherwise empty. Startup
 prints the source and count on stderr. `--allow-site`/`--no-allow-site` overrides
-`JIRA_ALLOW_SITE_OPERATIONS` or the configured site policy.
+`JIRA_ALLOW_SITE_OPERATIONS` or the configured site policy. Serve ignores
+`JIRA_SCOPE_ENFORCEMENT` and the `scope_enforcement` setting: it always enforces.
 
 With that same build already present in your client image, mount the socket
 directory and run the client as the socket owner's UID (the socket is 0600):

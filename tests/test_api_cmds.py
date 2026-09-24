@@ -222,6 +222,7 @@ def test_http_factory_uses_existing_tuple_config_and_correct_base_for_each_docum
     config.get_api_config.return_value = {"timeout": 9, "max_retries": 0}
     config.get_allowed_projects.return_value = ["SBX"]
     config.get_allow_site_operations.return_value = True
+    config.get_scope_enforcement.return_value = "enforcing"
     monkeypatch.setattr(ConfigManager, "get_instance", lambda: config)
     surface = create_surface(transport="http")
     surface.search(["sprint"])

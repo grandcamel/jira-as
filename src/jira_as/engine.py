@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import json
 import os
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -19,6 +20,29 @@ if TYPE_CHECKING:
     from as_engine.simulation import JiraSimulationStore
 
 
+_PERMISSIVE_WARNING = (
+    "Warning: scope enforcement is permissive (JIRA_SCOPE_ENFORCEMENT / "
+    "jira.scope_enforcement); x-as-scope project and site checks are skipped.\n"
+)
+
+
+def _check_permissive(scope: dict[str, Any]) -> None:
+    """Refuse a permissive mode that would be ambiguous or silently ignored."""
+    if scope["scope_enforcement"] != "permissive":
+        return
+    if scope["scope_allowlist"] is not None:
+        raise ValueError(
+            "JIRA_SCOPE_ENFORCEMENT=permissive cannot be combined with a project "
+            "allowlist; unset jira.allowed_projects and JIRA_ALLOWED_PROJECTS"
+        )
+    # An older engine accepts the attribute but would keep enforcing.
+    if not isinstance(getattr(Surface, "scope_enforcement", None), property):
+        raise ValueError(
+            "JIRA_SCOPE_ENFORCEMENT=permissive requires an as-engine release "
+            "with scope_enforcement support"
+        )
+
+
 class _ConfiguredSurface(Surface):
     """Load project policy once, before the first guard or transport send."""
 
@@ -26,9 +50,10 @@ class _ConfiguredSurface(Surface):
         super().__init__(*args, **kwargs)
         self._scope_loaded = False
         self._scope_overrides: set[str] = set()
+        self._permissive_warned = False
 
     def __setattr__(self, name: str, value: Any) -> None:
-        if name in {"scope_allowlist", "scope_allow_site"}:
+        if name in {"scope_allowlist", "scope_allow_site", "scope_enforcement"}:
             overrides = self.__dict__.get("_scope_overrides")
             if overrides is not None:
                 overrides.add(name)
@@ -65,6 +90,15 @@ class _ConfiguredSurface(Surface):
         return value
 
     def call(self, *args: Any, **kwargs: Any) -> Response:
+        if kwargs.get("scope_enforcement") == "permissive":
+            raise SurfaceError(
+                None,
+                [
+                    "scope_enforcement=permissive is not supported per call; "
+                    "set JIRA_SCOPE_ENFORCEMENT or jira.scope_enforcement"
+                ],
+                code=2,
+            )
         if not self._scope_loaded:
             from jira_as.config_manager import ConfigManager
             from jira_as.error_handler import ValidationError
@@ -72,16 +106,44 @@ class _ConfiguredSurface(Surface):
             try:
                 config = ConfigManager.get_instance()
                 allowed = config.get_allowed_projects()
-                scope = {
+                configured = {
                     "scope_allowlist": None if allowed is None else tuple(allowed),
                     "scope_allow_site": config.get_allow_site_operations(),
+                    "scope_enforcement": config.get_scope_enforcement(),
                 }
+                # Explicit attribute assignments win over configuration.
+                scope = {
+                    name: getattr(self, name)
+                    if name in self._scope_overrides
+                    else value
+                    for name, value in configured.items()
+                }
+                _check_permissive(scope)
+                # The engine's setter validates scope_enforcement, so assign
+                # inside the policy-error boundary.
+                for name, value in scope.items():
+                    if name not in self._scope_overrides:
+                        setattr(self, name, value)
             except (ValueError, ValidationError) as exc:
                 raise SurfaceError(None, [str(exc)], code=2) from exc
-            for name, value in scope.items():
-                if name not in self._scope_overrides:
-                    setattr(self, name, value)
             self._scope_loaded = True
+        try:
+            _check_permissive(
+                {
+                    "scope_enforcement": self.scope_enforcement,
+                    "scope_allowlist": self.scope_allowlist,
+                }
+            )
+        except ValueError as exc:
+            raise SurfaceError(None, [str(exc)], code=2) from exc
+        if (
+            self.scope_enforcement == "permissive"
+            and kwargs.get("scope_enforcement") is None
+            and not self._permissive_warned
+        ):
+            # Once per Surface, before the first unguarded send.
+            sys.stderr.write(_PERMISSIVE_WARNING)
+            self._permissive_warned = True
         try:
             if "textarea_fields" not in kwargs:
                 from jira_as.autocomplete_cache import InstanceFieldsCache

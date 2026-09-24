@@ -243,6 +243,29 @@ class ConfigManager(BaseConfigManager):
             raise ValueError("jira.allow_site_operations must be a boolean")
         return value
 
+    def get_scope_enforcement(self) -> str:
+        """Read the Generic Surface scope mode: ``enforcing`` unless opted out.
+
+        ``permissive`` skips the ``x-as-scope`` guard for trusted interactive
+        use. ``jira-as serve`` never reads this setting.
+        """
+        override = os.getenv("JIRA_SCOPE_ENFORCEMENT")
+        if override is not None:
+            normalized = override.strip().lower()
+            if normalized not in {"enforcing", "permissive"}:
+                raise ValueError(
+                    "JIRA_SCOPE_ENFORCEMENT must be enforcing or permissive"
+                )
+            return normalized
+        value = self.config.get(self.service_name, {}).get(
+            "scope_enforcement", "enforcing"
+        )
+        if value not in ("enforcing", "permissive"):
+            raise ValueError(
+                'jira.scope_enforcement must be "enforcing" or "permissive"'
+            )
+        return str(value)
+
     def get_agile_fields(self, project_key: str | None = None) -> dict[str, str]:
         """
         Get Agile field IDs.

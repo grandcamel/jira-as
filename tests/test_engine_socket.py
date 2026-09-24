@@ -36,7 +36,9 @@ def socket_config(monkeypatch):
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("JIRA_AS_TRANSPORT", "socket")
     config = SimpleNamespace(
-        get_allowed_projects=lambda: ["SBX"], get_allow_site_operations=lambda: False
+        get_allowed_projects=lambda: ["SBX"],
+        get_allow_site_operations=lambda: False,
+        get_scope_enforcement=lambda: "enforcing",
     )
     # No credential or API-settings method exists: any access fails the test.
     monkeypatch.setattr(ConfigManager, "get_instance", lambda: config)
