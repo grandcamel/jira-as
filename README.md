@@ -378,7 +378,7 @@ The product vendors pristine Base Documents and manifest pins in
 three documents through as-engine into `_generated/catalog.json` and three
 indexes. Editable builds persist the same indexes; sdists contain source
 inputs and the hook, excluding compiled indexes. Nothing is fetched during
-compilation or runtime. The dependency range is `as-engine>=0.1.0a0,<0.2`.
+compilation or runtime. The dependency range is `as-engine>=0.1.2,<0.2`.
 
 To rebuild local indexes after changing an overlay:
 
