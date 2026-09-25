@@ -7,12 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-09-25
+
 ### Added
 
+- JAS-82: discoverable `workflows search`, `describe`, and `run` commands for bounded indexed Jira reads, with a shared CLI and MCP workflow contract and a guarded native Jira pilot guide.
 - `JIRA_SCOPE_ENFORCEMENT=permissive` (or `jira.scope_enforcement: "permissive"`) turns off the Generic Surface `x-as-scope` guard for trusted interactive use, so a fully privileged token can run OR-joined or project-less JQL and site operations. The default stays `enforcing`, so a sandbox that sets nothing behaves exactly as before. Permissive mode prints one stderr warning per Generic Surface. Generic Surface paths refuse a configured project allowlist (exit 2 for `api call` and `workflows run`; compatibility verbs retain exit 1) or an as-engine without `scope_enforcement` support. Hand-written `JiraClient` verbs keep their legacy scan, including when permissive mode and an allowlist are both configured. `jira-as serve` never reads the setting and always enforces. Requires the matching as-engine change.
 
 ### Changed
 
+- The build and runtime dependency now requires `as-engine>=0.1.2,<0.2` for scope-enforcement support.
 - `docs/allowed-projects.md` now describes 2.x scope enforcement as the engine guard, which is on regardless of the allowlist. The legacy verbs' argv pre-check moves to a short final section, dropping its stale per-module call-site table.
 
 ### Fixed
