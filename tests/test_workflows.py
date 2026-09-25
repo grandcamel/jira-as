@@ -20,6 +20,7 @@ from textwrap import dedent
 import pytest
 import requests
 from as_engine.help import render_help
+from as_engine.surface import Surface
 from as_engine.transport import Response
 from click.testing import CliRunner
 
@@ -408,6 +409,10 @@ def test_discovery_cannot_grant_site_access_and_each_run_rechecks(
     assert os.environ["JIRA_ALLOW_SITE_OPERATIONS"] == "false"
 
 
+@pytest.mark.skipif(
+    not isinstance(getattr(Surface, "scope_enforcement", None), property),
+    reason="as-engine main does not yet include scope_enforcement",
+)
 def test_permissive_run_skips_site_scope_and_warns(monkeypatch, transport):
     monkeypatch.delenv("JIRA_ALLOWED_PROJECTS")
     monkeypatch.setenv("JIRA_ALLOW_SITE_OPERATIONS", "false")

@@ -28,6 +28,8 @@ _PERMISSIVE_WARNING = (
 
 def _check_permissive(scope: dict[str, Any]) -> None:
     """Refuse a permissive mode that would be ambiguous or silently ignored."""
+    if scope["scope_enforcement"] not in ("enforcing", "permissive"):
+        raise ValueError("scope_enforcement must be enforcing or permissive")
     if scope["scope_enforcement"] != "permissive":
         return
     if scope["scope_allowlist"] is not None:
@@ -127,17 +129,20 @@ class _ConfiguredSurface(Surface):
             except (ValueError, ValidationError) as exc:
                 raise SurfaceError(None, [str(exc)], code=2) from exc
             self._scope_loaded = True
+        # Older as-engine releases do not initialize this attribute. A test or
+        # consumer may also pre-load policy without going through the setter.
+        mode = getattr(self, "scope_enforcement", "enforcing")
         try:
             _check_permissive(
                 {
-                    "scope_enforcement": self.scope_enforcement,
+                    "scope_enforcement": mode,
                     "scope_allowlist": self.scope_allowlist,
                 }
             )
         except ValueError as exc:
             raise SurfaceError(None, [str(exc)], code=2) from exc
         if (
-            self.scope_enforcement == "permissive"
+            mode == "permissive"
             and kwargs.get("scope_enforcement") is None
             and not self._permissive_warned
         ):

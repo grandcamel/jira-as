@@ -23,6 +23,10 @@ PROVABLE = [
 # ... and refused by it even when no allowlist is configured.
 UNPROVABLE = ["project = TTRP OR project = CSRE", "assignee = currentUser()"]
 WARNING = "Warning: scope enforcement is permissive"
+requires_scope_switch = pytest.mark.skipif(
+    not isinstance(getattr(Surface, "scope_enforcement", None), property),
+    reason="as-engine main does not yet include scope_enforcement",
+)
 
 
 @pytest.fixture
@@ -78,6 +82,7 @@ def test_default_accepts_provable_jql_without_warning(unrestricted):
     assert [call[1] for call in unrestricted] == [{"jql": jql} for jql in PROVABLE]
 
 
+@requires_scope_switch
 def test_permissive_sends_every_query_and_warns_once_per_command(
     unrestricted, monkeypatch
 ):
@@ -91,6 +96,7 @@ def test_permissive_sends_every_query_and_warns_once_per_command(
     ]
 
 
+@requires_scope_switch
 def test_permissive_warning_is_written_once_per_surface(
     unrestricted, monkeypatch, capsys
 ):
@@ -125,6 +131,7 @@ def test_per_call_permissive_is_refused_before_send(unrestricted, capsys):
     assert unrestricted == []
 
 
+@requires_scope_switch
 def test_late_permissive_assignment_checks_policy_and_warns_once(unrestricted, capsys):
     surface = create_surface(transport="responder")
     assert surface.call(SEARCH, {"jql": PROVABLE[0]}).status == 200
@@ -139,6 +146,7 @@ def test_late_permissive_assignment_checks_policy_and_warns_once(unrestricted, c
     assert len(unrestricted) == 3
 
 
+@requires_scope_switch
 @pytest.mark.parametrize(
     "operation,flags",
     [
@@ -215,6 +223,7 @@ def test_unvalidated_policy_source_stays_a_usage_error(unrestricted, monkeypatch
     )
 
 
+@requires_scope_switch
 def test_setting_enables_permissive_and_environment_overrides_it(
     unrestricted, monkeypatch
 ):
@@ -234,9 +243,18 @@ def test_setting_enables_permissive_and_environment_overrides_it(
 def test_older_engine_refuses_permissive_instead_of_silently_enforcing(
     unrestricted, monkeypatch
 ):
-    # An engine without the switch stores the attribute but keeps enforcing.
-    monkeypatch.delattr(Surface, "scope_enforcement")
+    # An engine without the switch must keep the default guard and refuse opt-out.
+    has_scope_switch = isinstance(getattr(Surface, "scope_enforcement", None), property)
+    monkeypatch.delattr(Surface, "scope_enforcement", raising=False)
     assert invoke(SEARCH, "--jql", PROVABLE[0]).exit_code == 0
+    surface = create_surface(transport="responder")
+    # A pre-loaded fixture may bypass configuration on an older engine, which
+    # never created this attribute. The default must still be enforcing.
+    if not has_scope_switch:
+        surface.__dict__.pop("scope_enforcement", None)
+    surface.scope_allowlist = None
+    surface._scope_loaded = True
+    assert surface.call(SEARCH, {"jql": PROVABLE[0]}).status == 200
     monkeypatch.setenv("JIRA_SCOPE_ENFORCEMENT", "permissive")
     result = invoke(SEARCH, "--jql", UNPROVABLE[0])
     assert result.exit_code == 2, result.output
@@ -244,4 +262,4 @@ def test_older_engine_refuses_permissive_instead_of_silently_enforcing(
         "JIRA_SCOPE_ENFORCEMENT=permissive requires an as-engine release "
         "with scope_enforcement support"
     ]
-    assert len(unrestricted) == 1
+    assert len(unrestricted) == 2

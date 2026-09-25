@@ -5,6 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 from as_engine.errors import SurfaceError
+from as_engine.surface import Surface
 from click.testing import CliRunner
 
 from jira_as import __version__
@@ -175,6 +176,10 @@ def test_invalid_endpoint_options(startup, tmp_path, args):
     assert startup[1] == []
 
 
+@pytest.mark.skipif(
+    not isinstance(getattr(Surface, "scope_enforcement", None), property),
+    reason="as-engine main does not yet include scope_enforcement",
+)
 def test_scope_opt_out_never_reaches_serve(startup, monkeypatch, tmp_path):
     # The startup config double has no get_scope_enforcement: reading it fails.
     config, _ = startup
