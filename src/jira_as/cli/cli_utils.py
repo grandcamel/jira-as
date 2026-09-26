@@ -30,7 +30,7 @@ from jira_as import (
     get_jira_client,
     print_error,
 )
-from jira_as.config_manager import ConfigManager
+from jira_as.cli.invocation_profile import allowed_projects_for_cli
 from jira_as.project_guard import check_project_access
 
 if TYPE_CHECKING:
@@ -51,9 +51,7 @@ def get_client_from_context(ctx: click.Context) -> "JiraClient":
     Returns:
         Shared JiraClient instance
     """
-    check_project_access(
-        ctx.params, ConfigManager.get_instance().get_allowed_projects()
-    )
+    check_project_access(ctx.params, allowed_projects_for_cli())
     ctx.ensure_object(dict)
     if ctx.obj.get("_client") is None:
         ctx.obj["_client"] = get_jira_client()

@@ -65,6 +65,12 @@ def usage_error(result, calls, message):
     assert calls == []
 
 
+def profile_usage_error(result, calls, message):
+    assert result.exit_code == 2, (result.output, result.exception)
+    assert message in result.output
+    assert calls == []
+
+
 @pytest.mark.parametrize("jql", UNPROVABLE)
 def test_default_refuses_unproved_jql_with_no_allowlist(unrestricted, jql):
     result = invoke(SEARCH, "--jql", jql)
@@ -80,6 +86,189 @@ def test_default_accepts_provable_jql_without_warning(unrestricted):
         assert result.exit_code == 0, result.output
         assert WARNING not in result.stderr
     assert [call[1] for call in unrestricted] == [{"jql": jql} for jql in PROVABLE]
+
+
+@requires_scope_switch
+def test_interactive_profile_allows_broad_jql_despite_workspace_allowlist(
+    unrestricted,
+):
+    ConfigManager.get_instance().config["jira"]["allowed_projects"] = ["SBX"]
+    result = CliRunner().invoke(
+        cli,
+        [
+            "--profile",
+            "interactive",
+            "api",
+            "call",
+            SEARCH,
+            "--jql",
+            "assignee = currentUser()",
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert result.stderr.count(WARNING) == 1
+    assert [call[1] for call in unrestricted] == [{"jql": "assignee = currentUser()"}]
+
+
+def test_interactive_profile_refuses_serve(unrestricted, monkeypatch, tmp_path):
+    from jira_as.cli.commands import serve_cmds
+
+    monkeypatch.setattr(
+        serve_cmds,
+        "run_server",
+        lambda *_args, **_kwargs: pytest.fail("server started"),
+    )
+    result = CliRunner().invoke(
+        cli,
+        [
+            "--profile",
+            "interactive",
+            "serve",
+            "--call-log",
+            str(tmp_path / "calls.jsonl"),
+        ],
+    )
+    assert result.exit_code == 2, result.output
+    assert "interactive profile is unavailable for serve" in result.output
+
+
+def test_interactive_profile_refuses_socket_transport(unrestricted, monkeypatch):
+    monkeypatch.setenv("JIRA_AS_TRANSPORT", "socket")
+    result = CliRunner().invoke(
+        cli,
+        ["--profile", "interactive", "api", "call", "searchProjects"],
+    )
+    assert result.exit_code == 2, result.output
+    assert "interactive profile requires direct transport" in result.output
+    assert unrestricted == []
+
+
+def test_interactive_profile_reaches_compatibility_issue_get(unrestricted):
+    ConfigManager.get_instance().config["jira"]["allowed_projects"] = ["SBX"]
+    result = CliRunner().invoke(
+        cli,
+        ["--profile", "interactive", "issue", "get", "EX-1", "--output", "json"],
+    )
+    assert result.exit_code == 0, result.output
+    assert "key" in json.loads(result.stdout)
+    assert [(call[0], call[1]["issueIdOrKey"]) for call in unrestricted] == [
+        ("getIssue", "EX-1")
+    ]
+
+
+def test_interactive_profile_cannot_override_enforcing_environment(
+    unrestricted, monkeypatch
+):
+    monkeypatch.setenv("JIRA_SCOPE_ENFORCEMENT", "enforcing")
+    result = CliRunner().invoke(
+        cli,
+        ["--profile", "interactive", "api", "call", "searchProjects"],
+    )
+    profile_usage_error(
+        result,
+        unrestricted,
+        "--profile interactive cannot override JIRA_SCOPE_ENFORCEMENT=enforcing",
+    )
+
+
+def test_interactive_profile_refuses_exported_allowlist(unrestricted, monkeypatch):
+    monkeypatch.setenv("JIRA_ALLOWED_PROJECTS", "SBX")
+    result = CliRunner().invoke(
+        cli,
+        ["--profile", "interactive", "api", "call", "searchProjects"],
+    )
+    profile_usage_error(
+        result,
+        unrestricted,
+        "--profile interactive cannot override JIRA_ALLOWED_PROJECTS; "
+        "unset it outside the sandbox",
+    )
+
+
+def test_interactive_profile_refuses_exported_site_denial(unrestricted, monkeypatch):
+    monkeypatch.setenv("JIRA_ALLOW_SITE_OPERATIONS", "false")
+    result = CliRunner().invoke(
+        cli,
+        ["--profile", "interactive", "api", "call", "searchProjects"],
+    )
+    profile_usage_error(
+        result,
+        unrestricted,
+        "--profile interactive cannot override JIRA_ALLOW_SITE_OPERATIONS=false",
+    )
+
+
+def test_interactive_profile_refuses_exported_policy_on_direct_jsm_command(
+    unrestricted, monkeypatch
+):
+    from jira_as.cli.commands import jsm_cmds
+
+    monkeypatch.setenv("JIRA_ALLOWED_PROJECTS", "SBX")
+    monkeypatch.setattr(
+        jsm_cmds,
+        "get_jira_client",
+        lambda: pytest.fail("JiraClient created before profile policy check"),
+    )
+    result = CliRunner().invoke(
+        cli, ["--profile", "interactive", "jsm", "service-desk", "list"]
+    )
+    assert result.exit_code == 2, result.output
+    assert (
+        "--profile interactive cannot override JIRA_ALLOWED_PROJECTS" in result.output
+    )
+    assert unrestricted == []
+
+
+def test_interactive_profile_does_not_persist_to_next_command(unrestricted):
+    runner = CliRunner()
+    profile = runner.invoke(
+        cli,
+        ["--profile", "interactive", "api", "call", "searchProjects"],
+    )
+    assert profile.exit_code == 0, profile.output
+    default = runner.invoke(cli, ["api", "call", "searchProjects"])
+    assert default.exit_code == 4, default.output
+    assert [call[0] for call in unrestricted] == ["searchProjects"]
+
+
+def test_interactive_profile_runs_site_workflow(unrestricted):
+    ConfigManager.get_instance().config["jira"]["allowed_projects"] = ["SBX"]
+    result = CliRunner().invoke(
+        cli,
+        [
+            "--profile",
+            "interactive",
+            "workflows",
+            "run",
+            "list-projects",
+            "--format",
+            "json",
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.stdout)["status"] == "completed-read"
+    assert result.stderr.count(WARNING) == 1
+    assert [call[0] for call in unrestricted] == ["searchProjects"]
+
+
+def test_interactive_profile_keeps_risk_preview_and_confirmation(unrestricted):
+    ConfigManager.get_instance().config["jira"]["allowed_projects"] = ["SBX"]
+    argv = [
+        "--profile",
+        "interactive",
+        "api",
+        "call",
+        "deleteIssue",
+        "--issueIdOrKey",
+        "EX-1",
+    ]
+    preview = CliRunner().invoke(cli, argv)
+    assert preview.exit_code == 0, preview.output
+    assert json.loads(preview.stdout)["dry_run"] is True
+    assert unrestricted == []
+    confirmed = CliRunner().invoke(cli, [*argv, "--confirm"])
+    assert confirmed.exit_code == 0, confirmed.output
+    assert [call[0] for call in unrestricted] == ["deleteIssue"]
 
 
 @requires_scope_switch

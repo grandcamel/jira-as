@@ -52,6 +52,14 @@ def test_required_gotchas_are_rendered_from_entries(topic, phrases):
         assert phrase in result.stdout
 
 
+def test_scope_help_explains_interactive_profile_boundary():
+    result = invoke("help", "scope")
+    assert result.exit_code == 0, result.output
+    assert "jira-as --profile interactive" in result.stdout
+    assert "serve" in result.stdout
+    assert "JIRA_ALLOWED_PROJECTS" in result.stdout
+
+
 def test_every_seeded_note_has_provenance_and_a_generated_entry_id():
     from tests.test_enrichment_entries import entry_case_ids
 

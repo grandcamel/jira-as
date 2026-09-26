@@ -291,9 +291,13 @@ also check any project change hidden in the body. JQL requires a complete projec
 restriction and supports literal AND predicates. Site-level calls (including
 numeric board, sprint and service-desk routes) require
 `JIRA_ALLOW_SITE_OPERATIONS=true`; the default is false. Discovery and help stay
-settings-free. For trusted interactive use, `JIRA_SCOPE_ENFORCEMENT=permissive`
-skips the guard with a warning on Generic Surface paths. Those paths refuse
-permissive mode with an allowlist. `jira-as serve` always enforces. See
+settings-free. For a trusted human's direct CLI call outside a sandbox, use
+`jira-as --profile interactive api call ...` or
+`jira-as --profile interactive workflows run ...`. The profile lets Jira apply
+the token's permissions while keeping input validation and risk confirmation.
+It ignores workspace scope settings for that invocation but refuses exported
+allowlist or enforcing environment settings. `jira-as serve` and workflow MCP
+always enforce. See
 [project scope details](docs/allowed-projects.md).
 
 ### Wrapper migration

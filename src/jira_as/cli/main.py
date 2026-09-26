@@ -111,16 +111,37 @@ class LazyGroups(HelpGroup):
 )
 @click.option("--verbose", "-v", is_flag=True, help="Enable verbose output")
 @click.option("--quiet", "-q", is_flag=True, help="Suppress non-essential output")
+@click.option(
+    "--profile",
+    type=click.Choice(["interactive"]),
+    default=None,
+    help="Use the trusted direct-CLI policy posture for this invocation.",
+)
 @click.pass_context
-def cli(ctx, output: str, verbose: bool, quiet: bool):
+def cli(ctx, output: str, verbose: bool, quiet: bool, profile: str | None):
     """Jira Assistant Skills CLI.
 
     Use --help on any command for more information.
     """
+    if profile == "interactive" and ctx.invoked_subcommand == "serve":
+        raise click.UsageError("interactive profile is unavailable for serve")
+    if profile == "interactive":
+        from jira_as.cli.invocation_profile import check_interactive_environment
+        from jira_as.error_handler import ValidationError
+
+        try:
+            check_interactive_environment()
+        except ValidationError as exc:
+            raise click.UsageError(str(exc)) from exc
     ctx.ensure_object(dict)
     ctx.obj["OUTPUT"] = output
     ctx.obj["VERBOSE"] = verbose
     ctx.obj["QUIET"] = quiet
+
+    from jira_as.cli.invocation_profile import reset_profile, select_profile
+
+    profile_token = select_profile(profile)
+    ctx.call_on_close(lambda: reset_profile(profile_token))
 
     # Set environment variables for subprocess calls to inherit global options
     env_prefix = "JIRA"  # This will be dynamic for other services

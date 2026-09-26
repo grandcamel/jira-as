@@ -10,8 +10,8 @@ the compatibility verbs that delegate to the Generic Surface, and the
 The guard is on by default and does not depend on an allowlist. With nothing
 configured it still refuses JQL that names no project or joins clauses with OR,
 and refusals then report `allowlist=null`. The project allowlist only narrows
-which projects pass. The one opt-out is [permissive mode](#permissive-mode),
-meant for trusted interactive use.
+which projects pass. A trusted human can select the
+[interactive profile](#interactive-profile) for one direct CLI invocation.
 
 Surviving legacy verbs that still use the hand-written `JiraClient` are outside
 the engine guard. They keep an older argv pre-check, described under
@@ -107,6 +107,10 @@ fixture records explicit site opt-ins separately.
 
 ## Permissive mode
 
+The underlying scope switch remains available for existing direct clients and
+settings. For a human using the CLI, prefer the explicit interactive profile
+below because it scopes the choice to one invocation.
+
 A trusted interactive user whose Atlassian token already carries the needed
 permissions can switch the guard off:
 
@@ -143,6 +147,37 @@ reach the API.
   commands it launches.
 - Do not use it in a sandbox or agent seat. The default exists so that an
   automated run gets a narrow, auditable surface.
+
+## Interactive profile
+
+For a trusted human using the CLI directly outside a sandbox, put the profile
+before the command:
+
+```sh
+jira-as --profile interactive api call searchAndReconsileIssuesUsingJql \
+  --jql 'assignee = currentUser() ORDER BY updated DESC'
+jira-as --profile interactive workflows run list-projects
+jira-as --profile interactive issue get EX-1
+```
+
+The profile applies only to that process. It skips local project, JQL and site
+scope checks, including the older argv scan on surviving legacy commands. It
+also ignores scope settings in the nearest workspace `.claude/settings.json`
+and `.claude/settings.local.json`. Jira still applies the caller's token
+permissions. Input and body validation, risk previews and `--confirm` remain
+in effect. A Generic Surface warns once before its first permissive send.
+
+An exported policy signals an automation boundary. The profile refuses an
+exported `JIRA_ALLOWED_PROJECTS` even when empty, and refuses
+`JIRA_SCOPE_ENFORCEMENT=enforcing` or `JIRA_ALLOW_SITE_OPERATIONS=false`.
+Unset those variables only in a trusted human shell, outside the sandbox.
+Malformed environment values are usage errors. A classic personal API token
+uses the normal `JIRA_SITE_URL` for its Jira Cloud site; the profile does not
+change authentication or grant any Jira permission.
+
+The profile is unavailable for `serve` and socket transport. The workflow MCP
+adapter continues to pin enforcing scope for its commands. The profile is a
+direct CLI choice, not a server or agent setting.
 
 ## Legacy verbs
 

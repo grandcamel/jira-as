@@ -102,17 +102,30 @@ class _ConfiguredSurface(Surface):
                 code=2,
             )
         if not self._scope_loaded:
+            from jira_as.cli.invocation_profile import (
+                active_profile,
+                check_interactive_environment,
+            )
             from jira_as.config_manager import ConfigManager
             from jira_as.error_handler import ValidationError
 
             try:
-                config = ConfigManager.get_instance()
-                allowed = config.get_allowed_projects()
-                configured = {
-                    "scope_allowlist": None if allowed is None else tuple(allowed),
-                    "scope_allow_site": config.get_allow_site_operations(),
-                    "scope_enforcement": config.get_scope_enforcement(),
-                }
+                configured: dict[str, Any]
+                if active_profile() == "interactive":
+                    check_interactive_environment()
+                    configured = {
+                        "scope_allowlist": None,
+                        "scope_allow_site": True,
+                        "scope_enforcement": "permissive",
+                    }
+                else:
+                    config = ConfigManager.get_instance()
+                    allowed = config.get_allowed_projects()
+                    configured = {
+                        "scope_allowlist": None if allowed is None else tuple(allowed),
+                        "scope_allow_site": config.get_allow_site_operations(),
+                        "scope_enforcement": config.get_scope_enforcement(),
+                    }
                 # Explicit attribute assignments win over configuration.
                 scope = {
                     name: getattr(self, name)
@@ -182,7 +195,13 @@ def create_surface(
     store: JiraSimulationStore | None = None,
 ) -> Surface:
     """Keep discovery and responder mode credential-free; configure HTTP at call time."""
+    from jira_as.cli.invocation_profile import active_profile
+
     mode = transport or os.environ.get("JIRA_AS_TRANSPORT", "http")
+    if active_profile() == "interactive" and mode == "socket":
+        raise ValueError(
+            "interactive profile requires direct transport; socket is unavailable"
+        )
     if mode not in ("http", "responder", "cassette", "simulation", "socket"):
         raise ValueError(
             "JIRA_AS_TRANSPORT must be http, responder, cassette, simulation or socket"
