@@ -145,6 +145,23 @@ def help_command(
                     value = topic_document(
                         index, subject, examples=examples, offset=offset
                     )
+                    if subject == "scope":
+                        value["sections"].insert(
+                            0,
+                            {
+                                "text": (
+                                    "Direct CLI calls enforce local project and site scope by default. "
+                                    "For a trusted human outside a sandbox, use "
+                                    "`jira-as --profile interactive COMMAND` to let Jira "
+                                    "apply the token's permissions. This profile ignores workspace "
+                                    "`.claude` scope settings for that invocation; exported "
+                                    "`JIRA_ALLOWED_PROJECTS` and enforcing environment settings "
+                                    "must be removed explicitly. `serve`, socket transport and "
+                                    "workflow MCP remain enforcing. Input validation and risk "
+                                    "preview/`--confirm` still apply."
+                                )
+                            },
+                        )
             elif examples:
                 value = group_examples_document(index, subject, offset=offset)
             else:

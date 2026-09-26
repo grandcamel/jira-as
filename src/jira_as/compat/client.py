@@ -15,7 +15,7 @@ from as_engine.errors import SurfaceError, messages_from
 from as_engine.surface import Surface
 
 from jira_as import engine
-from jira_as.config_manager import ConfigManager
+from jira_as.cli.invocation_profile import allowed_projects_for_cli
 from jira_as.error_handler import JiraError, ValidationError
 from jira_as.project_guard import check_project_access
 
@@ -28,9 +28,7 @@ def get_client(ctx: click.Context) -> Any:
         if key
         in {"issue_key", "project", "source_issue", "target_issue", "target", "jql"}
     }
-    check_project_access(
-        identities, ConfigManager.get_instance().get_allowed_projects()
-    )
+    check_project_access(identities, allowed_projects_for_cli())
     ctx.ensure_object(dict)
     client = ctx.obj.get("_compat_client")
     if client is None:
@@ -334,7 +332,7 @@ class GenericClient:
         # Recheck policy on the actual selected keys, not only on the argv.
         check_project_access(
             {"source_issue": source, "target_issue": target},
-            ConfigManager.get_instance().get_allowed_projects(),
+            allowed_projects_for_cli(),
         )
         self.call("deleteIssueLink", {"linkId": link_id}, scope_allow_site=True)
         del self._link_proofs[link_id]
